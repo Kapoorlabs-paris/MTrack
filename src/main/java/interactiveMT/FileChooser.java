@@ -326,9 +326,9 @@ public class FileChooser extends JPanel {
 			frametosec = Float.parseFloat(inputFieldT.getText());
 
 			if (kymoimg!=null)
-			new InteractiveMT(originalimg, originalPreprocessedimg, kymoimg, psf, calibration, 2, frametosec).run(null);
+			new Interactive_MT(originalimg, originalPreprocessedimg, kymoimg, psf, calibration, 2, frametosec).run(null);
 			else
-			new InteractiveMT(originalimg, originalPreprocessedimg, psf, calibration, 2, frametosec).run(null);	
+			new Interactive_MT(originalimg, originalPreprocessedimg, psf, calibration, 2, frametosec).run(null);	
 			close(parent);
 		}
 	}

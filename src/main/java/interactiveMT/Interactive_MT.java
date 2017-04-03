@@ -71,7 +71,6 @@ import javax.swing.text.PlainDocument;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
 
-import com.sun.tools.javac.util.Pair;
 
 import LineModels.UseLineModel.UserChoiceModel;
 import ch.qos.logback.core.rolling.helper.RollingCalendar;
@@ -147,6 +146,8 @@ import net.imglib2.type.numeric.integer.IntType;
 import net.imglib2.type.numeric.integer.UnsignedByteType;
 import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.util.Intervals;
+import net.imglib2.util.Pair;
+import net.imglib2.util.ValuePair;
 import net.imglib2.view.Views;
 import peakFitter.SortListbyproperty;
 import preProcessing.GetLocalmaxmin;
@@ -231,7 +232,7 @@ public class Interactive_MT implements PlugIn {
 	float rhoPerPixelInit = new Float(0.5);
 	float thetaPerPixelInit = new Float(0.5);
 
-	final float frametosec;
+	float frametosec;
 	public int minDiversityInit = 1;
 	public int radius = 1;
 	public long Size = 1;
@@ -331,9 +332,9 @@ public class Interactive_MT implements PlugIn {
 	ImagePlus imp;
 	ImagePlus impcopy;
 	ImagePlus preprocessedimp;
-	final double[] psf;
+	double[] psf;
 	int count, startdim;
-	final int minlength;
+	int minlength;
 	int Maxlabel;
 	private int ndims;
 	ArrayList<int[]> ClickedPoints = new ArrayList<int[]>();
@@ -549,6 +550,8 @@ public class Interactive_MT implements PlugIn {
 		return addToName;
 	}
 
+	public Interactive_MT(){};
+	
 	public Interactive_MT(final RandomAccessibleInterval<FloatType> originalimg,
 			final RandomAccessibleInterval<FloatType> originalPreprocessedimg, final double[] psf,
 			final double[] imgCal, final int minlength, final float frametosec) {
@@ -935,7 +938,6 @@ public class Interactive_MT implements PlugIn {
 	JPanel panelSeventh = new JPanel();
 	JPanel panelEighth = new JPanel();
 	JPanel panelNinth = new JPanel();
-	JPanel panelTenth = new JPanel();
 
 	public void Card() {
 
@@ -952,7 +954,6 @@ public class Interactive_MT implements PlugIn {
 		panelCont.add(panelSeventh, "7");
 		panelCont.add(panelEighth, "8");
 		panelCont.add(panelNinth, "9");
-		panelCont.add(panelTenth, "10");
 
 		// First Panel
 		panelFirst.setName("Preprocess and Determine Seeds");
@@ -1261,6 +1262,28 @@ public class Interactive_MT implements PlugIn {
 		panelEighth.repaint();
 		}
 
+		
+		
+
+		panelNinth.setLayout(layout);
+		final Label Done = new Label("Hope that everything was to your satisfaction!");
+		final Button Exit= new Button("Close and exit");
+		
+		
+		Done.setBackground(new Color(1, 0, 1));
+		Done.setForeground(new Color(255, 255, 255));
+		++c.gridy;
+		c.insets = new Insets(10, 10, 0, 50);
+		panelNinth.add(Done, c);
+		
+		++c.gridy;
+		c.insets = new Insets(10, 10, 0, 50);
+		panelNinth.add(Exit, c);
+		
+		
+
+		Exit.addActionListener(new FinishedButtonListener(Cardframe, true));
+		
 		Cardframe.add(panelCont, BorderLayout.CENTER);
 		Cardframe.add(control, BorderLayout.SOUTH);
 		Cardframe.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -2201,10 +2224,31 @@ public class Interactive_MT implements PlugIn {
 
 	}
 
-	protected class FindLinesListener implements ActionListener {
+	
+	public void goSeeds() {
+
+		jpb.setIndeterminate(false);
+
+		jpb.setMaximum(max);
+		panel.add(label);
+		panel.add(jpb);
+		frame.add(panel);
+		frame.pack();
+		frame.setSize(200, 100);
+		frame.setLocationRelativeTo(panelCont);
+		frame.setVisible(true);
+
+		ProgressSeeds trackMT = new ProgressSeeds();
+		trackMT.execute();
+
+	}
+	
+	
+	class ProgressSeeds extends SwingWorker<Void, Void> {
 
 		@Override
-		public void actionPerformed(final ActionEvent arg0) {
+		protected Void doInBackground() throws Exception {
+			
 
 			// add listener to the imageplus slice slider
 			IJ.log("Starting Chosen Line finder from the seed image (first frame should be seeds)");
@@ -2221,46 +2265,46 @@ public class Interactive_MT implements PlugIn {
 							newtree, minlength, thirdDimension);
 
 					PrevFrameparam = FindlinesVia.LinefindingMethod(groundframe, groundframepre, minlength,
-							thirdDimension, psf, newlineMser, UserChoiceModel.Line, Domask, Intensityratio, Inispacing);
+							thirdDimension, psf, newlineMser, UserChoiceModel.Line, Domask, Intensityratio, Inispacing, jpb);
 
 					ArrayList<KalmanIndexedlength> start = new ArrayList<KalmanIndexedlength>();
 					ArrayList<KalmanIndexedlength> end = new ArrayList<KalmanIndexedlength>();
 
-					for (int index = 0; index < PrevFrameparam.fst.size(); ++index) {
+					for (int index = 0; index < PrevFrameparam.getA().size(); ++index) {
 
-						double dx = PrevFrameparam.fst.get(index).ds / Math
-								.sqrt(1 + PrevFrameparam.fst.get(index).slope * PrevFrameparam.fst.get(index).slope);
-						double dy = PrevFrameparam.fst.get(index).slope * dx;
+						double dx = PrevFrameparam.getA().get(index).ds / Math
+								.sqrt(1 + PrevFrameparam.getA().get(index).slope * PrevFrameparam.getA().get(index).slope);
+						double dy = PrevFrameparam.getA().get(index).slope * dx;
 
 						KalmanIndexedlength startPart = new KalmanIndexedlength(
-								PrevFrameparam.fst.get(index).currentLabel, PrevFrameparam.fst.get(index).seedLabel,
-								PrevFrameparam.fst.get(index).framenumber, PrevFrameparam.fst.get(index).ds,
-								PrevFrameparam.fst.get(index).lineintensity, PrevFrameparam.fst.get(index).background,
-								PrevFrameparam.fst.get(index).currentpos, PrevFrameparam.fst.get(index).fixedpos,
-								PrevFrameparam.fst.get(index).slope, PrevFrameparam.fst.get(index).intercept,
-								PrevFrameparam.fst.get(index).slope, PrevFrameparam.fst.get(index).intercept, 0, 0,
+								PrevFrameparam.getA().get(index).currentLabel, PrevFrameparam.getA().get(index).seedLabel,
+								PrevFrameparam.getA().get(index).framenumber, PrevFrameparam.getA().get(index).ds,
+								PrevFrameparam.getA().get(index).lineintensity, PrevFrameparam.getA().get(index).background,
+								PrevFrameparam.getA().get(index).currentpos, PrevFrameparam.getA().get(index).fixedpos,
+								PrevFrameparam.getA().get(index).slope, PrevFrameparam.getA().get(index).intercept,
+								PrevFrameparam.getA().get(index).slope, PrevFrameparam.getA().get(index).intercept, 0, 0,
 								new double[] { dx, dy });
 
 						start.add(startPart);
 					}
-					for (int index = 0; index < PrevFrameparam.snd.size(); ++index) {
+					for (int index = 0; index < PrevFrameparam.getB().size(); ++index) {
 
-						double dx = PrevFrameparam.snd.get(index).ds / Math
-								.sqrt(1 + PrevFrameparam.snd.get(index).slope * PrevFrameparam.snd.get(index).slope);
-						double dy = PrevFrameparam.snd.get(index).slope * dx;
+						double dx = PrevFrameparam.getB().get(index).ds / Math
+								.sqrt(1 + PrevFrameparam.getB().get(index).slope * PrevFrameparam.getB().get(index).slope);
+						double dy = PrevFrameparam.getB().get(index).slope * dx;
 
 						KalmanIndexedlength endPart = new KalmanIndexedlength(
-								PrevFrameparam.snd.get(index).currentLabel, PrevFrameparam.snd.get(index).seedLabel,
-								PrevFrameparam.snd.get(index).framenumber, PrevFrameparam.snd.get(index).ds,
-								PrevFrameparam.snd.get(index).lineintensity, PrevFrameparam.snd.get(index).background,
-								PrevFrameparam.snd.get(index).currentpos, PrevFrameparam.snd.get(index).fixedpos,
-								PrevFrameparam.snd.get(index).slope, PrevFrameparam.snd.get(index).intercept,
-								PrevFrameparam.snd.get(index).slope, PrevFrameparam.snd.get(index).intercept, 0, 0,
+								PrevFrameparam.getB().get(index).currentLabel, PrevFrameparam.getB().get(index).seedLabel,
+								PrevFrameparam.getB().get(index).framenumber, PrevFrameparam.getB().get(index).ds,
+								PrevFrameparam.getB().get(index).lineintensity, PrevFrameparam.getB().get(index).background,
+								PrevFrameparam.getB().get(index).currentpos, PrevFrameparam.getB().get(index).fixedpos,
+								PrevFrameparam.getB().get(index).slope, PrevFrameparam.getB().get(index).intercept,
+								PrevFrameparam.getB().get(index).slope, PrevFrameparam.getB().get(index).intercept, 0, 0,
 								new double[] { dx, dy });
 						end.add(endPart);
 					}
 
-					PrevFrameparamKalman = new Pair<ArrayList<KalmanIndexedlength>, ArrayList<KalmanIndexedlength>>(
+					PrevFrameparamKalman = new ValuePair<ArrayList<KalmanIndexedlength>, ArrayList<KalmanIndexedlength>>(
 							start, end);
 
 				}
@@ -2277,46 +2321,46 @@ public class Interactive_MT implements PlugIn {
 
 					PrevFrameparam = FindlinesVia.LinefindingMethod(groundframe, groundframepre, minlength,
 							thirdDimension, psf, newlineHough, UserChoiceModel.Line, Domask, Intensityratio,
-							Inispacing);
+							Inispacing, jpb);
 
 					ArrayList<KalmanIndexedlength> start = new ArrayList<KalmanIndexedlength>();
 					ArrayList<KalmanIndexedlength> end = new ArrayList<KalmanIndexedlength>();
 
-					for (int index = 0; index < PrevFrameparam.fst.size(); ++index) {
+					for (int index = 0; index < PrevFrameparam.getA().size(); ++index) {
 
-						double dx = PrevFrameparam.fst.get(index).ds / Math
-								.sqrt(1 + PrevFrameparam.fst.get(index).slope * PrevFrameparam.fst.get(index).slope);
-						double dy = PrevFrameparam.fst.get(index).slope * dx;
+						double dx = PrevFrameparam.getA().get(index).ds / Math
+								.sqrt(1 + PrevFrameparam.getA().get(index).slope * PrevFrameparam.getA().get(index).slope);
+						double dy = PrevFrameparam.getA().get(index).slope * dx;
 
 						KalmanIndexedlength startPart = new KalmanIndexedlength(
-								PrevFrameparam.fst.get(index).currentLabel, PrevFrameparam.fst.get(index).seedLabel,
-								PrevFrameparam.fst.get(index).framenumber, PrevFrameparam.fst.get(index).ds,
-								PrevFrameparam.fst.get(index).lineintensity, PrevFrameparam.fst.get(index).background,
-								PrevFrameparam.fst.get(index).currentpos, PrevFrameparam.fst.get(index).fixedpos,
-								PrevFrameparam.fst.get(index).slope, PrevFrameparam.fst.get(index).intercept,
-								PrevFrameparam.fst.get(index).slope, PrevFrameparam.fst.get(index).intercept, 0, 0,
+								PrevFrameparam.getA().get(index).currentLabel, PrevFrameparam.getA().get(index).seedLabel,
+								PrevFrameparam.getA().get(index).framenumber, PrevFrameparam.getA().get(index).ds,
+								PrevFrameparam.getA().get(index).lineintensity, PrevFrameparam.getA().get(index).background,
+								PrevFrameparam.getA().get(index).currentpos, PrevFrameparam.getA().get(index).fixedpos,
+								PrevFrameparam.getA().get(index).slope, PrevFrameparam.getA().get(index).intercept,
+								PrevFrameparam.getA().get(index).slope, PrevFrameparam.getA().get(index).intercept, 0, 0,
 								new double[] { dx, dy });
 
 						start.add(startPart);
 					}
-					for (int index = 0; index < PrevFrameparam.snd.size(); ++index) {
+					for (int index = 0; index < PrevFrameparam.getB().size(); ++index) {
 
-						double dx = PrevFrameparam.snd.get(index).ds / Math
-								.sqrt(1 + PrevFrameparam.snd.get(index).slope * PrevFrameparam.snd.get(index).slope);
-						double dy = PrevFrameparam.snd.get(index).slope * dx;
+						double dx = PrevFrameparam.getB().get(index).ds / Math
+								.sqrt(1 + PrevFrameparam.getB().get(index).slope * PrevFrameparam.getB().get(index).slope);
+						double dy = PrevFrameparam.getB().get(index).slope * dx;
 
 						KalmanIndexedlength endPart = new KalmanIndexedlength(
-								PrevFrameparam.snd.get(index).currentLabel, PrevFrameparam.snd.get(index).seedLabel,
-								PrevFrameparam.snd.get(index).framenumber, PrevFrameparam.snd.get(index).ds,
-								PrevFrameparam.snd.get(index).lineintensity, PrevFrameparam.snd.get(index).background,
-								PrevFrameparam.snd.get(index).currentpos, PrevFrameparam.snd.get(index).fixedpos,
-								PrevFrameparam.snd.get(index).slope, PrevFrameparam.snd.get(index).intercept,
-								PrevFrameparam.snd.get(index).slope, PrevFrameparam.snd.get(index).intercept, 0, 0,
+								PrevFrameparam.getB().get(index).currentLabel, PrevFrameparam.getB().get(index).seedLabel,
+								PrevFrameparam.getB().get(index).framenumber, PrevFrameparam.getB().get(index).ds,
+								PrevFrameparam.getB().get(index).lineintensity, PrevFrameparam.getB().get(index).background,
+								PrevFrameparam.getB().get(index).currentpos, PrevFrameparam.getB().get(index).fixedpos,
+								PrevFrameparam.getB().get(index).slope, PrevFrameparam.getB().get(index).intercept,
+								PrevFrameparam.getB().get(index).slope, PrevFrameparam.getB().get(index).intercept, 0, 0,
 								new double[] { dx, dy });
 						end.add(endPart);
 					}
 
-					PrevFrameparamKalman = new Pair<ArrayList<KalmanIndexedlength>, ArrayList<KalmanIndexedlength>>(
+					PrevFrameparamKalman = new ValuePair<ArrayList<KalmanIndexedlength>, ArrayList<KalmanIndexedlength>>(
 							start, end);
 
 				}
@@ -2331,51 +2375,85 @@ public class Interactive_MT implements PlugIn {
 
 					PrevFrameparam = FindlinesVia.LinefindingMethod(groundframe, groundframepre, minlength,
 							thirdDimension, psf, newlineMserwHough, UserChoiceModel.Line, Domask, Intensityratio,
-							Inispacing);
+							Inispacing, jpb);
 
 					ArrayList<KalmanIndexedlength> start = new ArrayList<KalmanIndexedlength>();
 					ArrayList<KalmanIndexedlength> end = new ArrayList<KalmanIndexedlength>();
 
-					for (int index = 0; index < PrevFrameparam.fst.size(); ++index) {
+					for (int index = 0; index < PrevFrameparam.getA().size(); ++index) {
 
-						double dx = PrevFrameparam.fst.get(index).ds / Math
-								.sqrt(1 + PrevFrameparam.fst.get(index).slope * PrevFrameparam.fst.get(index).slope);
-						double dy = PrevFrameparam.fst.get(index).slope * dx;
+						double dx = PrevFrameparam.getA().get(index).ds / Math
+								.sqrt(1 + PrevFrameparam.getA().get(index).slope * PrevFrameparam.getA().get(index).slope);
+						double dy = PrevFrameparam.getA().get(index).slope * dx;
 
 						KalmanIndexedlength startPart = new KalmanIndexedlength(
-								PrevFrameparam.fst.get(index).currentLabel, PrevFrameparam.fst.get(index).seedLabel,
-								PrevFrameparam.fst.get(index).framenumber, PrevFrameparam.fst.get(index).ds,
-								PrevFrameparam.fst.get(index).lineintensity, PrevFrameparam.fst.get(index).background,
-								PrevFrameparam.fst.get(index).currentpos, PrevFrameparam.fst.get(index).fixedpos,
-								PrevFrameparam.fst.get(index).slope, PrevFrameparam.fst.get(index).intercept,
-								PrevFrameparam.fst.get(index).slope, PrevFrameparam.fst.get(index).intercept, 0, 0,
+								PrevFrameparam.getA().get(index).currentLabel, PrevFrameparam.getA().get(index).seedLabel,
+								PrevFrameparam.getA().get(index).framenumber, PrevFrameparam.getA().get(index).ds,
+								PrevFrameparam.getA().get(index).lineintensity, PrevFrameparam.getA().get(index).background,
+								PrevFrameparam.getA().get(index).currentpos, PrevFrameparam.getA().get(index).fixedpos,
+								PrevFrameparam.getA().get(index).slope, PrevFrameparam.getA().get(index).intercept,
+								PrevFrameparam.getA().get(index).slope, PrevFrameparam.getA().get(index).intercept, 0, 0,
 								new double[] { dx, dy });
 
 						start.add(startPart);
 					}
-					for (int index = 0; index < PrevFrameparam.snd.size(); ++index) {
+					for (int index = 0; index < PrevFrameparam.getB().size(); ++index) {
 
-						double dx = PrevFrameparam.snd.get(index).ds / Math
-								.sqrt(1 + PrevFrameparam.snd.get(index).slope * PrevFrameparam.snd.get(index).slope);
-						double dy = PrevFrameparam.snd.get(index).slope * dx;
+						double dx = PrevFrameparam.getB().get(index).ds / Math
+								.sqrt(1 + PrevFrameparam.getB().get(index).slope * PrevFrameparam.getB().get(index).slope);
+						double dy = PrevFrameparam.getB().get(index).slope * dx;
 
 						KalmanIndexedlength endPart = new KalmanIndexedlength(
-								PrevFrameparam.snd.get(index).currentLabel, PrevFrameparam.snd.get(index).seedLabel,
-								PrevFrameparam.snd.get(index).framenumber, PrevFrameparam.snd.get(index).ds,
-								PrevFrameparam.snd.get(index).lineintensity, PrevFrameparam.snd.get(index).background,
-								PrevFrameparam.snd.get(index).currentpos, PrevFrameparam.snd.get(index).fixedpos,
-								PrevFrameparam.snd.get(index).slope, PrevFrameparam.snd.get(index).intercept,
-								PrevFrameparam.snd.get(index).slope, PrevFrameparam.snd.get(index).intercept, 0, 0,
+								PrevFrameparam.getB().get(index).currentLabel, PrevFrameparam.getB().get(index).seedLabel,
+								PrevFrameparam.getB().get(index).framenumber, PrevFrameparam.getB().get(index).ds,
+								PrevFrameparam.getB().get(index).lineintensity, PrevFrameparam.getB().get(index).background,
+								PrevFrameparam.getB().get(index).currentpos, PrevFrameparam.getB().get(index).fixedpos,
+								PrevFrameparam.getB().get(index).slope, PrevFrameparam.getB().get(index).intercept,
+								PrevFrameparam.getB().get(index).slope, PrevFrameparam.getB().get(index).intercept, 0, 0,
 								new double[] { dx, dy });
 						end.add(endPart);
 					}
 
-					PrevFrameparamKalman = new Pair<ArrayList<KalmanIndexedlength>, ArrayList<KalmanIndexedlength>>(
+					PrevFrameparamKalman = new ValuePair<ArrayList<KalmanIndexedlength>, ArrayList<KalmanIndexedlength>>(
 							start, end);
 
 				}
 
 			}
+			
+			
+
+			return null;
+		}
+		
+		@Override
+		protected void done() {
+			try {
+				jpb.setIndeterminate(false);
+				get();
+				frame.dispose();
+				JOptionPane.showMessageDialog(jpb.getParent(), "Success", "Success", JOptionPane.INFORMATION_MESSAGE);
+			} catch (ExecutionException | InterruptedException e) {
+				e.printStackTrace();
+			}
+
+		}
+		
+	}
+	
+	protected class FindLinesListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(final ActionEvent arg0) {
+			SwingUtilities.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+
+					goSeeds();
+
+				}
+
+			});
 
 		}
 	}
@@ -2797,16 +2875,16 @@ public class Interactive_MT implements PlugIn {
 					double minDist = Double.MAX_VALUE;
 					double[] closestpoint = { Double.MAX_VALUE, Double.MAX_VALUE };
 					int fileindex = Double.MAX_EXPONENT;
-					for (int secindex = 0; secindex < PrevFrameparam.fst.size(); ++secindex) {
+					for (int secindex = 0; secindex < PrevFrameparam.getA().size(); ++secindex) {
 						double currDist = util.Boundingboxes.Distance(
 								new double[] { ClickedPoints.get(index)[0], ClickedPoints.get(index)[1] },
-								PrevFrameparam.fst.get(secindex).currentpos);
+								PrevFrameparam.getA().get(secindex).currentpos);
 
 						if (currDist < minDist) {
 
 							minDist = currDist;
 							fileindex = secindex;
-							closestpoint = PrevFrameparam.fst.get(secindex).currentpos;
+							closestpoint = PrevFrameparam.getA().get(secindex).currentpos;
 
 						}
 
@@ -2823,7 +2901,7 @@ public class Interactive_MT implements PlugIn {
 					double investigatedist = filepair.get(index)[1];
 
 					double currDist = util.Boundingboxes.Distance(investigatepoint,
-							PrevFrameparam.snd.get(Frameindex).currentpos);
+							PrevFrameparam.getB().get(Frameindex).currentpos);
 
 					Trackstart = (currDist > investigatedist) ? true : false;
 
@@ -3415,10 +3493,10 @@ public class Interactive_MT implements PlugIn {
 
 				if (showDeterministic) {
 
-					NewFrameparam = returnVector.snd;
+					NewFrameparam = returnVector.getB();
 
-					ArrayList<Trackproperties> startStateVectors = returnVector.fst.fst;
-					ArrayList<Trackproperties> endStateVectors = returnVector.fst.snd;
+					ArrayList<Trackproperties> startStateVectors = returnVector.getA().getA();
+					ArrayList<Trackproperties> endStateVectors = returnVector.getA().getB();
 
 					PrevFrameparam = NewFrameparam;
 
@@ -3428,10 +3506,10 @@ public class Interactive_MT implements PlugIn {
 				}
 
 				if (showKalman) {
-					NewFrameparamKalman = returnVectorKalman.snd;
+					NewFrameparamKalman = returnVectorKalman.getB();
 
-					ArrayList<KalmanTrackproperties> startStateVectorsKalman = returnVectorKalman.fst.fst;
-					ArrayList<KalmanTrackproperties> endStateVectorsKalman = returnVectorKalman.fst.snd;
+					ArrayList<KalmanTrackproperties> startStateVectorsKalman = returnVectorKalman.getA().getA();
+					ArrayList<KalmanTrackproperties> endStateVectorsKalman = returnVectorKalman.getA().getB();
 
 					PrevFrameparamKalman = NewFrameparamKalman;
 
@@ -3792,7 +3870,7 @@ public class Interactive_MT implements PlugIn {
 									final double[] startinfo = { oldpoint[0], oldpoint[1], newpoint[0], newpoint[1],
 											oldpointCal[0], oldpointCal[1], newpointCal[0], newpointCal[1], length,
 											startlength, lengthpixel, startlengthpixel };
-									Pair<Integer[], double[]> lengthpair = new Pair<Integer[], double[]>(FrameID,
+									Pair<Integer[], double[]> lengthpair = new ValuePair<Integer[], double[]>(FrameID,
 											startinfo);
 
 									lengthliststart.add(lengthpair);
@@ -3827,22 +3905,22 @@ public class Interactive_MT implements PlugIn {
 								bwmy.write("\tFramenumber\tLength\n");
 
 								for (int index = 0; index < lengthliststart.size(); ++index) {
-									if (lengthliststart.get(index).fst[1] == seedID) {
-										bw.write("\t" + lengthliststart.get(index).fst[0] + "\t" + "\t"
-												+ nf.format(lengthliststart.get(index).fst[1]) + "\t" + "\t"
-												+ nf.format(lengthliststart.get(index).snd[0]) + "\t" + "\t"
-												+ nf.format(lengthliststart.get(index).snd[1]) + "\t" + "\t"
-												+ nf.format(lengthliststart.get(index).snd[2]) + "\t" + "\t"
-												+ nf.format(lengthliststart.get(index).snd[3]) + "\t" + "\t"
-												+ nf.format(lengthliststart.get(index).snd[4]) + "\t" + "\t"
-												+ nf.format(lengthliststart.get(index).snd[5]) + "\t" + "\t"
-												+ nf.format(lengthliststart.get(index).snd[6]) + "\t" + "\t"
-												+ nf.format(lengthliststart.get(index).snd[7]) + "\t" + "\t"
-												+ nf.format(lengthliststart.get(index).snd[8]) + "\t" + "\t"
-												+ nf.format(lengthliststart.get(index).snd[9]) + "\n");
+									if (lengthliststart.get(index).getA()[1] == seedID) {
+										bw.write("\t" + lengthliststart.get(index).getA()[0] + "\t" + "\t"
+												+ nf.format(lengthliststart.get(index).getA()[1]) + "\t" + "\t"
+												+ nf.format(lengthliststart.get(index).getB()[0]) + "\t" + "\t"
+												+ nf.format(lengthliststart.get(index).getB()[1]) + "\t" + "\t"
+												+ nf.format(lengthliststart.get(index).getB()[2]) + "\t" + "\t"
+												+ nf.format(lengthliststart.get(index).getB()[3]) + "\t" + "\t"
+												+ nf.format(lengthliststart.get(index).getB()[4]) + "\t" + "\t"
+												+ nf.format(lengthliststart.get(index).getB()[5]) + "\t" + "\t"
+												+ nf.format(lengthliststart.get(index).getB()[6]) + "\t" + "\t"
+												+ nf.format(lengthliststart.get(index).getB()[7]) + "\t" + "\t"
+												+ nf.format(lengthliststart.get(index).getB()[8]) + "\t" + "\t"
+												+ nf.format(lengthliststart.get(index).getB()[9]) + "\n");
 
-										bwmy.write("\t" + lengthliststart.get(index).fst[0] + "\t" + "\t"
-												+ nf.format(lengthliststart.get(index).snd[11]) + "\n");
+										bwmy.write("\t" + lengthliststart.get(index).getA()[0] + "\t" + "\t"
+												+ nf.format(lengthliststart.get(index).getB()[11]) + "\n");
 
 									}
 
@@ -3857,37 +3935,37 @@ public class Interactive_MT implements PlugIn {
 						}
 
 						for (int index = 0; index < lengthliststart.size(); ++index) {
-							if (lengthliststart.get(index).fst[1] == seedID) {
+							if (lengthliststart.get(index).getA()[1] == seedID) {
 								rt.incrementCounter();
-								rt.addValue("FrameNumber", lengthliststart.get(index).fst[0]);
-								rt.addValue("SeedLabel", lengthliststart.get(index).fst[1]);
-								rt.addValue("OldX in px units", lengthliststart.get(index).snd[0]);
-								rt.addValue("OldY in px units", lengthliststart.get(index).snd[1]);
-								rt.addValue("NewX in px units", lengthliststart.get(index).snd[2]);
-								rt.addValue("NewY in px units", lengthliststart.get(index).snd[3]);
-								rt.addValue("OldX in real units", lengthliststart.get(index).snd[4]);
-								rt.addValue("OldY in real units", lengthliststart.get(index).snd[5]);
-								rt.addValue("NewX in real units", lengthliststart.get(index).snd[6]);
-								rt.addValue("NewY in real units", lengthliststart.get(index).snd[7]);
-								rt.addValue("Length in real units", lengthliststart.get(index).snd[8]);
-								rt.addValue("Cummulative Length in real units", lengthliststart.get(index).snd[9]);
-								double[] landt = { lengthliststart.get(index).snd[11],
-										lengthliststart.get(index).fst[0] };
+								rt.addValue("FrameNumber", lengthliststart.get(index).getA()[0]);
+								rt.addValue("SeedLabel", lengthliststart.get(index).getA()[1]);
+								rt.addValue("OldX in px units", lengthliststart.get(index).getB()[0]);
+								rt.addValue("OldY in px units", lengthliststart.get(index).getB()[1]);
+								rt.addValue("NewX in px units", lengthliststart.get(index).getB()[2]);
+								rt.addValue("NewY in px units", lengthliststart.get(index).getB()[3]);
+								rt.addValue("OldX in real units", lengthliststart.get(index).getB()[4]);
+								rt.addValue("OldY in real units", lengthliststart.get(index).getB()[5]);
+								rt.addValue("NewX in real units", lengthliststart.get(index).getB()[6]);
+								rt.addValue("NewY in real units", lengthliststart.get(index).getB()[7]);
+								rt.addValue("Length in real units", lengthliststart.get(index).getB()[8]);
+								rt.addValue("Cummulative Length in real units", lengthliststart.get(index).getB()[9]);
+								double[] landt = { lengthliststart.get(index).getB()[11],
+										lengthliststart.get(index).getA()[0] };
 								lengthtimestart.add(landt);
 
 								rtAll.incrementCounter();
-								rtAll.addValue("FrameNumber", lengthliststart.get(index).fst[0]);
-								rtAll.addValue("SeedLabel", lengthliststart.get(index).fst[1]);
-								rtAll.addValue("OldX in px units", lengthliststart.get(index).snd[0]);
-								rtAll.addValue("OldY in px units", lengthliststart.get(index).snd[1]);
-								rtAll.addValue("NewX in px units", lengthliststart.get(index).snd[2]);
-								rtAll.addValue("NewY in px units", lengthliststart.get(index).snd[3]);
-								rtAll.addValue("OldX in real units", lengthliststart.get(index).snd[4]);
-								rtAll.addValue("OldY in real units", lengthliststart.get(index).snd[5]);
-								rtAll.addValue("NewX in real units", lengthliststart.get(index).snd[6]);
-								rtAll.addValue("NewY in real units", lengthliststart.get(index).snd[7]);
-								rtAll.addValue("Length in real units", lengthliststart.get(index).snd[8]);
-								rtAll.addValue("Cummulative Length in real units", lengthliststart.get(index).snd[9]);
+								rtAll.addValue("FrameNumber", lengthliststart.get(index).getA()[0]);
+								rtAll.addValue("SeedLabel", lengthliststart.get(index).getA()[1]);
+								rtAll.addValue("OldX in px units", lengthliststart.get(index).getB()[0]);
+								rtAll.addValue("OldY in px units", lengthliststart.get(index).getB()[1]);
+								rtAll.addValue("NewX in px units", lengthliststart.get(index).getB()[2]);
+								rtAll.addValue("NewY in px units", lengthliststart.get(index).getB()[3]);
+								rtAll.addValue("OldX in real units", lengthliststart.get(index).getB()[4]);
+								rtAll.addValue("OldY in real units", lengthliststart.get(index).getB()[5]);
+								rtAll.addValue("NewX in real units", lengthliststart.get(index).getB()[6]);
+								rtAll.addValue("NewY in real units", lengthliststart.get(index).getB()[7]);
+								rtAll.addValue("Length in real units", lengthliststart.get(index).getB()[8]);
+								rtAll.addValue("Cummulative Length in real units", lengthliststart.get(index).getB()[9]);
 
 							}
 
@@ -3956,7 +4034,7 @@ public class Interactive_MT implements PlugIn {
 									final double[] endinfo = { oldpoint[0], oldpoint[1], newpoint[0], newpoint[1],
 											oldpointCal[0], oldpointCal[1], newpointCal[0], newpointCal[1], length,
 											endlength, lengthpixel, endlengthpixel };
-									Pair<Integer[], double[]> lengthpair = new Pair<Integer[], double[]>(FrameID,
+									Pair<Integer[], double[]> lengthpair = new ValuePair<Integer[], double[]>(FrameID,
 											endinfo);
 
 									lengthlistend.add(lengthpair);
@@ -3989,22 +4067,22 @@ public class Interactive_MT implements PlugIn {
 
 								bwmy.write("\tFramenumber\tLength\n");
 								for (int index = 0; index < lengthlistend.size(); ++index) {
-									if (lengthlistend.get(index).fst[1] == seedID) {
-										bw.write("\t" + lengthlistend.get(index).fst[0] + "\t" + "\t"
-												+ nf.format(lengthlistend.get(index).fst[1]) + "\t" + "\t"
-												+ nf.format(lengthlistend.get(index).snd[0]) + "\t" + "\t"
-												+ nf.format(lengthlistend.get(index).snd[1]) + "\t" + "\t"
-												+ nf.format(lengthlistend.get(index).snd[2]) + "\t" + "\t"
-												+ nf.format(lengthlistend.get(index).snd[3]) + "\t" + "\t"
-												+ nf.format(lengthlistend.get(index).snd[4]) + "\t" + "\t"
-												+ nf.format(lengthlistend.get(index).snd[5]) + "\t" + "\t"
-												+ nf.format(lengthlistend.get(index).snd[6]) + "\t" + "\t"
-												+ nf.format(lengthlistend.get(index).snd[7]) + "\t" + "\t"
-												+ nf.format(lengthlistend.get(index).snd[8]) + "\t" + "\t"
-												+ nf.format(lengthlistend.get(index).snd[9]) + "\n");
+									if (lengthlistend.get(index).getA()[1] == seedID) {
+										bw.write("\t" + lengthlistend.get(index).getA()[0] + "\t" + "\t"
+												+ nf.format(lengthlistend.get(index).getA()[1]) + "\t" + "\t"
+												+ nf.format(lengthlistend.get(index).getB()[0]) + "\t" + "\t"
+												+ nf.format(lengthlistend.get(index).getB()[1]) + "\t" + "\t"
+												+ nf.format(lengthlistend.get(index).getB()[2]) + "\t" + "\t"
+												+ nf.format(lengthlistend.get(index).getB()[3]) + "\t" + "\t"
+												+ nf.format(lengthlistend.get(index).getB()[4]) + "\t" + "\t"
+												+ nf.format(lengthlistend.get(index).getB()[5]) + "\t" + "\t"
+												+ nf.format(lengthlistend.get(index).getB()[6]) + "\t" + "\t"
+												+ nf.format(lengthlistend.get(index).getB()[7]) + "\t" + "\t"
+												+ nf.format(lengthlistend.get(index).getB()[8]) + "\t" + "\t"
+												+ nf.format(lengthlistend.get(index).getB()[9]) + "\n");
 
-										bwmy.write("\t" + lengthlistend.get(index).fst[0] + "\t" + "\t"
-												+ nf.format(lengthlistend.get(index).snd[11]) + "\n");
+										bwmy.write("\t" + lengthlistend.get(index).getA()[0] + "\t" + "\t"
+												+ nf.format(lengthlistend.get(index).getB()[11]) + "\n");
 
 									}
 								}
@@ -4018,35 +4096,35 @@ public class Interactive_MT implements PlugIn {
 						}
 
 						for (int index = 0; index < lengthlistend.size(); ++index) {
-							if (lengthlistend.get(index).fst[1] == seedID) {
+							if (lengthlistend.get(index).getA()[1] == seedID) {
 								rtend.incrementCounter();
-								rtend.addValue("FrameNumber", lengthlistend.get(index).fst[0]);
-								rtend.addValue("SeedLabel", lengthlistend.get(index).fst[1]);
-								rtend.addValue("OldX in px units", lengthlistend.get(index).snd[0]);
-								rtend.addValue("OldY in px units", lengthlistend.get(index).snd[1]);
-								rtend.addValue("NewX in px units", lengthlistend.get(index).snd[2]);
-								rtend.addValue("NewY in px units", lengthlistend.get(index).snd[3]);
-								rtend.addValue("OldX in real units", lengthlistend.get(index).snd[4]);
-								rtend.addValue("OldY in real units", lengthlistend.get(index).snd[5]);
-								rtend.addValue("NewX in real units", lengthlistend.get(index).snd[6]);
-								rtend.addValue("NewY in real units", lengthlistend.get(index).snd[7]);
-								rtend.addValue("Length in real units", lengthlistend.get(index).snd[8]);
-								rtend.addValue("Cummulative Length in real units", lengthlistend.get(index).snd[9]);
-								double[] landt = { lengthlistend.get(index).snd[11], lengthlistend.get(index).fst[0] };
+								rtend.addValue("FrameNumber", lengthlistend.get(index).getA()[0]);
+								rtend.addValue("SeedLabel", lengthlistend.get(index).getA()[1]);
+								rtend.addValue("OldX in px units", lengthlistend.get(index).getB()[0]);
+								rtend.addValue("OldY in px units", lengthlistend.get(index).getB()[1]);
+								rtend.addValue("NewX in px units", lengthlistend.get(index).getB()[2]);
+								rtend.addValue("NewY in px units", lengthlistend.get(index).getB()[3]);
+								rtend.addValue("OldX in real units", lengthlistend.get(index).getB()[4]);
+								rtend.addValue("OldY in real units", lengthlistend.get(index).getB()[5]);
+								rtend.addValue("NewX in real units", lengthlistend.get(index).getB()[6]);
+								rtend.addValue("NewY in real units", lengthlistend.get(index).getB()[7]);
+								rtend.addValue("Length in real units", lengthlistend.get(index).getB()[8]);
+								rtend.addValue("Cummulative Length in real units", lengthlistend.get(index).getB()[9]);
+								double[] landt = { lengthlistend.get(index).getB()[11], lengthlistend.get(index).getA()[0] };
 								lengthtimeend.add(landt);
 								rtAll.incrementCounter();
-								rtAll.addValue("FrameNumber", lengthlistend.get(index).fst[0]);
-								rtAll.addValue("SeedLabel", lengthlistend.get(index).fst[1]);
-								rtAll.addValue("OldX in px units", lengthlistend.get(index).snd[0]);
-								rtAll.addValue("OldY in px units", lengthlistend.get(index).snd[1]);
-								rtAll.addValue("NewX in px units", lengthlistend.get(index).snd[2]);
-								rtAll.addValue("NewY in px units", lengthlistend.get(index).snd[3]);
-								rtAll.addValue("OldX in real units", lengthlistend.get(index).snd[4]);
-								rtAll.addValue("OldY in real units", lengthlistend.get(index).snd[5]);
-								rtAll.addValue("NewX in real units", lengthlistend.get(index).snd[6]);
-								rtAll.addValue("NewY in real units", lengthlistend.get(index).snd[7]);
-								rtAll.addValue("Length in real units", lengthlistend.get(index).snd[8]);
-								rtAll.addValue("Cummulative Length in real units", lengthlistend.get(index).snd[9]);
+								rtAll.addValue("FrameNumber", lengthlistend.get(index).getA()[0]);
+								rtAll.addValue("SeedLabel", lengthlistend.get(index).getA()[1]);
+								rtAll.addValue("OldX in px units", lengthlistend.get(index).getB()[0]);
+								rtAll.addValue("OldY in px units", lengthlistend.get(index).getB()[1]);
+								rtAll.addValue("NewX in px units", lengthlistend.get(index).getB()[2]);
+								rtAll.addValue("NewY in px units", lengthlistend.get(index).getB()[3]);
+								rtAll.addValue("OldX in real units", lengthlistend.get(index).getB()[4]);
+								rtAll.addValue("OldY in real units", lengthlistend.get(index).getB()[5]);
+								rtAll.addValue("NewX in real units", lengthlistend.get(index).getB()[6]);
+								rtAll.addValue("NewY in real units", lengthlistend.get(index).getB()[7]);
+								rtAll.addValue("Length in real units", lengthlistend.get(index).getB()[8]);
+								rtAll.addValue("Cummulative Length in real units", lengthlistend.get(index).getB()[9]);
 
 							}
 
@@ -4448,10 +4526,10 @@ public class Interactive_MT implements PlugIn {
 				}
 
 				if (showDeterministic) {
-					NewFrameparam = returnVector.snd;
+					NewFrameparam = returnVector.getB();
 
-					ArrayList<Trackproperties> startStateVectors = returnVector.fst.fst;
-					ArrayList<Trackproperties> endStateVectors = returnVector.fst.snd;
+					ArrayList<Trackproperties> startStateVectors = returnVector.getA().getA();
+					ArrayList<Trackproperties> endStateVectors = returnVector.getA().getB();
 
 					PrevFrameparam = NewFrameparam;
 
@@ -4460,10 +4538,10 @@ public class Interactive_MT implements PlugIn {
 				}
 
 				if (showKalman) {
-					NewFrameparamKalman = returnVectorKalman.snd;
+					NewFrameparamKalman = returnVectorKalman.getB();
 
-					ArrayList<KalmanTrackproperties> startStateVectorsKalman = returnVectorKalman.fst.fst;
-					ArrayList<KalmanTrackproperties> endStateVectorsKalman = returnVectorKalman.fst.snd;
+					ArrayList<KalmanTrackproperties> startStateVectorsKalman = returnVectorKalman.getA().getA();
+					ArrayList<KalmanTrackproperties> endStateVectorsKalman = returnVectorKalman.getA().getB();
 
 					PrevFrameparamKalman = NewFrameparamKalman;
 
@@ -4829,7 +4907,7 @@ public class Interactive_MT implements PlugIn {
 									final double[] startinfo = { oldpoint[0], oldpoint[1], newpoint[0], newpoint[1],
 											oldpointCal[0], oldpointCal[1], newpointCal[0], newpointCal[1], length,
 											startlength, lengthpixel, startlengthpixel };
-									Pair<Integer[], double[]> lengthpair = new Pair<Integer[], double[]>(FrameID,
+									Pair<Integer[], double[]> lengthpair = new ValuePair<Integer[], double[]>(FrameID,
 											startinfo);
 
 									lengthliststart.add(lengthpair);
@@ -4863,22 +4941,22 @@ public class Interactive_MT implements PlugIn {
 								bwmy.write("\tFramenumber\tLength\n");
 
 								for (int index = 0; index < Allstart.size(); ++index) {
-									if (lengthliststart.get(index).fst[1] == seedID) {
-										bw.write("\t" + lengthliststart.get(index).fst[0] + "\t" + "\t"
-												+ nf.format(lengthliststart.get(index).fst[1]) + "\t" + "\t"
-												+ nf.format(lengthliststart.get(index).snd[0]) + "\t" + "\t"
-												+ nf.format(lengthliststart.get(index).snd[1]) + "\t" + "\t"
-												+ nf.format(lengthliststart.get(index).snd[2]) + "\t" + "\t"
-												+ nf.format(lengthliststart.get(index).snd[3]) + "\t" + "\t"
-												+ nf.format(lengthliststart.get(index).snd[4]) + "\t" + "\t"
-												+ nf.format(lengthliststart.get(index).snd[5]) + "\t" + "\t"
-												+ nf.format(lengthliststart.get(index).snd[6]) + "\t" + "\t"
-												+ nf.format(lengthliststart.get(index).snd[7]) + "\t" + "\t"
-												+ nf.format(lengthliststart.get(index).snd[8]) + "\t" + "\t"
-												+ nf.format(lengthliststart.get(index).snd[9]) + "\n");
+									if (lengthliststart.get(index).getA()[1] == seedID) {
+										bw.write("\t" + lengthliststart.get(index).getA()[0] + "\t" + "\t"
+												+ nf.format(lengthliststart.get(index).getA()[1]) + "\t" + "\t"
+												+ nf.format(lengthliststart.get(index).getB()[0]) + "\t" + "\t"
+												+ nf.format(lengthliststart.get(index).getB()[1]) + "\t" + "\t"
+												+ nf.format(lengthliststart.get(index).getB()[2]) + "\t" + "\t"
+												+ nf.format(lengthliststart.get(index).getB()[3]) + "\t" + "\t"
+												+ nf.format(lengthliststart.get(index).getB()[4]) + "\t" + "\t"
+												+ nf.format(lengthliststart.get(index).getB()[5]) + "\t" + "\t"
+												+ nf.format(lengthliststart.get(index).getB()[6]) + "\t" + "\t"
+												+ nf.format(lengthliststart.get(index).getB()[7]) + "\t" + "\t"
+												+ nf.format(lengthliststart.get(index).getB()[8]) + "\t" + "\t"
+												+ nf.format(lengthliststart.get(index).getB()[9]) + "\n");
 
-										bwmy.write("\t" + lengthliststart.get(index).fst[0] + "\t" + "\t"
-												+ nf.format(lengthliststart.get(index).snd[11]) + "\n");
+										bwmy.write("\t" + lengthliststart.get(index).getA()[0] + "\t" + "\t"
+												+ nf.format(lengthliststart.get(index).getB()[11]) + "\n");
 
 									}
 								}
@@ -4892,38 +4970,38 @@ public class Interactive_MT implements PlugIn {
 						}
 
 						for (int index = 0; index < Allstart.size(); ++index) {
-							if (lengthliststart.get(index).fst[1] == seedID) {
+							if (lengthliststart.get(index).getA()[1] == seedID) {
 								rt.incrementCounter();
-								rt.addValue("FrameNumber", lengthliststart.get(index).fst[0]);
-								rt.addValue("SeedLabel", lengthliststart.get(index).fst[1]);
-								rt.addValue("OldX in px units", (float) lengthliststart.get(index).snd[0]);
-								rt.addValue("OldY in px units", (float) lengthliststart.get(index).snd[1]);
-								rt.addValue("NewX in px units", (float) lengthliststart.get(index).snd[2]);
-								rt.addValue("NewY in px units", (float) lengthliststart.get(index).snd[3]);
-								rt.addValue("OldX in real units", (float) lengthliststart.get(index).snd[4]);
-								rt.addValue("OldY in real units", (float) lengthliststart.get(index).snd[5]);
-								rt.addValue("NewX in real units", (float) lengthliststart.get(index).snd[6]);
-								rt.addValue("NewY in real units", (float) lengthliststart.get(index).snd[7]);
-								rt.addValue("Length in real units", (float) lengthliststart.get(index).snd[8]);
+								rt.addValue("FrameNumber", lengthliststart.get(index).getA()[0]);
+								rt.addValue("SeedLabel", lengthliststart.get(index).getA()[1]);
+								rt.addValue("OldX in px units", (float) lengthliststart.get(index).getB()[0]);
+								rt.addValue("OldY in px units", (float) lengthliststart.get(index).getB()[1]);
+								rt.addValue("NewX in px units", (float) lengthliststart.get(index).getB()[2]);
+								rt.addValue("NewY in px units", (float) lengthliststart.get(index).getB()[3]);
+								rt.addValue("OldX in real units", (float) lengthliststart.get(index).getB()[4]);
+								rt.addValue("OldY in real units", (float) lengthliststart.get(index).getB()[5]);
+								rt.addValue("NewX in real units", (float) lengthliststart.get(index).getB()[6]);
+								rt.addValue("NewY in real units", (float) lengthliststart.get(index).getB()[7]);
+								rt.addValue("Length in real units", (float) lengthliststart.get(index).getB()[8]);
 								rt.addValue("Cummulative Length in real units",
-										(float) lengthliststart.get(index).snd[9]);
-								double[] landt = { lengthliststart.get(index).snd[11],
-										lengthliststart.get(index).fst[0] };
+										(float) lengthliststart.get(index).getB()[9]);
+								double[] landt = { lengthliststart.get(index).getB()[11],
+										lengthliststart.get(index).getA()[0] };
 								lengthtimestart.add(landt);
 
 								rtAll.incrementCounter();
-								rtAll.addValue("FrameNumber", lengthliststart.get(index).fst[0]);
-								rtAll.addValue("SeedLabel", lengthliststart.get(index).fst[1]);
-								rtAll.addValue("OldX in px units", lengthliststart.get(index).snd[0]);
-								rtAll.addValue("OldY in px units", lengthliststart.get(index).snd[1]);
-								rtAll.addValue("NewX in px units", lengthliststart.get(index).snd[2]);
-								rtAll.addValue("NewY in px units", lengthliststart.get(index).snd[3]);
-								rtAll.addValue("OldX in real units", lengthliststart.get(index).snd[4]);
-								rtAll.addValue("OldY in real units", lengthliststart.get(index).snd[5]);
-								rtAll.addValue("NewX in real units", lengthliststart.get(index).snd[6]);
-								rtAll.addValue("NewY in real units", lengthliststart.get(index).snd[7]);
-								rtAll.addValue("Length in real units", lengthliststart.get(index).snd[8]);
-								rtAll.addValue("Cummulative Length in real units", lengthliststart.get(index).snd[9]);
+								rtAll.addValue("FrameNumber", lengthliststart.get(index).getA()[0]);
+								rtAll.addValue("SeedLabel", lengthliststart.get(index).getA()[1]);
+								rtAll.addValue("OldX in px units", lengthliststart.get(index).getB()[0]);
+								rtAll.addValue("OldY in px units", lengthliststart.get(index).getB()[1]);
+								rtAll.addValue("NewX in px units", lengthliststart.get(index).getB()[2]);
+								rtAll.addValue("NewY in px units", lengthliststart.get(index).getB()[3]);
+								rtAll.addValue("OldX in real units", lengthliststart.get(index).getB()[4]);
+								rtAll.addValue("OldY in real units", lengthliststart.get(index).getB()[5]);
+								rtAll.addValue("NewX in real units", lengthliststart.get(index).getB()[6]);
+								rtAll.addValue("NewY in real units", lengthliststart.get(index).getB()[7]);
+								rtAll.addValue("Length in real units", lengthliststart.get(index).getB()[8]);
+								rtAll.addValue("Cummulative Length in real units", lengthliststart.get(index).getB()[9]);
 
 							}
 
@@ -4995,7 +5073,7 @@ public class Interactive_MT implements PlugIn {
 									final double[] endinfo = { oldpoint[0], oldpoint[1], newpoint[0], newpoint[1],
 											oldpointCal[0], oldpointCal[1], newpointCal[0], newpointCal[1], length,
 											endlength, lengthpixel, endlengthpixel };
-									Pair<Integer[], double[]> lengthpair = new Pair<Integer[], double[]>(FrameID,
+									Pair<Integer[], double[]> lengthpair = new ValuePair<Integer[], double[]>(FrameID,
 											endinfo);
 
 									lengthlistend.add(lengthpair);
@@ -5037,22 +5115,22 @@ public class Interactive_MT implements PlugIn {
 
 								bwmy.write("\tFramenumber\tLength\n");
 								for (int index = 0; index < Allend.size(); ++index) {
-									if (lengthlistend.get(index).fst[1] == seedID) {
-										bw.write("\t" + lengthlistend.get(index).fst[0] + "\t" + "\t"
-												+ nf.format(lengthlistend.get(index).fst[1]) + "\t" + "\t"
-												+ nf.format(lengthlistend.get(index).snd[0]) + "\t" + "\t"
-												+ nf.format(lengthlistend.get(index).snd[1]) + "\t" + "\t"
-												+ nf.format(lengthlistend.get(index).snd[2]) + "\t" + "\t"
-												+ nf.format(lengthlistend.get(index).snd[3]) + "\t" + "\t"
-												+ nf.format(lengthlistend.get(index).snd[4]) + "\t" + "\t"
-												+ nf.format(lengthlistend.get(index).snd[5]) + "\t" + "\t"
-												+ nf.format(lengthlistend.get(index).snd[6]) + "\t" + "\t"
-												+ nf.format(lengthlistend.get(index).snd[7]) + "\t" + "\t"
-												+ nf.format(lengthlistend.get(index).snd[8]) + "\t" + "\t"
-												+ nf.format(lengthlistend.get(index).snd[9]) + "\n");
+									if (lengthlistend.get(index).getA()[1] == seedID) {
+										bw.write("\t" + lengthlistend.get(index).getA()[0] + "\t" + "\t"
+												+ nf.format(lengthlistend.get(index).getA()[1]) + "\t" + "\t"
+												+ nf.format(lengthlistend.get(index).getB()[0]) + "\t" + "\t"
+												+ nf.format(lengthlistend.get(index).getB()[1]) + "\t" + "\t"
+												+ nf.format(lengthlistend.get(index).getB()[2]) + "\t" + "\t"
+												+ nf.format(lengthlistend.get(index).getB()[3]) + "\t" + "\t"
+												+ nf.format(lengthlistend.get(index).getB()[4]) + "\t" + "\t"
+												+ nf.format(lengthlistend.get(index).getB()[5]) + "\t" + "\t"
+												+ nf.format(lengthlistend.get(index).getB()[6]) + "\t" + "\t"
+												+ nf.format(lengthlistend.get(index).getB()[7]) + "\t" + "\t"
+												+ nf.format(lengthlistend.get(index).getB()[8]) + "\t" + "\t"
+												+ nf.format(lengthlistend.get(index).getB()[9]) + "\n");
 
-										bwmy.write("\t" + lengthlistend.get(index).fst[0] + "\t" + "\t"
-												+ nf.format(lengthlistend.get(index).snd[11]) + "\n");
+										bwmy.write("\t" + lengthlistend.get(index).getA()[0] + "\t" + "\t"
+												+ nf.format(lengthlistend.get(index).getB()[11]) + "\n");
 
 									}
 
@@ -5069,38 +5147,38 @@ public class Interactive_MT implements PlugIn {
 
 						for (int index = 0; index < Allend.size(); ++index) {
 
-							if (lengthlistend.get(index).fst[1] == seedID) {
+							if (lengthlistend.get(index).getA()[1] == seedID) {
 								rtend.incrementCounter();
-								rtend.addValue("FrameNumber", lengthlistend.get(index).fst[0]);
-								rtend.addValue("SeedLabel", lengthlistend.get(index).fst[1]);
-								rtend.addValue("OldX in px units", (float) lengthlistend.get(index).snd[0]);
-								rtend.addValue("OldY in px units", (float) lengthlistend.get(index).snd[1]);
-								rtend.addValue("NewX in px units", (float) lengthlistend.get(index).snd[2]);
-								rtend.addValue("NewY in px units", (float) lengthlistend.get(index).snd[3]);
-								rtend.addValue("OldX in real units", (float) lengthlistend.get(index).snd[4]);
-								rtend.addValue("OldY in real units", (float) lengthlistend.get(index).snd[5]);
-								rtend.addValue("NewX in real units", (float) lengthlistend.get(index).snd[6]);
-								rtend.addValue("NewY in real units", (float) lengthlistend.get(index).snd[7]);
-								rtend.addValue("Length in real units", (float) lengthlistend.get(index).snd[8]);
+								rtend.addValue("FrameNumber", lengthlistend.get(index).getA()[0]);
+								rtend.addValue("SeedLabel", lengthlistend.get(index).getA()[1]);
+								rtend.addValue("OldX in px units", (float) lengthlistend.get(index).getB()[0]);
+								rtend.addValue("OldY in px units", (float) lengthlistend.get(index).getB()[1]);
+								rtend.addValue("NewX in px units", (float) lengthlistend.get(index).getB()[2]);
+								rtend.addValue("NewY in px units", (float) lengthlistend.get(index).getB()[3]);
+								rtend.addValue("OldX in real units", (float) lengthlistend.get(index).getB()[4]);
+								rtend.addValue("OldY in real units", (float) lengthlistend.get(index).getB()[5]);
+								rtend.addValue("NewX in real units", (float) lengthlistend.get(index).getB()[6]);
+								rtend.addValue("NewY in real units", (float) lengthlistend.get(index).getB()[7]);
+								rtend.addValue("Length in real units", (float) lengthlistend.get(index).getB()[8]);
 								rtend.addValue("Cummulative Length in real units",
-										(float) lengthlistend.get(index).snd[9]);
+										(float) lengthlistend.get(index).getB()[9]);
 
-								double[] landt = { lengthlistend.get(index).snd[11], lengthlistend.get(index).fst[0] };
+								double[] landt = { lengthlistend.get(index).getB()[11], lengthlistend.get(index).getA()[0] };
 								lengthtimeend.add(landt);
 								rtAll.incrementCounter();
-								rtAll.addValue("FrameNumber", lengthlistend.get(index).fst[0]);
-								rtAll.addValue("SeedLabel", lengthlistend.get(index).fst[1]);
-								rtAll.addValue("OldX in px units", (float) lengthlistend.get(index).snd[0]);
-								rtAll.addValue("OldY in px units", (float) lengthlistend.get(index).snd[1]);
-								rtAll.addValue("NewX in px units", (float) lengthlistend.get(index).snd[2]);
-								rtAll.addValue("NewY in px units", (float) lengthlistend.get(index).snd[3]);
-								rtAll.addValue("OldX in real units", (float) lengthlistend.get(index).snd[4]);
-								rtAll.addValue("OldY in real units", (float) lengthlistend.get(index).snd[5]);
-								rtAll.addValue("NewX in real units", (float) lengthlistend.get(index).snd[6]);
-								rtAll.addValue("NewY in real units", (float) lengthlistend.get(index).snd[7]);
-								rtAll.addValue("Length in real units", (float) lengthlistend.get(index).snd[8]);
+								rtAll.addValue("FrameNumber", lengthlistend.get(index).getA()[0]);
+								rtAll.addValue("SeedLabel", lengthlistend.get(index).getA()[1]);
+								rtAll.addValue("OldX in px units", (float) lengthlistend.get(index).getB()[0]);
+								rtAll.addValue("OldY in px units", (float) lengthlistend.get(index).getB()[1]);
+								rtAll.addValue("NewX in px units", (float) lengthlistend.get(index).getB()[2]);
+								rtAll.addValue("NewY in px units", (float) lengthlistend.get(index).getB()[3]);
+								rtAll.addValue("OldX in real units", (float) lengthlistend.get(index).getB()[4]);
+								rtAll.addValue("OldY in real units", (float) lengthlistend.get(index).getB()[5]);
+								rtAll.addValue("NewX in real units", (float) lengthlistend.get(index).getB()[6]);
+								rtAll.addValue("NewY in real units", (float) lengthlistend.get(index).getB()[7]);
+								rtAll.addValue("Length in real units", (float) lengthlistend.get(index).getB()[8]);
 								rtAll.addValue("Cummulative Length in real units",
-										(float) lengthlistend.get(index).snd[9]);
+										(float) lengthlistend.get(index).getB()[9]);
 
 							}
 
@@ -5383,7 +5461,7 @@ public class Interactive_MT implements PlugIn {
 			xlOut = new FileOutputStream(xlFile);
 		} catch (FileNotFoundException ex) {
 
-			Logger.getLogger(InteractiveMT.class.getName()).log(Level.SEVERE, null, ex);
+			Logger.getLogger(Interactive_MT.class.getName()).log(Level.SEVERE, null, ex);
 		}
 
 		HSSFWorkbook xlBook = new HSSFWorkbook();
@@ -5440,7 +5518,7 @@ public class Interactive_MT implements PlugIn {
 			xlBook.write(xlOut);
 			xlOut.close();
 		} catch (IOException ex) {
-			Logger.getLogger(InteractiveMT.class.getName()).log(Level.SEVERE, null, ex);
+			Logger.getLogger(Interactive_MT.class.getName()).log(Level.SEVERE, null, ex);
 
 		}
 

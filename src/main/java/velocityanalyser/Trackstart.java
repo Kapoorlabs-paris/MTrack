@@ -4,11 +4,12 @@ import java.util.Iterator;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
 
-import com.sun.tools.javac.util.Pair;
 
 import graphconstructs.Logger;
 import graphconstructs.Trackproperties;
 import labeledObjects.Subgraphs;
+import net.imglib2.util.Pair;
+import net.imglib2.util.ValuePair;
 
 
 public class Trackstart implements Linetracker {
@@ -84,7 +85,7 @@ public class Trackstart implements Linetracker {
 						
 					}
 					if (frame == 1){
-					Pair<Integer, double[]> currentid = new Pair<Integer, double[]>(source.seedlabel, source.oldpoint);
+					Pair<Integer, double[]> currentid = new ValuePair<Integer, double[]>(source.seedlabel, source.oldpoint);
 					ID.add(currentid);
 					}
 					subgraph.addVertex(source.oldpoint);

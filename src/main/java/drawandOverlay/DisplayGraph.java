@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
 
-import com.sun.tools.javac.util.Pair;
 
 import fiji.tool.SliceListener;
 import fiji.tool.SliceObserver;
@@ -14,6 +13,7 @@ import graphconstructs.KalmanTrackproperties;
 import ij.ImagePlus;
 import ij.gui.Line;
 import ij.gui.Overlay;
+import net.imglib2.util.Pair;
 
 
 public class DisplayGraph {
@@ -71,12 +71,12 @@ public class DisplayGraph {
 			
 			for (int index = 0; index < ID.size(); ++index){
 				
-				 Line newellipse = new Line(ID.get(index).snd[0], ID.get(index).snd[1], ID.get(index).snd[0], ID.get(index).snd[1]);
+				 Line newellipse = new Line(ID.get(index).getB()[0], ID.get(index).getB()[1], ID.get(index).getB()[0], ID.get(index).getB()[1]);
 					
 
 					newellipse.setStrokeColor(Color.WHITE);
 					newellipse.setStrokeWidth(1);
-					newellipse.setName("TrackID: " + ID.get(index).fst);
+					newellipse.setName("TrackID: " + ID.get(index).getA());
 					
 					o.add(newellipse);
 					o.drawLabels(true);

@@ -6,7 +6,6 @@ import java.util.ArrayList;
 
 import org.jgrapht.graph.DefaultWeightedEdge;
 
-import com.sun.tools.javac.util.Pair;
 
 import fiji.tool.SliceListener;
 import fiji.tool.SliceObserver;
@@ -16,6 +15,7 @@ import ij.gui.Line;
 import ij.gui.Overlay;
 import ij.io.FileSaver;
 import labeledObjects.Subgraphs;
+import net.imglib2.util.Pair;
 
 public class DisplaysubGraphstart {
 	

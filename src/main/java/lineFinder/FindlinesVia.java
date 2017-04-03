@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import javax.security.auth.login.AccountExpiredException;
 import javax.swing.JProgressBar;
 
-import com.sun.tools.javac.util.Pair;
 
 import LineModels.UseLineModel.UserChoiceModel;
 import graphconstructs.KalmanTrackproperties;
@@ -17,6 +16,8 @@ import labeledObjects.Indexedlength;
 import labeledObjects.KalmanIndexedlength;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.type.numeric.real.FloatType;
+import net.imglib2.util.Pair;
+import net.imglib2.util.ValuePair;
 import peakFitter.SubpixelLengthPCKalmanLine;
 import peakFitter.SubpixelLengthPCLine;
 import peakFitter.SubpixelVelocityPCKalmanLine;
@@ -38,14 +39,14 @@ public  class FindlinesVia {
 	public static Pair<ArrayList<Indexedlength>,ArrayList<Indexedlength>> LinefindingMethod(final RandomAccessibleInterval<FloatType> source,
 			final RandomAccessibleInterval<FloatType> Preprocessedsource, final int minlength, 
 			final int framenumber, final double[] psf, final Linefinder linefinder, final UserChoiceModel model, 
-			final boolean DoMask, final double Intensityratio, final double Inispacing ) {
+			final boolean DoMask, final double Intensityratio, final double Inispacing, JProgressBar jpb ) {
 
 		
 		Pair<ArrayList<Indexedlength>,ArrayList<Indexedlength>>	PrevFrameparam = null;
 		
 
 			
-			SubpixelLengthPCLine MTline = new SubpixelLengthPCLine(source, linefinder, psf, minlength, model, 0, DoMask);
+			SubpixelLengthPCLine MTline = new SubpixelLengthPCLine(source, linefinder, psf, minlength, model, 0, DoMask, jpb);
 			MTline.setIntensityratio(Intensityratio);
 			MTline.setInispacing(Inispacing);
 			MTline.checkInput();
@@ -60,14 +61,14 @@ public  class FindlinesVia {
 	public static Pair<ArrayList<KalmanIndexedlength>,ArrayList<KalmanIndexedlength>> LinefindingMethodKalman(final RandomAccessibleInterval<FloatType> source,
 			final RandomAccessibleInterval<FloatType> Preprocessedsource, final int minlength, 
 			final int framenumber, final double[] psf, final Linefinder linefinder, final UserChoiceModel model, 
-			final boolean DoMask, final double Intensityratio, final double Inispacing ) {
+			final boolean DoMask, final double Intensityratio, final double Inispacing, JProgressBar jpb ) {
 
 		
 		Pair<ArrayList<KalmanIndexedlength>,ArrayList<KalmanIndexedlength>>	PrevFrameparam = null;
 		
 
 			
-			SubpixelLengthPCKalmanLine MTline = new SubpixelLengthPCKalmanLine(source, linefinder, psf, minlength, model, 0, DoMask);
+			SubpixelLengthPCKalmanLine MTline = new SubpixelLengthPCKalmanLine(source, linefinder, psf, minlength, model, 0, DoMask, jpb);
 			MTline.setIntensityratio(Intensityratio);
 			MTline.setInispacing(Inispacing);
 			MTline.checkInput();
@@ -90,7 +91,7 @@ public  class FindlinesVia {
 		
 
 			final SubpixelVelocityPCLine growthtracker = new SubpixelVelocityPCLine(source, linefinder,
-					PrevFrameparam.fst, PrevFrameparam.snd, psf, framenumber, model, DoMask, Trackstart,jpb, thirdDimsize);
+					PrevFrameparam.getA(), PrevFrameparam.getB(), psf, framenumber, model, DoMask, Trackstart,jpb, thirdDimsize);
 			growthtracker.setIntensityratio(intensityratio);
 			growthtracker.setInispacing(Inispacing);
 			growthtracker.checkInput();
@@ -100,9 +101,9 @@ public  class FindlinesVia {
 			Pair<ArrayList<Indexedlength>,ArrayList<Indexedlength>> NewFrameparam = growthtracker.getResult();
 			ArrayList<Trackproperties> startStateVectors = growthtracker.getstartStateVectors();
 			ArrayList<Trackproperties> endStateVectors = growthtracker.getendStateVectors();
-			Pair<ArrayList<Trackproperties>, ArrayList<Trackproperties>> Statevectors = new Pair<ArrayList<Trackproperties>, ArrayList<Trackproperties>>(startStateVectors, endStateVectors); 
+			Pair<ArrayList<Trackproperties>, ArrayList<Trackproperties>> Statevectors = new ValuePair<ArrayList<Trackproperties>, ArrayList<Trackproperties>>(startStateVectors, endStateVectors); 
 			returnVector = 
-					new Pair<Pair<ArrayList<Trackproperties>, ArrayList<Trackproperties>>,Pair<ArrayList<Indexedlength>,ArrayList<Indexedlength>>>(Statevectors, NewFrameparam);
+					new ValuePair<Pair<ArrayList<Trackproperties>, ArrayList<Trackproperties>>,Pair<ArrayList<Indexedlength>,ArrayList<Indexedlength>>>(Statevectors, NewFrameparam);
 			
 			
 			
@@ -129,7 +130,7 @@ public  class FindlinesVia {
 		
 
 			final SubpixelVelocityPCKalmanLine growthtracker = new SubpixelVelocityPCKalmanLine(source, linefinder,
-					PrevFrameparam.fst, PrevFrameparam.snd, psf, framenumber, model, DoMask, KalmanCount, Trackstart,jpb, thirdDimsize);
+					PrevFrameparam.getA(), PrevFrameparam.getB(), psf, framenumber, model, DoMask, KalmanCount, Trackstart,jpb, thirdDimsize);
 			growthtracker.setIntensityratio(Intensityratio);
 			growthtracker.setInispacing(Inispacing);
 			growthtracker.checkInput();
@@ -140,9 +141,9 @@ public  class FindlinesVia {
 			ArrayList<KalmanTrackproperties> startStateVectors = growthtracker.getcurrstartStateVectors();
 			ArrayList<KalmanTrackproperties> endStateVectors = growthtracker.getcurrendStateVectors();
 			Pair<ArrayList<KalmanTrackproperties>, ArrayList<KalmanTrackproperties>> Statevectors = 
-					new Pair<ArrayList<KalmanTrackproperties>, ArrayList<KalmanTrackproperties>>(startStateVectors, endStateVectors); 
+					new ValuePair<ArrayList<KalmanTrackproperties>, ArrayList<KalmanTrackproperties>>(startStateVectors, endStateVectors); 
 			returnVector = 
-					new Pair<Pair<ArrayList<KalmanTrackproperties>, ArrayList<KalmanTrackproperties>>,Pair<ArrayList<KalmanIndexedlength>,ArrayList<KalmanIndexedlength>>>(Statevectors, NewFrameparam);
+					new ValuePair<Pair<ArrayList<KalmanTrackproperties>, ArrayList<KalmanTrackproperties>>,Pair<ArrayList<KalmanIndexedlength>,ArrayList<KalmanIndexedlength>>>(Statevectors, NewFrameparam);
 			
 			
 			

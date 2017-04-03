@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 import javax.swing.JProgressBar;
 
-import com.sun.tools.javac.util.Pair;
+
 
 import LineModels.GaussianLineds;
 import LineModels.GaussianLinedsHF;
@@ -33,6 +33,8 @@ import net.imglib2.algorithm.BenchmarkAlgorithm;
 import net.imglib2.algorithm.OutputAlgorithm;
 import net.imglib2.type.numeric.integer.IntType;
 import net.imglib2.type.numeric.real.FloatType;
+import net.imglib2.util.Pair;
+import net.imglib2.util.ValuePair;
 import net.imglib2.view.Views;
 import peakFitter.GaussianMaskFitMSER.EndfitMSER;
 import preProcessing.GetLocalmaxmin;
@@ -286,7 +288,7 @@ public class SubpixelVelocityPCLine extends BenchmarkAlgorithm
 	@Override
 	public Pair<ArrayList<Indexedlength>, ArrayList<Indexedlength>> getResult() {
 
-		Pair<ArrayList<Indexedlength>, ArrayList<Indexedlength>> listpair = new Pair<ArrayList<Indexedlength>, ArrayList<Indexedlength>>(
+		Pair<ArrayList<Indexedlength>, ArrayList<Indexedlength>> listpair = new ValuePair<ArrayList<Indexedlength>, ArrayList<Indexedlength>>(
 				final_paramliststart, final_paramlistend);
 
 		return listpair;

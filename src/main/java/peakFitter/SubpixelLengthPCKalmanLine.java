@@ -3,7 +3,7 @@ package peakFitter;
 
 import java.util.ArrayList;
 
-import com.sun.tools.javac.util.Pair;
+import javax.swing.JProgressBar;
 
 import LineModels.GaussianLineds;
 import LineModels.GaussianLinedsHF;
@@ -31,6 +31,8 @@ import net.imglib2.algorithm.OutputAlgorithm;
 import net.imglib2.img.display.imagej.ImageJFunctions;
 import net.imglib2.type.numeric.integer.IntType;
 import net.imglib2.type.numeric.real.FloatType;
+import net.imglib2.util.Pair;
+import net.imglib2.util.ValuePair;
 import net.imglib2.view.Views;
 import peakFitter.GaussianMaskFitMSER.EndfitMSER;
 import preProcessing.GetLocalmaxmin;
@@ -61,7 +63,8 @@ implements OutputAlgorithm<Pair<ArrayList<KalmanIndexedlength>, ArrayList<Kalman
 	public boolean halfgaussian = false;
     public double Intensityratio;
     public double Inispacing;
-	
+    final JProgressBar jpb;
+    double percent = 0;
   	public void setInispacing (double Inispacing){
   		
   		this.Inispacing = Inispacing;
@@ -180,7 +183,8 @@ implements OutputAlgorithm<Pair<ArrayList<KalmanIndexedlength>, ArrayList<Kalman
 			             final int minlength,
 			             final UserChoiceModel model,
 			             final int framenumber, 
-			             final boolean DoMask){
+			             final boolean DoMask,
+			             final JProgressBar jpb){
 		
 		finder.checkInput();
 		finder.process();
@@ -191,6 +195,7 @@ implements OutputAlgorithm<Pair<ArrayList<KalmanIndexedlength>, ArrayList<Kalman
 		this.framenumber = framenumber;
 		this.model = model;
 		this.DoMask = DoMask;
+		this.jpb =jpb;
 		this.ndims = source.numDimensions();
 		
 	}
@@ -222,13 +227,13 @@ implements OutputAlgorithm<Pair<ArrayList<KalmanIndexedlength>, ArrayList<Kalman
 			if ( slope!= Double.MAX_VALUE && intercept!= Double.MAX_VALUE){
 			final Pair<KalmanIndexedlength, KalmanIndexedlength> returnparam = Getfinallineparam(Label, slope, intercept, Curvature, Inflection, psf, minlength);
 			if (returnparam!= null ){
-			startlist.add(returnparam.fst);
-			endlist.add(returnparam.snd);
+			startlist.add(returnparam.getA());
+			endlist.add(returnparam.getB());
 			}
 			}
 		}
 		
-		pair_paramlist = new Pair<ArrayList<KalmanIndexedlength>, ArrayList<KalmanIndexedlength>>(startlist, endlist);
+		pair_paramlist = new ValuePair<ArrayList<KalmanIndexedlength>, ArrayList<KalmanIndexedlength>>(startlist, endlist);
 
 		return true;
 	}
@@ -652,7 +657,12 @@ public ArrayList<KalmanIndexedlength> getEndPoints(){
 					
 					
 					
-					final Pair<KalmanIndexedlength, KalmanIndexedlength> pair = new Pair<KalmanIndexedlength, KalmanIndexedlength> ( startPart, endPart);
+					final Pair<KalmanIndexedlength, KalmanIndexedlength> pair = new ValuePair<KalmanIndexedlength, KalmanIndexedlength> ( startPart, endPart);
+					jpb.setValue((int) percent);
+					jpb.setOpaque(true);
+					jpb.setStringPainted(true);
+				//	jpb.setForeground(Color.YELLOW);
+					jpb.setString("End points in frame = " + framenumber );
 					return pair;
 					
 					}
@@ -757,8 +767,13 @@ public ArrayList<KalmanIndexedlength> getEndPoints(){
 						
 						
 						
-						final Pair<KalmanIndexedlength, KalmanIndexedlength> pair = new Pair<KalmanIndexedlength, KalmanIndexedlength> ( startPart, endPart);
-						return pair;
+						final Pair<KalmanIndexedlength, KalmanIndexedlength> pair = new ValuePair<KalmanIndexedlength, KalmanIndexedlength> ( startPart, endPart);
+						jpb.setValue((int) percent);
+					jpb.setOpaque(true);
+					jpb.setStringPainted(true);
+				//	jpb.setForeground(Color.YELLOW);
+					jpb.setString("End points in frame = " + framenumber );
+					return pair;
 						
 						}
 						
@@ -863,7 +878,12 @@ public ArrayList<KalmanIndexedlength> getEndPoints(){
 					
 					
 					
-					final Pair<KalmanIndexedlength, KalmanIndexedlength> pair = new Pair<KalmanIndexedlength, KalmanIndexedlength> ( startPart, endPart);
+					final Pair<KalmanIndexedlength, KalmanIndexedlength> pair = new ValuePair<KalmanIndexedlength, KalmanIndexedlength> ( startPart, endPart);
+					jpb.setValue((int) percent);
+					jpb.setOpaque(true);
+					jpb.setStringPainted(true);
+				//	jpb.setForeground(Color.YELLOW);
+					jpb.setString("End points in frame = " + framenumber );
 					return pair;
 					}
 

@@ -10,7 +10,6 @@ package peakFitter;
 
 import javax.swing.JProgressBar;
 
-import com.sun.tools.javac.util.Pair;
 
 	import LineModels.GaussianLineds;
 	import LineModels.GaussianLinedsHF;
@@ -37,7 +36,9 @@ import labeledObjects.KalmanIndexedlength;
 	import net.imglib2.algorithm.OutputAlgorithm;
 	import net.imglib2.type.numeric.integer.IntType;
 	import net.imglib2.type.numeric.real.FloatType;
-	import net.imglib2.view.Views;
+import net.imglib2.util.Pair;
+import net.imglib2.util.ValuePair;
+import net.imglib2.view.Views;
 	import peakFitter.GaussianMaskFitMSER.EndfitMSER;
 import peakFitter.SubpixelVelocityPCLine.StartorEnd;
 import preProcessing.GetLocalmaxmin;
@@ -325,7 +326,7 @@ import preProcessing.GetLocalmaxmin;
 		@Override
 		public Pair<ArrayList<KalmanIndexedlength>, ArrayList<KalmanIndexedlength>> getResult() {
 
-			Pair<ArrayList<KalmanIndexedlength>, ArrayList<KalmanIndexedlength>> listpair = new Pair<ArrayList<KalmanIndexedlength>, ArrayList<KalmanIndexedlength>>(
+			Pair<ArrayList<KalmanIndexedlength>, ArrayList<KalmanIndexedlength>> listpair = new ValuePair<ArrayList<KalmanIndexedlength>, ArrayList<KalmanIndexedlength>>(
 					final_paramliststart, final_paramlistend);
 
 			return listpair;
