@@ -3351,27 +3351,7 @@ public class Interactive_MT implements PlugIn {
 				next = 2;
 
 			maxStack();
-			/*
-			 * int loopsize = 0;
-			 * 
-			 * double currentrationeg = Intensityratio; double currentratiopos =
-			 * Intensityratio; int negcount = 0; int poscount = 0; while
-			 * (currentrationeg >= 0.2) { negcount++; currentrationeg-=0.1;
-			 * 
-			 * };
-			 * 
-			 * while (currentratiopos <= 0.2) { poscount++;
-			 * currentratiopos+=0.1;
-			 * 
-			 * }; loopsize = negcount + poscount;
-			 * 
-			 * for (int loop = 0; loop < loopsize && DoRloop;++loop){
-			 * 
-			 * 
-			 * Intensityratio = currentrationeg + loop*0.1;
-			 * 
-			 * }
-			 */
+			
 
 			int Kalmancount = 0;
 			
@@ -3522,9 +3502,10 @@ public class Interactive_MT implements PlugIn {
 			if (showDeterministic) {
 				
 				
-				final Trackstart trackerstart = new Trackstart(Allstart, thirdDimensionSize - next);
-				final Trackend trackerend = new Trackend(Allend, thirdDimensionSize - next);
+				
+			
 				if (Trackstart) {
+					final Trackstart trackerstart = new Trackstart(Allstart, thirdDimensionSize - next);
 					ImagePlus impstart = ImageJFunctions.show(originalimg);
 					ImagePlus impstartsec = ImageJFunctions.show(originalimg);
 					trackerstart.process();
@@ -3544,6 +3525,7 @@ public class Interactive_MT implements PlugIn {
 				}
 
 				if (Trackstart == false) {
+					final Trackend trackerend = new Trackend(Allend, thirdDimensionSize - next);
 					ImagePlus impend = ImageJFunctions.show(originalPreprocessedimg);
 
 					
@@ -3804,9 +3786,10 @@ public class Interactive_MT implements PlugIn {
 
 					}
 
-					rtAll.show("Results");
+					
 
 				}
+				rtAll.show("Results");
 			}
 			if (showDeterministic) {
 
@@ -3821,12 +3804,12 @@ public class Interactive_MT implements PlugIn {
 					final ArrayList<Trackproperties> first = Allstart.get(0);
 					int MaxSeedLabel = first.get(first.size() - 1).seedlabel;
 					int MinSeedLabel = first.get(0).seedlabel;
-
 					for (int currentseed = MinSeedLabel; currentseed < MaxSeedLabel + 1; ++currentseed) {
 						double startlength = 0;
 						double startlengthpixel = 0;
 						for (int index = 0; index < Allstart.size(); ++index) {
 
+					
 						
 							final ArrayList<Trackproperties> thirdDimension = Allstart.get(index);
 
@@ -3836,7 +3819,6 @@ public class Interactive_MT implements PlugIn {
 
 								final int framenumber = thirdDimension.get(frameindex).Framenumber;
 								if (SeedID == currentseed) {
-
 									final Integer[] FrameID = { framenumber, SeedID };
 									final double[] originalpoint = thirdDimension.get(frameindex).originalpoint;
 									final double[] newpoint = thirdDimension.get(frameindex).newpoint;
@@ -3881,9 +3863,9 @@ public class Interactive_MT implements PlugIn {
 						}
 
 					}
-
+					ResultsTable rt = new ResultsTable();
 					for (int seedID = MinSeedLabel; seedID <= MaxSeedLabel; ++seedID) {
-						ResultsTable rt = new ResultsTable();
+						
 						if (SaveTxt) {
 							try {
 
@@ -3933,9 +3915,8 @@ public class Interactive_MT implements PlugIn {
 							} catch (IOException e) {
 							}
 						}
-
+					}
 						for (int index = 0; index < lengthliststart.size(); ++index) {
-							if (lengthliststart.get(index).getA()[1] == seedID) {
 								rt.incrementCounter();
 								rt.addValue("FrameNumber", lengthliststart.get(index).getA()[0]);
 								rt.addValue("SeedLabel", lengthliststart.get(index).getA()[1]);
@@ -3967,16 +3948,13 @@ public class Interactive_MT implements PlugIn {
 								rtAll.addValue("Length in real units", lengthliststart.get(index).getB()[8]);
 								rtAll.addValue("Cummulative Length in real units", lengthliststart.get(index).getB()[9]);
 
-							}
 
 						}
-						ArrayList<Line> allline = new ArrayList<Line>();
 
 						if (SaveXLS)
 							saveResultsToExcel(
-									usefolder + "//" + addTrackToName + "start" + "SeedLabel" + seedID + ".xls", rt);
+									usefolder + "//" + addTrackToName + "start"  + ".xls", rt);
 
-					}
 				}
 				if (Trackstart == false) {
 					final ArrayList<Trackproperties> first = Allend.get(0);
@@ -3994,8 +3972,8 @@ public class Interactive_MT implements PlugIn {
 
 							for (int frameindex = 0; frameindex < thirdDimension.size(); ++frameindex) {
 								final Integer SeedID = thirdDimension.get(frameindex).seedlabel;
-								final int framenumber = thirdDimension.get(frameindex).Framenumber;
 								if (SeedID == currentseed) {
+								final int framenumber = thirdDimension.get(frameindex).Framenumber;
 
 									final Integer[] FrameID = { framenumber, SeedID };
 									final double[] originalpoint = thirdDimension.get(frameindex).originalpoint;
@@ -4042,12 +4020,11 @@ public class Interactive_MT implements PlugIn {
 								}
 							}
 
-						}
-
 					}
-
+					}
+					ResultsTable rtend = new ResultsTable();
 					for (int seedID = MinSeedLabel; seedID <= MaxSeedLabel; ++seedID) {
-						ResultsTable rtend = new ResultsTable();
+						
 						if (SaveTxt) {
 							try {
 								File fichier = new File(
@@ -4094,9 +4071,9 @@ public class Interactive_MT implements PlugIn {
 							} catch (IOException e) {
 							}
 						}
+					}
 
 						for (int index = 0; index < lengthlistend.size(); ++index) {
-							if (lengthlistend.get(index).getA()[1] == seedID) {
 								rtend.incrementCounter();
 								rtend.addValue("FrameNumber", lengthlistend.get(index).getA()[0]);
 								rtend.addValue("SeedLabel", lengthlistend.get(index).getA()[1]);
@@ -4126,16 +4103,14 @@ public class Interactive_MT implements PlugIn {
 								rtAll.addValue("Length in real units", lengthlistend.get(index).getB()[8]);
 								rtAll.addValue("Cummulative Length in real units", lengthlistend.get(index).getB()[9]);
 
-							}
 
 						}
 
 						if (SaveXLS)
 							saveResultsToExcel(
-									usefolder + "//" + addTrackToName + "end" + "seedLabel" + seedID + ".xls", rtend);
+									usefolder + "//" + addTrackToName + "end" + ".xls", rtend);
 
 					}
-				}
 				rtAll.show("Start and End of MT, respectively");
 				if (Trackstart) 
 					lengthtime = lengthtimestart;
@@ -4358,8 +4333,11 @@ public class Interactive_MT implements PlugIn {
 				
 				Kymoimp.show();
 			}
-			if (displayoverlay)
+		
+			if (displayoverlay){
+				prestack.deleteLastSlice();
 				new ImagePlus("Overlays", prestack).show();
+			}
 			return null;
 
 		}
@@ -4842,9 +4820,10 @@ public class Interactive_MT implements PlugIn {
 
 					}
 
-					rtAll.show("Results");
+					
 
 				}
+				rtAll.show("Results");
 			}
 			if (showDeterministic) {
 				NumberFormat nf = NumberFormat.getInstance(Locale.ENGLISH);
@@ -4855,7 +4834,6 @@ public class Interactive_MT implements PlugIn {
 					final ArrayList<Trackproperties> first = Allstart.get(0);
 					int MaxSeedLabel = first.get(first.size() - 1).seedlabel;
 					int MinSeedLabel = first.get(0).seedlabel;
-
 					ArrayList<Pair<Integer[], double[]>> lengthliststart = new ArrayList<Pair<Integer[], double[]>>();
 					for (int currentseed = MinSeedLabel; currentseed < MaxSeedLabel + 1; ++currentseed) {
 						double startlength = 0;
@@ -4870,7 +4848,6 @@ public class Interactive_MT implements PlugIn {
 								final Integer SeedID = thirdDimension.get(frameindex).seedlabel;
 								final int framenumber =  thirdDimension.get(frameindex).Framenumber;
 								if (SeedID == currentseed) {
-
 									final Integer[] FrameID = { framenumber, SeedID };
 									final double[] originalpoint = thirdDimension.get(frameindex).originalpoint;
 									final double[] newpoint = thirdDimension.get(frameindex).newpoint;
@@ -4914,13 +4891,11 @@ public class Interactive_MT implements PlugIn {
 
 								}
 							}
-
 						}
-
 					}
-
+					ResultsTable rt = new ResultsTable();
 					for (int seedID = MinSeedLabel; seedID <= MaxSeedLabel; ++seedID) {
-						ResultsTable rt = new ResultsTable();
+						
 						if (SaveTxt) {
 							try {
 								File fichier = new File(
@@ -4940,8 +4915,8 @@ public class Interactive_MT implements PlugIn {
 
 								bwmy.write("\tFramenumber\tLength\n");
 
-								for (int index = 0; index < Allstart.size(); ++index) {
-									if (lengthliststart.get(index).getA()[1] == seedID) {
+								for (int index = 0; index < lengthliststart.size(); ++index) {
+									if(lengthliststart.get(index).getA()[1] == seedID){
 										bw.write("\t" + lengthliststart.get(index).getA()[0] + "\t" + "\t"
 												+ nf.format(lengthliststart.get(index).getA()[1]) + "\t" + "\t"
 												+ nf.format(lengthliststart.get(index).getB()[0]) + "\t" + "\t"
@@ -4957,9 +4932,8 @@ public class Interactive_MT implements PlugIn {
 
 										bwmy.write("\t" + lengthliststart.get(index).getA()[0] + "\t" + "\t"
 												+ nf.format(lengthliststart.get(index).getB()[11]) + "\n");
-
 									}
-								}
+									}
 								bw.close();
 								fw.close();
 								bwmy.close();
@@ -4968,9 +4942,8 @@ public class Interactive_MT implements PlugIn {
 							} catch (IOException e) {
 							}
 						}
-
-						for (int index = 0; index < Allstart.size(); ++index) {
-							if (lengthliststart.get(index).getA()[1] == seedID) {
+					}
+						for (int index = 0; index < lengthliststart.size(); ++index) {
 								rt.incrementCounter();
 								rt.addValue("FrameNumber", lengthliststart.get(index).getA()[0]);
 								rt.addValue("SeedLabel", lengthliststart.get(index).getA()[1]);
@@ -5003,16 +4976,15 @@ public class Interactive_MT implements PlugIn {
 								rtAll.addValue("Length in real units", lengthliststart.get(index).getB()[8]);
 								rtAll.addValue("Cummulative Length in real units", lengthliststart.get(index).getB()[9]);
 
-							}
 
 						}
 
 						if (SaveXLS)
 							saveResultsToExcel(
-									usefolder + "//" + addTrackToName + "start" + "SeedLabel" + seedID + ".xls", rt);
+									usefolder + "//" + addTrackToName + "start"  + ".xls", rt);
 
 					}
-				}
+				
 
 				if (Trackstart == false) {
 					ArrayList<Pair<Integer[], double[]>> lengthlistend = new ArrayList<Pair<Integer[], double[]>>();
@@ -5032,7 +5004,6 @@ public class Interactive_MT implements PlugIn {
 								final Integer SeedID = thirdDimension.get(frameindex).seedlabel;
 
 								if (SeedID == currentseed) {
-
 									final Integer[] FrameID = { framenumber, SeedID };
 									final double[] originalpoint = thirdDimension.get(frameindex).originalpoint;
 									final double[] newpoint = thirdDimension.get(frameindex).newpoint;
@@ -5079,15 +5050,13 @@ public class Interactive_MT implements PlugIn {
 									lengthlistend.add(lengthpair);
 
 								}
-
 							}
-
 						}
 
 					}
-
+					ResultsTable rtend = new ResultsTable();
 					for (int seedID = MinSeedLabel; seedID <= MaxSeedLabel; ++seedID) {
-						ResultsTable rtend = new ResultsTable();
+						
 						if (SaveTxt) {
 							try {
 								File fichier = new File(
@@ -5114,7 +5083,7 @@ public class Interactive_MT implements PlugIn {
 								BufferedWriter bwmy = new BufferedWriter(fwmy);
 
 								bwmy.write("\tFramenumber\tLength\n");
-								for (int index = 0; index < Allend.size(); ++index) {
+								for (int index = 0; index < lengthlistend.size(); ++index) {
 									if (lengthlistend.get(index).getA()[1] == seedID) {
 										bw.write("\t" + lengthlistend.get(index).getA()[0] + "\t" + "\t"
 												+ nf.format(lengthlistend.get(index).getA()[1]) + "\t" + "\t"
@@ -5133,7 +5102,6 @@ public class Interactive_MT implements PlugIn {
 												+ nf.format(lengthlistend.get(index).getB()[11]) + "\n");
 
 									}
-
 								}
 								bwmy.close();
 								fwmy.close();
@@ -5144,10 +5112,9 @@ public class Interactive_MT implements PlugIn {
 							} catch (IOException e) {
 							}
 						}
+					}
+						for (int index = 0; index < lengthlistend.size(); ++index) {
 
-						for (int index = 0; index < Allend.size(); ++index) {
-
-							if (lengthlistend.get(index).getA()[1] == seedID) {
 								rtend.incrementCounter();
 								rtend.addValue("FrameNumber", lengthlistend.get(index).getA()[0]);
 								rtend.addValue("SeedLabel", lengthlistend.get(index).getA()[1]);
@@ -5180,16 +5147,16 @@ public class Interactive_MT implements PlugIn {
 								rtAll.addValue("Cummulative Length in real units",
 										(float) lengthlistend.get(index).getB()[9]);
 
-							}
 
 						}
 
 						if (SaveXLS)
 							saveResultsToExcel(
-									usefolder + "//" + addTrackToName + "end" + "SeedLabel" + seedID + ".xls", rtend);
+									usefolder + "//" + addTrackToName + "end" + ".xls", rtend);
 
 					}
-				}
+				
+				
 				rtAll.show("Start and End of MT");
 				if (Trackstart)
 					lengthtime = lengthtimestart;
@@ -5415,8 +5382,10 @@ public class Interactive_MT implements PlugIn {
 				
 				Kymoimp.show();
 			}
-			if (displayoverlay)
+			if (displayoverlay){
+				prestack.deleteLastSlice();
 				new ImagePlus("Overlays", prestack).show();
+			}
 			return null;
 		}
 
@@ -5540,9 +5509,10 @@ public class Interactive_MT implements PlugIn {
 				final GridBagLayout layout = new GridBagLayout();
 				final GridBagConstraints c = new GridBagConstraints();
 				panelFifth.removeAll();
-
+				final Label Step = new Label("Step 5", Label.CENTER);
 				panelFifth.setLayout(layout);
 
+				panelFifth.add(Step, c);
 				final Label exthresholdText = new Label("threshold = threshold to create Bitimg for watershedding.",
 						Label.CENTER);
 				final Label exthetaText = new Label("thetaPerPixel = Pixel Size in theta direction for Hough space.",
@@ -5579,7 +5549,6 @@ public class Interactive_MT implements PlugIn {
 				Update.setForeground(new Color(255, 255, 255));
 				/* Location */
 				panelFifth.setLayout(layout);
-
 				c.fill = GridBagConstraints.HORIZONTAL;
 				c.gridx = 0;
 				c.gridy = 0;
@@ -5663,8 +5632,9 @@ public class Interactive_MT implements PlugIn {
 				final GridBagLayout layout = new GridBagLayout();
 				final GridBagConstraints c = new GridBagConstraints();
 				panelFifth.removeAll();
-
+				final Label Step = new Label("Step 5", Label.CENTER);
 				panelFifth.setLayout(layout);
+				panelFifth.add(Step, c);
 				final Scrollbar deltaS = new Scrollbar(Scrollbar.HORIZONTAL, deltaInit, 10, 0, 10 + scrollbarSize);
 				final Scrollbar maxVarS = new Scrollbar(Scrollbar.HORIZONTAL, maxVarInit, 10, 0, 10 + scrollbarSize);
 				final Scrollbar minDiversityS = new Scrollbar(Scrollbar.HORIZONTAL, minDiversityInit, 10, 0,
@@ -5691,6 +5661,8 @@ public class Interactive_MT implements PlugIn {
 				Update.setBackground(new Color(1, 0, 1));
 				Update.setForeground(new Color(255, 255, 255));
 				panelFifth.setLayout(layout);
+				final Label Stepfive = new Label("Step 5", Label.CENTER);
+				panelFifth.add(Stepfive, c);
 				c.fill = GridBagConstraints.HORIZONTAL;
 				c.gridx = 0;
 				c.gridy = 0;
@@ -5781,8 +5753,9 @@ public class Interactive_MT implements PlugIn {
 				final GridBagLayout layout = new GridBagLayout();
 				final GridBagConstraints c = new GridBagConstraints();
 				panelFifth.removeAll();
-
+				final Label Step = new Label("Step 5", Label.CENTER);
 				panelFifth.setLayout(layout);
+				panelFifth.add(Step, c);
 				final Scrollbar deltaS = new Scrollbar(Scrollbar.HORIZONTAL, deltaInit, 10, 0, 10 + scrollbarSize);
 				final Scrollbar maxVarS = new Scrollbar(Scrollbar.HORIZONTAL, maxVarInit, 10, 0, 10 + scrollbarSize);
 				final Scrollbar minDiversityS = new Scrollbar(Scrollbar.HORIZONTAL, minDiversityInit, 10, 0,
@@ -5808,8 +5781,10 @@ public class Interactive_MT implements PlugIn {
 				final Label Update = new Label("Update parameters for dynamic channel");
 				Update.setBackground(new Color(1, 0, 1));
 				Update.setForeground(new Color(255, 255, 255));
+				final Label Stepfive = new Label("Step 5", Label.CENTER);
 				panelFifth.setLayout(layout);
 
+				panelFifth.add(Stepfive, c);
 				c.fill = GridBagConstraints.HORIZONTAL;
 				c.gridx = 0;
 				c.gridy = 0;
@@ -5903,9 +5878,11 @@ public class Interactive_MT implements PlugIn {
 
 				final GridBagLayout layout = new GridBagLayout();
 				final GridBagConstraints c = new GridBagConstraints();
+				final Label Step = new Label("Step 2", Label.CENTER);
 
 				panelSecond.setLayout(layout);
 
+				panelSecond.add(Step, c);
 				final Scrollbar deltaS = new Scrollbar(Scrollbar.HORIZONTAL, deltaInit, 10, 0, 10 + scrollbarSize);
 				final Scrollbar maxVarS = new Scrollbar(Scrollbar.HORIZONTAL, maxVarInit, 10, 0, 10 + scrollbarSize);
 				final Scrollbar minDiversityS = new Scrollbar(Scrollbar.HORIZONTAL, minDiversityInit, 10, 0,
@@ -6040,8 +6017,10 @@ public class Interactive_MT implements PlugIn {
 				final GridBagConstraints c = new GridBagConstraints();
 
 				panelSecond.removeAll();
+				final Label Step = new Label("Step 2", Label.CENTER);
 
 				panelSecond.setLayout(layout);
+				panelSecond.add(Step, c);
 				final Label exthresholdText = new Label("threshold = threshold to create Bitimg for watershedding.",
 						Label.CENTER);
 				final Label exthetaText = new Label("thetaPerPixel = Pixel Size in theta direction for Hough space.",
@@ -6077,10 +6056,12 @@ public class Interactive_MT implements PlugIn {
 				final Label Houghparam = new Label("Determine Hough Transform parameters");
 				Houghparam.setBackground(new Color(1, 0, 1));
 				Houghparam.setForeground(new Color(255, 255, 255));
+				final Label Stepsec = new Label("Step 1", Label.CENTER);
 
 				/* Location */
 				panelSecond.setLayout(layout);
 
+				panelSecond.add(Stepsec, c);
 				c.fill = GridBagConstraints.HORIZONTAL;
 				c.gridx = 0;
 				c.gridy = 0;
@@ -6237,8 +6218,10 @@ public class Interactive_MT implements PlugIn {
 				final GridBagLayout layout = new GridBagLayout();
 				final GridBagConstraints c = new GridBagConstraints();
 				panelSecond.removeAll();
+				final Label Step = new Label("Step 1", Label.CENTER);
 
 				panelSecond.setLayout(layout);
+				panelSecond.add(Step, c);
 				final Label exthetaText = new Label("thetaPerPixel = Pixel Size in theta direction for Hough space.",
 						Label.CENTER);
 				final Label exrhoText = new Label("rhoPerPixel = Pixel Size in rho direction for Hough space.",
@@ -6297,8 +6280,11 @@ public class Interactive_MT implements PlugIn {
 				final Label minSizeText = new Label("MinSize = ", Label.CENTER);
 				final Label maxSizeText = new Label("MaxSize = ", Label.CENTER);
 				/* Location */
+				final Label Stepsec = new Label("Step 2", Label.CENTER);
+
 				panelSecond.setLayout(layout);
 
+				panelSecond.add(Stepsec, c);
 				c.fill = GridBagConstraints.HORIZONTAL;
 				c.gridx = 0;
 				c.gridy = 0;
@@ -7058,6 +7044,10 @@ public class Interactive_MT implements PlugIn {
 			sliceObserver.unregister();
 		if (roiListener != null)
 			imp.getCanvas().removeMouseListener(roiListener);
+		if (imp!=null)
+			imp.close();
+		if (preprocessedimp!=null)
+			preprocessedimp.close();
 
 		isFinished = true;
 	}

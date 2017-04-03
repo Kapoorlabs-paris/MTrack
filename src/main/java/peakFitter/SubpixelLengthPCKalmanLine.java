@@ -662,7 +662,7 @@ public ArrayList<KalmanIndexedlength> getEndPoints(){
 					jpb.setOpaque(true);
 					jpb.setStringPainted(true);
 				//	jpb.setForeground(Color.YELLOW);
-					jpb.setString("End points in frame = " + framenumber );
+					jpb.setString("Finding MT ends" );
 					return pair;
 					
 					}
@@ -772,7 +772,7 @@ public ArrayList<KalmanIndexedlength> getEndPoints(){
 					jpb.setOpaque(true);
 					jpb.setStringPainted(true);
 				//	jpb.setForeground(Color.YELLOW);
-					jpb.setString("End points in frame = " + framenumber );
+					jpb.setString("Finding MT ends" );
 					return pair;
 						
 						}
@@ -883,7 +883,7 @@ public ArrayList<KalmanIndexedlength> getEndPoints(){
 					jpb.setOpaque(true);
 					jpb.setStringPainted(true);
 				//	jpb.setForeground(Color.YELLOW);
-					jpb.setString("End points in frame = " + framenumber );
+					jpb.setString("Finding MT ends" );
 					return pair;
 					}
 
