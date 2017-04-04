@@ -47,10 +47,12 @@ import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
+import javax.swing.ComboBoxModel;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
@@ -104,7 +106,6 @@ import ij.process.ColorProcessor;
 import ij.process.FloatProcessor;
 import interactiveMT.InteractiveKymoAnalyze.GetBaseCords;
 import interactiveMT.InteractiveKymoAnalyze.GetCords;
-import interactiveMT.InteractiveKymoAnalyze.GetLength;
 import labeledObjects.CommonOutputHF;
 import labeledObjects.Indexedlength;
 import labeledObjects.KalmanIndexedlength;
@@ -175,7 +176,7 @@ public class Interactive_MT implements PlugIn {
 	ArrayList<float[]> deltadstart = new ArrayList<>();
 	ArrayList<float[]> deltadend = new ArrayList<>();
 	ArrayList<float[]> deltad = new ArrayList<>();
-	ArrayList<float[]> Length;
+	ArrayList<float[]> lengthKymo;
 	final int scrollbarSize = 1000;
 	final int scrollbarSizebig = 1000;
 	// steps per octave
@@ -211,6 +212,7 @@ public class Interactive_MT implements PlugIn {
 	long minSizemax = 1000;
 	long maxSizemin = 100;
 	long maxSizemax = 10000;
+	int selectedSeed;
 	double netdeltad = 0;
 	double Intensityratio = 0.5;
 	double Inispacing = 0.5;
@@ -280,6 +282,7 @@ public class Interactive_MT implements PlugIn {
 	int nbRois;
 	Roi rorig = null;
 	ArrayList<double[]> lengthtimestart = new ArrayList<double[]>();
+	ArrayList<Integer> ID = new ArrayList<Integer>();
 	ArrayList<double[]> lengthtimeend = new ArrayList<double[]>();
 	ArrayList<double[]> lengthtime = new ArrayList<double[]>();
 	MTTracker MTtrackerstart;
@@ -1187,80 +1190,8 @@ public class Interactive_MT implements PlugIn {
 			DeterTracker.addItemListener(new DeterchoiceListener());
 		}
 		
-		if (analyzekymo == false || Kymoimg == null){
-		panelEighth.removeAll();
-		final Label Step8 = new Label("Step 6", Label.CENTER);
-		panelEighth.setLayout(layout);
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.gridx = 0;
-		c.gridy = 0;
-		c.weightx = 4;
-		c.weighty = 1.5;
-
-		panelEighth.add(Step8, c);
-	
-		final Label SuccessB = new Label(" Now you can compute rates, choose start and end frame: ",
-				Label.CENTER);
-
-		final Label Done = new Label("The results have been compiled and stored, you can now exit",
-				Label.CENTER);
-
-		final Button Analyze = new Button("Do Rough Analysis");
-
-		final Scrollbar startS = new Scrollbar(Scrollbar.HORIZONTAL, thirdDimensionsliderInit, 10, 0,
-				10 + scrollbarSize);
-		final Scrollbar endS = new Scrollbar(Scrollbar.HORIZONTAL, thirdDimensionsliderInit, 10, 0,
-				10 + scrollbarSize);
-		starttime = (int) computeValueFromScrollbarPosition(thirdDimensionsliderInit, 0, thirdDimensionSize,
-				scrollbarSize);
-		endtime = (int) computeValueFromScrollbarPosition(thirdDimensionsliderInit, 0, thirdDimensionSize,
-				scrollbarSize);
-		final Label startText = new Label("startFrame = ", Label.CENTER);
-		final Label endText = new Label("endFrame = ", Label.CENTER);
-
-		
-
-		SuccessB.setBackground(new Color(1, 0, 1));
-		SuccessB.setForeground(new Color(255, 255, 255));
-		
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 50);
-		panelEighth.add(SuccessB, c);
 		
 		
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 50);
-		panelEighth.add(startText, c);
-
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 50);
-		panelEighth.add(startS, c);
-
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 50);
-		panelEighth.add(endText, c);
-
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 50);
-		panelEighth.add(endS, c);
-
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 50);
-		panelEighth.add(Analyze, c);
-
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 50);
-		panelEighth.add(Done, c);
-
-		startS.addAdjustmentListener(new starttimeListener(startText, thirdDimensionsliderInit,
-				thirdDimensionSize, scrollbarSize, startS));
-		endS.addAdjustmentListener(new endtimeListener(endText, thirdDimensionsliderInit, thirdDimensionSize,
-				scrollbarSize, endS));
-		Analyze.addActionListener(new AnalyzeListener());
-
-		panelEighth.validate();
-		panelEighth.repaint();
-		}
 
 		
 		
@@ -1625,7 +1556,7 @@ public class Interactive_MT implements PlugIn {
 
 		}
 		overlaysec.clear();
-		Length = new ArrayList<float[]>();
+		lengthKymo = new ArrayList<float[]>();
 		for (int i = 0; i < nbRois; ++i) {
 
 			PolygonRoi l = (PolygonRoi) RoisOrig[i];
@@ -1653,7 +1584,7 @@ public class Interactive_MT implements PlugIn {
 					cordsLine[1] = y;
 					cordsLine[0] = (y - intercept) / (slope);
 					if (slope != 0)
-						Length.add(new float[] { cordsLine[0], cordsLine[1] });
+						lengthKymo.add(new float[] { cordsLine[0], cordsLine[1] });
 
 				}
 
@@ -1668,15 +1599,15 @@ public class Interactive_MT implements PlugIn {
 
 		int j = 0;
 
-		for (int index = 0; index < Length.size() - 1; ++index) {
+		for (int index = 0; index < lengthKymo.size() - 1; ++index) {
 
 			j = index + 1;
 
-			while (j < Length.size()) {
+			while (j < lengthKymo.size()) {
 
-				if (Length.get(index)[1] == Length.get(j)[1]) {
+				if (lengthKymo.get(index)[1] == lengthKymo.get(j)[1]) {
 
-					Length.remove(index);
+					lengthKymo.remove(index);
 				}
 
 				else {
@@ -1691,10 +1622,10 @@ public class Interactive_MT implements PlugIn {
 			File fichierKy = new File(usefolder + "//" + addToName + "KymoWill-start" + ".txt");
 			fw = new FileWriter(fichierKy);
 			BufferedWriter bw = new BufferedWriter(fw);
-			bw.write("\tFramenumber\tLength\n");
-			for (int index = 0; index < Length.size(); ++index) {
-				System.out.println(Length.get(index)[1] + " " + Length.get(index)[0]);
-				bw.write("\t" + (Length.get(index)[1]) + "\t" + (Length.get(index)[0] + "\n"));
+			bw.write("\tFramenumber\tlengthKymo\n");
+			for (int index = 0; index < lengthKymo.size(); ++index) {
+				System.out.println(lengthKymo.get(index)[1] + " " + lengthKymo.get(index)[0]);
+				bw.write("\t" + (lengthKymo.get(index)[1]) + "\t" + (lengthKymo.get(index)[0] + "\n"));
 			}
 
 			bw.close();
@@ -1750,6 +1681,7 @@ public class Interactive_MT implements PlugIn {
 				final Button SkipframeandTrackEndPoints = new Button(
 						"TrackEndPoint (User specified first and last frame)");
 				final Button CheckResults = new Button("Check Results (then click next)");
+				final Button RoughResults = new Button("Analyze Rates");
 				final Label Checkres = new Label("The tracker now performs an internal check on the results");
 				Checkres.setBackground(new Color(1, 0, 1));
 				Checkres.setForeground(new Color(255, 255, 255));
@@ -1769,9 +1701,14 @@ public class Interactive_MT implements PlugIn {
 				c.insets = new Insets(10, 175, 0, 175);
 				panelSeventh.add(CheckResults, c);
 				}
+				++c.gridy;
+				c.insets = new Insets(10, 175, 0, 175);
+				panelSeventh.add(RoughResults, c);
+				
 				TrackEndPoints.addActionListener(new TrackendsListener());
 				SkipframeandTrackEndPoints.addActionListener(new SkipFramesandTrackendsListener());
 				CheckResults.addActionListener(new CheckResultsListener());
+				RoughResults.addActionListener(new AcceptResultsListener());
 				panelSeventh.repaint();
 				panelSeventh.validate();
 
@@ -1872,7 +1809,7 @@ public class Interactive_MT implements PlugIn {
 				final Button SkipframeandTrackEndPoints = new Button(
 						"TrackEndPoint (User specified first and last frame)");
 				final Button CheckResults = new Button("Check Results (then click next)");
-
+				final Button RoughResults = new Button("Analyze Rates");
 				final Label Checkres = new Label("The tracker now performs an internal check on the results");
 				Checkres.setBackground(new Color(1, 0, 1));
 				Checkres.setForeground(new Color(255, 255, 255));
@@ -1892,9 +1829,15 @@ public class Interactive_MT implements PlugIn {
 				c.insets = new Insets(10, 175, 0, 175);
 				panelSeventh.add(CheckResults, c);
 				}
+				++c.gridy;
+				c.insets = new Insets(10, 175, 0, 175);
+				panelSeventh.add(RoughResults, c);
+				
 				TrackEndPoints.addActionListener(new TrackendsListener());
 				SkipframeandTrackEndPoints.addActionListener(new SkipFramesandTrackendsListener());
 				CheckResults.addActionListener(new CheckResultsListener());
+				RoughResults.addActionListener(new AcceptResultsListener());
+				
 				panelSeventh.repaint();
 				panelSeventh.validate();
 				
@@ -2657,11 +2600,11 @@ public class Interactive_MT implements PlugIn {
 			ArrayList<float[]> deltaL = new ArrayList<>();
 			if (numberKymo) {
 
-				for (int index = 1; index < Length.size(); ++index) {
+				for (int index = 1; index < lengthKymo.size(); ++index) {
 
-					float delta = Length.get(index)[0] - Length.get(index - 1)[0];
+					float delta = lengthKymo.get(index)[0] - lengthKymo.get(index - 1)[0];
 
-					float[] deltalt = { delta, Length.get(index)[1] };
+					float[] deltalt = { delta, lengthKymo.get(index)[1] };
 
 					deltaL.add(deltalt);
 
@@ -2714,11 +2657,14 @@ public class Interactive_MT implements PlugIn {
 			ArrayList<float[]> deltaLMT = new ArrayList<>();
 			for (int index = 1; index < lengthtime.size(); ++index) {
 
+				if ((int) lengthtime.get(index)[2] == selectedSeed ){
 				float delta = (float) (lengthtime.get(index)[0] - lengthtime.get(index - 1)[0]);
 
-				float[] deltalt = { delta, (int) lengthtime.get(index)[1] };
+				float[] deltalt = { delta, (int) lengthtime.get(index)[1], selectedSeed };
 
 				deltaLMT.add(deltalt);
+				
+				}
 
 			}
 
@@ -2743,7 +2689,7 @@ public class Interactive_MT implements PlugIn {
 
 			}
 
-			// Choosing the faster end
+		
 
 			double velocity = 0;
 			for (int index = 0; index < deltaLMT.size(); ++index) {
@@ -2783,7 +2729,7 @@ public class Interactive_MT implements PlugIn {
 
 			}
 
-			float[] rates = { starttime, endtime, (float) velocity, (float) (velocity * calibration[0] / frametosec) };
+			float[] rates = { starttime, endtime, (float) velocity, (float) (velocity * calibration[0] / frametosec), selectedSeed };
 			finalvelocity.add(rates);
 
 			FileWriter vw;
@@ -2791,17 +2737,17 @@ public class Interactive_MT implements PlugIn {
 			try {
 				vw = new FileWriter(fichierKyvel);
 				BufferedWriter bvw = new BufferedWriter(vw);
-
+				bvw.write("\tStarttime\tEndtime\tRate(velocity pixel units)\tRate (velocity in real units)\tSelectedSeed\n");
 				for (int i = 0; i < finalvelocity.size(); ++i) {
 
 					System.out.println("MT tracker: " + "\t" + finalvelocity.get(i)[0] + "\t" + finalvelocity.get(i)[1]
-							+ "\t" + finalvelocity.get(i)[2] + "\t" + finalvelocity.get(i)[3] + "\n");
+							+ "\t" + finalvelocity.get(i)[2] + "\t" + finalvelocity.get(i)[3] + "\t" + finalvelocity.get(i)[4] + "\n");
 
 					IJ.log("MT tracker: " + "\t" + finalvelocity.get(i)[0] + "\t" + finalvelocity.get(i)[1] + "\t"
-							+ finalvelocity.get(i)[2] + "\t" + finalvelocity.get(i)[3] + "\n");
-					bvw.write("\tStarttime\tEndtime\tRate(velocity pixel units)\tRate (velocity in real units)\n");
+							+ finalvelocity.get(i)[2] + "\t" + finalvelocity.get(i)[3] + "\t" + finalvelocity.get(i)[4] +  "\n");
+					
 					bvw.write("\t" + finalvelocity.get(i)[0] + "\t" + finalvelocity.get(i)[1] + "\t"
-							+ finalvelocity.get(i)[2] + "\t" + finalvelocity.get(i)[3] + "\n");
+							+ finalvelocity.get(i)[2] + "\t" + finalvelocity.get(i)[3] + "\t" + finalvelocity.get(i)[4] +  "\n");
 
 				}
 				bvw.close();
@@ -2980,6 +2926,35 @@ public class Interactive_MT implements PlugIn {
 			final Label startText = new Label("startFrame = ", Label.CENTER);
 			final Label endText = new Label("endFrame = ", Label.CENTER);
 			final Label Done = new Label("The results have been compiled and stored, you can now exit", Label.CENTER);
+			
+			 JLabel lbl = new JLabel("Select the SeedID of the MT for analysis");
+			 
+			 String[] choices = new String[ID.size()] ;
+			 
+			 
+			 for (int index = 0; index < ID.size(); ++index){
+				 
+				 String currentseed = Double.toString(ID.get(index));
+				 
+				 choices[index] = "Seed " + currentseed;
+				 
+				 System.out.println(choices[index]);
+			 }
+			 
+			 
+			JComboBox<String> cb = new JComboBox<String>(choices);
+			
+			++c.gridy;
+			c.insets = new Insets(10, 10, 0, 50);
+			panelEighth.add(lbl, c);
+			
+			
+			
+			++c.gridy;
+			c.insets = new Insets(10, 10, 0, 50);
+			panelEighth.add(cb, c);
+			
+			
 			++c.gridy;
 			c.insets = new Insets(10, 10, 0, 50);
 			panelEighth.add(startText, c);
@@ -3007,7 +2982,7 @@ public class Interactive_MT implements PlugIn {
 			endS.addAdjustmentListener(
 					new endtimeListener(endText, thirdDimensionsliderInit, thirdDimensionSize, scrollbarSize, endS));
 			Analyze.addActionListener(new AnalyzeListener());
-
+			cb.addActionListener(new SeedchoiceListener(cb));
 			panelEighth.validate();
 			panelEighth.repaint();
 
@@ -3247,12 +3222,19 @@ public class Interactive_MT implements PlugIn {
 				
 				final Label SuccessA = new Label(" Congratulations: that is quite close to the Kymograph, + ",
 						Label.CENTER);
+				
+				
 				final Label SuccessB = new Label(" Now you can compute rates, choose start and end frame: ",
 						Label.CENTER);
 
+				
 				final Label Done = new Label("The results have been compiled and stored, you can now exit",
 						Label.CENTER);
 
+				
+				 
+				
+				
 				final Button Analyze = new Button("Do Rough Analysis");
 
 				final Scrollbar startS = new Scrollbar(Scrollbar.HORIZONTAL, thirdDimensionsliderInit, 10, 0,
@@ -3280,6 +3262,7 @@ public class Interactive_MT implements PlugIn {
 				c.insets = new Insets(10, 10, 0, 50);
 				panelEighth.add(SuccessB, c);
 				
+			
 				
 				++c.gridy;
 				c.insets = new Insets(10, 10, 0, 50);
@@ -3311,6 +3294,8 @@ public class Interactive_MT implements PlugIn {
 						scrollbarSize, endS));
 				Analyze.addActionListener(new AnalyzeListener());
 
+				
+			
 				panelEighth.validate();
 				panelEighth.repaint();
 
@@ -3320,6 +3305,28 @@ public class Interactive_MT implements PlugIn {
 
 	}
 
+	public class SeedchoiceListener implements ActionListener{
+		
+		
+		
+		final JComboBox<String> cb;
+		
+		public SeedchoiceListener (JComboBox<String> cb){
+			
+			this.cb = cb;
+			
+		}
+		
+		@Override
+		public void actionPerformed(final ActionEvent arg0) {
+			
+       selectedSeed = cb.getSelectedIndex();
+			
+			
+		}
+		
+	}
+	
 	public void goSkip() {
 
 		jpb.setIndeterminate(false);
@@ -3596,6 +3603,7 @@ public class Interactive_MT implements PlugIn {
 						final double[] originalpoint = list.get(0).currentpoint;
 						double startlength = 0;
 						double startlengthpixel = 0;
+						ID.add(id);
 						for (int index = 1; index < list.size(); ++index) {
 
 							final double[] currentpoint = list.get(index).currentpoint;
@@ -3640,9 +3648,9 @@ public class Interactive_MT implements PlugIn {
 							rt.addValue("PreviousPosition Y (real units)", oldpointCal[1]);
 							rt.addValue("CurrentPosition X (real units)", currentpointCal[0]);
 							rt.addValue("CurrentPosition Y (real units)", currentpointCal[1]);
-							rt.addValue("Length in real units", length);
-							rt.addValue("Cummulative Length in real units", startlength);
-							double[] landt = { startlengthpixel, list.get(index).thirdDimension };
+							rt.addValue("lengthKymo in real units", length);
+							rt.addValue("Cummulative lengthKymo in real units", startlength);
+							double[] landt = { startlengthpixel, list.get(index).thirdDimension, id};
 							lengthtimestart.add(landt);
 							rtAll.incrementCounter();
 
@@ -3656,8 +3664,8 @@ public class Interactive_MT implements PlugIn {
 							rtAll.addValue("PreviousPosition Y (real units)", oldpointCal[1]);
 							rtAll.addValue("CurrentPosition X (real units)", currentpointCal[0]);
 							rtAll.addValue("CurrentPosition Y (real units)", currentpointCal[1]);
-							rtAll.addValue("Length in real units", length);
-							rtAll.addValue("Cummulative Length in real units", startlength);
+							rtAll.addValue("lengthKymo in real units", length);
+							rtAll.addValue("Cummulative lengthKymo in real units", startlength);
 
 						}
 
@@ -3719,6 +3727,7 @@ public class Interactive_MT implements PlugIn {
 						final double[] originalpoint = list.get(0).currentpoint;
 						double endlength = 0;
 						double endlengthpixel = 0;
+                        ID.add(id);
 						for (int index = 1; index < list.size() - 1; ++index) {
 
 							final double[] currentpoint = list.get(index).currentpoint;
@@ -3760,9 +3769,9 @@ public class Interactive_MT implements PlugIn {
 							rt.addValue("PreviousPosition Y (real units)", oldpointCal[1]);
 							rt.addValue("CurrentPosition X (real units)", currentpointCal[0]);
 							rt.addValue("CurrentPosition Y (real units)", currentpointCal[1]);
-							rt.addValue("Length in real units", length);
-							rt.addValue("Cummulative Length in real units", endlength);
-							double[] landt = { endlengthpixel, list.get(index).thirdDimension };
+							rt.addValue("lengthKymo in real units", length);
+							rt.addValue("Cummulative lengthKymo in real units", endlength);
+							double[] landt = { endlengthpixel, list.get(index).thirdDimension, id};
 							lengthtimeend.add(landt);
 							rtAll.incrementCounter();
 
@@ -3776,8 +3785,8 @@ public class Interactive_MT implements PlugIn {
 							rtAll.addValue("PreviousPosition Y (real units)", oldpointCal[1]);
 							rtAll.addValue("CurrentPosition X (real units)", currentpointCal[0]);
 							rtAll.addValue("CurrentPosition Y (real units)", currentpointCal[1]);
-							rtAll.addValue("Length in real units", length);
-							rtAll.addValue("Cummulative Length in real units", endlength);
+							rtAll.addValue("lengthKymo in real units", length);
+							rtAll.addValue("Cummulative lengthKymo in real units", endlength);
 
 						}
 
@@ -3807,6 +3816,7 @@ public class Interactive_MT implements PlugIn {
 					for (int currentseed = MinSeedLabel; currentseed < MaxSeedLabel + 1; ++currentseed) {
 						double startlength = 0;
 						double startlengthpixel = 0;
+						
 						for (int index = 0; index < Allstart.size(); ++index) {
 
 					
@@ -3865,7 +3875,7 @@ public class Interactive_MT implements PlugIn {
 					}
 					ResultsTable rt = new ResultsTable();
 					for (int seedID = MinSeedLabel; seedID <= MaxSeedLabel; ++seedID) {
-						
+						ID.add(seedID);
 						if (SaveTxt) {
 							try {
 
@@ -3879,13 +3889,14 @@ public class Interactive_MT implements PlugIn {
 								bw.write(
 										"\tFramenumber\tSeedLabel\tOldX (px)\tOldY (px)\tNewX (px)\tNewY (px)\tOldX (real)\tOldY (real)"
 												+ "\tNewX (real)\tNewY (real)"
-												+ "\tLength ( real)\tCummulativeLength (real)n");
+												+ "\tlengthKymo ( real)\tCummulativelengthKymo (real)n");
 
 								FileWriter fwmy = new FileWriter(fichierMy);
 								BufferedWriter bwmy = new BufferedWriter(fwmy);
 
-								bwmy.write("\tFramenumber\tLength\n");
+								bwmy.write("\tFramenumber\tlengthKymo\n");
 
+								
 								for (int index = 0; index < lengthliststart.size(); ++index) {
 									if (lengthliststart.get(index).getA()[1] == seedID) {
 										bw.write("\t" + lengthliststart.get(index).getA()[0] + "\t" + "\t"
@@ -3928,10 +3939,10 @@ public class Interactive_MT implements PlugIn {
 								rt.addValue("OldY in real units", lengthliststart.get(index).getB()[5]);
 								rt.addValue("NewX in real units", lengthliststart.get(index).getB()[6]);
 								rt.addValue("NewY in real units", lengthliststart.get(index).getB()[7]);
-								rt.addValue("Length in real units", lengthliststart.get(index).getB()[8]);
-								rt.addValue("Cummulative Length in real units", lengthliststart.get(index).getB()[9]);
+								rt.addValue("lengthKymo in real units", lengthliststart.get(index).getB()[8]);
+								rt.addValue("Cummulative lengthKymo in real units", lengthliststart.get(index).getB()[9]);
 								double[] landt = { lengthliststart.get(index).getB()[11],
-										lengthliststart.get(index).getA()[0] };
+										lengthliststart.get(index).getA()[0],lengthliststart.get(index).getA()[1] };
 								lengthtimestart.add(landt);
 
 								rtAll.incrementCounter();
@@ -3945,8 +3956,8 @@ public class Interactive_MT implements PlugIn {
 								rtAll.addValue("OldY in real units", lengthliststart.get(index).getB()[5]);
 								rtAll.addValue("NewX in real units", lengthliststart.get(index).getB()[6]);
 								rtAll.addValue("NewY in real units", lengthliststart.get(index).getB()[7]);
-								rtAll.addValue("Length in real units", lengthliststart.get(index).getB()[8]);
-								rtAll.addValue("Cummulative Length in real units", lengthliststart.get(index).getB()[9]);
+								rtAll.addValue("lengthKymo in real units", lengthliststart.get(index).getB()[8]);
+								rtAll.addValue("Cummulative lengthKymo in real units", lengthliststart.get(index).getB()[9]);
 
 
 						}
@@ -4024,7 +4035,7 @@ public class Interactive_MT implements PlugIn {
 					}
 					ResultsTable rtend = new ResultsTable();
 					for (int seedID = MinSeedLabel; seedID <= MaxSeedLabel; ++seedID) {
-						
+						ID.add(seedID);
 						if (SaveTxt) {
 							try {
 								File fichier = new File(
@@ -4038,11 +4049,11 @@ public class Interactive_MT implements PlugIn {
 								bw.write(
 										"\tFramenumber\tSeedLabel\tOldX (px)\tOldY (px)\tNewX (px)\tNewY (px)\tOldX (real)\tOldY (real)"
 												+ "\tNewX (real)\tNewY (real)"
-												+ "\tLength ( real)\tCummulativeLength(real)\n");
+												+ "\tlengthKymo ( real)\tCummulativelengthKymo(real)\n");
 								FileWriter fwmy = new FileWriter(fichierMy);
 								BufferedWriter bwmy = new BufferedWriter(fwmy);
 
-								bwmy.write("\tFramenumber\tLength\n");
+								bwmy.write("\tFramenumber\tlengthKymo\n");
 								for (int index = 0; index < lengthlistend.size(); ++index) {
 									if (lengthlistend.get(index).getA()[1] == seedID) {
 										bw.write("\t" + lengthlistend.get(index).getA()[0] + "\t" + "\t"
@@ -4085,9 +4096,9 @@ public class Interactive_MT implements PlugIn {
 								rtend.addValue("OldY in real units", lengthlistend.get(index).getB()[5]);
 								rtend.addValue("NewX in real units", lengthlistend.get(index).getB()[6]);
 								rtend.addValue("NewY in real units", lengthlistend.get(index).getB()[7]);
-								rtend.addValue("Length in real units", lengthlistend.get(index).getB()[8]);
-								rtend.addValue("Cummulative Length in real units", lengthlistend.get(index).getB()[9]);
-								double[] landt = { lengthlistend.get(index).getB()[11], lengthlistend.get(index).getA()[0] };
+								rtend.addValue("lengthKymo in real units", lengthlistend.get(index).getB()[8]);
+								rtend.addValue("Cummulative lengthKymo in real units", lengthlistend.get(index).getB()[9]);
+								double[] landt = { lengthlistend.get(index).getB()[11], lengthlistend.get(index).getA()[0],lengthlistend.get(index).getA()[1]};
 								lengthtimeend.add(landt);
 								rtAll.incrementCounter();
 								rtAll.addValue("FrameNumber", lengthlistend.get(index).getA()[0]);
@@ -4100,8 +4111,8 @@ public class Interactive_MT implements PlugIn {
 								rtAll.addValue("OldY in real units", lengthlistend.get(index).getB()[5]);
 								rtAll.addValue("NewX in real units", lengthlistend.get(index).getB()[6]);
 								rtAll.addValue("NewY in real units", lengthlistend.get(index).getB()[7]);
-								rtAll.addValue("Length in real units", lengthlistend.get(index).getB()[8]);
-								rtAll.addValue("Cummulative Length in real units", lengthlistend.get(index).getB()[9]);
+								rtAll.addValue("lengthKymo in real units", lengthlistend.get(index).getB()[8]);
+								rtAll.addValue("Cummulative lengthKymo in real units", lengthlistend.get(index).getB()[9]);
 
 
 						}
@@ -4127,14 +4138,14 @@ public class Interactive_MT implements PlugIn {
 
 							lengthcheckstart += lengthtimestart.get(index)[0];
 
-							for (int secindex = 0; secindex < Length.size(); ++secindex) {
-								if ((int) Length.get(secindex)[1] == time) {
+							for (int secindex = 0; secindex < lengthKymo.size(); ++secindex) {
+								if ((int) lengthKymo.get(secindex)[1] == time) {
 									for (int accountindex = 0; accountindex < Accountedframes.size(); ++accountindex) {
 
 										if (Accountedframes.get(accountindex) == time) {
 
 											float delta = (float) (lengthtimestart.get(index)[0]
-													- Length.get(secindex)[0]);
+													- lengthKymo.get(secindex)[0]);
 											float[] cudeltadeltaLstart = { delta, time };
 											deltadstart.add(cudeltadeltaLstart);
 
@@ -4194,14 +4205,14 @@ public class Interactive_MT implements PlugIn {
 
 							lengthcheckend += lengthtimeend.get(index)[0];
 
-							for (int secindex = 0; secindex < Length.size(); ++secindex) {
-								if ((int) Length.get(secindex)[1] == time) {
+							for (int secindex = 0; secindex < lengthKymo.size(); ++secindex) {
+								if ((int) lengthKymo.get(secindex)[1] == time) {
 									for (int accountindex = 0; accountindex < Accountedframes.size(); ++accountindex) {
 
 										if (Accountedframes.get(accountindex) == time) {
 
 											float delta = (float) (lengthtimeend.get(index)[0]
-													- Length.get(secindex)[0]);
+													- lengthKymo.get(secindex)[0]);
 											float[] cudeltadeltaLend = { delta, time };
 											deltadend.add(cudeltadeltaLend);
 										}
@@ -4628,7 +4639,7 @@ public class Interactive_MT implements PlugIn {
 						final double[] originalpoint = list.get(0).originalpoint;
 						double startlength = 0;
 						double startlengthpixel = 0;
-
+						ID.add(id);
 						for (int index = 1; index < list.size() - 1; ++index) {
 
 							final double[] currentpoint = list.get(index).currentpoint;
@@ -4671,9 +4682,9 @@ public class Interactive_MT implements PlugIn {
 							rt.addValue("PreviousPosition Y (real units)", oldpointCal[1]);
 							rt.addValue("CurrentPosition X (real units)", currentpointCal[0]);
 							rt.addValue("CurrentPosition Y (real units)", currentpointCal[1]);
-							rt.addValue("Length in real units", length);
-							rt.addValue("Cummulative Length in real units", startlength);
-							double[] landt = { startlengthpixel, list.get(index).thirdDimension };
+							rt.addValue("lengthKymo in real units", length);
+							rt.addValue("Cummulative lengthKymo in real units", startlength);
+							double[] landt = { startlengthpixel, list.get(index).thirdDimension, id };
 							lengthtimestart.add(landt);
 							rtAll.incrementCounter();
 
@@ -4687,8 +4698,8 @@ public class Interactive_MT implements PlugIn {
 							rtAll.addValue("PreviousPosition Y (real units)", oldpointCal[1]);
 							rtAll.addValue("CurrentPosition X (real units)", currentpointCal[0]);
 							rtAll.addValue("CurrentPosition Y (real units)", currentpointCal[1]);
-							rtAll.addValue("Length in real units", length);
-							rtAll.addValue("Cummulative Length in real units", startlength);
+							rtAll.addValue("lengthKymo in real units", length);
+							rtAll.addValue("Cummulative lengthKymo in real units", startlength);
 
 						}
 
@@ -4750,7 +4761,7 @@ public class Interactive_MT implements PlugIn {
 						double endlength = 0;
 						double endlengthpixel = 0;
 						final double[] originalpoint = list.get(0).originalpoint;
-
+						ID.add(id);
 						for (int index = 1; index < list.size() - 1; ++index) {
 
 							final double[] currentpoint = list.get(index).currentpoint;
@@ -4793,10 +4804,10 @@ public class Interactive_MT implements PlugIn {
 							rt.addValue("PreviousPosition Y (real units)", oldpointCal[1]);
 							rt.addValue("CurrentPosition X (real units)", currentpointCal[0]);
 							rt.addValue("CurrentPosition Y (real units)", currentpointCal[1]);
-							rt.addValue("Length in real units", length);
-							rt.addValue("Cummulative Length in real units", endlength);
+							rt.addValue("lengthKymo in real units", length);
+							rt.addValue("Cummulative lengthKymo in real units", endlength);
 
-							double[] landt = { endlengthpixel, list.get(index).thirdDimension };
+							double[] landt = { endlengthpixel, list.get(index).thirdDimension, id };
 							lengthtimeend.add(landt);
 							rtAll.incrementCounter();
 
@@ -4810,8 +4821,8 @@ public class Interactive_MT implements PlugIn {
 							rtAll.addValue("PreviousPosition Y (real units)", oldpointCal[1]);
 							rtAll.addValue("CurrentPosition X (real units)", currentpointCal[0]);
 							rtAll.addValue("CurrentPosition Y (real units)", currentpointCal[1]);
-							rtAll.addValue("Length in real units", length);
-							rtAll.addValue("Cummulative Length in real units", endlength);
+							rtAll.addValue("lengthKymo in real units", length);
+							rtAll.addValue("Cummulative lengthKymo in real units", endlength);
 
 						}
 
@@ -4895,7 +4906,7 @@ public class Interactive_MT implements PlugIn {
 					}
 					ResultsTable rt = new ResultsTable();
 					for (int seedID = MinSeedLabel; seedID <= MaxSeedLabel; ++seedID) {
-						
+						ID.add(seedID);
 						if (SaveTxt) {
 							try {
 								File fichier = new File(
@@ -4908,12 +4919,12 @@ public class Interactive_MT implements PlugIn {
 								bw.write(
 										"\tFramenumber\tSeedLabel\tOldX (px)\tOldY (px)\tNewX (px)\tNewY (px)\tOldX (real)\tOldY (real)"
 												+ "\tNewX (real)\tNewY (real)"
-												+ "\tLength ( real)\tCummulativeLength (real)\n");
+												+ "\tlengthKymo ( real)\tCummulativelengthKymo (real)\n");
 
 								FileWriter fwmy = new FileWriter(fichierMy);
 								BufferedWriter bwmy = new BufferedWriter(fwmy);
 
-								bwmy.write("\tFramenumber\tLength\n");
+								bwmy.write("\tFramenumber\tlengthKymo\n");
 
 								for (int index = 0; index < lengthliststart.size(); ++index) {
 									if(lengthliststart.get(index).getA()[1] == seedID){
@@ -4955,11 +4966,11 @@ public class Interactive_MT implements PlugIn {
 								rt.addValue("OldY in real units", (float) lengthliststart.get(index).getB()[5]);
 								rt.addValue("NewX in real units", (float) lengthliststart.get(index).getB()[6]);
 								rt.addValue("NewY in real units", (float) lengthliststart.get(index).getB()[7]);
-								rt.addValue("Length in real units", (float) lengthliststart.get(index).getB()[8]);
-								rt.addValue("Cummulative Length in real units",
+								rt.addValue("lengthKymo in real units", (float) lengthliststart.get(index).getB()[8]);
+								rt.addValue("Cummulative lengthKymo in real units",
 										(float) lengthliststart.get(index).getB()[9]);
 								double[] landt = { lengthliststart.get(index).getB()[11],
-										lengthliststart.get(index).getA()[0] };
+										lengthliststart.get(index).getA()[0],lengthliststart.get(index).getA()[1] };
 								lengthtimestart.add(landt);
 
 								rtAll.incrementCounter();
@@ -4973,8 +4984,8 @@ public class Interactive_MT implements PlugIn {
 								rtAll.addValue("OldY in real units", lengthliststart.get(index).getB()[5]);
 								rtAll.addValue("NewX in real units", lengthliststart.get(index).getB()[6]);
 								rtAll.addValue("NewY in real units", lengthliststart.get(index).getB()[7]);
-								rtAll.addValue("Length in real units", lengthliststart.get(index).getB()[8]);
-								rtAll.addValue("Cummulative Length in real units", lengthliststart.get(index).getB()[9]);
+								rtAll.addValue("lengthKymo in real units", lengthliststart.get(index).getB()[8]);
+								rtAll.addValue("Cummulative lengthKymo in real units", lengthliststart.get(index).getB()[9]);
 
 
 						}
@@ -5056,7 +5067,7 @@ public class Interactive_MT implements PlugIn {
 					}
 					ResultsTable rtend = new ResultsTable();
 					for (int seedID = MinSeedLabel; seedID <= MaxSeedLabel; ++seedID) {
-						
+						ID.add(seedID);
 						if (SaveTxt) {
 							try {
 								File fichier = new File(
@@ -5077,12 +5088,12 @@ public class Interactive_MT implements PlugIn {
 								bw.write(
 										"\tFramenumber\tSeedLabel\tOldX (px)\tOldY (px)\tNewX (px)\tNewY (px)\tOldX (real)\tOldY (real)"
 												+ "\tNewX (real)\tNewY (real)"
-												+ "\tLength ( real)\tCummulativeLength (real)\n");
+												+ "\tlengthKymo ( real)\tCummulativelengthKymo (real)\n");
 
 								FileWriter fwmy = new FileWriter(fichierMy);
 								BufferedWriter bwmy = new BufferedWriter(fwmy);
 
-								bwmy.write("\tFramenumber\tLength\n");
+								bwmy.write("\tFramenumber\tlengthKymo\n");
 								for (int index = 0; index < lengthlistend.size(); ++index) {
 									if (lengthlistend.get(index).getA()[1] == seedID) {
 										bw.write("\t" + lengthlistend.get(index).getA()[0] + "\t" + "\t"
@@ -5126,11 +5137,11 @@ public class Interactive_MT implements PlugIn {
 								rtend.addValue("OldY in real units", (float) lengthlistend.get(index).getB()[5]);
 								rtend.addValue("NewX in real units", (float) lengthlistend.get(index).getB()[6]);
 								rtend.addValue("NewY in real units", (float) lengthlistend.get(index).getB()[7]);
-								rtend.addValue("Length in real units", (float) lengthlistend.get(index).getB()[8]);
-								rtend.addValue("Cummulative Length in real units",
+								rtend.addValue("lengthKymo in real units", (float) lengthlistend.get(index).getB()[8]);
+								rtend.addValue("Cummulative lengthKymo in real units",
 										(float) lengthlistend.get(index).getB()[9]);
 
-								double[] landt = { lengthlistend.get(index).getB()[11], lengthlistend.get(index).getA()[0] };
+								double[] landt = { lengthlistend.get(index).getB()[11], lengthlistend.get(index).getA()[0], lengthlistend.get(index).getA()[1]};
 								lengthtimeend.add(landt);
 								rtAll.incrementCounter();
 								rtAll.addValue("FrameNumber", lengthlistend.get(index).getA()[0]);
@@ -5143,8 +5154,8 @@ public class Interactive_MT implements PlugIn {
 								rtAll.addValue("OldY in real units", (float) lengthlistend.get(index).getB()[5]);
 								rtAll.addValue("NewX in real units", (float) lengthlistend.get(index).getB()[6]);
 								rtAll.addValue("NewY in real units", (float) lengthlistend.get(index).getB()[7]);
-								rtAll.addValue("Length in real units", (float) lengthlistend.get(index).getB()[8]);
-								rtAll.addValue("Cummulative Length in real units",
+								rtAll.addValue("lengthKymo in real units", (float) lengthlistend.get(index).getB()[8]);
+								rtAll.addValue("Cummulative lengthKymo in real units",
 										(float) lengthlistend.get(index).getB()[9]);
 
 
@@ -5173,14 +5184,14 @@ public class Interactive_MT implements PlugIn {
 
 							lengthcheckstart += lengthtimestart.get(index)[0];
 
-							for (int secindex = 0; secindex < Length.size(); ++secindex) {
+							for (int secindex = 0; secindex < lengthKymo.size(); ++secindex) {
 
 								for (int accountindex = 0; accountindex < Accountedframes.size(); ++accountindex) {
 
-									if ((int) Length.get(secindex)[1] == time
+									if ((int) lengthKymo.get(secindex)[1] == time
 											&& Accountedframes.get(accountindex) == time) {
 
-										float delta = (float) (lengthtimestart.get(index)[0] - Length.get(secindex)[0]);
+										float delta = (float) (lengthtimestart.get(index)[0] - lengthKymo.get(secindex)[0]);
 										float[] cudeltadeltaLstart = { delta, time };
 										deltadstart.add(cudeltadeltaLstart);
 
@@ -5241,18 +5252,18 @@ public class Interactive_MT implements PlugIn {
 
 							lengthcheckend += lengthtimeend.get(index)[0];
 
-							for (int secindex = 0; secindex < Length.size(); ++secindex) {
+							for (int secindex = 0; secindex < lengthKymo.size(); ++secindex) {
 
 								for (int accountindex = 0; accountindex < Accountedframes.size(); ++accountindex) {
 
-									if ((int) Length.get(secindex)[1] == time
+									if ((int) lengthKymo.get(secindex)[1] == time
 											&& Accountedframes.get(accountindex) == time) {
 
-										if ((int) Length.get(secindex)[1] == time
+										if ((int) lengthKymo.get(secindex)[1] == time
 												&& Accountedframes.get(accountindex) == time) {
 
 											float delta = (float) (lengthtimeend.get(index)[0]
-													- Length.get(secindex)[0]);
+													- lengthKymo.get(secindex)[0]);
 											float[] cudeltadeltaLend = { delta, time };
 											deltadend.add(cudeltadeltaLend);
 										}
@@ -5661,8 +5672,7 @@ public class Interactive_MT implements PlugIn {
 				Update.setBackground(new Color(1, 0, 1));
 				Update.setForeground(new Color(255, 255, 255));
 				panelFifth.setLayout(layout);
-				final Label Stepfive = new Label("Step 5", Label.CENTER);
-				panelFifth.add(Stepfive, c);
+				
 				c.fill = GridBagConstraints.HORIZONTAL;
 				c.gridx = 0;
 				c.gridy = 0;
@@ -6163,7 +6173,10 @@ public class Interactive_MT implements PlugIn {
 				Kal.setForeground(new Color(255, 255, 255));
 				Det.setBackground(new Color(1, 0, 1));
 				Det.setForeground(new Color(255, 255, 255));
+				final Label Step = new Label("Step 6", Label.CENTER);
 
+				panelSixth.add(Step, c);
+				
 				++c.gridy;
 				c.insets = new Insets(10, 10, 0, 50);
 				panelSixth.add(Kal, c);
