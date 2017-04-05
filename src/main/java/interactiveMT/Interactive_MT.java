@@ -213,6 +213,7 @@ public class Interactive_MT implements PlugIn {
 	long maxSizemin = 100;
 	long maxSizemax = 10000;
 	int selectedSeed;
+	int displayselectedSeed;
 	double netdeltad = 0;
 	double Intensityratio = 0.5;
 	double Inispacing = 0.5;
@@ -282,7 +283,7 @@ public class Interactive_MT implements PlugIn {
 	int nbRois;
 	Roi rorig = null;
 	ArrayList<double[]> lengthtimestart = new ArrayList<double[]>();
-	ArrayList<Integer> ID = new ArrayList<Integer>();
+	
 	ArrayList<double[]> lengthtimeend = new ArrayList<double[]>();
 	ArrayList<double[]> lengthtime = new ArrayList<double[]>();
 	MTTracker MTtrackerstart;
@@ -340,6 +341,8 @@ public class Interactive_MT implements PlugIn {
 	int minlength;
 	int Maxlabel;
 	private int ndims;
+	
+	ArrayList<Pair<Integer, double[]>> IDALL = new ArrayList<Pair<Integer, double[]>>();
 	ArrayList<int[]> ClickedPoints = new ArrayList<int[]>();
 	Pair<ArrayList<Indexedlength>, ArrayList<Indexedlength>> PrevFrameparam;
 	Pair<ArrayList<Indexedlength>, ArrayList<Indexedlength>> NewFrameparam;
@@ -1041,7 +1044,6 @@ public class Interactive_MT implements PlugIn {
 		}
 
 		panelFirst.setVisible(true);
-
 		cl.show(panelCont, "1");
 
 		// MedFiltercur.addItemListener(new MediancurrListener() );
@@ -1128,7 +1130,6 @@ public class Interactive_MT implements PlugIn {
 		++c.gridy;
 		c.insets = new Insets(10, 10, 0, 0);
 		panelThird.add(xlsfile, c);
-
 		MoveNext.addActionListener(new moveNextListener());
 		JumptoFrame.addActionListener(new moveToFrameListener());
 		ClickFast.addActionListener(new chooseendListener());
@@ -1409,11 +1410,14 @@ public class Interactive_MT implements PlugIn {
 				ExtractKymo.addActionListener(new GetCords());
 				
 			}
+			
+			
 			if (showDeterministic) {
 				final Button TrackEndPoints = new Button("Track EndPoints (From first to a chosen last frame)");
 				final Button SkipframeandTrackEndPoints = new Button(
 						"TrackEndPoint (User specified first and last frame)");
 				final Button CheckResults = new Button("Check Results (then click next)");
+				
 				
 				
 				++c.gridy;
@@ -1432,13 +1436,17 @@ public class Interactive_MT implements PlugIn {
 				++c.gridy;
 				c.insets = new Insets(10, 175, 0, 175);
 				panelSeventh.add(CheckResults, c);
+				
 				}
+				
+				
 				
 				
 				
 				TrackEndPoints.addActionListener(new TrackendsListener());
 				SkipframeandTrackEndPoints.addActionListener(new SkipFramesandTrackendsListener());
 				CheckResults.addActionListener(new CheckResultsListener());
+				
 				
 			}
 
@@ -1521,16 +1529,18 @@ public class Interactive_MT implements PlugIn {
 				++c.gridy;
 				c.insets = new Insets(10, 175, 0, 175);
 				panelSeventh.add(CheckResults, c);
+				
+			
 
 				TrackEndPoints.addActionListener(new TrackendsListener());
 				SkipframeandTrackEndPoints.addActionListener(new SkipFramesandTrackendsListener());
 				CheckResults.addActionListener(new CheckResultsListener());
-				
+			
 
 			}
 			panelSeventh.repaint();
 			panelSeventh.validate();
-
+			Cardframe.pack();
 		}
 
 	}
@@ -1674,6 +1684,7 @@ public class Interactive_MT implements PlugIn {
 
 				}
 				panelSeventh.removeAll();
+				
 				final Label Step7 = new Label("Step 7", Label.CENTER);
 				panelSeventh.setLayout(layout);
 				panelSeventh.add(Step7, c);
@@ -1705,12 +1716,17 @@ public class Interactive_MT implements PlugIn {
 				c.insets = new Insets(10, 175, 0, 175);
 				panelSeventh.add(RoughResults, c);
 				
+				
+				
+
+				
 				TrackEndPoints.addActionListener(new TrackendsListener());
 				SkipframeandTrackEndPoints.addActionListener(new SkipFramesandTrackendsListener());
 				CheckResults.addActionListener(new CheckResultsListener());
 				RoughResults.addActionListener(new AcceptResultsListener());
 				panelSeventh.repaint();
 				panelSeventh.validate();
+				Cardframe.pack();
 
 			}
 
@@ -1743,6 +1759,7 @@ public class Interactive_MT implements PlugIn {
 
 				}
 
+			
 				panelSeventh.removeAll();
 				final Label Step7 = new Label("Step 7", Label.CENTER);
 				panelSeventh.setLayout(layout);
@@ -1790,7 +1807,8 @@ public class Interactive_MT implements PlugIn {
 				++c.gridy;
 				c.insets = new Insets(10, 10, 0, 50);
 				panelSeventh.add(Costfunc, c);
-
+			
+				
 				rad.addAdjustmentListener(
 						new SearchradiusListener(SearchText, initialSearchradiusMin, initialSearchradiusMax));
 				Maxrad.addAdjustmentListener(
@@ -1840,7 +1858,7 @@ public class Interactive_MT implements PlugIn {
 				
 				panelSeventh.repaint();
 				panelSeventh.validate();
-				
+				Cardframe.pack();
 			}
 
 		}
@@ -1940,6 +1958,7 @@ public class Interactive_MT implements PlugIn {
 			mserwhough.addItemListener(new UpdateMserwHoughListener());
 			panelFourth.validate();
 			panelFourth.repaint();
+			Cardframe.pack();
 		}
 	}
 
@@ -2929,20 +2948,29 @@ public class Interactive_MT implements PlugIn {
 			
 			 JLabel lbl = new JLabel("Select the SeedID of the MT for analysis");
 			 
-			 String[] choices = new String[ID.size()] ;
+			 String[] choices = new String[IDALL.size()] ;
+             
+			 JLabel lbltrack = new JLabel("Select the SeedID of the MT for displaying tracks");
 			 
-			 
-			 for (int index = 0; index < ID.size(); ++index){
+			 String[] choicestrack = new String[IDALL.size() + 1];
+			 choicestrack[0] = "Display All";
+			 for (int index = 0; index < IDALL.size(); ++index){
 				 
-				 String currentseed = Double.toString(ID.get(index));
+				 String currentseed = Double.toString(IDALL.get(index).getA());
 				 
 				 choices[index] = "Seed " + currentseed;
-				 
-				 System.out.println(choices[index]);
+				 choicestrack[index + 1] = "Seed " + currentseed;
 			 }
 			 
 			 
 			JComboBox<String> cb = new JComboBox<String>(choices);
+			
+			 
+			 System.out.println("Size " +  IDALL.size());
+			JComboBox<String> cbtrack = new JComboBox<String>(choicestrack);
+			
+			
+			
 			
 			++c.gridy;
 			c.insets = new Insets(10, 10, 0, 50);
@@ -2953,6 +2981,16 @@ public class Interactive_MT implements PlugIn {
 			++c.gridy;
 			c.insets = new Insets(10, 10, 0, 50);
 			panelEighth.add(cb, c);
+			
+			++c.gridy;
+			c.insets = new Insets(10, 10, 0, 50);
+			panelEighth.add(lbltrack, c);
+			
+			
+			
+			++c.gridy;
+			c.insets = new Insets(10, 10, 0, 50);
+			panelEighth.add(cbtrack, c);
 			
 			
 			++c.gridy;
@@ -2983,8 +3021,13 @@ public class Interactive_MT implements PlugIn {
 					new endtimeListener(endText, thirdDimensionsliderInit, thirdDimensionSize, scrollbarSize, endS));
 			Analyze.addActionListener(new AnalyzeListener());
 			cb.addActionListener(new SeedchoiceListener(cb));
+			
+			
+			
+			cbtrack.addActionListener(new SeedDisplayListener(cbtrack, Views.hyperSlice(originalimg, 2, 1)));
 			panelEighth.validate();
 			panelEighth.repaint();
+			Cardframe.pack();
 
 		}
 
@@ -3018,6 +3061,9 @@ public class Interactive_MT implements PlugIn {
 			c.weighty = 1.5;
 
 			panelEighth.add(Step8, c);
+			
+
+			
 			if (showDeterministic) {
 				final Button TrackEndPoints = new Button("Track EndPoints (From first to a chosen last frame)");
 				final Button SkipframeandTrackEndPoints = new Button(
@@ -3036,13 +3082,18 @@ public class Interactive_MT implements PlugIn {
 				c.insets = new Insets(10, 175, 0, 175);
 				panelEighth.add(CheckResults, c);
 
+
+				
+				
+				
 				TrackEndPoints.addActionListener(new TrackendsListener());
 				SkipframeandTrackEndPoints.addActionListener(new SkipFramesandTrackendsListener());
 				CheckResults.addActionListener(new CheckResultsListener());
-
+			
 				panelEighth.validate();
 				panelEighth.repaint();
 
+				Cardframe.pack();
 			}
 
 			if (showKalman) {
@@ -3090,7 +3141,8 @@ public class Interactive_MT implements PlugIn {
 				++c.gridy;
 				c.insets = new Insets(10, 10, 0, 50);
 				panelEighth.add(Costfunc, c);
-
+				
+				
 				rad.addAdjustmentListener(
 						new SearchradiusListener(SearchText, initialSearchradiusMin, initialSearchradiusMax));
 				Maxrad.addAdjustmentListener(
@@ -3139,6 +3191,7 @@ public class Interactive_MT implements PlugIn {
 
 				panelEighth.validate();
 				panelEighth.repaint();
+				Cardframe.pack();
 
 			}
 
@@ -3298,7 +3351,7 @@ public class Interactive_MT implements PlugIn {
 			
 				panelEighth.validate();
 				panelEighth.repaint();
-
+				Cardframe.pack();
 			}
 
 		}
@@ -3326,6 +3379,86 @@ public class Interactive_MT implements PlugIn {
 		}
 		
 	}
+	
+	public class SeedDisplayListener implements ActionListener{
+		
+		
+		
+		final JComboBox<String> cb;
+		final RandomAccessibleInterval<FloatType> seedimg;
+		
+		public SeedDisplayListener (JComboBox<String> cb, RandomAccessibleInterval<FloatType> seedimg){
+			
+			this.cb = cb;
+			this.seedimg = seedimg;
+			
+		}
+		
+		@Override
+		public void actionPerformed(final ActionEvent arg0) {
+			
+       displayselectedSeed = cb.getSelectedIndex();
+     
+       ImagePlus displayimp;
+       
+      
+       
+     displayimp = ImageJFunctions.show(seedimg);
+	 displayimp.setTitle("Display Tracks");
+       
+       Overlay o = displayimp.getOverlay();
+		
+		if( displayimp.getOverlay() == null )
+		{
+			o = new Overlay();
+			displayimp.setOverlay( o ); 
+		}
+		
+		o.clear();
+		
+		for (int index = 0; index < IDALL.size(); ++index){
+			
+			 Line newellipse = new Line(IDALL.get(index).getB()[0], IDALL.get(index).getB()[1], IDALL.get(index).getB()[0], IDALL.get(index).getB()[1]);
+				
+
+			
+				
+				if(displayselectedSeed == 0){
+					newellipse.setStrokeColor(Color.WHITE);
+					newellipse.setStrokeWidth(1);
+					newellipse.setName("TrackID: " + IDALL.get(index).getA());
+					
+				o.add(newellipse);
+				
+				o.drawLabels(true);
+				
+				o.drawNames(true);
+				}
+				else if (displayselectedSeed == index + 1){
+					
+					newellipse.setStrokeColor(Color.WHITE);
+					newellipse.setStrokeWidth(1);
+					newellipse.setName("TrackID: " + IDALL.get(index).getA());
+					
+				o.add(newellipse);
+				
+				o.drawLabels(true);
+				
+				o.drawNames(true);
+					
+				}
+					
+				
+				
+			
+			
+		}
+			
+		}
+		
+	}
+	
+	
 	
 	public void goSkip() {
 
@@ -3391,7 +3524,6 @@ public class Interactive_MT implements PlugIn {
 
 				boolean dialog;
 				boolean dialogupdate;
-				ArrayList<Pair<Integer, double[]>> ID = new ArrayList<Pair<Integer, double[]>>();
 				RandomAccessibleInterval<FloatType> groundframe = currentimg;
 				RandomAccessibleInterval<FloatType> groundframepre = currentPreprocessedimg;
 				if (FindLinesViaMSER) {
@@ -3520,6 +3652,7 @@ public class Interactive_MT implements PlugIn {
 					ArrayList<Subgraphs> subgraphstart = trackerstart.getFramedgraph();
 					ArrayList<Pair<Integer, double[]>> ID = trackerstart.getSeedID();
 
+					IDALL.addAll(ID);
 					DisplaysubGraphstart displaytrackstart = new DisplaysubGraphstart(impstart, subgraphstart, next);
 					displaytrackstart.getImp();
 					impstart.draw();
@@ -3541,6 +3674,7 @@ public class Interactive_MT implements PlugIn {
 					SimpleWeightedGraph<double[], DefaultWeightedEdge> graphend = trackerend.getResult();
 					ArrayList<Subgraphs> subgraphend = trackerend.getFramedgraph();
 					ArrayList<Pair<Integer, double[]>> ID = trackerend.getSeedID();
+					IDALL.addAll(ID);
 					DisplaysubGraphend displaytrackend = new DisplaysubGraphend(impend, subgraphend, next);
 					displaytrackend.getImp();
 					impend.draw();
@@ -3603,7 +3737,7 @@ public class Interactive_MT implements PlugIn {
 						final double[] originalpoint = list.get(0).currentpoint;
 						double startlength = 0;
 						double startlengthpixel = 0;
-						ID.add(id);
+						
 						for (int index = 1; index < list.size(); ++index) {
 
 							final double[] currentpoint = list.get(index).currentpoint;
@@ -3727,7 +3861,6 @@ public class Interactive_MT implements PlugIn {
 						final double[] originalpoint = list.get(0).currentpoint;
 						double endlength = 0;
 						double endlengthpixel = 0;
-                        ID.add(id);
 						for (int index = 1; index < list.size() - 1; ++index) {
 
 							final double[] currentpoint = list.get(index).currentpoint;
@@ -3875,7 +4008,6 @@ public class Interactive_MT implements PlugIn {
 					}
 					ResultsTable rt = new ResultsTable();
 					for (int seedID = MinSeedLabel; seedID <= MaxSeedLabel; ++seedID) {
-						ID.add(seedID);
 						if (SaveTxt) {
 							try {
 
@@ -4035,7 +4167,6 @@ public class Interactive_MT implements PlugIn {
 					}
 					ResultsTable rtend = new ResultsTable();
 					for (int seedID = MinSeedLabel; seedID <= MaxSeedLabel; ++seedID) {
-						ID.add(seedID);
 						if (SaveTxt) {
 							try {
 								File fichier = new File(
@@ -4554,6 +4685,7 @@ public class Interactive_MT implements PlugIn {
 					SimpleWeightedGraph<double[], DefaultWeightedEdge> graphstart = trackerstart.getResult();
 					ArrayList<Pair<Integer, double[]>> ID = trackerstart.getSeedID();
 					DisplayGraph displaygraphtrackstart = new DisplayGraph(impstartsec, graphstart, ID);
+					IDALL.addAll(ID);
 					displaygraphtrackstart.getImp();
 					impstartsec.draw();
 					ArrayList<Subgraphs> subgraphstart = trackerstart.getFramedgraph();
@@ -4571,6 +4703,7 @@ public class Interactive_MT implements PlugIn {
 					SimpleWeightedGraph<double[], DefaultWeightedEdge> graphend = trackerend.getResult();
 					ArrayList<Pair<Integer, double[]>> ID = trackerend.getSeedID();
 					DisplayGraph displaygraphtrackend = new DisplayGraph(impendsec, graphend, ID);
+					IDALL.addAll(ID);
 					displaygraphtrackend.getImp();
 					impendsec.draw();
 					ArrayList<Subgraphs> subgraphend = trackerend.getFramedgraph();
@@ -4639,7 +4772,6 @@ public class Interactive_MT implements PlugIn {
 						final double[] originalpoint = list.get(0).originalpoint;
 						double startlength = 0;
 						double startlengthpixel = 0;
-						ID.add(id);
 						for (int index = 1; index < list.size() - 1; ++index) {
 
 							final double[] currentpoint = list.get(index).currentpoint;
@@ -4761,7 +4893,6 @@ public class Interactive_MT implements PlugIn {
 						double endlength = 0;
 						double endlengthpixel = 0;
 						final double[] originalpoint = list.get(0).originalpoint;
-						ID.add(id);
 						for (int index = 1; index < list.size() - 1; ++index) {
 
 							final double[] currentpoint = list.get(index).currentpoint;
@@ -4906,7 +5037,6 @@ public class Interactive_MT implements PlugIn {
 					}
 					ResultsTable rt = new ResultsTable();
 					for (int seedID = MinSeedLabel; seedID <= MaxSeedLabel; ++seedID) {
-						ID.add(seedID);
 						if (SaveTxt) {
 							try {
 								File fichier = new File(
@@ -5067,7 +5197,6 @@ public class Interactive_MT implements PlugIn {
 					}
 					ResultsTable rtend = new ResultsTable();
 					for (int seedID = MinSeedLabel; seedID <= MaxSeedLabel; ++seedID) {
-						ID.add(seedID);
 						if (SaveTxt) {
 							try {
 								File fichier = new File(
@@ -5621,6 +5750,7 @@ public class Interactive_MT implements PlugIn {
 				Dowatershed.addActionListener(new DowatershedListener());
 				panelFifth.repaint();
 				panelFifth.validate();
+				Cardframe.pack();
 
 			}
 
@@ -6203,7 +6333,7 @@ public class Interactive_MT implements PlugIn {
 				
 				panelSixth.validate();
 				panelSixth.repaint();
-
+				Cardframe.pack();
 			}
 			if (arg0.getStateChange() == ItemEvent.DESELECTED) {
 				analyzekymo = false;

@@ -64,10 +64,11 @@ public class DisplayGraph {
 
 				
 				imp.updateAndDraw();
+				imp.setTitle("Found Tracks");
 				//System.out.println( arg0.getCurrentSlice() );
 				
 			}
-			
+			/*
 			
 			for (int index = 0; index < ID.size(); ++index){
 				
@@ -86,6 +87,7 @@ public class DisplayGraph {
 				
 			}
 			
+			*/
 			
 		}		
 	}

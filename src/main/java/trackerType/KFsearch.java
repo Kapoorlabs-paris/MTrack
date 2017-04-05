@@ -232,8 +232,8 @@ public class KFsearch implements MTTracker {
 					// Update Kalman track KalmanTrackproperties
 					kalmanFiltersMap.put(kf, target);
 
-					// Remove from orphan set
-					Secondorphan.remove(target);
+				
+					
 
 					// Remove from childless KF set
 					childlessKFs.remove(kf);
