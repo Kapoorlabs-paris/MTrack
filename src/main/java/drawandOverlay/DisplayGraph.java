@@ -65,7 +65,6 @@ public class DisplayGraph {
 				
 				imp.updateAndDraw();
 				imp.setTitle("Found Tracks");
-				//System.out.println( arg0.getCurrentSlice() );
 				
 			}
 			/*

@@ -2966,7 +2966,6 @@ public class Interactive_MT implements PlugIn {
 			JComboBox<String> cb = new JComboBox<String>(choices);
 			
 			 
-			 System.out.println("Size " +  IDALL.size());
 			JComboBox<String> cbtrack = new JComboBox<String>(choicestrack);
 			
 			
@@ -4693,6 +4692,7 @@ public class Interactive_MT implements PlugIn {
 							next - 1);
 					displaytrackstart.getImp();
 					impstart.draw();
+					impstart.setTitle("Sub Graph A");
 				}
 				if (Trackstart == false) {
 					ImagePlus impendsec = ImageJFunctions.show(originalPreprocessedimg);
@@ -4710,6 +4710,7 @@ public class Interactive_MT implements PlugIn {
 					DisplaysubGraphend displaytrackend = new DisplaysubGraphend(impend, subgraphend, next - 1);
 					displaytrackend.getImp();
 					impend.draw();
+					impend.setTitle("Sub Graph B");
 				}
 
 				

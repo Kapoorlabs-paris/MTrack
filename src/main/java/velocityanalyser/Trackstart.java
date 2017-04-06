@@ -55,6 +55,7 @@ public class Trackstart implements Linetracker {
 			ID = new ArrayList<Pair<Integer, double[]>>();
 			graph = new SimpleWeightedGraph<double[], DefaultWeightedEdge>(DefaultWeightedEdge.class);
 			Framedgraph = new ArrayList<Subgraphs>();
+			int count = 0;
 			for (int frame = 1; frame < maxframe   ; ++frame){
 			
 			
@@ -74,7 +75,7 @@ public class Trackstart implements Linetracker {
 					
 					
 					double sqdist = Distance(source.oldpoint, source.newpoint);
-					if (sqdist > 0){
+					
 					synchronized (graph) {
 						
 						graph.addVertex(source.oldpoint);
@@ -83,11 +84,13 @@ public class Trackstart implements Linetracker {
 						graph.setEdgeWeight(edge, sqdist);
 						
 						
-					}
-					if (frame == 1){
+					
+					if (count == 0){
+						System.out.println(source.seedlabel);
 					Pair<Integer, double[]> currentid = new ValuePair<Integer, double[]>(source.seedlabel, source.oldpoint);
 					ID.add(currentid);
 					}
+					count++;
 					subgraph.addVertex(source.oldpoint);
 					subgraph.addVertex(source.newpoint);
 					final DefaultWeightedEdge subedge = subgraph.addEdge(source.oldpoint, source.newpoint);
@@ -97,7 +100,6 @@ public class Trackstart implements Linetracker {
 					Framedgraph.add(currentframegraph);
 				}
 				}
-				System.out.println("Moving to next frame!");
 			}
 			
 			
