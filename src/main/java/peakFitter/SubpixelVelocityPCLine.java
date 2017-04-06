@@ -5,6 +5,7 @@ import java.awt.geom.RoundRectangle2D;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import javax.swing.JProgressBar;
 
@@ -56,7 +57,7 @@ public class SubpixelVelocityPCLine extends BenchmarkAlgorithm
 	public int Accountedframes;
 	private final double[] psf;
 	private final boolean DoMask;
-	private final boolean Trackstart;
+	private final HashMap<Integer, Boolean>  Trackstart;
 	private boolean Maskfail = false;
 	// LM solver iteration params
 	public int maxiter = 300;
@@ -129,7 +130,7 @@ public class SubpixelVelocityPCLine extends BenchmarkAlgorithm
 
 	public SubpixelVelocityPCLine(final RandomAccessibleInterval<FloatType> source, final LinefinderHF linefinder,
 			final ArrayList<Indexedlength> PrevFrameparamstart, final ArrayList<Indexedlength> PrevFrameparamend,
-			final double[] psf, final int framenumber, final UserChoiceModel model, final boolean DoMask, final boolean Trackstart, final JProgressBar jpb,
+			final double[] psf, final int framenumber, final UserChoiceModel model, final boolean DoMask, final HashMap<Integer, Boolean>  Trackstart, final JProgressBar jpb,
 			final int thirdDimsize) {
 
 		linefinder.checkInput();
@@ -177,13 +178,13 @@ public class SubpixelVelocityPCLine extends BenchmarkAlgorithm
 		startinframe = new ArrayList<Trackproperties>();
 		endinframe = new ArrayList<Trackproperties>();
 
-		if (Trackstart){
-		final int oldframenumber = PrevFrameparamstart.get(PrevFrameparamstart.size() - 1).framenumber;
-		final int framediff = framenumber - oldframenumber;
+		
+		
 		for (int index = 0; index < PrevFrameparamstart.size(); ++index) {
 			
-			
-			
+			final int oldframenumber = PrevFrameparamstart.get(PrevFrameparamstart.size() - 1).framenumber;
+			final int framediff = framenumber - oldframenumber;
+			if (Trackstart.get(PrevFrameparamstart.get(index).seedLabel)){
 			percent = (Math.round(100 * (index + 1) / (PrevFrameparamstart.size())));
 			
 			final double originalslope = PrevFrameparamstart.get(index).originalslope;
@@ -227,17 +228,20 @@ public class SubpixelVelocityPCLine extends BenchmarkAlgorithm
 					PrevFrameparamstart.get(index).originalds);
 
 			startinframe.add(startedge);
+			}
 
 		}
-		}
 		
-		if (Trackstart == false){
+		
 			
+			
+		for (int index = 0; index < PrevFrameparamend.size(); ++index) {
 			final int oldframenumber = PrevFrameparamend.get(PrevFrameparamend.size() - 1).framenumber;
 			final int framediff = framenumber - oldframenumber;
-		for (int index = 0; index < PrevFrameparamend.size(); ++index) {
 			
-			
+			if (Trackstart.get(PrevFrameparamend.get(index).seedLabel) == false){
+				
+				
 			percent = (Math.round(100 * (index + 1) / (PrevFrameparamend.size())));
 
 			Point secondlinepoint = new Point(ndims);

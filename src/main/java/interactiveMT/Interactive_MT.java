@@ -212,7 +212,7 @@ public class Interactive_MT implements PlugIn {
 	long minSizemax = 1000;
 	long maxSizemin = 100;
 	long maxSizemax = 10000;
-	int selectedSeed;
+	int selectedSeed = 0;
 	int displayselectedSeed;
 	double netdeltad = 0;
 	double Intensityratio = 0.5;
@@ -350,6 +350,7 @@ public class Interactive_MT implements PlugIn {
 	ArrayList<Integer> Missedframes = new ArrayList<Integer>();
 	Pair<Pair<ArrayList<Trackproperties>, ArrayList<Trackproperties>>, Pair<ArrayList<Indexedlength>, ArrayList<Indexedlength>>> returnVector;
 
+	HashMap<Integer, Boolean> seedmap =  new HashMap<Integer, Boolean>();
 	Pair<ArrayList<KalmanIndexedlength>, ArrayList<KalmanIndexedlength>> PrevFrameparamKalman;
 	Pair<ArrayList<KalmanIndexedlength>, ArrayList<KalmanIndexedlength>> NewFrameparamKalman;
 	Pair<Pair<ArrayList<KalmanTrackproperties>, ArrayList<KalmanTrackproperties>>, Pair<ArrayList<KalmanIndexedlength>, ArrayList<KalmanIndexedlength>>> returnVectorKalman;
@@ -2612,7 +2613,7 @@ public class Interactive_MT implements PlugIn {
 
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
-
+	
 			if (analyzekymo)
 				numberKymo = true;
 
@@ -2674,18 +2675,41 @@ public class Interactive_MT implements PlugIn {
 
 			ArrayList<float[]> deltadeltaL = new ArrayList<>();
 			ArrayList<float[]> deltaLMT = new ArrayList<>();
-			for (int index = 1; index < lengthtime.size(); ++index) {
+			if(lengthtimestart!=null){
+			for (int index = 1; index < lengthtimestart.size(); ++index) {
 
-				if ((int) lengthtime.get(index)[2] == selectedSeed ){
-				float delta = (float) (lengthtime.get(index)[0] - lengthtime.get(index - 1)[0]);
+				System.out.println("Start" + lengthtimestart.get(index)[0] + " " + lengthtimestart.get(index)[1] + " " + lengthtimestart.get(index)[2]);
+				if ((int) lengthtimestart.get(index)[2] == selectedSeed ){
+				float delta = (float) (lengthtimestart.get(index)[0] - lengthtimestart.get(index - 1)[0]);
 
-				float[] deltalt = { delta, (int) lengthtime.get(index)[1], selectedSeed };
+				float[] deltalt = { delta, (int) lengthtimestart.get(index)[1], selectedSeed };
 
 				deltaLMT.add(deltalt);
 				
 				}
 
 			}
+			}
+			if(lengthtimeend!=null){
+				for (int index = 1; index < lengthtimeend.size(); ++index) {
+					System.out.println("End" + lengthtimeend.get(index)[0] + " " + lengthtimeend.get(index)[1] + " " + lengthtimeend.get(index)[2]);
+					if ((int) lengthtimeend.get(index)[2] == selectedSeed ){
+					float delta = (float) (lengthtimeend.get(index)[0] - lengthtimeend.get(index - 1)[0]);
+
+					float[] deltalt = { delta, (int) lengthtimeend.get(index)[1], selectedSeed };
+
+					deltaLMT.add(deltalt);
+					
+					}
+				}
+			}
+
+				
+				
+			
+		
+
+			
 
 			if (numberKymo) {
 				for (int index = 0; index < deltaLMT.size(); ++index) {
@@ -2871,6 +2895,20 @@ public class Interactive_MT implements PlugIn {
 					Trackstart = (currDist > investigatedist) ? true : false;
 
 					whichend.put(Frameindex, Trackstart);
+					
+					
+					if (Trackstart){
+						
+						
+						seedmap.put(PrevFrameparam.getA().get(Frameindex).seedLabel, Trackstart);
+						
+					}
+					
+					else{
+						
+						seedmap.put(PrevFrameparam.getB().get(Frameindex).seedLabel, Trackstart);
+						
+					}
 
 				}
 
@@ -2954,6 +2992,18 @@ public class Interactive_MT implements PlugIn {
 			 
 			 String[] choicestrack = new String[IDALL.size() + 1];
 			 choicestrack[0] = "Display All";
+				Comparator<Pair<Integer, double[]>> Seedidcomparison = new Comparator<Pair<Integer, double[]>>() {
+
+					@Override
+					public int compare(final Pair<Integer, double[]> A, final Pair<Integer, double[]> B) {
+
+						return A.getA() - B.getA();
+
+					}
+
+				};
+				
+				Collections.sort(IDALL, Seedidcomparison);
 			 for (int index = 0; index < IDALL.size(); ++index){
 				 
 				 String currentseed = Double.toString(IDALL.get(index).getA());
@@ -3373,7 +3423,7 @@ public class Interactive_MT implements PlugIn {
 		public void actionPerformed(final ActionEvent arg0) {
 			
        selectedSeed = cb.getSelectedIndex();
-			
+       
 			
 		}
 		
@@ -3540,14 +3590,14 @@ public class Interactive_MT implements PlugIn {
 					if (showDeterministic) {
 						returnVector = FindlinesVia.LinefindingMethodHF(groundframe, groundframepre, PrevFrameparam,
 								minlength, thirdDimension, psf, newlineMser, userChoiceModel, Domask, Intensityratio,
-								Inispacing, Trackstart,jpb, thirdDimensionSize);
+								Inispacing, seedmap,jpb, thirdDimensionSize);
 
 						Accountedframes.add(FindlinesVia.getAccountedframes());
 					}
 					if (showKalman) {
 						returnVectorKalman = FindlinesVia.LinefindingMethodHFKalman(groundframe, groundframepre,
 								PrevFrameparamKalman, minlength, thirdDimension, psf, newlineMser, userChoiceModel,
-								Domask, Kalmancount, Intensityratio, Inispacing, Trackstart,jpb, thirdDimensionSize);
+								Domask, Kalmancount, Intensityratio, Inispacing, seedmap,jpb, thirdDimensionSize);
 						Accountedframes.add(FindlinesVia.getAccountedframes());
 					}
 
@@ -3566,14 +3616,14 @@ public class Interactive_MT implements PlugIn {
 					if (showDeterministic) {
 						returnVector = FindlinesVia.LinefindingMethodHF(groundframe, groundframepre, PrevFrameparam,
 								minlength, thirdDimension, psf, newlineHough, userChoiceModel, Domask, Intensityratio,
-								Inispacing, Trackstart,jpb, thirdDimensionSize);
+								Inispacing, seedmap,jpb, thirdDimensionSize);
 						Accountedframes.add(FindlinesVia.getAccountedframes());
 
 					}
 					if (showKalman) {
 						returnVectorKalman = FindlinesVia.LinefindingMethodHFKalman(groundframe, groundframepre,
 								PrevFrameparamKalman, minlength, thirdDimension, psf, newlineHough, userChoiceModel,
-								Domask, Kalmancount, Intensityratio, Inispacing, Trackstart,jpb, thirdDimensionSize);
+								Domask, Kalmancount, Intensityratio, Inispacing, seedmap,jpb, thirdDimensionSize);
 
 						Accountedframes.add(FindlinesVia.getAccountedframes());
 					}
@@ -3593,7 +3643,7 @@ public class Interactive_MT implements PlugIn {
 					if (showDeterministic) {
 						returnVector = FindlinesVia.LinefindingMethodHF(groundframe, groundframepre, PrevFrameparam,
 								minlength, thirdDimension, psf, newlineMserwHough, userChoiceModel, Domask,
-								Intensityratio, Inispacing, Trackstart,jpb, thirdDimensionSize);
+								Intensityratio, Inispacing, seedmap,jpb, thirdDimensionSize);
 						Accountedframes.add(FindlinesVia.getAccountedframes());
 
 					}
@@ -3601,7 +3651,7 @@ public class Interactive_MT implements PlugIn {
 					if (showKalman) {
 						returnVectorKalman = FindlinesVia.LinefindingMethodHFKalman(groundframe, groundframepre,
 								PrevFrameparamKalman, minlength, thirdDimension, psf, newlineMserwHough,
-								userChoiceModel, Domask, Kalmancount, Intensityratio, Inispacing, Trackstart,jpb, thirdDimensionSize);
+								userChoiceModel, Domask, Kalmancount, Intensityratio, Inispacing, seedmap,jpb, thirdDimensionSize);
 
 						Accountedframes.add(FindlinesVia.getAccountedframes());
 
@@ -3642,7 +3692,7 @@ public class Interactive_MT implements PlugIn {
 				
 				
 			
-				if (Trackstart) {
+				if (Allstart!=null) {
 					final Trackstart trackerstart = new Trackstart(Allstart, thirdDimensionSize - next);
 					ImagePlus impstart = ImageJFunctions.show(originalimg);
 					ImagePlus impstartsec = ImageJFunctions.show(originalimg);
@@ -3663,7 +3713,7 @@ public class Interactive_MT implements PlugIn {
 					impstartsec.setTitle("Graph A");
 				}
 
-				if (Trackstart == false) {
+				if (Allend!=null) {
 					final Trackend trackerend = new Trackend(Allend, thirdDimensionSize - next);
 					ImagePlus impend = ImageJFunctions.show(originalPreprocessedimg);
 
@@ -3687,7 +3737,7 @@ public class Interactive_MT implements PlugIn {
 
 			if (showKalman) {
 				ResultsTable rtAll = new ResultsTable();
-				if (Trackstart) {
+				if (AllstartKalman!=null) {
 					MTtrackerstart.reset();
 					MTtrackerstart.process();
 
@@ -3809,7 +3859,7 @@ public class Interactive_MT implements PlugIn {
 
 				}
 
-				if (Trackstart == false) {
+				if (AllendKalman!= null) {
 					MTtrackerend.reset();
 					MTtrackerend.process();
 
@@ -3939,7 +3989,7 @@ public class Interactive_MT implements PlugIn {
 
 				ResultsTable rtAll = new ResultsTable();
 
-				if (Trackstart) {
+				if (Allstart!=null) {
 					ArrayList<Pair<Integer[], double[]>> lengthliststart = new ArrayList<Pair<Integer[], double[]>>();
 
 					final ArrayList<Trackproperties> first = Allstart.get(0);
@@ -4098,7 +4148,7 @@ public class Interactive_MT implements PlugIn {
 									usefolder + "//" + addTrackToName + "start"  + ".xls", rt);
 
 				}
-				if (Trackstart == false) {
+				if (Allend!=null) {
 					final ArrayList<Trackproperties> first = Allend.get(0);
 					int MaxSeedLabel = first.get(first.size() - 1).seedlabel;
 					int MinSeedLabel = first.get(0).seedlabel;
@@ -4253,14 +4303,14 @@ public class Interactive_MT implements PlugIn {
 
 					}
 				rtAll.show("Start and End of MT, respectively");
-				if (Trackstart) 
+				if (lengthtimestart!=null)
 					lengthtime = lengthtimestart;
 				else
 					lengthtime = lengthtimeend;
 				if (analyzekymo) {
 					double lengthcheckstart = 0;
 					double lengthcheckend = 0;
-					if (Trackstart) {
+					if (lengthtimestart!=null) {
 						lengthtime = lengthtimestart;
 						for (int index = 0; index < lengthtimestart.size(); ++index) {
 
@@ -4328,7 +4378,8 @@ public class Interactive_MT implements PlugIn {
 						deltad = deltadstart;
 						
 					}
-					if (Trackstart == false) {
+					if (lengthtimeend!=null) {
+						lengthtime = lengthtimeend;
 						for (int index = 0; index < lengthtimeend.size(); ++index) {
 
 							int time = (int) lengthtimeend.get(index)[1];
@@ -4396,10 +4447,7 @@ public class Interactive_MT implements PlugIn {
 						lengthtime = lengthtimeend;
 					}
 
-					if (lengthtimestart.size() > 0 && lengthtimeend.size() > 0) {
-						deltad = (netdeltadstart >= netdeltadend) ? deltadend : deltadstart;
-						lengthtime = (netdeltadstart >= netdeltadend) ? lengthtimeend : lengthtimestart;
-					}
+					
 
 					FileWriter deltaw;
 					File fichierKydel = new File(usefolder + "//" + addToName + "MTtracker-deltad" + ".txt");
@@ -4575,14 +4623,14 @@ public class Interactive_MT implements PlugIn {
 					if (showDeterministic) {
 						returnVector = FindlinesVia.LinefindingMethodHF(groundframe, groundframepre, PrevFrameparam,
 								minlength, thirdDimension, psf, newlineMser, userChoiceModel, Domask, Intensityratio,
-								Inispacing, Trackstart, jpb, thirdDimensionSize);
+								Inispacing, seedmap, jpb, thirdDimensionSize);
 						Accountedframes.add(FindlinesVia.getAccountedframes());
 					}
 
 					if (showKalman) {
 						returnVectorKalman = FindlinesVia.LinefindingMethodHFKalman(groundframe, groundframepre,
 								PrevFrameparamKalman, minlength, thirdDimension, psf, newlineMser, userChoiceModel,
-								Domask, Kalmancount, Intensityratio, Inispacing, Trackstart, jpb, thirdDimensionSize);
+								Domask, Kalmancount, Intensityratio, Inispacing, seedmap, jpb, thirdDimensionSize);
 
 						Accountedframes.add(FindlinesVia.getAccountedframes());
 					}
@@ -4603,7 +4651,7 @@ public class Interactive_MT implements PlugIn {
 					if (showDeterministic) {
 						returnVector = FindlinesVia.LinefindingMethodHF(groundframe, groundframepre, PrevFrameparam,
 								minlength, thirdDimension, psf, newlineHough, userChoiceModel, Domask, Intensityratio,
-								Inispacing, Trackstart, jpb, thirdDimensionSize);
+								Inispacing, seedmap, jpb, thirdDimensionSize);
 
 						Accountedframes.add(FindlinesVia.getAccountedframes());
 					}
@@ -4611,7 +4659,7 @@ public class Interactive_MT implements PlugIn {
 					if (showKalman) {
 						returnVectorKalman = FindlinesVia.LinefindingMethodHFKalman(groundframe, groundframepre,
 								PrevFrameparamKalman, minlength, thirdDimension, psf, newlineHough, userChoiceModel,
-								Domask, Kalmancount, Intensityratio, Inispacing, Trackstart, jpb, thirdDimensionSize);
+								Domask, Kalmancount, Intensityratio, Inispacing, seedmap, jpb, thirdDimensionSize);
 						Accountedframes.add(FindlinesVia.getAccountedframes());
 					}
 
@@ -4630,14 +4678,14 @@ public class Interactive_MT implements PlugIn {
 					if (showDeterministic) {
 						returnVector = FindlinesVia.LinefindingMethodHF(groundframe, groundframepre, PrevFrameparam,
 								minlength, thirdDimension, psf, newlineMserwHough, userChoiceModel, Domask,
-								Intensityratio, Inispacing, Trackstart, jpb, thirdDimensionSize);
+								Intensityratio, Inispacing, seedmap, jpb, thirdDimensionSize);
 
 						Accountedframes.add(FindlinesVia.getAccountedframes());
 					}
 					if (showKalman) {
 						returnVectorKalman = FindlinesVia.LinefindingMethodHFKalman(groundframe, groundframepre,
 								PrevFrameparamKalman, minlength, thirdDimension, psf, newlineMserwHough,
-								userChoiceModel, Domask, Kalmancount, Intensityratio, Inispacing, Trackstart, jpb, thirdDimensionSize);
+								userChoiceModel, Domask, Kalmancount, Intensityratio, Inispacing, seedmap, jpb, thirdDimensionSize);
 
 						Accountedframes.add(FindlinesVia.getAccountedframes());
 					}
@@ -4676,7 +4724,7 @@ public class Interactive_MT implements PlugIn {
 
 				
 			
-				if (Trackstart) {
+				if (Allstart!=null) {
 					ImagePlus impstart = ImageJFunctions.show(originalimg);
 					ImagePlus impstartsec = ImageJFunctions.show(originalimg);
 					final Trackstart trackerstart = new Trackstart(Allstart, thirdDimensionSize - next);
@@ -4694,7 +4742,7 @@ public class Interactive_MT implements PlugIn {
 					impstart.draw();
 					impstart.setTitle("Sub Graph A");
 				}
-				if (Trackstart == false) {
+				if (Allend!=null) {
 					ImagePlus impendsec = ImageJFunctions.show(originalPreprocessedimg);
 					final Trackend trackerend = new Trackend(Allend, thirdDimensionSize - next);
 					
@@ -4721,7 +4769,7 @@ public class Interactive_MT implements PlugIn {
 			if (showKalman) {
 
 				ResultsTable rtAll = new ResultsTable();
-				if (Trackstart) {
+				if (AllstartKalman!=null) {
 					MTtrackerstart = new KFsearch(AllstartKalman, UserchosenCostFunction, maxSearchradius,
 							initialSearchradius, thirdDimension, thirdDimensionSize, missedframes);
 					MTtrackerstart.reset();
@@ -4842,7 +4890,7 @@ public class Interactive_MT implements PlugIn {
 					}
 				}
 
-				if (Trackstart == false) {
+				if (AllendKalman!=null) {
 					MTtrackerend = new KFsearch(AllendKalman, UserchosenCostFunction, maxSearchradius,
 							initialSearchradius, thirdDimension, thirdDimensionSize, missedframes);
 
@@ -4973,7 +5021,7 @@ public class Interactive_MT implements PlugIn {
 				nf.setMaximumFractionDigits(3);
 
 				ResultsTable rtAll = new ResultsTable();
-				if (Trackstart) {
+				if (Allstart!=null) {
 					final ArrayList<Trackproperties> first = Allstart.get(0);
 					int MaxSeedLabel = first.get(first.size() - 1).seedlabel;
 					int MinSeedLabel = first.get(0).seedlabel;
@@ -5128,7 +5176,7 @@ public class Interactive_MT implements PlugIn {
 					}
 				
 
-				if (Trackstart == false) {
+				if (Allend!=null) {
 					ArrayList<Pair<Integer[], double[]>> lengthlistend = new ArrayList<Pair<Integer[], double[]>>();
 					final ArrayList<Trackproperties> first = Allend.get(0);
 					int MaxSeedLabel = first.get(first.size() - 1).seedlabel;
@@ -5299,15 +5347,16 @@ public class Interactive_MT implements PlugIn {
 				
 				
 				rtAll.show("Start and End of MT");
-				if (Trackstart)
+				if (lengthtimestart!=null)
 					lengthtime = lengthtimestart;
 				else
 					lengthtime = lengthtimeend;
 				if (analyzekymo) {
 					double lengthcheckstart = 0;
 					double lengthcheckend = 0;
-					if (Trackstart) {
+					if (lengthtimestart!=null) {
 
+						lengthtime = lengthtimestart;
 						for (int index = 0; index < lengthtimestart.size(); ++index) {
 
 							int time = (int) lengthtimestart.get(index)[1];
@@ -5371,11 +5420,11 @@ public class Interactive_MT implements PlugIn {
 
 						}
 						deltad = deltadstart;
-						lengthtime = lengthtimestart;
 
 					}
 
-					if (Trackstart == false) {
+					if (lengthtimeend!=null) {
+						lengthtime = lengthtimeend;
 						for (int index = 0; index < lengthtimeend.size(); ++index) {
 
 							int time = (int) lengthtimeend.get(index)[1];
@@ -5444,13 +5493,9 @@ public class Interactive_MT implements PlugIn {
 						}
 
 						deltad = deltadend;
-						lengthtime = lengthtimeend;
 					}
 
-					if (lengthtimestart.size() > 0 && lengthtimeend.size() > 0) {
-						deltad = (netdeltadstart >= netdeltadend) ? deltadend : deltadstart;
-						lengthtime = (netdeltadstart >= netdeltadend) ? lengthtimeend : lengthtimestart;
-					}
+					
 
 					FileWriter deltaw;
 					File fichierKydel = new File(usefolder + "//" + addToName + "MTtracker-deltad" + ".txt");

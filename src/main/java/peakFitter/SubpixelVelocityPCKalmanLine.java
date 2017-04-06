@@ -7,6 +7,7 @@ package peakFitter;
 	import java.io.FileWriter;
 	import java.io.IOException;
 	import java.util.ArrayList;
+import java.util.HashMap;
 
 import javax.swing.JProgressBar;
 
@@ -73,7 +74,7 @@ import preProcessing.GetLocalmaxmin;
 		public int iterations = 300;
 		public double cutoffdistance = 5;
 		public boolean halfgaussian = false;
-		boolean Trackstart;
+		final HashMap<Integer, Boolean> Trackstart;
 		public double Intensityratio;
 		private final UserChoiceModel model;
 		public double Inispacing;
@@ -138,7 +139,7 @@ import preProcessing.GetLocalmaxmin;
 		public SubpixelVelocityPCKalmanLine(final RandomAccessibleInterval<FloatType> source, final LinefinderHF linefinder,
 				final ArrayList<KalmanIndexedlength> PrevFrameparamstart, final ArrayList<KalmanIndexedlength> PrevFrameparamend,
 				final double[] psf, final int framenumber, final UserChoiceModel model, final boolean DoMask, final int KalmanCount, 
-				final boolean Trackstart, final JProgressBar jpb,
+				final HashMap<Integer, Boolean>  Trackstart, final JProgressBar jpb,
 				final int thirdDimsize) {
 
 			linefinder.checkInput();
@@ -191,10 +192,15 @@ import preProcessing.GetLocalmaxmin;
 			
 			double size = Math.sqrt(psf[0] * psf[0] + psf[1] * psf[1]);
 			
-			if (Trackstart){
-			final int oldframenumber = PrevFrameparamstart.get(PrevFrameparamstart.size() - 1).framenumber;
-			final int framediff = framenumber - oldframenumber;
+			
+			
 			for (int index = 0; index < PrevFrameparamstart.size(); ++index) {
+				final int oldframenumber = PrevFrameparamstart.get(PrevFrameparamstart.size() - 1).framenumber;
+				final int framediff = framenumber - oldframenumber;
+				
+				if (Trackstart.get(PrevFrameparamstart.get(index).seedLabel)){
+					
+					
 				percent = (Math.round(100 * (index + 1) / (PrevFrameparamstart.size())));
 				final double originalslope = PrevFrameparamstart.get(index).originalslope;
 
@@ -255,11 +261,14 @@ import preProcessing.GetLocalmaxmin;
 			}
 			}
 			
-			if (Trackstart == false){
+			
+				
+			for (int index = 0; index < PrevFrameparamend.size(); ++index) {
 				final int oldframenumber = PrevFrameparamend.get(PrevFrameparamend.size() - 1).framenumber;
 				final int framediff = framenumber - oldframenumber;
-			for (int index = 0; index < PrevFrameparamend.size(); ++index) {
-
+				
+				if (Trackstart.get(PrevFrameparamend.get(index).seedLabel) == false){
+					
 				percent = (Math.round(100 * (index + 1) / (PrevFrameparamend.size())));
 				Point secondlinepoint = new Point(ndims);
 				secondlinepoint.setPosition(new long[] { (long) PrevFrameparamend.get(index).currentpos[0],
