@@ -100,7 +100,20 @@ public class Polynomial extends AbstractFunction<Polynomial> {
 		}
 
 	}
+	static double asinh(double x) 
+	{ 
+	return Math.log(x + Math.sqrt(x*x + 1.0)); 
+	} 
 
+	static double acosh(double x) 
+	{ 
+	return Math.log(x + Math.sqrt(x*x - 1.0)); 
+	} 
+
+	static double atanh(double x) 
+	{ 
+	return 0.5*Math.log( (x + 1.0) / (x - 1.0) ); 
+	} 
 	// Distance of a point from a polynomial
 	@Override
 	public double distanceTo(final Point point) {
@@ -110,6 +123,96 @@ public class Polynomial extends AbstractFunction<Polynomial> {
 		
 		if (degree == 1)
 			return Math.abs(y1 - coeff[1]*x1 - coeff[0]) /(Math.sqrt( 1 + coeff[1] * coeff[1]));
+		
+		if (degree == 2){
+			
+			double a3 , a2, a1, a0, Abar, Bbar, Phi, p, q, xc;
+		    double xc1 = 0, xc2 = 0, xc3 = 0, yc1 = 0, yc2 = 0, yc3 = 0 ;
+			
+			a3 = 2 * coeff[2] * coeff[2] ;
+			a2 =   3 * coeff[1] * coeff[2]  / a3 ;
+			a1 =  (2 * coeff[0] * coeff[2] - 2 * coeff[2] * y1 + 1 + coeff[1] *coeff[1]) / a3  ;
+			a0 = (coeff[0] *coeff[1] - y1 * coeff[1] - x1) / a3 ;
+			
+			p = (3 * a1 - a2 * a2) / 3 ;
+			q = (-9 * a1 * a2  + 27 * a0  + 2 * a2 * a2 * a2) / 27 ;
+			
+			
+			
+			if ((q * q / 4 + p * p * p / 27) > 0){
+				Abar = Math.pow(-q/2 + Math.sqrt( q * q / 4 + p * p * p / 27), 1/3);
+				Bbar = Math.pow(-q/2 - Math.sqrt( q * q / 4 + p * p * p / 27), 1/3);
+				
+				xc = Abar + Bbar;
+				xc1 = xc;
+				xc2 = xc;
+				xc3 = xc;
+				
+			}
+			if ((q * q / 4 + p * p * p / 27) == 0){
+				
+				if (q > 0){
+				xc1 = -2 * Math.sqrt(-p / 3);
+				xc2 = Math.sqrt(-p / 3);
+				xc3 = xc2;
+				}
+				
+				if (q < 0){
+					xc1 = 2 * Math.sqrt(-p / 3);
+					xc2 = -Math.sqrt(-p / 3);
+					xc3 = xc2;
+				}
+				
+				if (q == 0){
+					
+					xc1 = 0;
+					xc2 = 0;
+					xc3 = 0;
+					
+				}
+				
+			}
+			
+			if ((q * q / 4 + p * p * p / 27) < 0){
+				
+				if ( q >= 0)
+					
+					Phi = Math.acos(- Math.sqrt( q * q * 0.25 / (-p * p * p / 27)));
+				
+				else
+					
+					Phi = Math.acos(Math.sqrt(  q * q * 0.25 / (-p * p * p / 27)));
+					
+				
+				xc1 = 2 * Math.sqrt( -p / 3) * Math.cos(Phi / 3) - a2 / 3;
+				xc2 = 2 * Math.sqrt( -p / 3) * Math.cos((Phi + 2 * Math.PI) / 3) - a2 / 3;
+				xc3 =  2 * Math.sqrt( -p / 3) * Math.cos((Phi + 4 * Math.PI) / 3) - a2 / 3;
+				
+				
+			}
+				
+		
+			for (int j = degree; j >= 0; j--) {
+
+				yc1 += coeff[j] * Math.pow(xc1, j);
+				
+				yc2 += coeff[j] * Math.pow(xc2, j);
+				
+				yc3 += coeff[j] * Math.pow(xc3, j);
+			}
+			
+			double returndistA = util.Boundingboxes.Distance(new double[] { x1, y1 }, new double[] { xc1, yc1 });
+			
+			double returndistB = util.Boundingboxes.Distance(new double[] { x1, y1 }, new double[] { xc2, yc2 });
+			
+			double returndistC = util.Boundingboxes.Distance(new double[] { x1, y1 }, new double[] { xc3, yc3 });
+			
+			double returndist = Math.min(returndistA, Math.min(returndistB, returndistC));
+			
+
+			return returndist;
+			
+		}
 	
 		else{
 		// Initial guesses for Newton Raphson
@@ -165,7 +268,7 @@ public class Polynomial extends AbstractFunction<Polynomial> {
 				xcNew = xc;
 			
 			
-			System.out.println(xcNew);
+		//	System.out.println(xcNew);
 
 			// Compute the functions and the required derivates at the new point
 			delpolyfuncdiff = 0;
@@ -210,7 +313,6 @@ public class Polynomial extends AbstractFunction<Polynomial> {
 		// value
 
 		double returndist = util.Boundingboxes.Distance(new double[] { x1, y1 }, new double[] { xc, polyfunc });
-
 		return returndist;
 		}
 	}
@@ -299,7 +401,8 @@ public class Polynomial extends AbstractFunction<Polynomial> {
 		regression.ransac(candidates, inliersPoly, 100, 0.1, 0.5);
 
 		System.out.println("inliers: " + inliersPoly.size());
-
+		for ( final PointFunctionMatch p : inliersPoly )
+			System.out.println( regression.distanceTo( p.getP1() ) );
 		regression.fit(inliersPoly);
 		System.out.println(" y = "  );
 		for (int i = degree; i >= 0; --i)

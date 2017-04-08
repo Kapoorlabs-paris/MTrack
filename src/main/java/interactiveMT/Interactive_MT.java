@@ -2678,7 +2678,6 @@ public class Interactive_MT implements PlugIn {
 			if(lengthtimestart!=null){
 			for (int index = 1; index < lengthtimestart.size(); ++index) {
 
-				System.out.println("Start" + lengthtimestart.get(index)[0] + " " + lengthtimestart.get(index)[1] + " " + lengthtimestart.get(index)[2]);
 				if ((int) lengthtimestart.get(index)[2] == selectedSeed ){
 				float delta = (float) (lengthtimestart.get(index)[0] - lengthtimestart.get(index - 1)[0]);
 
@@ -2692,7 +2691,6 @@ public class Interactive_MT implements PlugIn {
 			}
 			if(lengthtimeend!=null){
 				for (int index = 1; index < lengthtimeend.size(); ++index) {
-					System.out.println("End" + lengthtimeend.get(index)[0] + " " + lengthtimeend.get(index)[1] + " " + lengthtimeend.get(index)[2]);
 					if ((int) lengthtimeend.get(index)[2] == selectedSeed ){
 					float delta = (float) (lengthtimeend.get(index)[0] - lengthtimeend.get(index - 1)[0]);
 
