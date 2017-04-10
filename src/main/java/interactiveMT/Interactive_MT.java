@@ -16,6 +16,7 @@ import java.awt.Insets;
 import java.awt.Label;
 import java.awt.Rectangle;
 import java.awt.Scrollbar;
+import java.awt.TextField;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.AdjustmentEvent;
@@ -54,6 +55,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -65,6 +67,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
@@ -104,6 +107,7 @@ import ij.plugin.PlugIn;
 import ij.plugin.frame.RoiManager;
 import ij.process.ColorProcessor;
 import ij.process.FloatProcessor;
+import interactiveMT.FileChooser.UploadTrackListener;
 import interactiveMT.InteractiveKymoAnalyze.GetBaseCords;
 import interactiveMT.InteractiveKymoAnalyze.GetCords;
 import labeledObjects.CommonOutputHF;
@@ -172,7 +176,6 @@ public class Interactive_MT implements PlugIn {
 	String usefolder = IJ.getDirectory("imagej");
 	ColorProcessor cp = null;
 	String addToName = "MTTrack";
-	String addTrackToName = "MTTrack";
 	ArrayList<float[]> deltadstart = new ArrayList<>();
 	ArrayList<float[]> deltadend = new ArrayList<>();
 	ArrayList<float[]> deltad = new ArrayList<>();
@@ -933,7 +936,49 @@ public class Interactive_MT implements PlugIn {
 		return !gd.wasCanceled();
 
 	}
+	protected class ChooseWorkspaceListener implements ActionListener {
 
+
+		
+
+		@Override
+		public void actionPerformed(final ActionEvent arg0) {
+
+			JFileChooser chooserA = new JFileChooser();
+			chooserA.setCurrentDirectory(new java.io.File("."));
+			chooserA.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+			chooserA.showOpenDialog(panelFirst);
+			usefolder = chooserA.getSelectedFile().getAbsolutePath();
+
+		
+
+		}
+
+	}
+
+	protected class ConfirmWorkspaceListener implements ActionListener {
+		
+		final TextField filename;
+		
+		public ConfirmWorkspaceListener(TextField filename){
+			
+			this.filename = filename;
+			
+		}
+		
+		@Override
+		public void actionPerformed(final ActionEvent arg0) {
+			
+			addToName = filename.getText();
+			
+			
+		}
+		
+		
+		
+		
+	}
+	
 	// Making the card
 	JFrame Cardframe = new JFrame("MicroTubule Tracker");
 	JPanel panelCont = new JPanel();
@@ -965,7 +1010,9 @@ public class Interactive_MT implements PlugIn {
 
 		// First Panel
 		panelFirst.setName("Preprocess and Determine Seeds");
-
+		
+		
+		
 		CheckboxGroup Finders = new CheckboxGroup();
 		final Checkbox MedFilterAll = new Checkbox("Apply Median Filter to Stack", MedianAll);
 		final Scrollbar thirdDimensionslider = new Scrollbar(Scrollbar.HORIZONTAL, thirdDimensionsliderInit, 0, 0,
@@ -978,7 +1025,11 @@ public class Interactive_MT implements PlugIn {
 		final Label MTText = new Label("Preprocess and Determine Seed Ends (Green Channel)", Label.CENTER);
 		final Label Step = new Label("Step 1", Label.CENTER);
 		final Checkbox Analyzekymo = new Checkbox("Analyze Kymograph");
-
+		final JButton ChooseWorkspace = new JButton("Choose Workspace");
+		final JLabel outputfilename = new JLabel("Enter output filename: ");
+		TextField inputField = new TextField();
+		inputField.setColumns(10);
+		final JButton Confirm= new JButton("Confirm Workspace Selection");
 		final Checkbox mser = new Checkbox("MSER", Finders, FindLinesViaMSER);
 		final Checkbox hough = new Checkbox("HOUGH", Finders, FindLinesViaHOUGH);
 		final Checkbox mserwhough = new Checkbox("MSERwHOUGH", Finders, FindLinesViaMSERwHOUGH);
@@ -1045,6 +1096,25 @@ public class Interactive_MT implements PlugIn {
 			panelFirst.add(JumpinTime, c);
 		}
 
+		++c.gridy;
+		c.insets = new Insets(10, 10, 0, 0);
+		panelFirst.add(ChooseWorkspace, c);
+
+		++c.gridy;
+		c.insets = new Insets(10, 10, 10, 0);
+		panelFirst.add(outputfilename, c);
+		
+		++c.gridy;
+		c.insets = new Insets(10, 10, 10, 0);
+		panelFirst.add(inputField, c);
+		
+		++c.gridy;
+		c.insets = new Insets(10, 10, 0, 0);
+		panelFirst.add(Confirm, c);
+		
+		
+		
+		
 		panelFirst.setVisible(true);
 		cl.show(panelCont, "1");
 
@@ -1057,7 +1127,8 @@ public class Interactive_MT implements PlugIn {
 		Analyzekymo.addItemListener(new AnalyzekymoListener());
 		hough.addItemListener(new HoughListener());
 		mserwhough.addItemListener(new MserwHoughListener());
-
+		ChooseWorkspace.addActionListener(new ChooseWorkspaceListener());
+		Confirm.addActionListener(new ConfirmWorkspaceListener(inputField));
 		JPanel control = new JPanel();
 
 		control.add(new JButton(new AbstractAction("\u22b2Prev") {
@@ -3938,7 +4009,7 @@ public class Interactive_MT implements PlugIn {
 						}
 
 						if (SaveXLS )
-							saveResultsToExcel(usefolder + "//" + addTrackToName + "KalmanStart" + id + ".xls", rt);
+							saveResultsToExcel(usefolder + "//" + addToName + "KalmanStart" + id + ".xls", rt);
 
 					}
 
@@ -4058,7 +4129,7 @@ public class Interactive_MT implements PlugIn {
 						}
 
 						if (SaveXLS )
-							saveResultsToExcel(usefolder + "//" + addTrackToName + "KalmanEnd" + id + ".xls", rt);
+							saveResultsToExcel(usefolder + "//" + addToName + "KalmanEnd" + id + ".xls", rt);
 
 					}
 
@@ -4146,7 +4217,7 @@ public class Interactive_MT implements PlugIn {
 							try {
 
 								File fichier = new File(
-										usefolder + "//" + addTrackToName + "SeedLabel" + seedID + "-start" + ".txt");
+										usefolder + "//" + addToName + "SeedLabel" + seedID + "-start" + ".txt");
 								File fichierMy = new File(
 										usefolder + "//" + addToName + "KymoVarun-start" + seedID + ".txt");
 								FileWriter fw = new FileWriter(fichier);
@@ -4230,7 +4301,7 @@ public class Interactive_MT implements PlugIn {
 
 						if (SaveXLS)
 							saveResultsToExcel(
-									usefolder + "//" + addTrackToName + "start"  + ".xls", rt);
+									usefolder + "//" + addToName + "start"  + ".xls", rt);
 
 				}
 				if (Allend!=null) {
@@ -4304,7 +4375,7 @@ public class Interactive_MT implements PlugIn {
 						if (SaveTxt) {
 							try {
 								File fichier = new File(
-										usefolder + "//" + addTrackToName + "SeedLabel" + seedID + "-end" + ".txt");
+										usefolder + "//" + addToName + "SeedLabel" + seedID + "-end" + ".txt");
 								File fichierMy = new File(
 										usefolder + "//" + addToName + "KymoVarun-end" + seedID + ".txt");
 
@@ -4384,7 +4455,7 @@ public class Interactive_MT implements PlugIn {
 
 						if (SaveXLS)
 							saveResultsToExcel(
-									usefolder + "//" + addTrackToName + "end" + ".xls", rtend);
+									usefolder + "//" + addToName + "end" + ".xls", rtend);
 
 					}
 				rtAll.show("Start and End of MT, respectively");
@@ -4970,7 +5041,7 @@ public class Interactive_MT implements PlugIn {
 						}
 
 						if (SaveXLS )
-							saveResultsToExcel(usefolder + "//" + addTrackToName + "KalmanStart" + id + ".xls", rt);
+							saveResultsToExcel(usefolder + "//" + addToName + "KalmanStart" + id + ".xls", rt);
 
 					}
 				}
@@ -5092,7 +5163,7 @@ public class Interactive_MT implements PlugIn {
 						}
 
 						if (SaveXLS )
-							saveResultsToExcel(usefolder + "//" + addTrackToName + "KalmanEnd" + id + ".xls", rt);
+							saveResultsToExcel(usefolder + "//" + addToName + "KalmanEnd" + id + ".xls", rt);
 
 					}
 
@@ -5174,7 +5245,7 @@ public class Interactive_MT implements PlugIn {
 						if (SaveTxt) {
 							try {
 								File fichier = new File(
-										usefolder + "//" + addTrackToName + "SeedLabel" + seedID + "-start" + ".txt");
+										usefolder + "//" + addToName + "SeedLabel" + seedID + "-start" + ".txt");
 								File fichierMy = new File(
 										usefolder + "//" + addToName + "KymoVarun-start" + seedID + ".txt");
 								FileWriter fw = new FileWriter(fichier);
@@ -5256,7 +5327,7 @@ public class Interactive_MT implements PlugIn {
 
 						if (SaveXLS)
 							saveResultsToExcel(
-									usefolder + "//" + addTrackToName + "start"  + ".xls", rt);
+									usefolder + "//" + addToName + "start"  + ".xls", rt);
 
 					}
 				
@@ -5334,7 +5405,7 @@ public class Interactive_MT implements PlugIn {
 						if (SaveTxt) {
 							try {
 								File fichier = new File(
-										usefolder + "//" + addTrackToName + "SeedLabel" + seedID + "-end" + ".txt");
+										usefolder + "//" + addToName + "SeedLabel" + seedID + "-end" + ".txt");
 
 								File fichierMy = new File(
 										usefolder + "//" + addToName + "KymoVarun-end" + seedID + ".txt");
@@ -5426,7 +5497,7 @@ public class Interactive_MT implements PlugIn {
 
 						if (SaveXLS)
 							saveResultsToExcel(
-									usefolder + "//" + addTrackToName + "end" + ".xls", rtend);
+									usefolder + "//" + addToName + "end" + ".xls", rtend);
 
 					}
 				
@@ -7200,8 +7271,8 @@ public class Interactive_MT implements PlugIn {
 		gd.addNumericField("Spacing between Gaussians = G * Min(Psf), G (enter 0.3 to 1.0) = ",
 				Inispacing / Math.min(psf[0], psf[1]), 2);
 		
-		gd.addStringField("Use_folder:", usefolder);
-		gd.addStringField("Choose_filestartname:", addToName);
+		gd.addStringField("Choose a different workspace?:", usefolder);
+		gd.addStringField("Choose a different filename?:", addToName);
 		
 		if (analyzekymo && Kymoimg!=null){
 		gd.addNumericField("Average max difference between Kymo and tracker = ", deltadcutoff, 2);

@@ -189,7 +189,7 @@ public class FileChooser extends JPanel {
 			chooserA = new JFileChooser();
 			chooserA.setCurrentDirectory(new java.io.File("."));
 			chooserA.setDialogTitle(choosertitleA);
-			chooserA.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+			chooserA.setFileSelectionMode(JFileChooser.FILES_ONLY);
 			//
 			// disable the "All files" option.
 			//
@@ -227,7 +227,7 @@ public class FileChooser extends JPanel {
 			chooserB = new JFileChooser();
 			chooserB.setCurrentDirectory(chooserA.getCurrentDirectory());
 			chooserB.setDialogTitle(choosertitleB);
-			chooserB.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+			chooserB.setFileSelectionMode(JFileChooser.FILES_ONLY);
 			//
 			// disable the "All files" option.
 			//
@@ -265,7 +265,7 @@ public class FileChooser extends JPanel {
 			chooserC = new JFileChooser();
 			chooserC.setCurrentDirectory(new java.io.File("."));
 			chooserC.setDialogTitle(choosertitleC);
-			chooserC.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+			chooserC.setFileSelectionMode(JFileChooser.FILES_ONLY);
 			//
 			// disable the "All files" option.
 			//
