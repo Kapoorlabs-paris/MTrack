@@ -186,6 +186,7 @@ public class Interactive_MT implements PlugIn {
 	float thetaPerPixelMin = new Float(0.2);
 	float rhoPerPixelMin = new Float(0.2);
 	MouseListener ml;
+	MouseListener removeml;
 	
 	float thresholdHoughMin = 0;
 	float thresholdHoughMax = 250;
@@ -314,7 +315,6 @@ public class Interactive_MT implements PlugIn {
 
 	ArrayList<ArrayList<KalmanTrackproperties>> AllstartKalman = new ArrayList<ArrayList<KalmanTrackproperties>>();
 	ArrayList<ArrayList<KalmanTrackproperties>> AllendKalman = new ArrayList<ArrayList<KalmanTrackproperties>>();
-
 	int channel = 0;
 	int thirdDimensionSize = 0;
 	ImagePlus Kymoimp;
@@ -342,7 +342,7 @@ public class Interactive_MT implements PlugIn {
 	int minlength;
 	int Maxlabel;
 	private int ndims;
-	
+	Overlay overlaysec;
 	ArrayList<Pair<Integer, double[]>> IDALL = new ArrayList<Pair<Integer, double[]>>();
 	ArrayList<int[]> ClickedPoints = new ArrayList<int[]>();
 	Pair<ArrayList<Indexedlength>, ArrayList<Indexedlength>> PrevFrameparam;
@@ -2073,7 +2073,7 @@ public class Interactive_MT implements PlugIn {
 					ClickedPoints.add(new int[] { x, y });
 					
 					
-					Overlay overlaysec = preprocessedimp.getOverlay();
+					overlaysec = preprocessedimp.getOverlay();
 
 					if (overlaysec == null) {
 						overlaysec = new Overlay();
@@ -2118,53 +2118,51 @@ public class Interactive_MT implements PlugIn {
 	protected class removeendListener implements ActionListener {
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
-
-			preprocessedimp.getCanvas().addMouseListener( ml = new MouseListener() {
+			preprocessedimp.getCanvas().removeMouseListener(ml);
+			preprocessedimp.getCanvas().addMouseListener( removeml = new MouseListener() {
 
 				@Override
 				public void mouseClicked(MouseEvent e) {
 					int x = e.getX();
 					int y = e.getY();
-					System.out.println("You chose: " + x + "," + y);// these
+					System.out.println("You removed: " + x + "," + y);// these
 																	// co-ords
 																	// are
 																	// relative
 																	// to the
 																	// component
-					int nearestx, nearesty;
-					Overlay overlaysec = preprocessedimp.getOverlay();
+					int[] nearestxy = null;
+					
 					double Distmin = Double.MAX_VALUE;
-					for (int index = 0 ; index < overlaysec.size(); ++index){
+					for (int index = 0 ; index < ClickedPoints.size(); ++index){
 						
-						Roi currentroi = overlaysec.get(index);
 						
-						int currentx = (int)currentroi.getXBase();
-						int currenty = (int)currentroi.getYBase();
+						int[] currentxy = ClickedPoints.get(index);
 						
-						double currentdist = util.Boundingboxes.Distance(new double[]{currentx, currenty}, new double[]{x, y}  );
+						double currentdist = util.Boundingboxes.Distance(currentxy, new double[]{x, y}  );
 						
-						if (currentdist < Distmin){
+						if (currentdist < Distmin && currentdist < 10){
 							
-						//	nearestx =
+							nearestxy = currentxy;
 							
 							
 						}
 						
 					}
-					
-					
-					ClickedPoints.remove(new int[] { x, y });
-					
-					
-					
-
-					
-					
+					OvalRoi Bigroi = null;
+					if (nearestxy!=null){
+					ClickedPoints.remove(nearestxy);
 				
 					
-					final OvalRoi Bigroi = new OvalRoi(Util.round(x - 5), Util.round(y - 5), Util.round(10),
+					Bigroi = new OvalRoi(Util.round(nearestxy[0] - 5), Util.round(nearestxy[1] - 5), Util.round(10),
 							Util.round(10));
-					overlaysec.add(Bigroi);
+					}
+					
+					if (Bigroi!=null){
+					if(overlaysec.contains(Bigroi)){
+					overlaysec.remove(Bigroi);
+					}
+					}
 
 				}
 
@@ -2943,6 +2941,7 @@ public class Interactive_MT implements PlugIn {
 			else if (arg0.getStateChange() == ItemEvent.SELECTED) {
 				finalpoint = true;
 
+				preprocessedimp.getCanvas().removeMouseListener(removeml);
 				preprocessedimp.getCanvas().removeMouseListener(ml);
 
 				ArrayList<double[]> filepair = new ArrayList<double[]>();

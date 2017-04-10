@@ -617,5 +617,16 @@ public static FinalInterval CurrentroiInterval(RandomAccessibleInterval<FloatTyp
 		return Velocity;
 	}
 
+	public static double Distance(int[] minCorner, double[] maxCorner) {
+		double distance = 0;
+
+		for (int d = 0; d < minCorner.length; ++d) {
+
+			distance += Math.pow((minCorner[d] - maxCorner[d]), 2);
+
+		}
+		return Math.sqrt(distance);
+	}
+
 	
 }
