@@ -186,6 +186,7 @@ public class Interactive_MT implements PlugIn {
 	float thetaPerPixelMin = new Float(0.2);
 	float rhoPerPixelMin = new Float(0.2);
 	MouseListener ml;
+	
 	float thresholdHoughMin = 0;
 	float thresholdHoughMax = 250;
 	float deltaMax = 400f;
@@ -1089,6 +1090,7 @@ public class Interactive_MT implements PlugIn {
 		final Button MoveNext = new Button("Update method and parameters (first image in dynamic channel)");
 		final Button JumptoFrame = new Button("Update method and parameters (choose an image in dynamic channel)");
 		final Button ClickFast = new Button("Click here to track only fast ends, click seed ends on image after that");
+		final Button RemoveFast = new Button("Remove wrongly selected points");
 		final Checkbox Finalize = new Checkbox("Confirm the end point(s)");
 		final Label MTTextHF = new Label("Choose End point finding method for Higher Frames (dynamic channel)",
 				Label.CENTER);
@@ -1122,6 +1124,10 @@ public class Interactive_MT implements PlugIn {
 
 		++c.gridy;
 		c.insets = new Insets(10, 10, 0, 180);
+		panelThird.add(RemoveFast, c);
+		
+		++c.gridy;
+		c.insets = new Insets(10, 10, 0, 180);
 		panelThird.add(Finalize, c);
 
 		++c.gridy;
@@ -1134,6 +1140,8 @@ public class Interactive_MT implements PlugIn {
 		MoveNext.addActionListener(new moveNextListener());
 		JumptoFrame.addActionListener(new moveToFrameListener());
 		ClickFast.addActionListener(new chooseendListener());
+		RemoveFast.addActionListener(new removeendListener());
+		
 		thirdDimensionslider
 				.addAdjustmentListener(new thirdDimensionsliderListener(timeText, timeMin, thirdDimensionSize));
 		Cardframe.addWindowListener(new FrameListener(Cardframe));
@@ -2107,6 +2115,86 @@ public class Interactive_MT implements PlugIn {
 
 	}
 
+	protected class removeendListener implements ActionListener {
+		@Override
+		public void actionPerformed(final ActionEvent arg0) {
+
+			preprocessedimp.getCanvas().addMouseListener( ml = new MouseListener() {
+
+				@Override
+				public void mouseClicked(MouseEvent e) {
+					int x = e.getX();
+					int y = e.getY();
+					System.out.println("You chose: " + x + "," + y);// these
+																	// co-ords
+																	// are
+																	// relative
+																	// to the
+																	// component
+					int nearestx, nearesty;
+					Overlay overlaysec = preprocessedimp.getOverlay();
+					double Distmin = Double.MAX_VALUE;
+					for (int index = 0 ; index < overlaysec.size(); ++index){
+						
+						Roi currentroi = overlaysec.get(index);
+						
+						int currentx = (int)currentroi.getXBase();
+						int currenty = (int)currentroi.getYBase();
+						
+						double currentdist = util.Boundingboxes.Distance(new double[]{currentx, currenty}, new double[]{x, y}  );
+						
+						if (currentdist < Distmin){
+							
+						//	nearestx =
+							
+							
+						}
+						
+					}
+					
+					
+					ClickedPoints.remove(new int[] { x, y });
+					
+					
+					
+
+					
+					
+				
+					
+					final OvalRoi Bigroi = new OvalRoi(Util.round(x - 5), Util.round(y - 5), Util.round(10),
+							Util.round(10));
+					overlaysec.add(Bigroi);
+
+				}
+
+				@Override
+				public void mousePressed(MouseEvent e) {
+
+				}
+
+				@Override
+				public void mouseReleased(MouseEvent e) {
+
+				}
+
+				@Override
+				public void mouseEntered(MouseEvent e) {
+
+				}
+
+				@Override
+				public void mouseExited(MouseEvent e) {
+
+				}
+			});
+
+		}
+
+	}
+
+	
+	
 	protected class moveToFrameListener implements ActionListener {
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {

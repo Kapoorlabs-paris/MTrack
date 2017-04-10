@@ -323,10 +323,18 @@ public class Polynomial extends AbstractFunction<Polynomial> {
 		double secondordertermA = -(Functionderiv - oldpoint*Functionsecderiv) ;
 		double secondordertermSQRT = Math.pow((Functionderiv - oldpoint*Functionsecderiv),2) - 2 * Functionsecderiv * (Function + Functionsecderiv*0.5*oldpoint*oldpoint - Functionderiv*oldpoint) ;
 		double newpoint = 0 ;
+		
+		
+		/* This part used the actual second order Taylor expansion, however the paper is VLSI Design doing the same suggested using binomial theorem after that
+		/*
 		if (secondordertermSQRT > 0 && Functionsecderiv!= 0)
 		newpoint = (secondordertermA + Math.sqrt(secondordertermSQRT)) / (Functionsecderiv);
 		else
 		newpoint = 	oldpoint -  Function / Functionderiv;
+		
+		*/
+		newpoint = oldpoint -  (Function / Functionderiv) * (1 + 0.5 * Function * Functionsecderiv / (Functionderiv * Functionderiv) );
+		
 		
 		return newpoint;
 
@@ -390,7 +398,7 @@ public class Polynomial extends AbstractFunction<Polynomial> {
 
 		final ArrayList<PointFunctionMatch> candidates = new ArrayList<PointFunctionMatch>();
 		final ArrayList<PointFunctionMatch> inliersPoly = new ArrayList<PointFunctionMatch>();
-
+		long startTime = System.nanoTime();
 		for (final Point p : points)
 			candidates.add(new PointFunctionMatch(p));
 
@@ -407,7 +415,8 @@ public class Polynomial extends AbstractFunction<Polynomial> {
 		System.out.println(" y = "  );
 		for (int i = degree; i >= 0; --i)
 			System.out.println(regression.getCoefficients(i) + "  " + "x" + " X to the power of "  + i );
-		
+		long totalTime = System.nanoTime()- startTime;
+		System.out.println("Time: " + totalTime);
 
 	}
 

@@ -129,6 +129,8 @@ public class Line extends AbstractFunction<Line>
 		final ArrayList< PointFunctionMatch > candidates = new ArrayList<PointFunctionMatch>();
 		final ArrayList< PointFunctionMatch > inliers = new ArrayList<PointFunctionMatch>();
 		
+		long startTime = System.nanoTime();
+		
 		for ( final Point p : points )
 			candidates.add( new PointFunctionMatch( p ) );
 		
@@ -145,6 +147,8 @@ public class Line extends AbstractFunction<Line>
 			System.out.println( l.distanceTo( p.getP1() ) );
 		
 		//System.out.println( l.distanceTo( new Point( new float[]{ 1f, 0f } ) ) );
+		long totalTime = System.nanoTime()- startTime;
+		System.out.println("Time: " + totalTime);
 	}
 
 	
