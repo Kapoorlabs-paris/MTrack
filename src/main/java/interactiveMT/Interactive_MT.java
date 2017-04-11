@@ -315,7 +315,8 @@ public class Interactive_MT implements PlugIn {
 	ArrayList<float[]> finalvelocityKymo = new ArrayList<float[]>();
 	ArrayList<ArrayList<Trackproperties>> Allstart = new ArrayList<ArrayList<Trackproperties>>();
 	ArrayList<ArrayList<Trackproperties>> Allend = new ArrayList<ArrayList<Trackproperties>>();
-
+	ArrayList<Pair<Integer[], double[]>> lengthliststart = new ArrayList<Pair<Integer[], double[]>>();
+	ArrayList<Pair<Integer[], double[]>> lengthlistend = new ArrayList<Pair<Integer[], double[]>>();
 	ArrayList<ArrayList<KalmanTrackproperties>> AllstartKalman = new ArrayList<ArrayList<KalmanTrackproperties>>();
 	ArrayList<ArrayList<KalmanTrackproperties>> AllendKalman = new ArrayList<ArrayList<KalmanTrackproperties>>();
 	int channel = 0;
@@ -4146,7 +4147,7 @@ public class Interactive_MT implements PlugIn {
 				ResultsTable rtAll = new ResultsTable();
 
 				if (Allstart!=null) {
-					ArrayList<Pair<Integer[], double[]>> lengthliststart = new ArrayList<Pair<Integer[], double[]>>();
+					
 
 					final ArrayList<Trackproperties> first = Allstart.get(0);
 					int MaxSeedLabel = first.get(first.size() - 1).seedlabel;
@@ -4308,7 +4309,6 @@ public class Interactive_MT implements PlugIn {
 					final ArrayList<Trackproperties> first = Allend.get(0);
 					int MaxSeedLabel = first.get(first.size() - 1).seedlabel;
 					int MinSeedLabel = first.get(0).seedlabel;
-					ArrayList<Pair<Integer[], double[]>> lengthlistend = new ArrayList<Pair<Integer[], double[]>>();
 					for (int currentseed = MinSeedLabel; currentseed < MaxSeedLabel + 1; ++currentseed) {
 						double endlengthpixel = 0;
 						double endlength = 0;
@@ -5181,7 +5181,6 @@ public class Interactive_MT implements PlugIn {
 					final ArrayList<Trackproperties> first = Allstart.get(0);
 					int MaxSeedLabel = first.get(first.size() - 1).seedlabel;
 					int MinSeedLabel = first.get(0).seedlabel;
-					ArrayList<Pair<Integer[], double[]>> lengthliststart = new ArrayList<Pair<Integer[], double[]>>();
 					for (int currentseed = MinSeedLabel; currentseed < MaxSeedLabel + 1; ++currentseed) {
 						double startlength = 0;
 						double startlengthpixel = 0;
@@ -5333,7 +5332,6 @@ public class Interactive_MT implements PlugIn {
 				
 
 				if (Allend!=null) {
-					ArrayList<Pair<Integer[], double[]>> lengthlistend = new ArrayList<Pair<Integer[], double[]>>();
 					final ArrayList<Trackproperties> first = Allend.get(0);
 					int MaxSeedLabel = first.get(first.size() - 1).seedlabel;
 					int MinSeedLabel = first.get(0).seedlabel;

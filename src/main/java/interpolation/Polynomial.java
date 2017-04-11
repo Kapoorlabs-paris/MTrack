@@ -411,7 +411,12 @@ public class Polynomial extends AbstractFunction<Polynomial> {
 		System.out.println("inliers: " + inliersPoly.size());
 		for ( final PointFunctionMatch p : inliersPoly )
 			System.out.println( regression.distanceTo( p.getP1() ) );
+		
+		
 		regression.fit(inliersPoly);
+		
+		
+		
 		System.out.println(" y = "  );
 		for (int i = degree; i >= 0; --i)
 			System.out.println(regression.getCoefficients(i) + "  " + "x" + " X to the power of "  + i );
