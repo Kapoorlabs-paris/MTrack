@@ -65,11 +65,11 @@ public class FileChooser extends JPanel {
 		Measure = new JButton("Upload image for performing measurments");
 		Kymo = new JButton("Upload Kymograph for the MT");
 		Done = new JButton("Done");
-		inputLabelX = new JLabel("Enter psfX: ");
+		inputLabelX = new JLabel("Enter psfX (pixel units): ");
 		inputFieldX = new TextField();
 		inputFieldX.setColumns(10);
 
-		inputLabelY = new JLabel("Enter psfY: ");
+		inputLabelY = new JLabel("Enter psfY (pixel units): ");
 		inputFieldY = new TextField();
 		inputFieldY.setColumns(10);
 

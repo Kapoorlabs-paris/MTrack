@@ -87,7 +87,6 @@ public ImagePlus getImp() { return this.imp; }
 			
 			int currentFrame = arg0.getCurrentSlice();
 
-			System.out.println(currentFrame + " " + frame + " " + maxFrame);
 			for (int index = 0; index < subgraph.size(); ++index){
 			
 				if (currentFrame  == frame + subgraph.get(index).Previousframe + 1 && currentFrame< maxFrame){
@@ -114,7 +113,6 @@ public ImagePlus getImp() { return this.imp; }
 		//	final FileSaver savestart = new FileSaver(imp);
 		//	savestart.saveAsJpeg("Movingend_subgraph"+arg0.getFrame());
 			
-			System.out.println( arg0.getFrame() );
 		}		
 	}
 	

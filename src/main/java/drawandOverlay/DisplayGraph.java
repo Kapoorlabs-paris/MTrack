@@ -67,26 +67,7 @@ public class DisplayGraph {
 				imp.setTitle("Found Tracks");
 				
 			}
-			/*
-			
-			for (int index = 0; index < ID.size(); ++index){
-				
-				 Line newellipse = new Line(ID.get(index).getB()[0], ID.get(index).getB()[1], ID.get(index).getB()[0], ID.get(index).getB()[1]);
-					
-
-					newellipse.setStrokeColor(Color.WHITE);
-					newellipse.setStrokeWidth(1);
-					newellipse.setName("TrackID: " + ID.get(index).getA());
-					
-					o.add(newellipse);
-					o.drawLabels(true);
-					
-					o.drawNames(true);
-				
-				
-			}
-			
-			*/
+		
 			
 		}		
 	}

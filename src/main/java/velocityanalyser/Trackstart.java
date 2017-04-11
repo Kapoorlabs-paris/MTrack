@@ -86,7 +86,6 @@ public class Trackstart implements Linetracker {
 					}
 					
 					if (frame == 1){
-						System.out.println("Seedid start " + source.seedlabel);
 					Pair<Integer, double[]> currentid = new ValuePair<Integer, double[]>(source.seedlabel, source.oldpoint);
 					ID.add(currentid);
 					}
