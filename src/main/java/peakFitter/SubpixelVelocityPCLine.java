@@ -60,12 +60,12 @@ public class SubpixelVelocityPCLine extends BenchmarkAlgorithm
 	private final HashMap<Integer, Boolean>  Trackstart;
 	private boolean Maskfail = false;
 	// LM solver iteration params
-	public int maxiter = 300;
+	public int maxiter = 500;
 	public double lambda = 1e-2;
-	public double termepsilon = 1e-2;
+	public double termepsilon = 1e-3;
 	// Mask fits iteration param
-	public int iterations = 300;
-	public double cutoffdistance = 5;
+	public int iterations = 500;
+	public double cutoffdistance = 15;
 	public boolean halfgaussian = false;
 	public double Intensityratio;
 	final JProgressBar jpb;
@@ -1964,7 +1964,7 @@ public class SubpixelVelocityPCLine extends BenchmarkAlgorithm
 						sigmas+=psf[d] * psf[d];
 					}
 					
-					final int numgaussians = (int) Math.max(0.5 * Math.round(Math.sqrt(sigmas) /  ds), 2);
+					final int numgaussians =  (int) Math.max(0.5 * Math.round(Math.sqrt(sigmas) /  ds), 2);
 				
 					if (DoMask){
 					

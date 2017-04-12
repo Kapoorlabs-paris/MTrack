@@ -67,12 +67,12 @@ import preProcessing.GetLocalmaxmin;
 	    private final int KalmanCount;
 	    private boolean Maskfail = false;
 		// LM solver iteration params
-		public int maxiter = 200;
+		public int maxiter = 500;
 		public double lambda = 1e-2;
-		public double termepsilon = 1e-2;
+		public double termepsilon = 1e-3;
 		// Mask fits iteration param
-		public int iterations = 300;
-		public double cutoffdistance = 5;
+		public int iterations = 500;
+		public double cutoffdistance = 15;
 		public boolean halfgaussian = false;
 		final HashMap<Integer, Boolean> Trackstart;
 		public double Intensityratio;

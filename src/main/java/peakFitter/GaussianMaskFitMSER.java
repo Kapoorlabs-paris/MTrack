@@ -30,6 +30,7 @@ public class GaussianMaskFitMSER {
 		// make the interval we fit on iterable
 		final IterableInterval<FloatType> signalIterable = Views.iterable(signalInterval);
 
+		final double[] originallocation = location;
 		// create the mask image
 		final Img<FloatType> gaussianMask = new ArrayImgFactory<FloatType>().create(signalInterval,
 				signalIterable.firstElement());
@@ -46,6 +47,7 @@ public class GaussianMaskFitMSER {
 		final double bg = removeBackground(signalIterable);
 
 		double N = 0;
+		double Nold = 0;
 		int i = 0;
 		do {
 
@@ -97,29 +99,25 @@ public class GaussianMaskFitMSER {
 				}
 			for (int d = 0; d < n; ++d)
 				location[d] = sumLocSN[d] / sumSN;
-				
+			Nold = N;	
 			N = sumSN / sumSS;
 
 			++i;
+			if (i >= iterations)
+				break;
+			if (i >= iterations  && Math.abs(N - Nold) > 1.0E-1 ){
+			
+				for (int d = 0; d < n; ++d)
+					location[d] = originallocation[d];
+				
+			}
 
-		} while (i < iterations);
+		} while (Math.abs(N - Nold) > 1.0E-2 );
 		restoreBackground(signalIterable, bg);
 
 		// ImageJFunctions.show(gaussianMask);
-	
 		
-		switch (startorend) {
-
-		case StartfitMSER:
-			for (int d = 0; d < n; ++d)
-			location[d] += -(numgaussians - 1)*dxvector[d];
-			break;
-		case EndfitMSER:
-			for (int d = 0; d < n; ++d)
-			location[d] +=  (numgaussians - 1)*dxvector[d];
-			break;
-		}
-	
+		
 		
 		
 		return location;
@@ -177,10 +175,7 @@ public class GaussianMaskFitMSER {
 				
 		}
 			
-			if (halfgaussian){
-			if (cursor.getDoublePosition(1) >= location[1] - (cursor.getDoublePosition(0) - location[0])/slope)
-				 					value *= 0;
-			}
+			
 			cursor.get().setReal(value);
 
 		
@@ -218,10 +213,7 @@ public class GaussianMaskFitMSER {
 				
 			}
 			
-			if (halfgaussian){
-				if (cursor.getDoublePosition(1) <= location[1] - (cursor.getDoublePosition(0) - location[0])/slope)
-					 					value *= 0;
-				}
+			
 			cursor.get().setReal(value);
 
 		}

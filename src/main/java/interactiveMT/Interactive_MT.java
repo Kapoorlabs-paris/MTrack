@@ -2087,9 +2087,14 @@ public class Interactive_MT implements PlugIn {
 				public void mouseClicked(MouseEvent e) {
 					int x = e.getX();
 					int y = e.getY();
+					if (preprocessedimp.getWidth() > 1000)
+						x = 2 * x;
+					if (preprocessedimp.getHeight() > 1000)
+						y = 2 * y;
+					
 					System.out.println("You chose: " + x + "," + y);// these
 																	// co-ords
-																	// are
+																// are
 																	// relative
 																	// to the
 																	// component
@@ -2145,6 +2150,10 @@ public class Interactive_MT implements PlugIn {
 				public void mouseClicked(MouseEvent e) {
 					int x = e.getX();
 					int y = e.getY();
+					if (preprocessedimp.getWidth() > 1000)
+						x = 2 * x;
+					if (preprocessedimp.getHeight() > 1000)
+						y = 2 * y;
 					System.out.println("You removed: " + x + "," + y);// these
 																		// co-ords
 																		// are
@@ -2740,7 +2749,7 @@ public class Interactive_MT implements PlugIn {
 			final Label NumberMT = new Label("Add Lengths of all MTs per frame", Label.CENTER);
 			final Button Nlength = new Button("Sum Lengths per frame");
 
-			final Label NumberMTMax = new Label("Count MT less than Maxdpixel/ Maxdmicro", Label.CENTER);
+			final Label NumberMTMax = new Label("Count MT less than the input Max Length", Label.CENTER);
 			final Button NlengthMax = new Button("Get count per frame");
 
 			inputMaxdpixel = new JLabel("Enter maxLength of MT (pixel units): ");
@@ -2902,9 +2911,10 @@ public class Interactive_MT implements PlugIn {
 								}
 
 							}
-							if (MTcount == 0)
-								break;
+							
 						}
+						if (MTcount == 0)
+							break;
 						MTcounter newcounter = new MTcounter(frameindex, MTcount, maxlength);
 
 						ALLcounts.add(newcounter);
@@ -2954,9 +2964,10 @@ public class Interactive_MT implements PlugIn {
 
 							}
 
-							if (MTcount == 0)
-								break;
+							
 						}
+						if (MTcount == 0)
+							break;
 
 						MTcounter newcounter = new MTcounter(frameindex, MTcount, maxlength);
 
@@ -7426,6 +7437,7 @@ public class Interactive_MT implements PlugIn {
 		int indexmodel = 0;
 
 		gd.addChoice("Choose your model: ", LineModel, LineModel[indexmodel]);
+		gd.addCheckbox("Do Gaussian Mask Fits", Domask);
 		gd.addCheckbox("Display rois:", displayoverlay);
 		gd.addTextAreas("Advanced Options for the optimizer", null, 1, 35);
 		gd.addNumericField("Min Intensity = R * Max Intensity along MT, R (enter 0.2 to 0.9) = ", Intensityratio, 2);
@@ -7436,7 +7448,7 @@ public class Interactive_MT implements PlugIn {
 		gd.showDialog();
 		indexmodel = gd.getNextChoiceIndex();
 		displayoverlay = gd.getNextBoolean();
-		Domask = false;
+		Domask = gd.getNextBoolean();
 
 		if (indexmodel == 0)
 			userChoiceModel = UserChoiceModel.Line;
