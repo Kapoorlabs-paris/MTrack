@@ -140,8 +140,8 @@ public class Polynomial extends AbstractFunction<Polynomial> {
 			
 			
 			if ((q * q / 4 + p * p * p / 27) > 0){
-				Abar = Math.pow(-q/2 + Math.sqrt( q * q / 4 + p * p * p / 27), 1/3);
-				Bbar = Math.pow(-q/2 - Math.sqrt( q * q / 4 + p * p * p / 27), 1/3);
+				Abar = Math.pow(-q/2 + Math.sqrt( q * q / 4 + p * p * p / 27), 1.0/3.0);
+				Bbar = Math.pow(-q/2 - Math.sqrt( q * q / 4 + p * p * p / 27), 1.0/3.0);
 				
 				xc = Abar + Bbar;
 				xc1 = xc;

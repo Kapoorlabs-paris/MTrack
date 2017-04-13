@@ -1751,7 +1751,7 @@ public class Interactive_MT implements PlugIn {
 					panelSeventh.add(CheckResults, c);
 				}
 				++c.gridy;
-				c.insets = new Insets(10, 175, 0, 175);
+				c.insets = new Insets(10, 10, 0, 175);
 				panelSeventh.add(RoughResults, c);
 
 				TrackEndPoints.addActionListener(new TrackendsListener());
@@ -2869,9 +2869,15 @@ public class Interactive_MT implements PlugIn {
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
 
+			
+			int MinFrame = 0;
+			int MaxFrame = 0;
+			int term = 0;
+			ArrayList<MTcounter> ALLcountsstart = new ArrayList<MTcounter>();
+			ArrayList<MTcounter> ALLcountsend = new ArrayList<MTcounter>();
 			if (Allstart != null) {
-				int MaxFrame = Allstart.get(Allstart.size() - 1).get(0).Framenumber;
-				int MinFrame = Allstart.get(0).get(0).Framenumber;
+				MaxFrame = Allstart.get(Allstart.size() - 1).get(0).Framenumber;
+				MinFrame = Allstart.get(0).get(0).Framenumber;
 
 				final ArrayList<Trackproperties> first = Allstart.get(0);
 				int MaxSeedLabel = first.get(first.size() - 1).seedlabel;
@@ -2913,20 +2919,25 @@ public class Interactive_MT implements PlugIn {
 							}
 							
 						}
-						if (MTcount == 0)
+						if (MTcount == 0){
+						
 							break;
+						}
+						
+							
+							
 						MTcounter newcounter = new MTcounter(frameindex, MTcount, maxlength);
 
-						ALLcounts.add(newcounter);
+						ALLcountsstart.add(newcounter);
 						
-						System.out.println(newcounter.framenumber + " " + newcounter.MTcountnumber+ " " + newcounter.maxlength);
 					}
 				}
 
 			}
+			term = 0;
 			if (Allend != null) {
-				int MaxFrame = Allend.get(Allend.size() - 1).get(0).Framenumber;
-				int MinFrame = Allend.get(0).get(0).Framenumber;
+				MaxFrame = Allend.get(Allend.size() - 1).get(0).Framenumber;
+				MinFrame = Allend.get(0).get(0).Framenumber;
 
 				final ArrayList<Trackproperties> first = Allend.get(0);
 				int MaxSeedLabel = first.get(first.size() - 1).seedlabel;
@@ -2966,17 +2977,101 @@ public class Interactive_MT implements PlugIn {
 
 							
 						}
-						if (MTcount == 0)
-							break;
+						if (MTcount == 0){
+							
+							
+							
+								break;
+							}
+							
+								
 
 						MTcounter newcounter = new MTcounter(frameindex, MTcount, maxlength);
 
-						ALLcounts.add(newcounter);
-						System.out.println(newcounter.framenumber + " " + newcounter.MTcountnumber + " " + newcounter.maxlength);
+						
+								
+								ALLcountsend.add(newcounter);
+							
+							
+						
+						
+						
+						
 					}
 				}
 
 			}
+			
+			
+			if (ALLcountsstart.size() > 0 && ALLcountsend.size() > 0){
+				
+				for (int index = 0; index < ALLcountsstart.size(); ++index){
+					
+					for (int secindex =  0; secindex < ALLcountsend.size(); ++secindex){
+						
+						
+						if (ALLcountsstart.get(index).framenumber == ALLcountsend.get(secindex).framenumber && ALLcountsstart.get(index).maxlength == ALLcountsend.get(secindex).maxlength){
+							MTcounter newcounter = new MTcounter(ALLcountsstart.get(index).framenumber, ALLcountsstart.get(index).MTcountnumber + ALLcountsend.get(secindex).MTcountnumber , ALLcountsstart.get(index).maxlength );
+							ALLcounts.add(newcounter);
+							
+						}
+						
+						
+						
+					}
+					
+					
+					
+				}
+				
+				
+				
+				
+			}
+			
+			else
+				
+				ALLcounts = (ALLcountsstart.size() == 0)? ALLcountsend: ALLcountsstart;
+			
+			
+			
+			NumberFormat nf = NumberFormat.getInstance(Locale.ENGLISH);
+			nf.setMaximumFractionDigits(3);
+			System.out.println(ALLcounts.size());
+			try {
+			File newfile = new File(
+					usefolder + "//" + addToName + "STAT" + "N_L"  + ".txt");
+			
+			FileWriter fw;
+			
+				fw = new FileWriter(newfile);
+			
+			BufferedWriter bw = new BufferedWriter(fw);
+			
+			bw.write("\tFramenumber\tMTcount\tMaxLength\n");
+			
+			for (int index = 0; index < ALLcounts.size(); ++index ){
+				
+				System.out.println("\t" + nf.format(ALLcounts.get(index).framenumber) + "\t" + "\t"
+						+ nf.format(ALLcounts.get(index).MTcountnumber) + "\t" + "\t"   
+						+ nf.format(ALLcounts.get(index).maxlength) + "\n" 		);
+				
+				bw.write("\t" + nf.format(ALLcounts.get(index).framenumber) + "\t" + "\t"
+				+ nf.format(ALLcounts.get(index).MTcountnumber) + "\t" + "\t"   
+				+ nf.format(ALLcounts.get(index).maxlength) + "\n" 		);
+				
+				
+			}
+			
+			
+			bw.close();
+			fw.close();
+			
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
 
 		}
 
