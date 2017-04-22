@@ -22,6 +22,7 @@ import net.imglib2.labeling.DefaultROIStrategyFactory;
 import net.imglib2.labeling.Labeling;
 import net.imglib2.labeling.LabelingROIStrategy;
 import net.imglib2.labeling.NativeImgLabeling;
+import net.imglib2.type.numeric.RealType;
 import net.imglib2.type.numeric.integer.IntType;
 import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.util.Util;
@@ -31,7 +32,24 @@ import net.imglib2.view.Views;
 public class Boundingboxes {
 
 	
-	
+	public static <T extends RealType<T>> double[] transformback(double[] location, double[] size, double[] min,
+			double[] max) {
+
+		int n = location.length;
+
+		double[] delta = new double[n];
+
+		final double[] realpos = new double[n];
+
+		for (int d = 0; d < n; ++d){
+			
+			delta[d] = (max[d] - min[d]) / size[d];
+		    
+			realpos[d] = (location[d] - min[d]) / delta[d];
+		}
+		return realpos;
+
+	}
 	public static long[] GetMaxcorners(RandomAccessibleInterval<IntType> inputimg, int label) {
 
 		Cursor<IntType> intCursor = Views.iterable(inputimg).localizingCursor();

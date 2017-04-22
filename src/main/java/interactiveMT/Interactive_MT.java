@@ -96,6 +96,7 @@ import ij.ImagePlus;
 import ij.ImageStack;
 import ij.gui.EllipseRoi;
 import ij.gui.GenericDialog;
+import ij.gui.ImageCanvas;
 import ij.gui.Line;
 import ij.gui.OvalRoi;
 import ij.gui.Overlay;
@@ -107,7 +108,6 @@ import ij.plugin.PlugIn;
 import ij.plugin.frame.RoiManager;
 import ij.process.ColorProcessor;
 import ij.process.FloatProcessor;
-import interactiveMT.FileChooser.UploadTrackListener;
 import interactiveMT.InteractiveKymoAnalyze.GetBaseCords;
 import interactiveMT.InteractiveKymoAnalyze.GetCords;
 import labeledObjects.CommonOutputHF;
@@ -693,10 +693,13 @@ public class Interactive_MT implements PlugIn {
 		boolean roiChanged = false;
 		if (change == ValueChange.THIRDDIM) {
 			System.out.println("Current Time point: " + thirdDimension);
+			
 			if (preprocessedimp != null)
 				preprocessedimp.close();
-
 			preprocessedimp = ImageJFunctions.show(CurrentPreprocessedView);
+			
+			
+			
 			preprocessedimp.setTitle("Preprocessed image Current View in third dimension: " + " " + thirdDimension);
 		}
 
@@ -711,6 +714,23 @@ public class Interactive_MT implements PlugIn {
 		}
 
 		if (change == ValueChange.THIRDDIMTrack) {
+			
+			if ( preprocessedimp  == null )
+				preprocessedimp  = ImageJFunctions.show(CurrentPreprocessedView);
+			else
+			{
+				final float[] pixels = (float[])preprocessedimp.getProcessor().getPixels();
+				final Cursor<FloatType> c = Views.iterable(CurrentPreprocessedView).cursor();
+				
+				for ( int i = 0; i < pixels.length; ++i )
+					pixels[ i ] = c.next().get();
+				
+				preprocessedimp.updateAndDraw();
+				
+			}
+			preprocessedimp.setTitle("Preprocessed image Current View in third dimension: " + " " + thirdDimension);
+
+			
 			// check if Roi changed
 			System.out.println("Current Time point: " + thirdDimension);
 
@@ -733,9 +753,11 @@ public class Interactive_MT implements PlugIn {
 		}
 
 		if (change == ValueChange.MEDIAN) {
+			
 			if (preprocessedimp != null)
 				preprocessedimp.close();
 			preprocessedimp = ImageJFunctions.show(CurrentPreprocessedView);
+			
 			Roi roi = preprocessedimp.getRoi();
 			if (roi == null || roi.getType() != Roi.RECTANGLE) {
 				preprocessedimp.setRoi(new Rectangle(standardRectangle));
@@ -928,7 +950,7 @@ public class Interactive_MT implements PlugIn {
 
 	}
 
-	protected class ChooseWorkspaceListener implements ActionListener {
+	protected class ChooseDirectoryListener implements ActionListener {
 
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
@@ -943,11 +965,11 @@ public class Interactive_MT implements PlugIn {
 
 	}
 
-	protected class ConfirmWorkspaceListener implements ActionListener {
+	protected class ConfirmDirectoryListener implements ActionListener {
 
 		final TextField filename;
 
-		public ConfirmWorkspaceListener(TextField filename) {
+		public ConfirmDirectoryListener(TextField filename) {
 
 			this.filename = filename;
 
@@ -1008,11 +1030,11 @@ public class Interactive_MT implements PlugIn {
 		final Label MTText = new Label("Preprocess and Determine Seed Ends (Green Channel)", Label.CENTER);
 		final Label Step = new Label("Step 1", Label.CENTER);
 		final Checkbox Analyzekymo = new Checkbox("Analyze Kymograph");
-		final JButton ChooseWorkspace = new JButton("Choose Workspace");
+		final JButton ChooseDirectory = new JButton("Choose Directory");
 		final JLabel outputfilename = new JLabel("Enter output filename: ");
 		TextField inputField = new TextField();
 		inputField.setColumns(10);
-		final JButton Confirm = new JButton("Confirm Workspace Selection");
+		final JButton Confirm = new JButton("Confirm Directory Selection");
 		final Checkbox mser = new Checkbox("MSER", Finders, FindLinesViaMSER);
 		final Checkbox hough = new Checkbox("HOUGH", Finders, FindLinesViaHOUGH);
 		final Checkbox mserwhough = new Checkbox("MSERwHOUGH", Finders, FindLinesViaMSERwHOUGH);
@@ -1079,7 +1101,7 @@ public class Interactive_MT implements PlugIn {
 
 		++c.gridy;
 		c.insets = new Insets(10, 10, 0, 0);
-		panelFirst.add(ChooseWorkspace, c);
+		panelFirst.add(ChooseDirectory, c);
 
 		++c.gridy;
 		c.insets = new Insets(10, 10, 10, 0);
@@ -1105,8 +1127,8 @@ public class Interactive_MT implements PlugIn {
 		Analyzekymo.addItemListener(new AnalyzekymoListener());
 		hough.addItemListener(new HoughListener());
 		mserwhough.addItemListener(new MserwHoughListener());
-		ChooseWorkspace.addActionListener(new ChooseWorkspaceListener());
-		Confirm.addActionListener(new ConfirmWorkspaceListener(inputField));
+		ChooseDirectory.addActionListener(new ChooseDirectoryListener());
+		Confirm.addActionListener(new ConfirmDirectoryListener(inputField));
 		JPanel control = new JPanel();
 
 		control.add(new JButton(new AbstractAction("\u22b2Prev") {
@@ -2082,15 +2104,11 @@ public class Interactive_MT implements PlugIn {
 		public void actionPerformed(final ActionEvent arg0) {
 
 			preprocessedimp.getCanvas().addMouseListener(ml = new MouseListener() {
-
+				final ImageCanvas canvas = preprocessedimp.getWindow().getCanvas();
 				@Override
 				public void mouseClicked(MouseEvent e) {
-					int x = e.getX();
-					int y = e.getY();
-					if (preprocessedimp.getWidth() > 1000)
-						x = 2 * x;
-					if (preprocessedimp.getHeight() > 1000)
-						y = 2 * y;
+					int x = canvas.offScreenX(e.getX());
+	                int y = canvas.offScreenY(e.getY());
 					
 					System.out.println("You chose: " + x + "," + y);// these
 																	// co-ords
@@ -2148,12 +2166,11 @@ public class Interactive_MT implements PlugIn {
 
 				@Override
 				public void mouseClicked(MouseEvent e) {
-					int x = e.getX();
-					int y = e.getY();
-					if (preprocessedimp.getWidth() > 1000)
-						x = 2 * x;
-					if (preprocessedimp.getHeight() > 1000)
-						y = 2 * y;
+					final ImageCanvas canvas = preprocessedimp.getWindow().getCanvas();
+					
+					int x = canvas.offScreenX(e.getX());
+	                int y = canvas.offScreenY(e.getY());
+	                
 					System.out.println("You removed: " + x + "," + y);// these
 																		// co-ords
 																		// are
@@ -7495,7 +7512,7 @@ public class Interactive_MT implements PlugIn {
 		gd.addNumericField("Spacing between Gaussians = G * Min(Psf), G (enter 0.3 to 1.0) = ",
 				Inispacing / Math.min(psf[0], psf[1]), 2);
 
-		gd.addStringField("Choose a different workspace?:", usefolder);
+		gd.addStringField("Choose a different Directory?:", usefolder);
 		gd.addStringField("Choose a different filename?:", addToName);
 
 		if (analyzekymo && Kymoimg != null) {
@@ -7577,6 +7594,8 @@ public class Interactive_MT implements PlugIn {
 		RandomAccessibleInterval<FloatType> totalimg = factory.create(intervalView, type);
 		final RandomAccessibleInterval<FloatType> img = Views.interval(intervalView, interval);
 
+		
+		
 		totalimg = Views.interval(Views.extendZero(img), intervalView);
 
 		return totalimg;

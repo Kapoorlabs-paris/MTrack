@@ -61,9 +61,9 @@ public class FileChooser extends JPanel {
 		StartText.setBackground(new Color(1, 0, 1));
 		StartText.setForeground(new Color(255, 255, 255));
 
-		Track = new JButton("Upload Tracking image");
-		Measure = new JButton("Upload image for performing measurments");
-		Kymo = new JButton("Upload Kymograph for the MT");
+		Track = new JButton("Open Tracking image");
+		Measure = new JButton("Open image for performing measurments");
+		Kymo = new JButton("Open Kymograph for the MT");
 		Done = new JButton("Done");
 		inputLabelX = new JLabel("Enter psfX (pixel units): ");
 		inputFieldX = new TextField();
@@ -146,7 +146,7 @@ public class FileChooser extends JPanel {
 		c.insets = new Insets(10, 10, 10, 0);
 		panelIntro.add(Done, c);
 		panelIntro.setVisible(true);
-		Track.addActionListener(new UploadTrackListener(frame));
+		Track.addActionListener(new OpenTrackListener(frame));
 		Measure.addActionListener(new MeasureListener(frame));
 		Kymo.addActionListener(new KymoListener(frame));
 		Done.addActionListener(new DoneButtonListener(frame, true));
@@ -171,11 +171,11 @@ public class FileChooser extends JPanel {
 		}
 	}
 
-	protected class UploadTrackListener implements ActionListener {
+	protected class OpenTrackListener implements ActionListener {
 
 		final Frame parent;
 
-		public UploadTrackListener(Frame parent) {
+		public OpenTrackListener(Frame parent) {
 
 			this.parent = parent;
 
