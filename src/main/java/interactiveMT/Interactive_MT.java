@@ -871,6 +871,7 @@ public class Interactive_MT implements PlugIn {
 			newtree = MserTree.buildMserTree(newimg, delta, minSize, maxSize, maxVar, minDiversity, darktobright);
 			Rois = getcurrentRois(newtree);
 
+			
 			count++;
 
 			if (count == 1)
@@ -2809,7 +2810,7 @@ public class Interactive_MT implements PlugIn {
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
 
-			if (Allstart != null) {
+			if (Allstart.get(0).size() > 0) {
 				int MaxFrame = Allstart.get(Allstart.size() - 1).get(0).Framenumber;
 				int MinFrame = Allstart.get(0).get(0).Framenumber;
 
@@ -2843,7 +2844,7 @@ public class Interactive_MT implements PlugIn {
 				}
 
 			}
-			if (Allend != null) {
+			if (Allend.get(0).size() > 0) {
 				int MaxFrame = Allend.get(Allend.size() - 1).get(0).Framenumber;
 				int MinFrame = Allend.get(0).get(0).Framenumber;
 
@@ -2892,7 +2893,7 @@ public class Interactive_MT implements PlugIn {
 			int term = 0;
 			ArrayList<MTcounter> ALLcountsstart = new ArrayList<MTcounter>();
 			ArrayList<MTcounter> ALLcountsend = new ArrayList<MTcounter>();
-			if (Allstart != null) {
+			if (Allstart.get(0).size() > 0) {
 				MaxFrame = Allstart.get(Allstart.size() - 1).get(0).Framenumber;
 				MinFrame = Allstart.get(0).get(0).Framenumber;
 
@@ -2952,7 +2953,7 @@ public class Interactive_MT implements PlugIn {
 
 			}
 			term = 0;
-			if (Allend != null) {
+			if (Allend.get(0).size() > 0) {
 				MaxFrame = Allend.get(Allend.size() - 1).get(0).Framenumber;
 				MinFrame = Allend.get(0).get(0).Framenumber;
 
@@ -4122,7 +4123,7 @@ public class Interactive_MT implements PlugIn {
 
 			if (showDeterministic) {
 
-				if (Allstart != null) {
+				if (Allstart.get(0).size() > 0) {
 					final Trackstart trackerstart = new Trackstart(Allstart, thirdDimensionSize - next);
 					ImagePlus impstart = ImageJFunctions.show(originalimg);
 					ImagePlus impstartsec = ImageJFunctions.show(originalimg);
@@ -4143,7 +4144,7 @@ public class Interactive_MT implements PlugIn {
 					impstartsec.setTitle("Graph A");
 				}
 
-				if (Allend != null) {
+				if (Allend.get(0).size() > 0) {
 					final Trackend trackerend = new Trackend(Allend, thirdDimensionSize - next);
 					ImagePlus impend = ImageJFunctions.show(originalPreprocessedimg);
 
@@ -4166,7 +4167,7 @@ public class Interactive_MT implements PlugIn {
 
 			if (showKalman) {
 				ResultsTable rtAll = new ResultsTable();
-				if (AllstartKalman != null) {
+				if (AllstartKalman.size() > 0) {
 					MTtrackerstart.reset();
 					MTtrackerstart.process();
 
@@ -4288,7 +4289,7 @@ public class Interactive_MT implements PlugIn {
 
 				}
 
-				if (AllendKalman != null) {
+				if (AllendKalman.size() > 0) {
 					MTtrackerend.reset();
 					MTtrackerend.process();
 
@@ -4416,7 +4417,7 @@ public class Interactive_MT implements PlugIn {
 
 				ResultsTable rtAll = new ResultsTable();
 
-				if (Allstart != null) {
+				if (Allstart.get(0).size() > 0) {
 
 					final ArrayList<Trackproperties> first = Allstart.get(0);
 					int MaxSeedLabel = first.get(first.size() - 1).seedlabel;
@@ -4570,7 +4571,7 @@ public class Interactive_MT implements PlugIn {
 						saveResultsToExcel(usefolder + "//" + addToName + "start" + ".xls", rt);
 
 				}
-				if (Allend != null) {
+				if (Allend.get(0).size() > 0) {
 					final ArrayList<Trackproperties> first = Allend.get(0);
 					int MaxSeedLabel = first.get(first.size() - 1).seedlabel;
 					int MinSeedLabel = first.get(0).seedlabel;
@@ -5134,7 +5135,8 @@ public class Interactive_MT implements PlugIn {
 
 			if (showDeterministic) {
 
-				if (Allstart != null) {
+				if (Allstart.get(0).size() > 0) {
+					System.out.println(Allstart.size());
 					ImagePlus impstart = ImageJFunctions.show(originalimg);
 					ImagePlus impstartsec = ImageJFunctions.show(originalimg);
 					final Trackstart trackerstart = new Trackstart(Allstart, thirdDimensionSize - next);
@@ -5152,7 +5154,8 @@ public class Interactive_MT implements PlugIn {
 					impstart.draw();
 					impstart.setTitle("Sub Graph A");
 				}
-				if (Allend != null) {
+				if (Allend.get(0).size() > 0) {
+					System.out.println(Allend.size());
 					ImagePlus impendsec = ImageJFunctions.show(originalPreprocessedimg);
 					final Trackend trackerend = new Trackend(Allend, thirdDimensionSize - next);
 
@@ -5176,7 +5179,7 @@ public class Interactive_MT implements PlugIn {
 			if (showKalman) {
 
 				ResultsTable rtAll = new ResultsTable();
-				if (AllstartKalman != null) {
+				if (AllstartKalman.size() > 0) {
 					MTtrackerstart = new KFsearch(AllstartKalman, UserchosenCostFunction, maxSearchradius,
 							initialSearchradius, thirdDimension, thirdDimensionSize, missedframes);
 					MTtrackerstart.reset();
@@ -5297,7 +5300,7 @@ public class Interactive_MT implements PlugIn {
 					}
 				}
 
-				if (AllendKalman != null) {
+				if (AllendKalman.size() > 0) {
 					MTtrackerend = new KFsearch(AllendKalman, UserchosenCostFunction, maxSearchradius,
 							initialSearchradius, thirdDimension, thirdDimensionSize, missedframes);
 
@@ -5426,7 +5429,7 @@ public class Interactive_MT implements PlugIn {
 				nf.setMaximumFractionDigits(3);
 
 				ResultsTable rtAll = new ResultsTable();
-				if (Allstart != null) {
+				if (Allstart.get(0).size() > 0) {
 					final ArrayList<Trackproperties> first = Allstart.get(0);
 					int MaxSeedLabel = first.get(first.size() - 1).seedlabel;
 					int MinSeedLabel = first.get(0).seedlabel;
@@ -5577,7 +5580,7 @@ public class Interactive_MT implements PlugIn {
 
 				}
 
-				if (Allend != null) {
+				if (Allend.get(0).size() > 0) {
 					final ArrayList<Trackproperties> first = Allend.get(0);
 					int MaxSeedLabel = first.get(first.size() - 1).seedlabel;
 					int MinSeedLabel = first.get(0).seedlabel;
@@ -7594,11 +7597,39 @@ public class Interactive_MT implements PlugIn {
 		RandomAccessibleInterval<FloatType> totalimg = factory.create(intervalView, type);
 		final RandomAccessibleInterval<FloatType> img = Views.interval(intervalView, interval);
 
+		double[] newmin = util.Boundingboxes.Transformback(new double[]{img.min(0), img.min(1)}, 
+				new double[]{totalimg.dimension(0), totalimg.dimension(1)},
+				new double[]{img.min(0), img.min(1)},
+				new double[]{img.max(0), img.max(1)});
 		
+		double[] newmax = util.Boundingboxes.Transformback(new double[]{img.max(0), img.max(1)}, 
+				new double[]{totalimg.dimension(0), totalimg.dimension(1)},
+				new double[]{totalimg.min(0), totalimg.min(1)},
+				new double[]{totalimg.max(0), totalimg.max(1)});
+		long[] newminlong = new long[]{Math.round(newmin[0]), Math.round(newmin[1])};
+		long[] newmaxlong = new long[]{Math.round(newmax[0]), Math.round(newmax[1])};
 		
-		totalimg = Views.interval(Views.extendZero(img), intervalView);
+		RandomAccessibleInterval<FloatType> outimg = factory.create(new FinalInterval(newminlong, newmaxlong), type);
+		RandomAccess<FloatType> ranac = outimg.randomAccess();
+		final Cursor<FloatType> cursor = Views.iterable(img).localizingCursor();
+		
+		while(cursor.hasNext()){
+			
+			cursor.fwd();
+			
+			double[] newlocation = util.Boundingboxes.Transformback(new double[]{cursor.getDoublePosition(0), cursor.getDoublePosition(1)}, 
+					new double[]{totalimg.dimension(0), totalimg.dimension(1)},
+					new double[]{totalimg.min(0), totalimg.min(1)},
+					new double[]{totalimg.max(0), totalimg.max(1)});
+			long[] newlocationlong = new long[]{Math.round(newlocation[0]), Math.round(newlocation[1])};
+			ranac.setPosition(newlocationlong);
+			ranac.get().set(cursor.get());
+			
+		}
+		
+		//totalimg = Views.interval(Views.extendZero(img), intervalView);
 
-		return totalimg;
+		return outimg;
 	}
 
 	protected final void close(final Frame parent, final SliceObserver sliceObserver, final ImagePlus imp,

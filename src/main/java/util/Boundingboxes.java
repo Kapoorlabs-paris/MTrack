@@ -32,7 +32,7 @@ import net.imglib2.view.Views;
 public class Boundingboxes {
 
 	
-	public static <T extends RealType<T>> double[] transformback(double[] location, double[] size, double[] min,
+	public static <T extends RealType<T>> double[] Transformback(double[] location, double[] size, double[] min,
 			double[] max) {
 
 		int n = location.length;
@@ -50,6 +50,10 @@ public class Boundingboxes {
 		return realpos;
 
 	}
+	
+
+	
+	
 	public static long[] GetMaxcorners(RandomAccessibleInterval<IntType> inputimg, int label) {
 
 		Cursor<IntType> intCursor = Views.iterable(inputimg).localizingCursor();

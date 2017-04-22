@@ -65,11 +65,11 @@ public class FileChooser extends JPanel {
 		Measure = new JButton("Open image for performing measurments");
 		Kymo = new JButton("Open Kymograph for the MT");
 		Done = new JButton("Done");
-		inputLabelX = new JLabel("Enter psfX (pixel units): ");
+		inputLabelX = new JLabel("Enter sigmaX of Microscope PSF (pixel units): ");
 		inputFieldX = new TextField();
 		inputFieldX.setColumns(10);
 
-		inputLabelY = new JLabel("Enter psfY (pixel units): ");
+		inputLabelY = new JLabel("Enter sigmaY of Microscope PSF (pixel units): ");
 		inputFieldY = new TextField();
 		inputFieldY.setColumns(10);
 
