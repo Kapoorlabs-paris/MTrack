@@ -2924,31 +2924,37 @@ public class Interactive_MT implements PlugIn {
 				}
 				
 				int timeInterval = MaxFrame - MinFrame;
-				
+				try{
+					File meanfile = new File(
+										usefolder + "//" + addToName + "Start" + "-MeanLength" + ".txt");
+					FileWriter fw = new FileWriter(meanfile);
+					BufferedWriter bw = new BufferedWriter(fw);
+					bw.write("\tSeedLabel\tMeanLength(px)\tMeanLength (real units) \n");
+					
 				for (int currentseed = MinSeedLabel; currentseed < MaxSeedLabel + 1; ++currentseed) {
 					System.out.println("Seed ID : " +  currentseed + " " + "Average Length Pixels "  + pixellength.get(currentseed)/timeInterval + 
 							" " + "Average Length Real Units "  + microlength.get(currentseed)/timeInterval);
 
-					try{
-					File meanfile = new File(
-										usefolder + "//" + addToName + "SeedLabel" + currentseed + "-MeanLength" + ".txt");
-					FileWriter fw = new FileWriter(meanfile);
-					BufferedWriter bw = new BufferedWriter(fw);
-					bw.write("\tSeedLabel\tMeanLength(px)\tMeanLength (real units) \n");
+				
 					bw.write("\t" + currentseed + "\t" + "\t"
 					
 							+ nf.format(pixellength.get(currentseed)/timeInterval)+ "\t" + "\t"
 							+ nf.format(microlength.get(currentseed)/timeInterval) + "\n");
-					bw.close();
-					fw.close();
 					
-					}
-					catch (IOException e) {
-					}
 					
 					}
 
-			}
+			
+				bw.close();
+				fw.close();
+				
+				}
+				catch (IOException e) {
+					e.printStackTrace();
+				}
+				}
+				
+				
 			if (Allend.get(0).size() > 0) {
 				int MaxFrame = Allend.get(Allend.size() - 1).get(0).Framenumber;
 				int MinFrame = Allend.get(0).get(0).Framenumber;
@@ -2993,7 +2999,12 @@ public class Interactive_MT implements PlugIn {
 					}
 
 				}
-				
+				try{
+					File meanfile = new File(
+										usefolder + "//" + addToName + "End"  + "-MeanLength" + ".txt");
+					FileWriter fw = new FileWriter(meanfile);
+					BufferedWriter bw = new BufferedWriter(fw);
+					bw.write("\tSeedLabel\tMeanLength(px)\tMeanLength (real units) \n");
 
                 int timeInterval = MaxFrame - MinFrame;
 				
@@ -3001,28 +3012,27 @@ public class Interactive_MT implements PlugIn {
 					System.out.println("Seed ID : " +  currentseed + " " + "Average Length "  + pixellength.get(currentseed)/timeInterval + 
 							" " + "Average Length Real Units "  + microlength.get(currentseed)/timeInterval);
 
-					try{
-					File meanfile = new File(
-										usefolder + "//" + addToName + "SeedLabel" + currentseed + "-MeanLength" + ".txt");
-					FileWriter fw = new FileWriter(meanfile);
-					BufferedWriter bw = new BufferedWriter(fw);
-					bw.write("\tSeedLabel\tMeanLength(px)\tMeanLength (real units) \n");
+					
 					bw.write("\t" + currentseed + "\t" + "\t"
 					
 							+ nf.format(pixellength.get(currentseed)/timeInterval)+ "\t" + "\t"
 							+ nf.format(microlength.get(currentseed)/timeInterval) + "\n");
+					
+					
+            	}
 					bw.close();
 					fw.close();
 					
 					}
 					catch (IOException e) {
+						e.printStackTrace();
 					}
 					
 					}
 
 			
 
-			}
+			
 			
 
 		}
