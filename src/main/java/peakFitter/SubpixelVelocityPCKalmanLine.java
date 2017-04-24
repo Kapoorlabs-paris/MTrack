@@ -72,7 +72,7 @@ import preProcessing.GetLocalmaxmin;
 		public double termepsilon = 1e-3;
 		// Mask fits iteration param
 		public int iterations = 500;
-		public double cutoffdistance = 15;
+		public double cutoffdistance = 5;
 		public boolean halfgaussian = false;
 		final HashMap<Integer, Boolean> Trackstart;
 		public double Intensityratio;

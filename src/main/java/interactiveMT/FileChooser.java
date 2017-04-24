@@ -73,7 +73,7 @@ public class FileChooser extends JPanel {
 		inputFieldY = new TextField();
 		inputFieldY.setColumns(10);
 
-		inputLabelT = new JLabel("Enter frame to second conversion: ");
+		inputLabelT = new JLabel("Enter time frame to second conversion: ");
 		inputFieldT = new TextField();
 		inputFieldT.setColumns(2);
 

@@ -65,7 +65,7 @@ public class SubpixelVelocityPCLine extends BenchmarkAlgorithm
 	public double termepsilon = 1e-3;
 	// Mask fits iteration param
 	public int iterations = 500;
-	public double cutoffdistance = 15;
+	public double cutoffdistance = 5;
 	public boolean halfgaussian = false;
 	public double Intensityratio;
 	final JProgressBar jpb;
