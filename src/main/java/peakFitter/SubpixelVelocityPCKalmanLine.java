@@ -956,7 +956,7 @@ import preProcessing.GetLocalmaxmin;
 						jpb.setOpaque(true);
 						jpb.setStringPainted(true);
 					//	jpb.setForeground(Color.YELLOW);
-						jpb.setString("3D point = " + framenumber + "/" + thirdDimsize);
+						jpb.setString("Timestep = " + framenumber + "/" + thirdDimsize);
 						
 						return PointofInterest;
 					} else {

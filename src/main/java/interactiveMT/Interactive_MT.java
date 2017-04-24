@@ -872,7 +872,6 @@ public class Interactive_MT implements PlugIn {
 			currentPreprocessedimg = Views.interval(Views.extendBorder(currentPreprocessedimg), interval);
 
 			newimg = copytoByteImage(Kernels.CannyEdgeandMean(currentPreprocessedimg, Cannyradius));
-			IJ.log("Doing watershedding on the distance transformed image ");
 
 			RandomAccessibleInterval<BitType> bitimg = new ArrayImgFactory<BitType>().create(newimg, new BitType());
 			GetLocalmaxmin.ThresholdingBit(newimg, bitimg, thresholdHough);
@@ -909,7 +908,6 @@ public class Interactive_MT implements PlugIn {
 			currentPreprocessedimg = Views.interval(Views.extendBorder(currentPreprocessedimg), interval);
 
 			newimg = copytoByteImage(Kernels.CannyEdgeandMean(currentPreprocessedimg, Cannyradius));
-			IJ.log(" Computing the Component tree");
 
 			newtree = MserTree.buildMserTree(newimg, delta, minSize, maxSize, maxVar, minDiversity, darktobright);
 			Rois = getcurrentRois(newtree);
@@ -2415,7 +2413,10 @@ public class Interactive_MT implements PlugIn {
 					PrevFrameparam = FindlinesVia.LinefindingMethod(groundframe, groundframepre, minlength,
 							thirdDimension, psf, newlineMser, UserChoiceModel.Line, Domask, Intensityratio, Inispacing,
 							jpb);
-
+					IJ.log("MSER parameters:" + " " + " thirdDimension: " + " " + thirdDimension);
+					IJ.log("Delta " + " " + delta + " " + "minSize " + " " + minSize + " " + "maxSize " + " " + maxSize + " "
+							+ " maxVar " + " " + maxVar + " " + "minDIversity " + " " + minDiversity);
+					IJ.log("Optimization Parameters: " + "R" + Intensityratio + " G"  + Inispacing/Math.min(psf[0], psf[1]));
 					ArrayList<KalmanIndexedlength> start = new ArrayList<KalmanIndexedlength>();
 					ArrayList<KalmanIndexedlength> end = new ArrayList<KalmanIndexedlength>();
 
@@ -2475,7 +2476,9 @@ public class Interactive_MT implements PlugIn {
 					PrevFrameparam = FindlinesVia.LinefindingMethod(groundframe, groundframepre, minlength,
 							thirdDimension, psf, newlineHough, UserChoiceModel.Line, Domask, Intensityratio, Inispacing,
 							jpb);
-
+					IJ.log("Hough parameters:" + " " + " thirdDimension: " + " " + thirdDimension);
+					IJ.log("thetaPerPixel " + " " + thetaPerPixel + " " + "rhoPerPixel " + " " + rhoPerPixel );
+					IJ.log("Optimization Parameters: " + "R" + Intensityratio + " G"  + Inispacing/Math.min(psf[0], psf[1]));
 					ArrayList<KalmanIndexedlength> start = new ArrayList<KalmanIndexedlength>();
 					ArrayList<KalmanIndexedlength> end = new ArrayList<KalmanIndexedlength>();
 
@@ -2529,7 +2532,12 @@ public class Interactive_MT implements PlugIn {
 					// updatePreview(ValueChange.SHOWMSER);
 					LinefinderInteractiveMSERwHough newlineMserwHough = new LinefinderInteractiveMSERwHough(groundframe,
 							groundframepre, newtree, minlength, thirdDimension, thetaPerPixel, rhoPerPixel);
-
+					IJ.log("MSER parameters:" + " " + " thirdDimension: " + " " + thirdDimension);
+					IJ.log("Delta " + " " + delta + " " + "minSize " + " " + minSize + " " + "maxSize " + " " + maxSize + " "
+							+ " maxVar " + " " + maxVar + " " + "minDIversity " + " " + minDiversity);
+					IJ.log("Hough parameters:" + " " + " thirdDimension: " + " " + thirdDimension);
+					IJ.log("thetaPerPixel " + " " + thetaPerPixel + " " + "rhoPerPixel " + " " + rhoPerPixel );
+					IJ.log("Optimization Parameters: " + "R" + Intensityratio + " G"  + Inispacing/Math.min(psf[0], psf[1]));
 					PrevFrameparam = FindlinesVia.LinefindingMethod(groundframe, groundframepre, minlength,
 							thirdDimension, psf, newlineMserwHough, UserChoiceModel.Line, Domask, Intensityratio,
 							Inispacing, jpb);
@@ -2918,17 +2926,19 @@ public class Interactive_MT implements PlugIn {
 				int timeInterval = MaxFrame - MinFrame;
 				
 				for (int currentseed = MinSeedLabel; currentseed < MaxSeedLabel + 1; ++currentseed) {
-					System.out.println("Seed ID : " +  currentseed + " " + "Average Length "  + pixellength.get(currentseed)/timeInterval);
+					System.out.println("Seed ID : " +  currentseed + " " + "Average Length Pixels "  + pixellength.get(currentseed)/timeInterval + 
+							" " + "Average Length Real Units "  + microlength.get(currentseed)/timeInterval);
 
 					try{
 					File meanfile = new File(
 										usefolder + "//" + addToName + "SeedLabel" + currentseed + "-MeanLength" + ".txt");
 					FileWriter fw = new FileWriter(meanfile);
 					BufferedWriter bw = new BufferedWriter(fw);
-					bw.write("\tSeedLabel\tMeanLength n");
+					bw.write("\tSeedLabel\tMeanLength(px)\tMeanLength (real units) \n");
 					bw.write("\t" + currentseed + "\t" + "\t"
 					
-							+ nf.format(pixellength.get(currentseed)/timeInterval));
+							+ nf.format(pixellength.get(currentseed)/timeInterval)+ "\t" + "\t"
+							+ nf.format(microlength.get(currentseed)/timeInterval) + "\n");
 					bw.close();
 					fw.close();
 					
@@ -2988,17 +2998,19 @@ public class Interactive_MT implements PlugIn {
                 int timeInterval = MaxFrame - MinFrame;
 				
             	for (int currentseed = MinSeedLabel; currentseed < MaxSeedLabel + 1; ++currentseed) {
-					System.out.println("Seed ID : " +  currentseed + " " + "Average Length "  + pixellength.get(currentseed)/timeInterval);
+					System.out.println("Seed ID : " +  currentseed + " " + "Average Length "  + pixellength.get(currentseed)/timeInterval + 
+							" " + "Average Length Real Units "  + microlength.get(currentseed)/timeInterval);
 
 					try{
 					File meanfile = new File(
 										usefolder + "//" + addToName + "SeedLabel" + currentseed + "-MeanLength" + ".txt");
 					FileWriter fw = new FileWriter(meanfile);
 					BufferedWriter bw = new BufferedWriter(fw);
-					bw.write("\tSeedLabel\tMeanLength n");
+					bw.write("\tSeedLabel\tMeanLength(px)\tMeanLength (real units) \n");
 					bw.write("\t" + currentseed + "\t" + "\t"
 					
-							+ nf.format(pixellength.get(currentseed)/timeInterval));
+							+ nf.format(pixellength.get(currentseed)/timeInterval)+ "\t" + "\t"
+							+ nf.format(microlength.get(currentseed)/timeInterval) + "\n");
 					bw.close();
 					fw.close();
 					
@@ -3068,10 +3080,7 @@ public class Interactive_MT implements PlugIn {
 							}
 
 						}
-						if (MTcount == 0) {
-
-							break;
-						}
+						
 
 						MTcounter newcounter = new MTcounter(frameindex, MTcount, maxlength);
 
@@ -3123,10 +3132,7 @@ public class Interactive_MT implements PlugIn {
 							}
 
 						}
-						if (MTcount == 0) {
-
-							break;
-						}
+						
 
 						MTcounter newcounter = new MTcounter(frameindex, MTcount, maxlength);
 
@@ -3577,7 +3583,8 @@ public class Interactive_MT implements PlugIn {
 			final Label startText = new Label("startFrame = ", Label.CENTER);
 			final Label endText = new Label("endFrame = ", Label.CENTER);
 			final Label Done = new Label("Proceed to Statistical analysis", Label.CENTER);
-			
+			Done.setBackground(new Color(1, 0, 1));
+			Done.setForeground(new Color(255, 255, 255));
 			
 			final Button Stats = new Button("Do Statistical analysis");
 			JLabel lbl = new JLabel("Select the seedID of the MT for analysis");
@@ -3652,7 +3659,7 @@ public class Interactive_MT implements PlugIn {
 			c.insets = new Insets(10, 10, 0, 50);
 			panelEighth.add(Analyze, c);
 			++c.gridy;
-			c.insets = new Insets(10, 10, 0, 200);
+			c.insets = new Insets(10, 10, 0, 50);
 			panelEighth.add(Done, c);
 
 		//	++c.gridy;
@@ -3675,28 +3682,24 @@ public class Interactive_MT implements PlugIn {
 					
 
 						panelNinth.removeAll();
-						final Label Step9 = new Label("Step 9", Label.CENTER);
+						
 						panelNinth.setLayout(layout);
 						c.fill = GridBagConstraints.HORIZONTAL;
 						c.gridx = 0;
 						c.gridy = 0;
 						c.weightx = 4;
 						c.weighty = 1.5;
-
+						final Label Step9 = new Label("Step 9", Label.CENTER);
 						panelNinth.add(Step9, c);
-						final Label NumberMT = new Label("Get average MT length", Label.CENTER);
 						final Button Nlength = new Button("Time averaged MT lengths");
 
-						final Label NumberMTMax = new Label("MT length distribution", Label.CENTER);
 						final Button NlengthMax = new Button("Get length distribution");
 
 						inputMaxdpixel = new JLabel("Enter maxLength of MT (pixel units): ");
 						Maxdpixel = new TextField();
 						Maxdpixel.setColumns(10);
 
-						++c.gridy;
-						c.insets = new Insets(10, 10, 0, 50);
-						panelNinth.add(NumberMT, c);
+					
 
 						++c.gridy;
 						c.insets = new Insets(10, 10, 0, 50);
@@ -3709,9 +3712,7 @@ public class Interactive_MT implements PlugIn {
 						c.insets = new Insets(10, 10, 0, 50);
 						panelNinth.add(Maxdpixel, c);
 
-						++c.gridy;
-						c.insets = new Insets(10, 10, 0, 50);
-						panelNinth.add(NumberMTMax, c);
+						
 
 						++c.gridy;
 						c.insets = new Insets(10, 10, 0, 50);
@@ -4176,15 +4177,20 @@ public class Interactive_MT implements PlugIn {
 					preprocessedimp.setRoi(standardRectangle);
 					roi = preprocessedimp.getRoi();
 				}
-				IJ.log("Current frame: " + thirdDimension);
 
 				boolean dialog;
 				boolean dialogupdate;
 				RandomAccessibleInterval<FloatType> groundframe = currentimg;
 				RandomAccessibleInterval<FloatType> groundframepre = currentPreprocessedimg;
 				if (FindLinesViaMSER) {
-					if (index == next)
+					if (index == next){
 						dialog = DialogueModelChoiceHF();
+						IJ.log("MSER parameters:" + " " + " thirdDimension: " + " " + thirdDimension);
+						IJ.log("Delta " + " " + delta + " " + "minSize " + " " + minSize + " " + "maxSize " + " " + maxSize + " "
+								+ " maxVar " + " " + maxVar + " " + "minDIversity " + " " + minDiversity);
+						IJ.log("Optimization Parameters: " + "R" + Intensityratio + " G"  + Inispacing/Math.min(psf[0], psf[1]));	
+						
+					}
 
 					else
 						dialog = false;
@@ -4212,9 +4218,18 @@ public class Interactive_MT implements PlugIn {
 
 				if (FindLinesViaHOUGH) {
 
-					if (index == next)
+					if (index == next){
 						dialog = DialogueModelChoiceHF();
+						
+						IJ.log("Hough parameters:" + " " + " thirdDimension: " + " " + thirdDimension);
+						IJ.log("thetaPerPixel " + " " + thetaPerPixel + " " + "rhoPerPixel " + " " + rhoPerPixel );
+						IJ.log("Optimization Parameters: " + "R" + Intensityratio + " G"  + Inispacing/Math.min(psf[0], psf[1]));	
+						
+					}
 					else
+						
+						
+						
 						dialog = false;
 
 					updatePreview(ValueChange.SHOWHOUGH);
@@ -4237,8 +4252,16 @@ public class Interactive_MT implements PlugIn {
 				}
 
 				if (FindLinesViaMSERwHOUGH) {
-					if (index == next)
+					if (index == next){
 						dialog = DialogueModelChoiceHF();
+						IJ.log("MSER parameters:" + " " + " thirdDimension: " + " " + thirdDimension);
+						IJ.log("Delta " + " " + delta + " " + "minSize " + " " + minSize + " " + "maxSize " + " " + maxSize + " "
+								+ " maxVar " + " " + maxVar + " " + "minDIversity " + " " + minDiversity);
+						IJ.log("Hough parameters:" + " " + " thirdDimension: " + " " + thirdDimension);
+						IJ.log("thetaPerPixel " + " " + thetaPerPixel + " " + "rhoPerPixel " + " " + rhoPerPixel );
+						IJ.log("Optimization Parameters: " + "R" + Intensityratio + " G"  + Inispacing/Math.min(psf[0], psf[1]));	
+						
+					}
 					else
 						dialog = false;
 
@@ -4473,14 +4496,12 @@ public class Interactive_MT implements PlugIn {
 					ImagePlus impendKalman = ImageJFunctions.show(originalPreprocessedimg);
 					impendKalman.setTitle("Kalman End MT");
 
-					IJ.log("KalmanTracking Complete " + " " + "Displaying results");
 
 					DisplayGraphKalman Enddisplaytracks = new DisplayGraphKalman(impendKalman, graphendKalman);
 					Enddisplaytracks.getImp();
 
 					TrackModel modelend = new TrackModel(graphendKalman);
 					modelend.getDirectedNeighborIndex();
-					IJ.log(" " + graphendKalman.vertexSet().size());
 					// Get all the track id's
 					for (final Integer id : modelend.trackIDs(true)) {
 						ResultsTable rt = new ResultsTable();
@@ -5211,7 +5232,6 @@ public class Interactive_MT implements PlugIn {
 				CurrentView = getCurrentView();
 				updatePreview(ValueChange.THIRDDIMTrack);
 
-				IJ.log("Current frame: " + thirdDimension);
 
 				boolean dialog;
 				boolean dialogupdate;
@@ -5219,8 +5239,16 @@ public class Interactive_MT implements PlugIn {
 				RandomAccessibleInterval<FloatType> groundframe = currentimg;
 				RandomAccessibleInterval<FloatType> groundframepre = currentPreprocessedimg;
 				if (FindLinesViaMSER) {
-					if (index == next)
+					if (index == next){
 						dialog = DialogueModelChoiceHF();
+						
+						IJ.log("MSER parameters:" + " " + " thirdDimension: " + " " + thirdDimension);
+						IJ.log("Delta " + " " + delta + " " + "minSize " + " " + minSize + " " + "maxSize " + " " + maxSize + " "
+								+ " maxVar " + " " + maxVar + " " + "minDIversity " + " " + minDiversity);
+					
+						IJ.log("Optimization Parameters: " + "R" + Intensityratio + " G"  + Inispacing/Math.min(psf[0], psf[1]));	
+						
+					}
 
 					else
 						dialog = false;
@@ -5248,8 +5276,14 @@ public class Interactive_MT implements PlugIn {
 
 				if (FindLinesViaHOUGH) {
 
-					if (index == next)
+					if (index == next){
 						dialog = DialogueModelChoiceHF();
+				
+						IJ.log("Hough parameters:" + " " + " thirdDimension: " + " " + thirdDimension);
+						IJ.log("thetaPerPixel " + " " + thetaPerPixel + " " + "rhoPerPixel " + " " + rhoPerPixel );
+						IJ.log("Optimization Parameters: " + "R" + Intensityratio + " G"  + Inispacing/Math.min(psf[0], psf[1]));	
+						
+					}
 
 					else
 						dialog = false;
@@ -5275,8 +5309,17 @@ public class Interactive_MT implements PlugIn {
 				}
 
 				if (FindLinesViaMSERwHOUGH) {
-					if (index == next)
+					if (index == next){
 						dialog = DialogueModelChoice();
+						
+						IJ.log("MSER parameters:" + " " + " thirdDimension: " + " " + thirdDimension);
+						IJ.log("Delta " + " " + delta + " " + "minSize " + " " + minSize + " " + "maxSize " + " " + maxSize + " "
+								+ " maxVar " + " " + maxVar + " " + "minDIversity " + " " + minDiversity);
+						IJ.log("Hough parameters:" + " " + " thirdDimension: " + " " + thirdDimension);
+						IJ.log("thetaPerPixel " + " " + thetaPerPixel + " " + "rhoPerPixel " + " " + rhoPerPixel );
+						IJ.log("Optimization Parameters: " + "R" + Intensityratio + " G"  + Inispacing/Math.min(psf[0], psf[1]));	
+						
+					}
 					else
 						dialog = false;
 
@@ -5388,7 +5431,6 @@ public class Interactive_MT implements PlugIn {
 
 					TrackModel modelstart = new TrackModel(graphstartKalman);
 					modelstart.getDirectedNeighborIndex();
-					IJ.log(" " + graphstartKalman.vertexSet().size());
 
 					// Get all the track id's
 					for (final Integer id : modelstart.trackIDs(true)) {
@@ -5504,13 +5546,11 @@ public class Interactive_MT implements PlugIn {
 					ImagePlus impendKalman = ImageJFunctions.show(originalPreprocessedimg);
 					impendKalman.setTitle("Kalman End MT");
 
-					IJ.log("KalmanTracking Complete " + " " + "Displaying results");
 
 					DisplayGraphKalman Enddisplaytracks = new DisplayGraphKalman(impendKalman, graphendKalman);
 					Enddisplaytracks.getImp();
 					TrackModel modelend = new TrackModel(graphendKalman);
 					modelend.getDirectedNeighborIndex();
-					IJ.log(" " + graphendKalman.vertexSet().size());
 					// Get all the track id's
 					for (final Integer id : modelend.trackIDs(true)) {
 						ResultsTable rt = new ResultsTable();
