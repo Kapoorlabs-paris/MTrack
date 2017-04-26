@@ -86,6 +86,7 @@ import drawandOverlay.DisplayGraph;
 import drawandOverlay.DisplayGraphKalman;
 import drawandOverlay.DisplaysubGraphend;
 import drawandOverlay.DisplaysubGraphstart;
+import drawandOverlay.DisplaysubGraphstartKalman;
 import fiji.tool.SliceListener;
 import fiji.tool.SliceObserver;
 import graphconstructs.KalmanTrackproperties;
@@ -116,6 +117,7 @@ import labeledObjects.Indexedlength;
 import labeledObjects.KalmanIndexedlength;
 import labeledObjects.Shrink;
 import labeledObjects.Subgraphs;
+import labeledObjects.SubgraphsKalman;
 import lineFinder.FindlinesVia;
 import lineFinder.LinefinderInteractiveHFHough;
 import lineFinder.LinefinderInteractiveHFMSER;
@@ -4480,7 +4482,8 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 						next - 1);
 				displaytrackstart.getImp();
 				impstart.draw();
-				impstart.setTitle("Sub Graph A");
+				impstart.setTitle("Sub Graph Start A MT");
+				impstartsec.setTitle("Graph Start A MT");
 			}
 			if (Allend.get(0).size() > 0) {
 				ImagePlus impendsec = ImageJFunctions.show(originalPreprocessedimg);
@@ -4498,7 +4501,8 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 				DisplaysubGraphend displaytrackend = new DisplaysubGraphend(impend, subgraphend, next - 1);
 				displaytrackend.getImp();
 				impend.draw();
-				impend.setTitle("Sub Graph B");
+				impend.setTitle("Sub Graph Start B MT");
+				impendsec.setTitle("Graph Start B MT");
 			}
 
 		}
@@ -4506,21 +4510,40 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		if (showKalman) {
 
 			ResultsTable rtAll = new ResultsTable();
-			if (AllstartKalman.size() > 0) {
+			if (AllstartKalman.get(0).size() > 0) {
+				
+				ImagePlus impstartKalman = ImageJFunctions.show(originalimg);
+			
+				
+				impstartKalman.setTitle("Kalman Sub Graph Start A MT");
+				
 				MTtrackerstart = new KFsearch(AllstartKalman, UserchosenCostFunction, maxSearchradius,
 						initialSearchradius, thirdDimension, thirdDimensionSize, missedframes);
 				MTtrackerstart.reset();
 				MTtrackerstart.process();
 
+				ArrayList<SubgraphsKalman> subgraphstart = MTtrackerstart.getFramedgraph();
+				DisplaysubGraphstartKalman displaytrackstart = new DisplaysubGraphstartKalman(impstartKalman, subgraphstart,
+						next - 1);
+				displaytrackstart.getImp();
+				impstartKalman.draw();
+			
+				
+	          ImagePlus impstartsecKalman = ImageJFunctions.show(originalimg);
+			
+				
+				impstartsecKalman.setTitle("Kalman Graph Start A MT");
 				SimpleWeightedGraph<KalmanTrackproperties, DefaultWeightedEdge> graphstartKalman = MTtrackerstart
 						.getResult();
 
-				ImagePlus impstartKalman = ImageJFunctions.show(originalimg);
-				impstartKalman.setTitle("Kalman Start MT");
+			
+				
 
-				DisplayGraphKalman Startdisplaytracks = new DisplayGraphKalman(impstartKalman, graphstartKalman);
+				DisplayGraphKalman Startdisplaytracks = new DisplayGraphKalman(impstartsecKalman, graphstartKalman);
 				Startdisplaytracks.getImp();
-
+				impstartsecKalman.draw();
+				
+				
 				TrackModel modelstart = new TrackModel(graphstartKalman);
 				modelstart.getDirectedNeighborIndex();
 
@@ -4626,7 +4649,11 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 				}
 			}
 
-			if (AllendKalman.size() > 0) {
+			if (AllendKalman.get(0).size() > 0) {
+				
+				ImagePlus impendKalman = ImageJFunctions.show(originalimg);
+				impendKalman.setTitle("Kalman Sub Graph Start B MT");
+				
 				MTtrackerend = new KFsearch(AllendKalman, UserchosenCostFunction, maxSearchradius,
 						initialSearchradius, thirdDimension, thirdDimensionSize, missedframes);
 
@@ -4635,12 +4662,18 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 				SimpleWeightedGraph<KalmanTrackproperties, DefaultWeightedEdge> graphendKalman = MTtrackerend
 						.getResult();
 
-				ImagePlus impendKalman = ImageJFunctions.show(originalPreprocessedimg);
-				impendKalman.setTitle("Kalman End MT");
-
-
-				DisplayGraphKalman Enddisplaytracks = new DisplayGraphKalman(impendKalman, graphendKalman);
+				
+				ArrayList<SubgraphsKalman> subgraphstart = MTtrackerend.getFramedgraph();
+				DisplaysubGraphstartKalman displaytrackstart = new DisplaysubGraphstartKalman(impendKalman, subgraphstart,
+						next - 1);
+				displaytrackstart.getImp();
+				impendKalman.draw();
+			
+				ImagePlus impendsecKalman = ImageJFunctions.show(originalimg);
+				impendsecKalman.setTitle("Kalman Graph Start B MT");
+				DisplayGraphKalman Enddisplaytracks = new DisplayGraphKalman(impendsecKalman, graphendKalman);
 				Enddisplaytracks.getImp();
+				impendsecKalman.draw();
 				TrackModel modelend = new TrackModel(graphendKalman);
 				modelend.getDirectedNeighborIndex();
 				// Get all the track id's

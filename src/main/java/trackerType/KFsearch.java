@@ -16,12 +16,12 @@ import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
 
 import MTObjects.FramedMT;
-import MTObjects.Subgraphs;
 import costMatrix.CostFunction;
 import costMatrix.JaqamanLinkingCostMatrixCreator;
 import graphconstructs.JaqamanLinker;
 import graphconstructs.KalmanTrackproperties;
 import graphconstructs.Logger;
+import labeledObjects.SubgraphsKalman;
 
 
 public class KFsearch implements MTTracker {
@@ -43,7 +43,7 @@ public class KFsearch implements MTTracker {
 
 	private SimpleWeightedGraph<KalmanTrackproperties, DefaultWeightedEdge> graph;
 	private ArrayList<FramedMT> Allmeasured;
-	private ArrayList<Subgraphs> Framedgraph;
+	private ArrayList<SubgraphsKalman> Framedgraph;
 
 	protected Logger logger = Logger.DEFAULT_LOGGER;
 	protected String errorMessage;
@@ -70,8 +70,8 @@ public class KFsearch implements MTTracker {
 
 		return Allmeasured;
 	}
-
-	public ArrayList<Subgraphs> getFramedgraph() {
+	@Override
+	public ArrayList<SubgraphsKalman> getFramedgraph() {
 
 		return Framedgraph;
 	}
@@ -90,11 +90,11 @@ public class KFsearch implements MTTracker {
 
 		graph = new SimpleWeightedGraph<KalmanTrackproperties, DefaultWeightedEdge>(DefaultWeightedEdge.class);
 		Allmeasured = new ArrayList<FramedMT>();
-		Framedgraph = new ArrayList<Subgraphs>();
+		Framedgraph = new ArrayList<SubgraphsKalman>();
 
 		// Find first two non-zero frames containing blobs
 		int Firstframe = 0;
-		int Secondframe = 0;
+		int Secondframe = 1;
 
 		for (int frame = 0; frame < maxframe; ++frame) {
 
@@ -104,7 +104,7 @@ public class KFsearch implements MTTracker {
 			}
 		}
 
-		for (int frame = Firstframe + 1; frame < maxframe; ++frame) {
+		for (int frame = Secondframe; frame < maxframe; ++frame) {
 
 			if (AllMT.get(frame).size() > 0) {
 				Secondframe = frame;
@@ -215,7 +215,7 @@ public class KFsearch implements MTTracker {
 					final DefaultWeightedEdge subedge = subgraph.addEdge(source, target);
 					subgraph.setEdgeWeight(subedge, cost);
 
-					Subgraphs currentframegraph = new Subgraphs(frame - 1, frame, subgraph);
+					SubgraphsKalman currentframegraph = new SubgraphsKalman(frame - 1, frame, subgraph);
 
 					Framedgraph.add(currentframegraph);
 					final FramedMT prevframedMT = new FramedMT(frame - 1, source);
@@ -233,7 +233,7 @@ public class KFsearch implements MTTracker {
 					kalmanFiltersMap.put(kf, target);
 
 				
-					
+					Secondorphan.remove(target);
 
 					// Remove from childless KF set
 					childlessKFs.remove(kf);
@@ -265,7 +265,6 @@ public class KFsearch implements MTTracker {
 					final KalmanTrackproperties target = newAssignments.get(source);
 
 					// Remove from orphan collection.
-					Secondorphan.remove(target);
 
 					// Derive initial state and create Kalman filter.
 					final double[] XP = estimateInitialState(source, target);
@@ -278,21 +277,23 @@ public class KFsearch implements MTTracker {
 					kalmanFiltersMap.put(kt, target);
 
 					// Add edge to the graph.
+					synchronized (graph) {
 					graph.addVertex(source);
 					graph.addVertex(target);
 					final DefaultWeightedEdge edge = graph.addEdge(source, target);
 					final double cost = assignmentCosts.get(source);
+					System.out.println(cost + " " + source.Label);
 					graph.setEdgeWeight(edge, cost);
-
+					
 					subgraph.addVertex(source);
 					subgraph.addVertex(target);
 					final DefaultWeightedEdge subedge = subgraph.addEdge(source, target);
 					subgraph.setEdgeWeight(subedge, cost);
 
-					Subgraphs currentframegraph = new Subgraphs(frame - 1, frame, subgraph);
-
+					SubgraphsKalman currentframegraph = new SubgraphsKalman(frame - 1, frame, subgraph);
+					
 					Framedgraph.add(currentframegraph);
-
+					}
 					final FramedMT prevframedMT = new FramedMT(frame - 1, source);
 
 					Allmeasured.add(prevframedMT);

@@ -22,6 +22,7 @@ public class Trackend implements Linetracker {
 		protected Logger logger = Logger.DEFAULT_LOGGER;
 		protected String errorMessage;
 		private ArrayList<Pair<Integer, double[]>> ID;
+		
 		public Trackend(
 				final ArrayList<ArrayList<Trackproperties>> Allstartand,  
 				final int maxframe){

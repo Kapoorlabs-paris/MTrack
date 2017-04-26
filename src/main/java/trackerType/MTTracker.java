@@ -2,6 +2,8 @@ package trackerType;
 
 
 
+import java.util.ArrayList;
+
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
 
@@ -10,6 +12,7 @@ import graphconstructs.Logger;
 import net.imglib2.algorithm.MultiThreaded;
 import net.imglib2.algorithm.OutputAlgorithm;
 import graphconstructs.Trackproperties;
+import labeledObjects.SubgraphsKalman;
 /**
  * 
  * links objects across multiple frames in time-lapse images, Creates a new graph from a list of blobs, the blob properties of the current frame
@@ -30,6 +33,7 @@ public interface MTTracker extends OutputAlgorithm< SimpleWeightedGraph< KalmanT
 		 */
 		public void setLogger( final Logger logger );
 		public void reset();
+		public ArrayList<SubgraphsKalman>  getFramedgraph();
 	}
 	
 

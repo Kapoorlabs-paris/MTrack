@@ -196,7 +196,6 @@ import preProcessing.GetLocalmaxmin;
 			
 			for (int index = 0; index < PrevFrameparamstart.size(); ++index) {
 				final int oldframenumber = PrevFrameparamstart.get(PrevFrameparamstart.size() - 1).framenumber;
-				final int framediff = framenumber - oldframenumber;
 				
 				if (Trackstart.get(PrevFrameparamstart.get(index).seedLabel)){
 					
@@ -206,8 +205,7 @@ import preProcessing.GetLocalmaxmin;
 
 				final double originalintercept = PrevFrameparamstart.get(index).originalintercept;
 				
-				final double oldslope = PrevFrameparamstart.get(index).slope;
-				final double oldintercept = PrevFrameparamstart.get(index).intercept;
+	
 
 				final Point linepoint = new Point(ndims);
 				linepoint.setPosition(new long[] { (long) PrevFrameparamstart.get(index).currentpos[0],
@@ -240,8 +238,7 @@ import preProcessing.GetLocalmaxmin;
 				final double newstartslope = paramnextframestart.slope;
 				final double newstartintercept = paramnextframestart.intercept;
 
-				final double[] directionstart = { (newstartpoint[0] - oldstartpoint[0]) / framediff,
-						(newstartpoint[1] - oldstartpoint[1]) / framediff };
+			
 
 				final KalmanTrackproperties startedgePrevious = new KalmanTrackproperties(framenumber,labelstart, size, oldstartpoint, originalposition,
 						oldstartslope, oldstartintercept, originalslope, originalintercept,
@@ -264,8 +261,10 @@ import preProcessing.GetLocalmaxmin;
 			
 				
 			for (int index = 0; index < PrevFrameparamend.size(); ++index) {
-				final int oldframenumber = PrevFrameparamend.get(PrevFrameparamend.size() - 1).framenumber;
-				final int framediff = framenumber - oldframenumber;
+				
+				
+				
+				
 				
 				if (Trackstart.get(PrevFrameparamend.get(index).seedLabel) == false){
 					
@@ -280,9 +279,7 @@ import preProcessing.GetLocalmaxmin;
 				final double originalslopeend = PrevFrameparamend.get(index).originalslope;
 
 				final double originalinterceptend = PrevFrameparamend.get(index).originalintercept;
-				
-				final double oldslope = PrevFrameparamend.get(index).slope;
-				final double oldintercept = PrevFrameparamend.get(index).intercept;
+	
 				
 				int labelend = Getlabel(fixedendpoint, originalslopeend, originalinterceptend);
 				KalmanIndexedlength paramnextframeend;
@@ -306,21 +303,21 @@ import preProcessing.GetLocalmaxmin;
 				final double newendslope = paramnextframeend.slope;
 				final double newendintercept = paramnextframeend.intercept;
 
-				final double[] directionend = { (newendpoint[0] - oldendpoint[0]) / framediff,
-						(newendpoint[1] - oldendpoint[1]) / framediff };
-
+			
 				
-				final KalmanTrackproperties startedgePrevious = new KalmanTrackproperties(framenumber,labelend, size, oldendpoint, originalpoint,
+				final KalmanTrackproperties endedgePrevious = new KalmanTrackproperties(framenumber,labelend, size, oldendpoint, originalpoint,
 						oldstartslope, oldstartintercept, originalslopeend, originalinterceptend,
-						PrevFrameparamstart.get(index).seedLabel, PrevFrameparamstart.get(index).originalds);
+						PrevFrameparamend.get(index).seedLabel, PrevFrameparamend.get(index).originalds);
 				
-				final KalmanTrackproperties endedgeCurrent = new KalmanTrackproperties(framenumber, labelend, size, newendpoint, originalpoint, newendslope,
+				
+				final KalmanTrackproperties endedgeCurrent = new KalmanTrackproperties(framenumber, labelend, size, newendpoint, originalpoint, 
+						newendslope,
 						newendintercept, originalslopeend, originalinterceptend, PrevFrameparamend.get(index).seedLabel,
 						 PrevFrameparamend.get(index).originalds);
 		
 
 				if (KalmanCount == 1)
-				endincurrframe.add(startedgePrevious);
+				endincurrframe.add(endedgePrevious);
 				
 				endincurrframe.add(endedgeCurrent);
 				
