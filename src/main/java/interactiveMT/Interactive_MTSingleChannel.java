@@ -172,7 +172,7 @@ import velocityanalyser.Trackstart;
  * @author Varun Kapoor
  */
 
-public class Interactive_MT implements PlugIn {
+public class Interactive_MTSingleChannel implements PlugIn {
 
 	String usefolder = IJ.getDirectory("imagej");
 	ColorProcessor cp = null;
@@ -575,10 +575,10 @@ public class Interactive_MT implements PlugIn {
 		return addToName;
 	}
 
-	public Interactive_MT() {
+	public Interactive_MTSingleChannel() {
 	};
 
-	public Interactive_MT(final RandomAccessibleInterval<FloatType> originalimg,
+	public Interactive_MTSingleChannel(final RandomAccessibleInterval<FloatType> originalimg,
 			final RandomAccessibleInterval<FloatType> originalPreprocessedimg, final double[] psf,
 			final double[] imgCal, final int minlength, final float frametosec) {
 
@@ -598,7 +598,7 @@ public class Interactive_MT implements PlugIn {
 
 	}
 
-	public Interactive_MT(final RandomAccessibleInterval<FloatType> originalimg,
+	public Interactive_MTSingleChannel(final RandomAccessibleInterval<FloatType> originalimg,
 			final RandomAccessibleInterval<FloatType> originalPreprocessedimg,
 			final RandomAccessibleInterval<FloatType> kymoimg, final double[] psf, final double[] imgCal,
 			final int minlength, final float frametosec) {
@@ -3059,7 +3059,7 @@ public class Interactive_MT implements PlugIn {
 
 				for (int frameindex = MinFrame; frameindex < MaxFrame; ++frameindex) {
 
-					for (int maxlength = 0; maxlength < Double.parseDouble(Maxdpixel.getText()); ++maxlength) {
+					for (int maxlength = 0; maxlength < Double.parseDouble(Maxdpixel.getText()); maxlength+=5) {
 
 						int MTcount = 0;
 
@@ -3111,7 +3111,7 @@ public class Interactive_MT implements PlugIn {
 
 				for (int frameindex = MinFrame; frameindex < MaxFrame; ++frameindex) {
 
-					for (int maxlength = 0; maxlength < Double.parseDouble(Maxdpixel.getText()); ++maxlength) {
+					for (int maxlength = 0; maxlength < Double.parseDouble(Maxdpixel.getText()); maxlength+=5) {
 
 						int MTcount = 0;
 
@@ -6273,7 +6273,7 @@ public class Interactive_MT implements PlugIn {
 			xlOut = new FileOutputStream(xlFile);
 		} catch (FileNotFoundException ex) {
 
-			Logger.getLogger(Interactive_MT.class.getName()).log(Level.SEVERE, null, ex);
+			Logger.getLogger(Interactive_MTSingleChannel.class.getName()).log(Level.SEVERE, null, ex);
 		}
 
 		HSSFWorkbook xlBook = new HSSFWorkbook();
@@ -6330,7 +6330,7 @@ public class Interactive_MT implements PlugIn {
 			xlBook.write(xlOut);
 			xlOut.close();
 		} catch (IOException ex) {
-			Logger.getLogger(Interactive_MT.class.getName()).log(Level.SEVERE, null, ex);
+			Logger.getLogger(Interactive_MTSingleChannel.class.getName()).log(Level.SEVERE, null, ex);
 
 		}
 

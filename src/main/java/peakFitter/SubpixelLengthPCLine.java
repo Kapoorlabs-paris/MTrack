@@ -336,65 +336,7 @@ public ArrayList<Indexedlength> getEndPoints(){
 
 		return MinandMax;
            }
-          if (model ==  UserChoiceModel.Linefixedds){
-        	   
-        	   while(inputcursor.hasNext()){
-       			
-       			inputcursor.fwd();
-       			
-       			
-       				inputcursor.localize(newposition);
-
-       				if (inputcursor.getDoublePosition(0) <= minVal[0]
-    						&& inputcursor.get().get() / maxintensityline > Intensityratio) {
-    					minVal[0] = inputcursor.getDoublePosition(0);
-    					minVal[1] = inputcursor.getDoublePosition(1);
-    				}
-
-    				if (inputcursor.getDoublePosition(0) >= maxVal[0]
-    						&& inputcursor.get().get() / maxintensityline > Intensityratio) {
-    					maxVal[0] = inputcursor.getDoublePosition(0);
-    					maxVal[1] = inputcursor.getDoublePosition(1);
-    				}
-
-       			
-                  }
-		final double[] MinandMax = new double[2 * ndims + 2];
-
-		
-			for (int d = 0; d < ndims; ++d) {
-
-				MinandMax[d] = minVal[d];
-				MinandMax[d + ndims] = maxVal[d];
-			}
-
-		
-
-		// This parameter is guess estimate for spacing between the Gaussians
-		MinandMax[2 * ndims] = maxintensityline; 
-		// This parameter guess estimates the background noise level
-		MinandMax[2 * ndims + 1] = 0.5; 
-		
-		
-		System.out.println("Label: " + label + " " + "Detection: " + " StartX: " + MinandMax[0] + " StartY: "
-				+ MinandMax[1] + " EndX: " + MinandMax[2] + " EndY: " + MinandMax[3]);
-
-		
-		
-			for (int d = 0; d < ndims; ++d) {
-
-				if (MinandMax[d] == Double.MAX_VALUE || MinandMax[d + ndims] == -Double.MIN_VALUE)
-					return null;
-				if (MinandMax[d] >= source.dimension(d) || MinandMax[d + ndims] >= source.dimension(d))
-					return null;
-				if (MinandMax[d] <= 0 || MinandMax[d + ndims] <= 0)
-					return null;
-
-			}
-		
-
-		return MinandMax;
-           }
+       
            
           
            if (model ==  UserChoiceModel.Splineordersec ) {
@@ -524,24 +466,7 @@ public ArrayList<Indexedlength> getEndPoints(){
 					UserChoiceFunction = new GaussianLineds();
 
 				}
-					if (model == UserChoiceModel.Linefixedds) {
-						
-						UserChoiceFunction = new GaussianLinefixedds();
-
-					}
-
-					if (model == UserChoiceModel.LineHF) {
-
-						UserChoiceFunction = new GaussianLinedsHF();
-					}
-					if (model == UserChoiceModel.Splineordersec) {
-
-						UserChoiceFunction = new GaussianLineds();
-					}
-					if (model == UserChoiceModel.Splineordersecfixedds) {
-
-						UserChoiceFunction = new GaussianLineds();
-					}
+					
 					
 				
 				
@@ -561,7 +486,7 @@ public ArrayList<Indexedlength> getEndPoints(){
 							finalparamstart[j] = start_param[j];
 					}
 
-					if (model == UserChoiceModel.Line || model == UserChoiceModel.LineHF) {
+					if (model == UserChoiceModel.Line) {
 					double newslope = (endpos[1] - startpos[1]) / (endpos[0] - startpos[0]);
 					double newintercept = (endpos[1] - newslope * endpos[0]);
 					double ds = finalparamstart[2 * ndims];
@@ -671,130 +596,12 @@ public ArrayList<Indexedlength> getEndPoints(){
 					final Pair<Indexedlength, Indexedlength> pair = new ValuePair<Indexedlength, Indexedlength> ( startPart, endPart);
 					
 					
-				
-					jpb.setValue((int) percent);
-					jpb.setOpaque(true);
-					jpb.setStringPainted(true);
-				//	jpb.setForeground(Color.YELLOW);
-					jpb.setString("Finding MT ends" );
+					FitterUtils.SetProgressBar(jpb, percent);
 					return pair;
 					
 					}
 					
-					if (model == UserChoiceModel.Linefixedds) {
-						double newslope = (endpos[1] - startpos[1]) / (endpos[0] - startpos[0]);
-						double newintercept = (endpos[1] - newslope * endpos[0]);
-						double ds = fixed_param[ndims + 2];
-						double dx = ds/ Math.sqrt(1 + newslope * newslope);
-						double dy = newslope * dx;
-						final double LMdist = sqDistance(startpos, endpos);
-						double[] dxvector = { dx, dy };
-						final double Intensity = finalparamstart[2 * ndims];
-						final double background = finalparamstart[2 * ndims + 1];
-						double[] startfit = new double[ndims];
-						double[] endfit = new double[ndims];
-						final double maxintensityline = GetLocalmaxmin.computeMaxIntensity(currentimg);
-						double[] startparam = new double[ndims ];
-						double[] endparam = new double[ndims];
-						for (int d = 0; d < ndims; ++d) {
-							
-							startparam[d] = startpos[d];
-							endparam[d] = endpos[d];
-						}
-						double sigmas = 0;
-						 
-						for (int d  = 0; d < ndims; ++d){
-							
-							sigmas+= psf[d] * psf[d];
-						}
-						final int numgaussians = (int) Math.max(Math.round(Math.sqrt(sigmas) /  ds), 2);
-					
-					if (DoMask){
-					
-						System.out.println("Doing Mask Fits: ");
-						try {
-									
-								startfit =	peakFitter.GaussianMaskFitMSER.sumofgaussianMaskFit(currentimg, startpos.clone(), psf, numgaussians,
-									iterations, dxvector, newslope, newintercept, Intensity, halfgaussian, EndfitMSER.StartfitMSER,
-									label, background);
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-
-						try {
-							endfit = peakFitter.GaussianMaskFitMSER.sumofgaussianMaskFit(currentimg, endpos.clone(), psf, numgaussians,
-									iterations, dxvector, newslope, newintercept, Intensity,  halfgaussian, EndfitMSER.EndfitMSER,
-									label, background);
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-
-						
-						/**
-						 * dimensions of returnparam =  2 * ndims + 3 for the free parameters
-						 * + 4 for the label and the frame number information.
-						 */
-						
-						
-						for (int d = 0; d < ndims; ++d) {
-							
-							startparam[d] = startfit[d];
-							endparam[d] = endfit[d];
-						}
-						
-						if (Math.abs(endpos[0] - endfit[0]) >= cutoffdistance || Math.abs(endpos[1] - endfit[1]) >= cutoffdistance){
-
-
-							for (int d = 0; d < ndims; ++d) {
-								
-								startparam[d] = startpos[d];
-								endparam[d] = endpos[d];
-							}
-							}
-						
-						
-						
-						
-						
-
-						for (int d = 0; d < ndims; ++d) {
-							if (Double.isNaN(startfit[d]) || Double.isNaN(endfit[d])) {
-								
-								startparam[d] = startpos[d];
-								endparam[d] = endpos[d];
-
-							}
-						}
-						
-				    }
-						
-						final double currentslope = (endparam[1] - startparam[1]) / (endparam[0] - startparam[0]);
-						final double currentintercept = endparam[1] - currentslope * endparam[0];
-
-						System.out.println("Fits :" + "StartX:" + startparam[0] + " StartY:" + startparam[1] + " " + "EndX:"
-								+ endparam[0] + "EndY: " + endparam[1] + " " + "ds: " + ds );
-
-						System.out.println("Length: " + Distance(new double[]{startparam[0],  startparam[1]},new double[]{endparam[0],  endparam[1]} ));
-
-						final Indexedlength startPart = new Indexedlength(label, label, framenumber, ds,
-								finalparamstart[4], finalparamstart[5], startparam,
-								startparam , currentslope, currentintercept , currentslope, currentintercept, 0, 0, new double[]{dx, dy});
-						
-						final Indexedlength endPart = new Indexedlength(label, label, framenumber, ds,
-								finalparamstart[4], finalparamstart[5], endparam,
-								endparam, currentslope, currentintercept, currentslope, currentintercept, 0 , 0 , new double[]{dx, dy});
-						
-						
-						
-						final Pair<Indexedlength, Indexedlength> pair = new ValuePair<Indexedlength, Indexedlength> ( startPart, endPart);
-						jpb.setValue((int) percent);
-					jpb.setOpaque(true);
-					jpb.setStringPainted(true);
-				//	jpb.setForeground(Color.YELLOW);
-					jpb.setString("Finding MT ends" );
-					return pair;
-						
-						}
+			
 						
 					// default
 					else {
@@ -903,11 +710,7 @@ public ArrayList<Indexedlength> getEndPoints(){
 					
 					
 					final Pair<Indexedlength, Indexedlength> pair = new ValuePair<Indexedlength, Indexedlength> ( startPart, endPart);
-					jpb.setValue((int) percent);
-					jpb.setOpaque(true);
-					jpb.setStringPainted(true);
-				//	jpb.setForeground(Color.YELLOW);
-					jpb.setString("Finding MT ends" );
+					FitterUtils.SetProgressBar(jpb, percent);
 					return pair;
 					}
 

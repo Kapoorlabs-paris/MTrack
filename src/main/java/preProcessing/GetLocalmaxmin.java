@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import com.sun.tools.javac.util.Pair;
 
 import drawandOverlay.AddGaussian;
 import ij.ImageJ;
@@ -48,6 +47,7 @@ import net.imglib2.type.numeric.integer.IntType;
 import net.imglib2.type.numeric.integer.UnsignedByteType;
 import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.util.Intervals;
+import net.imglib2.util.Pair;
 import net.imglib2.util.RealSum;
 import net.imglib2.util.ValuePair;
 import net.imglib2.view.Views;
@@ -458,7 +458,7 @@ public class GetLocalmaxmin {
 
 			}
 		}
-		Pair<FloatType, FloatType> pair = new Pair<FloatType, FloatType>(min, max);
+		Pair<FloatType, FloatType> pair = new ValuePair<FloatType, FloatType>(min, max);
 		return pair;
 	}
 	public static Pair<FloatType, FloatType> computesecondMinMaxIntensity(final RandomAccessibleInterval<FloatType> inputimg) {
@@ -490,7 +490,7 @@ public class GetLocalmaxmin {
 
 			}
 		}
-		Pair<FloatType, FloatType> pair = new Pair<FloatType, FloatType>(secondmin, max);
+		Pair<FloatType, FloatType> pair = new ValuePair<FloatType, FloatType>(secondmin, max);
 		return pair;
 	}
 	
@@ -639,7 +639,7 @@ public class GetLocalmaxmin {
 		
 		// Neglect bright beads
 		
-		final Float threshold = (pair.snd.get() - pair.fst.get())/4;
+		final Float threshold = (pair.getB().get() - pair.getA().get())/4;
 		
 		// initialize min and max with the first image value
 		double max = Double.MIN_VALUE;

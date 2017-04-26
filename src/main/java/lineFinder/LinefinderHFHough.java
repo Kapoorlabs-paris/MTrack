@@ -2,7 +2,6 @@ package lineFinder;
 
 import java.util.ArrayList;
 
-import com.sun.tools.javac.util.Pair;
 
 import drawandOverlay.HoughPushCurves;
 import drawandOverlay.OverlayLines;
@@ -21,6 +20,7 @@ import net.imglib2.img.display.imagej.ImageJFunctions;
 import net.imglib2.type.logic.BitType;
 import net.imglib2.type.numeric.integer.IntType;
 import net.imglib2.type.numeric.real.FloatType;
+import net.imglib2.util.Pair;
 import preProcessing.GetLocalmaxmin;
 import preProcessing.GlobalThresholding;
 import preProcessing.Kernels;
@@ -94,9 +94,9 @@ public class LinefinderHFHough implements LinefinderHF {
            // Do not offset here
 			Pair<RandomAccessibleInterval<FloatType>, FinalInterval> pair =  Boundingboxes.CurrentLabelImagepair(intimg, Preprocessedsource, count);
 			RandomAccessibleInterval<FloatType> ActualRoiimg = Boundingboxes.CurrentLabelImage(intimg, source, count);
-			RandomAccessibleInterval<FloatType> roiimg = pair.fst;
+			RandomAccessibleInterval<FloatType> roiimg = pair.getA();
 			
-			FinalInterval Realinterval = pair.snd;
+			FinalInterval Realinterval = pair.getB();
 			
 			
 				

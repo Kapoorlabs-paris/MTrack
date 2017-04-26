@@ -1,6 +1,6 @@
 package preProcessing;
 
-import com.sun.tools.javac.util.Pair;
+
 
 import net.imglib2.Cursor;
 import net.imglib2.IterableInterval;
@@ -9,7 +9,9 @@ import net.imglib2.PointSampleList;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.algorithm.stats.Normalize;
 import net.imglib2.type.numeric.real.FloatType;
+import net.imglib2.util.Pair;
 import net.imglib2.util.RealSum;
+import net.imglib2.util.ValuePair;
 import net.imglib2.view.Views;
 
 public class GlobalThresholding {
@@ -29,10 +31,10 @@ public class GlobalThresholding {
 
 		Float ThresholdNew, Thresholdupdate;
 
-		Pair<FloatType, FloatType> pair = new Pair<FloatType, FloatType>(min, max);
+		Pair<FloatType, FloatType> pair = new ValuePair<FloatType, FloatType>(min, max);
 		pair = GetLocalmaxmin.computeMinMaxIntensity(inputimg);
 
-		ThresholdNew = (pair.snd.get() - pair.fst.get()) / 2;
+		ThresholdNew = (pair.getB().get() - pair.getA().get()) / 2;
 
 		// Get the new threshold value after segmenting the inputimage with thresholdnew
 		Thresholdupdate = SegmentbyThresholding(Views.iterable(inputimg), ThresholdNew);
@@ -60,10 +62,10 @@ public static Float AutomaticThresholdingSec(RandomAccessibleInterval<FloatType>
 
 		Float ThresholdNew, Thresholdupdate;
 
-		Pair<FloatType, FloatType> pair = new Pair<FloatType, FloatType>(min, max);
+		Pair<FloatType, FloatType> pair = new ValuePair<FloatType, FloatType>(min, max);
 		pair = GetLocalmaxmin.computesecondMinMaxIntensity(inputimg);
 
-		ThresholdNew = (pair.snd.get() - pair.fst.get()) / 2;
+		ThresholdNew = (pair.getB().get() - pair.getA().get()) / 2;
 
 		// Get the new threshold value after segmenting the inputimage with thresholdnew
 		Thresholdupdate = SegmentbyThresholding(Views.iterable(inputimg), ThresholdNew);

@@ -2,7 +2,6 @@ package lineFinder;
 
 import java.util.ArrayList;
 
-import com.sun.tools.javac.util.Pair;
 
 import graphconstructs.Logger;
 import labeledObjects.CommonOutputHF;
@@ -10,6 +9,7 @@ import net.imglib2.FinalInterval;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.type.numeric.integer.IntType;
 import net.imglib2.type.numeric.real.FloatType;
+import net.imglib2.util.Pair;
 import util.Boundingboxes;
 
 public class LinefinderInteractiveHFHough implements LinefinderHF {
@@ -77,9 +77,9 @@ public class LinefinderInteractiveHFHough implements LinefinderHF {
            // Do not offset here
 			Pair<RandomAccessibleInterval<FloatType>, FinalInterval> pair =  Boundingboxes.CurrentLabelImagepair(intimg, Preprocessedsource, count);
 			RandomAccessibleInterval<FloatType> ActualRoiimg = Boundingboxes.CurrentLabelImage(intimg, source, count);
-			RandomAccessibleInterval<FloatType> roiimg = pair.fst;
+			RandomAccessibleInterval<FloatType> roiimg = pair.getA();
 			
-			FinalInterval Realinterval = pair.snd;
+			FinalInterval Realinterval = pair.getB();
 			
 			
 				

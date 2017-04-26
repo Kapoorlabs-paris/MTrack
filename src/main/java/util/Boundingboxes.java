@@ -2,7 +2,6 @@ package util;
 
 import java.util.ArrayList;
 
-import com.sun.tools.javac.util.Pair;
 
 import ij.gui.EllipseRoi;
 import ij.gui.Roi;
@@ -25,14 +24,16 @@ import net.imglib2.labeling.NativeImgLabeling;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.type.numeric.integer.IntType;
 import net.imglib2.type.numeric.real.FloatType;
+import net.imglib2.util.Pair;
 import net.imglib2.util.Util;
+import net.imglib2.util.ValuePair;
 import net.imglib2.view.Views;
 
 @SuppressWarnings("deprecation")
 public class Boundingboxes {
 
 	
-	public static <T extends RealType<T>> double[] Transformback(double[] location, double[] size, double[] min,
+	public static  double[] Transformback(double[] location, double[] size, double[] min,
 			double[] max) {
 
 		int n = location.length;
@@ -148,7 +149,7 @@ public class Boundingboxes {
 
 		double boxsize = Distance(minVal, maxVal);
 
-		Pair<long[], long[]> boundingBox = new Pair<long[], long[]>(minVal, maxVal);
+		Pair<long[], long[]> boundingBox = new ValuePair<long[], long[]>(minVal, maxVal);
 		return boxsize;
 	}
 
@@ -235,7 +236,7 @@ public class Boundingboxes {
 		FinalInterval interval = new FinalInterval(minVal, maxVal);
 		RandomAccessibleInterval<FloatType> currentimgsmall = Views.interval(img, interval);
 		
-		Pair<RandomAccessibleInterval<FloatType>, FinalInterval> pair = new Pair<RandomAccessibleInterval<FloatType>, FinalInterval>(currentimgsmall, interval);
+		Pair<RandomAccessibleInterval<FloatType>, FinalInterval> pair = new ValuePair<RandomAccessibleInterval<FloatType>, FinalInterval>(currentimgsmall, interval);
 		
 		return pair;
 	}
@@ -423,7 +424,7 @@ public static FinalInterval CurrentroiInterval(RandomAccessibleInterval<FloatTyp
 
 		RandomAccessibleInterval<FloatType> outimgsmall = Views.offsetInterval(outimg, intervalsmall);
 
-		Pair<RandomAccessibleInterval<FloatType>, FinalInterval> pair = new Pair<RandomAccessibleInterval<FloatType>, FinalInterval>(outimgsmall, intervalsmall);
+		Pair<RandomAccessibleInterval<FloatType>, FinalInterval> pair = new ValuePair<RandomAccessibleInterval<FloatType>, FinalInterval>(outimgsmall, intervalsmall);
 		return pair;
 
 	}
@@ -468,7 +469,7 @@ public static FinalInterval CurrentroiInterval(RandomAccessibleInterval<FloatTyp
 		FinalInterval intervalsmall = new FinalInterval(minVal, maxVal) ;
 		RandomAccessibleInterval<FloatType> outimgsmall = Views.interval(outimg, intervalsmall);
 
-		Pair<RandomAccessibleInterval<FloatType>, FinalInterval> pair = new Pair<RandomAccessibleInterval<FloatType>, FinalInterval>(outimgsmall, intervalsmall);
+		Pair<RandomAccessibleInterval<FloatType>, FinalInterval> pair = new ValuePair<RandomAccessibleInterval<FloatType>, FinalInterval>(outimgsmall, intervalsmall);
 		return pair;
 
 	}
