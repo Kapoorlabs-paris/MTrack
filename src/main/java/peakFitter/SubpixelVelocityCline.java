@@ -1,5 +1,6 @@
 package peakFitter;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -9,11 +10,14 @@ import LineModels.GaussianLineds;
 import LineModels.UseLineModel.UserChoiceModel;
 import graphconstructs.Staticproperties;
 import ij.gui.EllipseRoi;
+import ij.gui.OvalRoi;
+import ij.gui.Overlay;
 import labeledObjects.CommonOutput;
 import labeledObjects.CommonOutputHF;
 import labeledObjects.Indexedlength;
 import labeledObjects.LabelledImg;
 import lineFinder.LinefinderHF;
+import mpicbg.imglib.util.Util;
 import net.imglib2.Cursor;
 import net.imglib2.FinalInterval;
 import net.imglib2.Point;
@@ -41,6 +45,7 @@ implements OutputAlgorithm<ArrayList<Indexedlength>> {
 	private ArrayList<Staticproperties> startandendinframe;
 	private final double[] psf;
 	private final UserChoiceModel model;
+	private final Overlay overlay;
 	
 	// LM solver iteration params
 	public int maxiter = 500;
@@ -99,7 +104,8 @@ implements OutputAlgorithm<ArrayList<Indexedlength>> {
 			                       final ArrayList<Indexedlength> PrevFrameparam,
 			                       final double[] psf,
 			                       final UserChoiceModel model,
-			                       final int framenumber) {
+			                       final int framenumber,
+			                       final Overlay overlay) {
 		finder.checkInput();
 		finder.process();
 		imgs = finder.getResult();
@@ -108,6 +114,7 @@ implements OutputAlgorithm<ArrayList<Indexedlength>> {
 		this.PrevFrameparam = PrevFrameparam;
 		this.psf = psf;
 		this.framenumber = framenumber;
+		this.overlay = overlay;
 		this.ndims = source.numDimensions();
 		
 	}
@@ -179,12 +186,25 @@ implements OutputAlgorithm<ArrayList<Indexedlength>> {
 			 final double[] oldendpoint = PrevFrameparam.get(index).fixedpos;
 			
 			 
+			 
+			 
+			 
 			 if (paramnextframe==null)
 				 paramnextframe = PrevFrameparam.get(index);
 			     final_paramlist.add(paramnextframe);
 			 
                   final double[] newstartpoint = paramnextframe.currentpos;
 			 
+                  
+                  final OvalRoi Bigroi = new OvalRoi(Util.round(newstartpoint[0] - 2.5), Util.round(newstartpoint[1] - 2.5), Util.round(5),
+							Util.round(5));
+							Bigroi.setStrokeColor(Color.GREEN);
+							Bigroi.setStrokeWidth(0.8);
+
+							
+							overlay.add(Bigroi);
+                  
+                  
 			 final double[] newendpoint = paramnextframe.fixedpos;
 			 
 			 final double[] directionstart = {newstartpoint[0] - oldstartpoint[0] , newstartpoint[1] - oldstartpoint[1] };

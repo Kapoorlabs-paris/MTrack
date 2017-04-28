@@ -98,8 +98,8 @@ public ImagePlus getImp() { return this.imp; }
 					KalmanTrackproperties startedge = subgraph.get(index).subgraphKalman.getEdgeSource(e);
 					KalmanTrackproperties targetedge = subgraph.get(index).subgraphKalman.getEdgeTarget(e);
 					        
-					final OvalRoi Bigroi = new OvalRoi(Util.round(startedge.currentpoint[0] - 5), Util.round(startedge.currentpoint[1] - 5), Util.round(10),
-							Util.round(10));
+					final OvalRoi Bigroi = new OvalRoi(Util.round(startedge.currentpoint[0] - 2.5), Util.round(startedge.currentpoint[1] - 2.5), Util.round(5),
+							Util.round(5));
 							Bigroi.setStrokeColor(Color.GREEN);
 							Bigroi.setStrokeWidth(0.8);
 

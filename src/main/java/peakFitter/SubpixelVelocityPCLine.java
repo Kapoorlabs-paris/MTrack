@@ -1,5 +1,6 @@
 package peakFitter;
 
+import java.awt.Color;
 import java.awt.Rectangle;
 import java.awt.geom.RoundRectangle2D;
 import java.io.FileWriter;
@@ -21,9 +22,12 @@ import LineModels.Gaussiansplinethirdorderfixedds;
 import LineModels.MTFitFunction;
 import LineModels.UseLineModel.UserChoiceModel;
 import graphconstructs.Trackproperties;
+import ij.gui.OvalRoi;
+import ij.gui.Overlay;
 import labeledObjects.CommonOutputHF;
 import labeledObjects.Indexedlength;
 import lineFinder.LinefinderHF;
+import mpicbg.imglib.util.Util;
 import net.imglib2.Cursor;
 import net.imglib2.FinalInterval;
 import net.imglib2.Point;
@@ -218,7 +222,6 @@ public class SubpixelVelocityPCLine extends BenchmarkAlgorithm
 
 			final double newstartslope = paramnextframestart.slope;
 			final double newstartintercept = paramnextframestart.intercept;
-
 
 			final Trackproperties startedge = new Trackproperties(framenumber, labelstart, oldstartpoint, newstartpoint,
 					newstartslope, newstartintercept, originalslope, originalintercept,

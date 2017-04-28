@@ -2,7 +2,8 @@ package peakFitter;
 
 
 
-	import java.awt.Rectangle;
+	import java.awt.Color;
+import java.awt.Rectangle;
 	import java.awt.geom.RoundRectangle2D;
 	import java.io.FileWriter;
 	import java.io.IOException;
@@ -23,11 +24,14 @@ import LineModels.MTFitFunction;
 	import LineModels.UseLineModel.UserChoiceModel;
 import graphconstructs.KalmanTrackproperties;
 import graphconstructs.Trackproperties;
-	import labeledObjects.CommonOutputHF;
+import ij.gui.OvalRoi;
+import ij.gui.Overlay;
+import labeledObjects.CommonOutputHF;
 import labeledObjects.Indexedlength;
 import labeledObjects.KalmanIndexedlength;
 	import lineFinder.LinefinderHF;
-	import net.imglib2.Cursor;
+import mpicbg.imglib.util.Util;
+import net.imglib2.Cursor;
 	import net.imglib2.FinalInterval;
 	import net.imglib2.Point;
 	import net.imglib2.PointSampleList;
@@ -60,7 +64,6 @@ import preProcessing.GetLocalmaxmin;
 		
 		private ArrayList<KalmanTrackproperties> startincurrframe;
 		private ArrayList<KalmanTrackproperties> endincurrframe;
-		
 		
 		private final double[] psf;
 	    private final boolean DoMask;
@@ -303,7 +306,7 @@ import preProcessing.GetLocalmaxmin;
 				final double newendslope = paramnextframeend.slope;
 				final double newendintercept = paramnextframeend.intercept;
 
-			
+				 
 				
 				final KalmanTrackproperties endedgePrevious = new KalmanTrackproperties(framenumber,labelend, size, oldendpoint, originalpoint,
 						oldstartslope, oldstartintercept, originalslopeend, originalinterceptend,

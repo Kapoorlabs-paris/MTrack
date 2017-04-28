@@ -4220,7 +4220,7 @@ public class Interactive_MTSingleChannel implements PlugIn {
 					if (showKalman) {
 						returnVectorKalman = FindlinesVia.LinefindingMethodHFKalman(groundframe, groundframepre,
 								PrevFrameparamKalman, minlength, thirdDimension, psf, newlineMser, userChoiceModel,
-								Domask, Kalmancount, Intensityratio, Inispacing, seedmap, jpb, thirdDimensionSize);
+								Domask, Kalmancount, Intensityratio, Inispacing, seedmap, jpb, thirdDimensionSize,preprocessedimp.getOverlay());
 						Accountedframes.add(FindlinesVia.getAccountedframes());
 					}
 
@@ -4255,7 +4255,7 @@ public class Interactive_MTSingleChannel implements PlugIn {
 					if (showKalman) {
 						returnVectorKalman = FindlinesVia.LinefindingMethodHFKalman(groundframe, groundframepre,
 								PrevFrameparamKalman, minlength, thirdDimension, psf, newlineHough, userChoiceModel,
-								Domask, Kalmancount, Intensityratio, Inispacing, seedmap, jpb, thirdDimensionSize);
+								Domask, Kalmancount, Intensityratio, Inispacing, seedmap, jpb, thirdDimensionSize,preprocessedimp.getOverlay());
 
 						Accountedframes.add(FindlinesVia.getAccountedframes());
 					}
@@ -4292,7 +4292,7 @@ public class Interactive_MTSingleChannel implements PlugIn {
 						returnVectorKalman = FindlinesVia.LinefindingMethodHFKalman(groundframe, groundframepre,
 								PrevFrameparamKalman, minlength, thirdDimension, psf, newlineMserwHough,
 								userChoiceModel, Domask, Kalmancount, Intensityratio, Inispacing, seedmap, jpb,
-								thirdDimensionSize);
+								thirdDimensionSize,preprocessedimp.getOverlay());
 
 						Accountedframes.add(FindlinesVia.getAccountedframes());
 
@@ -5277,7 +5277,7 @@ public class Interactive_MTSingleChannel implements PlugIn {
 					if (showKalman) {
 						returnVectorKalman = FindlinesVia.LinefindingMethodHFKalman(groundframe, groundframepre,
 								PrevFrameparamKalman, minlength, thirdDimension, psf, newlineMser, userChoiceModel,
-								Domask, Kalmancount, Intensityratio, Inispacing, seedmap, jpb, thirdDimensionSize);
+								Domask, Kalmancount, Intensityratio, Inispacing, seedmap, jpb, thirdDimensionSize,preprocessedimp.getOverlay());
 
 						Accountedframes.add(FindlinesVia.getAccountedframes());
 					}
@@ -5312,7 +5312,7 @@ public class Interactive_MTSingleChannel implements PlugIn {
 					if (showKalman) {
 						returnVectorKalman = FindlinesVia.LinefindingMethodHFKalman(groundframe, groundframepre,
 								PrevFrameparamKalman, minlength, thirdDimension, psf, newlineHough, userChoiceModel,
-								Domask, Kalmancount, Intensityratio, Inispacing, seedmap, jpb, thirdDimensionSize);
+								Domask, Kalmancount, Intensityratio, Inispacing, seedmap, jpb, thirdDimensionSize,preprocessedimp.getOverlay());
 						Accountedframes.add(FindlinesVia.getAccountedframes());
 					}
 
@@ -5348,7 +5348,7 @@ public class Interactive_MTSingleChannel implements PlugIn {
 						returnVectorKalman = FindlinesVia.LinefindingMethodHFKalman(groundframe, groundframepre,
 								PrevFrameparamKalman, minlength, thirdDimension, psf, newlineMserwHough,
 								userChoiceModel, Domask, Kalmancount, Intensityratio, Inispacing, seedmap, jpb,
-								thirdDimensionSize);
+								thirdDimensionSize,preprocessedimp.getOverlay());
 
 						Accountedframes.add(FindlinesVia.getAccountedframes());
 					}

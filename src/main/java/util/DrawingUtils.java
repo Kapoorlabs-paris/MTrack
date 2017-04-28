@@ -1,13 +1,27 @@
 package util;
 
+import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 
+import ij.ImagePlus;
+import ij.ImageStack;
 import ij.gui.EllipseRoi;
+import ij.gui.OvalRoi;
+import ij.gui.Roi;
+import ij.process.ColorProcessor;
+import kdTreeBlobs.FlagNode;
+import kdTreeBlobs.NNFlagsearchKDtree;
+import net.imglib2.KDTree;
+import net.imglib2.RandomAccessibleInterval;
+import net.imglib2.RealPoint;
 import net.imglib2.algorithm.componenttree.mser.Mser;
 import net.imglib2.algorithm.componenttree.mser.MserTree;
+import net.imglib2.img.display.imagej.ImageJFunctions;
 import net.imglib2.type.numeric.integer.UnsignedByteType;
+import net.imglib2.type.numeric.real.FloatType;
 import peakFitter.SortListbyproperty;
 
 public class DrawingUtils {
@@ -39,6 +53,44 @@ public class DrawingUtils {
 		final EllipseRoi ellipse = new EllipseRoi(x - dx, y - dy, x + dx, y + dy, scale2 / scale1);
 
 		return ellipse;
+	}
+	
+	
+	public static Roi getNearestRois(ArrayList<OvalRoi> Allrois, double[] Clickedpoint) {
+
+		Roi KDtreeroi = null;
+
+		final List<RealPoint> targetCoords = new ArrayList<RealPoint>(Allrois.size());
+		final List<FlagNode<Roi>> targetNodes = new ArrayList<FlagNode<Roi>>(Allrois.size());
+		for (int index = 0; index < Allrois.size(); ++index) {
+
+			 Roi r = Allrois.get(index);
+			 Rectangle rect = r.getBounds();
+			 
+			 targetCoords.add( new RealPoint(rect.x + rect.width/2.0, rect.y + rect.height/2.0 ) );
+			 
+
+			targetNodes.add(new FlagNode<Roi>(Allrois.get(index)));
+
+		}
+
+		if (targetNodes.size() > 0 && targetCoords.size() > 0) {
+
+			final KDTree<FlagNode<Roi>> Tree = new KDTree<FlagNode<Roi>>(targetNodes, targetCoords);
+
+			final NNFlagsearchKDtree<Roi> Search = new NNFlagsearchKDtree<Roi>(Tree);
+
+
+				final double[] source = Clickedpoint;
+				final RealPoint sourceCoords = new RealPoint(source);
+				Search.search(sourceCoords);
+				final FlagNode<Roi> targetNode = Search.getSampler().get();
+
+				KDtreeroi = targetNode.getValue();
+
+		}
+
+		return KDtreeroi;
 	}
 	
 	
