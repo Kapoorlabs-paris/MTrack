@@ -24,6 +24,7 @@ import LineModels.UseLineModel.UserChoiceModel;
 import graphconstructs.Trackproperties;
 import ij.gui.OvalRoi;
 import ij.gui.Overlay;
+import interactiveMT.Interactive_MTDoubleChannel.Whichend;
 import labeledObjects.CommonOutputHF;
 import labeledObjects.Indexedlength;
 import lineFinder.LinefinderHF;
@@ -61,7 +62,7 @@ public class SubpixelVelocityPCLine extends BenchmarkAlgorithm
 	public int Accountedframes;
 	private final double[] psf;
 	private final boolean DoMask;
-	private final HashMap<Integer, Boolean>  Trackstart;
+	private final HashMap<Integer, Whichend>  Trackstart;
 	private boolean Maskfail = false;
 	// LM solver iteration params
 	public int maxiter = 500;
@@ -134,7 +135,7 @@ public class SubpixelVelocityPCLine extends BenchmarkAlgorithm
 
 	public SubpixelVelocityPCLine(final RandomAccessibleInterval<FloatType> source, final LinefinderHF linefinder,
 			final ArrayList<Indexedlength> PrevFrameparamstart, final ArrayList<Indexedlength> PrevFrameparamend,
-			final double[] psf, final int framenumber, final UserChoiceModel model, final boolean DoMask, final HashMap<Integer, Boolean>  Trackstart, final JProgressBar jpb,
+			final double[] psf, final int framenumber, final UserChoiceModel model, final boolean DoMask, final HashMap<Integer, Whichend>  Trackstart, final JProgressBar jpb,
 			final int thirdDimsize) {
 
 		linefinder.checkInput();
@@ -188,7 +189,8 @@ public class SubpixelVelocityPCLine extends BenchmarkAlgorithm
 			
 			final int oldframenumber = PrevFrameparamstart.get(PrevFrameparamstart.size() - 1).framenumber;
 			final int framediff = framenumber - oldframenumber;
-			if (Trackstart.get(PrevFrameparamstart.get(index).seedLabel)){
+			if (Trackstart.get(PrevFrameparamstart.get(index).seedLabel) == Whichend.start
+					|| Trackstart.get(PrevFrameparamstart.get(index).seedLabel) == Whichend.both ){
 			percent = (Math.round(100 * (index + 1) / (PrevFrameparamstart.size())));
 			
 			final double originalslope = PrevFrameparamstart.get(index).originalslope;
@@ -240,7 +242,8 @@ public class SubpixelVelocityPCLine extends BenchmarkAlgorithm
 			final int oldframenumber = PrevFrameparamend.get(PrevFrameparamend.size() - 1).framenumber;
 			final int framediff = framenumber - oldframenumber;
 			
-			if (Trackstart.get(PrevFrameparamend.get(index).seedLabel) == false){
+			if (Trackstart.get(PrevFrameparamend.get(index).seedLabel) == Whichend.end 
+					|| Trackstart.get(PrevFrameparamend.get(index).seedLabel) == Whichend.both ){
 				
 				
 			percent = (Math.round(100 * (index + 1) / (PrevFrameparamend.size())));

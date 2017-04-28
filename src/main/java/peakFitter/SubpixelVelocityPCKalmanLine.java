@@ -26,6 +26,7 @@ import graphconstructs.KalmanTrackproperties;
 import graphconstructs.Trackproperties;
 import ij.gui.OvalRoi;
 import ij.gui.Overlay;
+import interactiveMT.Interactive_MTDoubleChannel.Whichend;
 import labeledObjects.CommonOutputHF;
 import labeledObjects.Indexedlength;
 import labeledObjects.KalmanIndexedlength;
@@ -77,7 +78,7 @@ import preProcessing.GetLocalmaxmin;
 		public int iterations = 500;
 		public double cutoffdistance = 5;
 		public boolean halfgaussian = false;
-		final HashMap<Integer, Boolean> Trackstart;
+		final HashMap<Integer, Whichend> Trackstart;
 		public double Intensityratio;
 		private final UserChoiceModel model;
 		public double Inispacing;
@@ -142,7 +143,7 @@ import preProcessing.GetLocalmaxmin;
 		public SubpixelVelocityPCKalmanLine(final RandomAccessibleInterval<FloatType> source, final LinefinderHF linefinder,
 				final ArrayList<KalmanIndexedlength> PrevFrameparamstart, final ArrayList<KalmanIndexedlength> PrevFrameparamend,
 				final double[] psf, final int framenumber, final UserChoiceModel model, final boolean DoMask, final int KalmanCount, 
-				final HashMap<Integer, Boolean>  Trackstart, final JProgressBar jpb,
+				final HashMap<Integer, Whichend>  Trackstart, final JProgressBar jpb,
 				final int thirdDimsize) {
 
 			linefinder.checkInput();
@@ -200,7 +201,8 @@ import preProcessing.GetLocalmaxmin;
 			for (int index = 0; index < PrevFrameparamstart.size(); ++index) {
 				final int oldframenumber = PrevFrameparamstart.get(PrevFrameparamstart.size() - 1).framenumber;
 				
-				if (Trackstart.get(PrevFrameparamstart.get(index).seedLabel)){
+				if (Trackstart.get(PrevFrameparamstart.get(index).seedLabel) == Whichend.start
+						|| Trackstart.get(PrevFrameparamstart.get(index).seedLabel) == Whichend.both){
 					
 					
 				percent = (Math.round(100 * (index + 1) / (PrevFrameparamstart.size())));
@@ -269,7 +271,8 @@ import preProcessing.GetLocalmaxmin;
 				
 				
 				
-				if (Trackstart.get(PrevFrameparamend.get(index).seedLabel) == false){
+				if (Trackstart.get(PrevFrameparamend.get(index).seedLabel) == Whichend.end 
+						|| Trackstart.get(PrevFrameparamend.get(index).seedLabel) == Whichend.both){
 					
 				percent = (Math.round(100 * (index + 1) / (PrevFrameparamend.size())));
 				Point secondlinepoint = new Point(ndims);

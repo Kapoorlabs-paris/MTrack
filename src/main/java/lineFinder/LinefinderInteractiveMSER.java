@@ -122,9 +122,7 @@ public class LinefinderInteractiveMSER  implements Linefinder{
 				final double[] covar = { ellipselist.get(index)[2], ellipselist.get(index)[3],
 						ellipselist.get(index)[4] };
 				ellipseroi = GetDelta.createEllipse(mean, covar, 3);
-	    		final double perimeter = ellipseroi.getLength();
-	    		final double smalleigenvalue = SmallerEigenvalue(mean, covar);
-	    	//	if (perimeter > 2 * Math.PI * minlength ){
+	    	
 	    			
 	    			Roiindex = count;
 	    			count++;
@@ -182,7 +180,7 @@ public class LinefinderInteractiveMSER  implements Linefinder{
 					
 				
 				slopeandintercept = LargestEigenvector(mean, covar);
-				if (slopeandintercept!= null){
+				
 				for (int d = 0; d < ndims; ++d){
 					slopeandinterceptCI[d] = slopeandintercept[d];
 					slopeandinterceptCI[d + ndims ] = 0;
@@ -191,10 +189,10 @@ public class LinefinderInteractiveMSER  implements Linefinder{
 				CommonOutput currentOutput = new CommonOutput(framenumber, Roiindex, slopeandinterceptCI, Roiimg, ActualRoiimg, interval);
 				
 				output.add(currentOutput);
-				}
+				
 				}
 				
-		//	}
+		
 
 		
 
@@ -228,7 +226,6 @@ public class LinefinderInteractiveMSER  implements Linefinder{
 	 */
 	public  double[] LargestEigenvector( final double[] mean, final double[] cov){
 		
-		// For inifinite slope lines support is provided
 		final double a = cov[0];
 		final double b = cov[1];
 		final double c = cov[2];
@@ -241,13 +238,10 @@ public class LinefinderInteractiveMSER  implements Linefinder{
         final double slope = LargerVec[1] / (LargerVec[0] );
         final double intercept = mean[1] - mean[0] * slope;
        
-        if (Math.abs(slope) != Double.POSITIVE_INFINITY){
         double[] pair = {slope, intercept};
         return pair;
       
-        }
-        else
-        	return null;
+     
        
         	 
        
