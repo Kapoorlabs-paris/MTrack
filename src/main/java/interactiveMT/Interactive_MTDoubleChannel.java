@@ -3382,29 +3382,36 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 				for (int index = 0; index < ClickedPoints.size(); ++index) {
 					for (int secindex = 0; secindex < PrevFrameparam.getA().size(); ++secindex) {
 
+						
+							
+							
 						if ((int) Math.abs(ClickedPoints.get(index)[0]
-								- PrevFrameparam.getA().get(secindex).fixedpos[0]) <= 1.0E-3)
+								- PrevFrameparam.getA().get(secindex).fixedpos[0]) <= 1.0E-3
+								&& seedmap.get(PrevFrameparam.getA().get(secindex).seedLabel) == null)
 
 							seedmap.put(PrevFrameparam.getA().get(secindex).seedLabel, Whichend.start);
 
-						if ((int) Math.abs(ClickedPoints.get(index)[0]
-								- PrevFrameparam.getB().get(secindex).fixedpos[0]) <= 1.0E-3)
+						else if ((int) Math.abs(ClickedPoints.get(index)[0]
+								- PrevFrameparam.getB().get(secindex).fixedpos[0]) <= 1.0E-3
+								&& seedmap.get(PrevFrameparam.getA().get(secindex).seedLabel) == null)
 
 							seedmap.put(PrevFrameparam.getA().get(secindex).seedLabel, Whichend.end);
 
-						if ((int) Math
-								.abs(ClickedPoints.get(index)[0] - PrevFrameparam.getA().get(secindex).fixedpos[0]) >= 5
-								&& (int) Math.abs(ClickedPoints.get(index)[0]
-										- PrevFrameparam.getB().get(secindex).fixedpos[0]) >= 5 
-										&& seedmap.get(PrevFrameparam.getA().get(secindex).seedLabel) == null)
+						else if ( seedmap.get(PrevFrameparam.getA().get(secindex).seedLabel) == null)
 							seedmap.put(PrevFrameparam.getA().get(secindex).seedLabel, Whichend.none);
 
-						if ((int) Math.abs(
-								ClickedPoints.get(index)[0] - PrevFrameparam.getA().get(secindex).fixedpos[0]) <= 1.0E-3
-								&& (int) Math.abs(ClickedPoints.get(index)[0]
-										- PrevFrameparam.getB().get(secindex).fixedpos[0]) <= 1.0E-3)
+						
 
+						else if ((int) Math.abs(ClickedPoints.get(index)[0]
+								- PrevFrameparam.getA().get(secindex).fixedpos[0]) <= 1.0E-3
+								&& seedmap.get(PrevFrameparam.getA().get(secindex).seedLabel) != null )
 							seedmap.put(PrevFrameparam.getA().get(secindex).seedLabel, Whichend.both);
+						
+						else if ((int) Math.abs(ClickedPoints.get(index)[0]
+								- PrevFrameparam.getB().get(secindex).fixedpos[0]) <= 1.0E-3
+								&& seedmap.get(PrevFrameparam.getA().get(secindex).seedLabel) != null )
+							seedmap.put(PrevFrameparam.getA().get(secindex).seedLabel, Whichend.both);
+						
 
 						System.out.println(seedmap.get(PrevFrameparam.getA().get(secindex).seedLabel));
 					}
