@@ -245,8 +245,8 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	int maxSizeInit = 500;
 
 	float thresholdHoughInit = 100;
-	float rhoPerPixelInit = new Float(0.5);
-	float thetaPerPixelInit = new Float(0.5);
+	float rhoPerPixelInit = new Float(1);
+	float thetaPerPixelInit = new Float(1);
 	JLabel inputMaxdpixel;
 	JLabel inputMaxdmicro;
 	private TextField Maxdpixel, Maxdmicro;
@@ -284,7 +284,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	boolean update = false;
 	boolean Canny = false;
 	boolean showKalman = false;
-	boolean showDeterministic = false;
+	boolean showDeterministic = true;
 	boolean RoisViaMSER = false;
 	boolean RoisViaWatershed = false;
 	boolean displayTree = false;
@@ -295,7 +295,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	boolean Domask = false;
 	boolean DoRloop = false;
 	boolean SaveTxt = true;
-	boolean SaveXLS = true;
+	boolean SaveXLS = false;
 	boolean finalpoint = false;
 	boolean Trackstart;
 	int nbRois;
@@ -329,7 +329,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public float maxSearchradiusMax = 500;
 
 	public int missedframesInit = missedframes;
-	public float missedframesMin = 0;
+	public float missedframesMin = 10;
 	public float missedframesMax = 100;
 	Overlay overlay;
 	HashMap<Integer, Boolean> whichend = new HashMap<Integer, Boolean>();
@@ -357,7 +357,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	int inix = 20;
 	int iniy = 20;
 	double[] calibration;
-	double radiusfactor = 0.8;
+	double radiusfactor = 1;
 	MserTree<UnsignedByteType> newtree;
 	// Image 2d at the current slice
 	RandomAccessibleInterval<FloatType> currentimg;
@@ -385,6 +385,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	Pair<ArrayList<KalmanIndexedlength>, ArrayList<KalmanIndexedlength>> PrevFrameparamKalman;
 	Pair<ArrayList<KalmanIndexedlength>, ArrayList<KalmanIndexedlength>> NewFrameparamKalman;
 	Pair<Pair<ArrayList<KalmanTrackproperties>, ArrayList<KalmanTrackproperties>>, Pair<ArrayList<KalmanIndexedlength>, ArrayList<KalmanIndexedlength>>> returnVectorKalman;
+	NumberFormat nf = NumberFormat.getInstance(Locale.ENGLISH);
 
 	ArrayList<CommonOutputHF> output;
 	ImageStack prestack;
@@ -644,9 +645,12 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		UserchosenCostFunction = new SquareDistCostFunction();
 		Inispacing = 0.5 * Math.min(psf[0], psf[1]);
 		count = 0;
-
+		nf.setMaximumFractionDigits(3);
 		setInitialmaxVar(maxVarInit);
 		setInitialDelta(deltaInit);
+		setInitialrhoPerPixel(rhoPerPixelInit);
+		setInitialthetaPerPixel(thetaPerPixelInit);
+		setInitialthresholdHough(thresholdHoughInit);
 
 		if (originalimg.numDimensions() < 3) {
 
@@ -1224,10 +1228,9 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 		final Button RemoveFast = new Button("Remove wrongly selected ends");
 		final Checkbox Finalize = new Checkbox("Confirm the dynamic seed end (s)");
-		final Label MTTextHF = new Label("Update method and parameters for the dynamic channel)", Label.CENTER);
+		final Label MTTextHF = new Label("Select ends for tracking", Label.CENTER);
 		final Label Step3 = new Label("Step 3", Label.CENTER);
 		final Checkbox txtfile = new Checkbox("Save tracks as TXT file", SaveTxt);
-		final Checkbox xlsfile = new Checkbox("Save tracks as XLS file", SaveXLS);
 
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridx = 0;
@@ -1275,7 +1278,6 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 		++c.gridy;
 		c.insets = new Insets(10, 10, 0, 0);
-		panelThird.add(xlsfile, c);
 		MoveNext.addActionListener(new moveNextListener());
 		JumptoFrame.addActionListener(new moveToFrameListener());
 		RemoveFast.addActionListener(new removeendListener());
@@ -1288,7 +1290,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 		txtfile.addItemListener(new SaveasTXT());
 		Finalize.addItemListener(new finalpoint());
-		xlsfile.addItemListener(new SaveasXLS());
+		// xlsfile.addItemListener(new SaveasXLS());
 
 		MTText.setFont(MTText.getFont().deriveFont(Font.BOLD));
 		Pre.setBackground(new Color(1, 0, 1));
@@ -1301,41 +1303,37 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 		if (analyzekymo == false && Kymoimg == null) {
 
-			final Label Step6 = new Label("Step 6", Label.CENTER);
-			panelSixth.setLayout(layout);
-
-			c.fill = GridBagConstraints.HORIZONTAL;
-			c.gridx = 0;
-			c.gridy = 0;
-			c.weightx = 1;
-			panelSixth.add(Step6, c);
-			final Checkbox KalmanTracker = new Checkbox("Use Kalman Filter for tracking");
-			final Checkbox DeterTracker = new Checkbox("Use Deterministic method for tracking");
-			final Label Kal = new Label("Use Kalman Filter for probabilistic tracking");
-			final Label Det = new Label("Use Deterministic tracker using the fixed Seed points");
-			Kal.setBackground(new Color(1, 0, 1));
-			Kal.setForeground(new Color(255, 255, 255));
-			Det.setBackground(new Color(1, 0, 1));
-			Det.setForeground(new Color(255, 255, 255));
-
-			++c.gridy;
-			c.insets = new Insets(10, 10, 0, 50);
-			panelSixth.add(Kal, c);
-
-			++c.gridy;
-			c.insets = new Insets(10, 10, 0, 50);
-			panelSixth.add(KalmanTracker, c);
-
-			++c.gridy;
-			c.insets = new Insets(10, 10, 0, 50);
-			panelSixth.add(Det, c);
-
-			++c.gridy;
-			c.insets = new Insets(10, 10, 0, 50);
-			panelSixth.add(DeterTracker, c);
-
-			KalmanTracker.addItemListener(new KalmanchoiceListener());
-			DeterTracker.addItemListener(new DeterchoiceListener());
+			/*
+			 * final Label Step6 = new Label("Step 6", Label.CENTER);
+			 * panelSixth.setLayout(layout);
+			 * 
+			 * c.fill = GridBagConstraints.HORIZONTAL; c.gridx = 0; c.gridy = 0;
+			 * c.weightx = 1; panelSixth.add(Step6, c); // final Checkbox
+			 * KalmanTracker = new Checkbox("Use Kalman Filter for tracking");
+			 * final Checkbox DeterTracker = new Checkbox(
+			 * "Use Deterministic method for tracking"); // final Label Kal =
+			 * new Label("Use Kalman Filter for probabilistic tracking"); final
+			 * Label Det = new Label(
+			 * "Use Deterministic tracker using the fixed Seed points"); //
+			 * Kal.setBackground(new Color(1, 0, 1)); // Kal.setForeground(new
+			 * Color(255, 255, 255)); Det.setBackground(new Color(1, 0, 1));
+			 * Det.setForeground(new Color(255, 255, 255));
+			 * 
+			 * // ++c.gridy; // c.insets = new Insets(10, 10, 0, 50); //
+			 * panelSixth.add(Kal, c);
+			 * 
+			 * // ++c.gridy; // c.insets = new Insets(10, 10, 0, 50); //
+			 * panelSixth.add(KalmanTracker, c);
+			 * 
+			 * ++c.gridy; c.insets = new Insets(10, 10, 0, 50);
+			 * panelSixth.add(Det, c);
+			 * 
+			 * ++c.gridy; c.insets = new Insets(10, 10, 0, 50);
+			 * panelSixth.add(DeterTracker, c);
+			 * 
+			 * // KalmanTracker.addItemListener(new KalmanchoiceListener());
+			 * DeterTracker.addItemListener(new DeterchoiceListener());
+			 */
 		}
 
 		panelNinth.setLayout(layout);
@@ -1498,176 +1496,179 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		}
 	}
 
-	protected class KymoExtractListener implements ItemListener {
+	public void Kymo() {
+
+		final GridBagLayout layout = new GridBagLayout();
+		final GridBagConstraints c = new GridBagConstraints();
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 0;
+		c.gridy = 0;
+		c.weightx = 1;
+
+		RoiManager roimanager = RoiManager.getInstance();
+
+		if (roimanager != null) {
+
+			roimanager.close();
+			roimanager = new RoiManager();
+
+		}
+
+		panelFifth.removeAll();
+		final Label Step5 = new Label("Step 5", Label.CENTER);
+		panelFifth.setLayout(layout);
+		panelFifth.add(Step5, c);
+		if (Kymoimg != null)
+			Kymoimp = ImageJFunctions.show(Kymoimg);
+		final Label Select = new Label(
+				"Make Segmented Line selection (Generates a file containing time (row 1) and length (row 2))");
+		final Button ExtractKymo = new Button("Extract Mask Co-ordinates :");
+		Select.setBackground(new Color(1, 0, 1));
+		Select.setForeground(new Color(255, 255, 255));
+
+		final Label Checkres = new Label("The tracker now performs an internal check on the results");
+		Checkres.setBackground(new Color(1, 0, 1));
+		Checkres.setForeground(new Color(255, 255, 255));
+
+		if (analyzekymo) {
+
+			++c.gridy;
+			c.insets = new Insets(10, 10, 0, 0);
+			panelFifth.add(Select, c);
+
+			++c.gridy;
+			c.insets = new Insets(10, 10, 0, 200);
+			panelFifth.add(ExtractKymo, c);
+
+			ExtractKymo.addActionListener(new GetCords());
+
+		}
+
+		if (showDeterministic) {
+			final Button TrackEndPoints = new Button("Track EndPoints (From first to a chosen last frame)");
+			final Button SkipframeandTrackEndPoints = new Button("TrackEndPoint (User specified first and last frame)");
+			final Button CheckResults = new Button("Check Results (then click next)");
+
+			++c.gridy;
+			c.insets = new Insets(10, 10, 0, 175);
+			panelFifth.add(TrackEndPoints, c);
+
+			++c.gridy;
+			c.insets = new Insets(10, 10, 0, 175);
+			panelFifth.add(SkipframeandTrackEndPoints, c);
+
+			if (analyzekymo && Kymoimg != null) {
+				++c.gridy;
+				c.insets = new Insets(10, 10, 0, 0);
+				panelFifth.add(Checkres, c);
+
+				++c.gridy;
+				c.insets = new Insets(10, 175, 0, 175);
+				panelFifth.add(CheckResults, c);
+
+			}
+
+			TrackEndPoints.addActionListener(new TrackendsListener());
+			SkipframeandTrackEndPoints.addActionListener(new SkipFramesandTrackendsListener());
+			CheckResults.addActionListener(new CheckResultsListener());
+
+		}
+
+		if (showKalman) {
+			final Scrollbar rad = new Scrollbar(Scrollbar.HORIZONTAL, initialSearchradiusInit, 10, 0,
+					10 + scrollbarSize);
+			initialSearchradius = computeValueFromScrollbarPosition(initialSearchradiusInit, initialSearchradiusMin,
+					initialSearchradiusMax, scrollbarSize);
+
+			final Label SearchText = new Label("Initial Search Radius: " + initialSearchradius, Label.CENTER);
+
+			++c.gridy;
+			c.insets = new Insets(10, 10, 0, 50);
+			panelFifth.add(SearchText, c);
+			++c.gridy;
+			c.insets = new Insets(10, 10, 0, 50);
+			panelFifth.add(rad, c);
+
+			final Scrollbar Maxrad = new Scrollbar(Scrollbar.HORIZONTAL, maxSearchradiusInit, 10, 0,
+					10 + scrollbarSize);
+			maxSearchradius = computeValueFromScrollbarPosition(maxSearchradiusInit, maxSearchradiusMin,
+					maxSearchradiusMax, scrollbarSize);
+			final Label MaxMovText = new Label("Max Movment of Objects per frame: " + maxSearchradius, Label.CENTER);
+			++c.gridy;
+			c.insets = new Insets(10, 10, 0, 50);
+			panelFifth.add(MaxMovText, c);
+			++c.gridy;
+			c.insets = new Insets(10, 10, 0, 50);
+			panelFifth.add(Maxrad, c);
+
+			final Scrollbar Miss = new Scrollbar(Scrollbar.HORIZONTAL, missedframesInit, 10, 0, 10 + scrollbarSize);
+			Miss.setBlockIncrement(1);
+			missedframes = (int) computeValueFromScrollbarPosition(missedframesInit, missedframesMin, missedframesMax,
+					scrollbarSize);
+			final Label LostText = new Label("Objects allowed to be lost for #frames" + missedframes, Label.CENTER);
+			++c.gridy;
+			c.insets = new Insets(10, 10, 0, 50);
+			panelFifth.add(LostText, c);
+			++c.gridy;
+			c.insets = new Insets(10, 10, 0, 50);
+			panelFifth.add(Miss, c);
+
+			final Checkbox Costfunc = new Checkbox("Squared Distance Cost Function");
+			// ++c.gridy;
+			// c.insets = new Insets(10, 10, 0, 50);
+			// panelFifth.add(Costfunc, c);
+
+			rad.addAdjustmentListener(
+					new SearchradiusListener(SearchText, initialSearchradiusMin, initialSearchradiusMax));
+			Maxrad.addAdjustmentListener(
+					new maxSearchradiusListener(MaxMovText, maxSearchradiusMin, maxSearchradiusMax));
+			Miss.addAdjustmentListener(new missedFrameListener(LostText, missedframesMin, missedframesMax));
+
+			// Costfunc.addItemListener(new CostfunctionListener());
+
+			MTtrackerstart = new KFsearch(AllstartKalman, UserchosenCostFunction, maxSearchradius, initialSearchradius,
+					thirdDimension, thirdDimensionSize, missedframes);
+
+			MTtrackerend = new KFsearch(AllendKalman, UserchosenCostFunction, maxSearchradius, initialSearchradius,
+					thirdDimension, thirdDimensionSize, missedframes);
+
+			final Button TrackEndPoints = new Button("Track EndPoints (From first to a chosen last frame)");
+			final Button SkipframeandTrackEndPoints = new Button("TrackEndPoint (User specified first and last frame)");
+			final Button CheckResults = new Button("Check Results (then click next)");
+
+			++c.gridy;
+			c.insets = new Insets(10, 10, 0, 175);
+			panelFifth.add(TrackEndPoints, c);
+
+			++c.gridy;
+			c.insets = new Insets(10, 10, 0, 175);
+			panelFifth.add(SkipframeandTrackEndPoints, c);
+
+			++c.gridy;
+			c.insets = new Insets(10, 10, 0, 0);
+			panelFifth.add(Checkres, c);
+
+			++c.gridy;
+			c.insets = new Insets(10, 175, 0, 175);
+			panelFifth.add(CheckResults, c);
+
+			TrackEndPoints.addActionListener(new TrackendsListener());
+			SkipframeandTrackEndPoints.addActionListener(new SkipFramesandTrackendsListener());
+			CheckResults.addActionListener(new CheckResultsListener());
+
+		}
+		panelFifth.repaint();
+		panelFifth.validate();
+		Cardframe.pack();
+	}
+
+	protected class AnalyzekymoListener implements ItemListener {
 
 		@Override
 		public void itemStateChanged(ItemEvent arg0) {
 
-			final GridBagLayout layout = new GridBagLayout();
-			final GridBagConstraints c = new GridBagConstraints();
-			c.fill = GridBagConstraints.HORIZONTAL;
-			c.gridx = 0;
-			c.gridy = 0;
-			c.weightx = 1;
+			Kymo();
 
-			RoiManager roimanager = RoiManager.getInstance();
-
-			if (roimanager != null) {
-
-				roimanager.close();
-				roimanager = new RoiManager();
-
-			}
-
-			panelSeventh.removeAll();
-			final Label Step7 = new Label("Step 7", Label.CENTER);
-			panelSeventh.setLayout(layout);
-			panelSeventh.add(Step7, c);
-			if (Kymoimg != null)
-				Kymoimp = ImageJFunctions.show(Kymoimg);
-			final Label Select = new Label(
-					"Make Segmented Line selection (Generates a file containing time (row 1) and length (row 2))");
-			final Button ExtractKymo = new Button("Extract Mask Co-ordinates :");
-			Select.setBackground(new Color(1, 0, 1));
-			Select.setForeground(new Color(255, 255, 255));
-
-			final Label Checkres = new Label("The tracker now performs an internal check on the results");
-			Checkres.setBackground(new Color(1, 0, 1));
-			Checkres.setForeground(new Color(255, 255, 255));
-
-			if (analyzekymo) {
-
-				++c.gridy;
-				c.insets = new Insets(10, 10, 0, 0);
-				panelSeventh.add(Select, c);
-
-				++c.gridy;
-				c.insets = new Insets(10, 10, 0, 200);
-				panelSeventh.add(ExtractKymo, c);
-
-				ExtractKymo.addActionListener(new GetCords());
-
-			}
-
-			if (showDeterministic) {
-				final Button TrackEndPoints = new Button("Track EndPoints (From first to a chosen last frame)");
-				final Button SkipframeandTrackEndPoints = new Button(
-						"TrackEndPoint (User specified first and last frame)");
-				final Button CheckResults = new Button("Check Results (then click next)");
-
-				++c.gridy;
-				c.insets = new Insets(10, 10, 0, 175);
-				panelSeventh.add(TrackEndPoints, c);
-
-				++c.gridy;
-				c.insets = new Insets(10, 10, 0, 175);
-				panelSeventh.add(SkipframeandTrackEndPoints, c);
-
-				if (analyzekymo && Kymoimg != null) {
-					++c.gridy;
-					c.insets = new Insets(10, 10, 0, 0);
-					panelSeventh.add(Checkres, c);
-
-					++c.gridy;
-					c.insets = new Insets(10, 175, 0, 175);
-					panelSeventh.add(CheckResults, c);
-
-				}
-
-				TrackEndPoints.addActionListener(new TrackendsListener());
-				SkipframeandTrackEndPoints.addActionListener(new SkipFramesandTrackendsListener());
-				CheckResults.addActionListener(new CheckResultsListener());
-
-			}
-
-			if (showKalman) {
-				final Scrollbar rad = new Scrollbar(Scrollbar.HORIZONTAL, initialSearchradiusInit, 10, 0,
-						10 + scrollbarSize);
-				initialSearchradius = computeValueFromScrollbarPosition(initialSearchradiusInit, initialSearchradiusMin,
-						initialSearchradiusMax, scrollbarSize);
-
-				final Label SearchText = new Label("Initial Search Radius: " + initialSearchradius, Label.CENTER);
-
-				++c.gridy;
-				c.insets = new Insets(10, 10, 0, 50);
-				panelSeventh.add(SearchText, c);
-				++c.gridy;
-				c.insets = new Insets(10, 10, 0, 50);
-				panelSeventh.add(rad, c);
-
-				final Scrollbar Maxrad = new Scrollbar(Scrollbar.HORIZONTAL, maxSearchradiusInit, 10, 0,
-						10 + scrollbarSize);
-				maxSearchradius = computeValueFromScrollbarPosition(maxSearchradiusInit, maxSearchradiusMin,
-						maxSearchradiusMax, scrollbarSize);
-				final Label MaxMovText = new Label("Max Movment of Objects per frame: " + maxSearchradius,
-						Label.CENTER);
-				++c.gridy;
-				c.insets = new Insets(10, 10, 0, 50);
-				panelSeventh.add(MaxMovText, c);
-				++c.gridy;
-				c.insets = new Insets(10, 10, 0, 50);
-				panelSeventh.add(Maxrad, c);
-
-				final Scrollbar Miss = new Scrollbar(Scrollbar.HORIZONTAL, missedframesInit, 10, 0, 10 + scrollbarSize);
-				Miss.setBlockIncrement(1);
-				missedframes = (int) computeValueFromScrollbarPosition(missedframesInit, missedframesMin,
-						missedframesMax, scrollbarSize);
-				final Label LostText = new Label("Objects allowed to be lost for #frames" + missedframes, Label.CENTER);
-				++c.gridy;
-				c.insets = new Insets(10, 10, 0, 50);
-				panelSeventh.add(LostText, c);
-				++c.gridy;
-				c.insets = new Insets(10, 10, 0, 50);
-				panelSeventh.add(Miss, c);
-
-				final Checkbox Costfunc = new Checkbox("Squared Distance Cost Function");
-				// ++c.gridy;
-				// c.insets = new Insets(10, 10, 0, 50);
-				// panelSeventh.add(Costfunc, c);
-
-				rad.addAdjustmentListener(
-						new SearchradiusListener(SearchText, initialSearchradiusMin, initialSearchradiusMax));
-				Maxrad.addAdjustmentListener(
-						new maxSearchradiusListener(MaxMovText, maxSearchradiusMin, maxSearchradiusMax));
-				Miss.addAdjustmentListener(new missedFrameListener(LostText, missedframesMin, missedframesMax));
-
-				// Costfunc.addItemListener(new CostfunctionListener());
-
-				MTtrackerstart = new KFsearch(AllstartKalman, UserchosenCostFunction, maxSearchradius,
-						initialSearchradius, thirdDimension, thirdDimensionSize, missedframes);
-
-				MTtrackerend = new KFsearch(AllendKalman, UserchosenCostFunction, maxSearchradius, initialSearchradius,
-						thirdDimension, thirdDimensionSize, missedframes);
-
-				final Button TrackEndPoints = new Button("Track EndPoints (From first to a chosen last frame)");
-				final Button SkipframeandTrackEndPoints = new Button(
-						"TrackEndPoint (User specified first and last frame)");
-				final Button CheckResults = new Button("Check Results (then click next)");
-
-				++c.gridy;
-				c.insets = new Insets(10, 10, 0, 175);
-				panelSeventh.add(TrackEndPoints, c);
-
-				++c.gridy;
-				c.insets = new Insets(10, 10, 0, 175);
-				panelSeventh.add(SkipframeandTrackEndPoints, c);
-
-				++c.gridy;
-				c.insets = new Insets(10, 10, 0, 0);
-				panelSeventh.add(Checkres, c);
-
-				++c.gridy;
-				c.insets = new Insets(10, 175, 0, 175);
-				panelSeventh.add(CheckResults, c);
-
-				TrackEndPoints.addActionListener(new TrackendsListener());
-				SkipframeandTrackEndPoints.addActionListener(new SkipFramesandTrackendsListener());
-				CheckResults.addActionListener(new CheckResultsListener());
-
-			}
-			panelSeventh.repaint();
-			panelSeventh.validate();
-			Cardframe.pack();
 		}
 
 	}
@@ -1786,6 +1787,67 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 	}
 
+	public void Deterministic() {
+
+		showDeterministic = true;
+		final GridBagLayout layout = new GridBagLayout();
+		final GridBagConstraints c = new GridBagConstraints();
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 0;
+		c.gridy = 0;
+		c.weightx = 1;
+
+		RoiManager roimanager = RoiManager.getInstance();
+
+		if (roimanager != null) {
+
+			roimanager.close();
+			roimanager = new RoiManager();
+
+		}
+		panelFifth.removeAll();
+
+		final Label Step5 = new Label("Step 5", Label.CENTER);
+		panelFifth.setLayout(layout);
+		panelFifth.add(Step5, c);
+		final Button TrackEndPoints = new Button("Track EndPoints (From first to a chosen last frame)");
+		final Button SkipframeandTrackEndPoints = new Button("TrackEndPoint (User specified first and last frame)");
+		final Button CheckResults = new Button("Check Results (then click next)");
+		final Checkbox RoughResults = new Checkbox("Rates and Statistical Analysis");
+
+		final Label Checkres = new Label("The tracker now performs an internal check on the results");
+		Checkres.setBackground(new Color(1, 0, 1));
+		Checkres.setForeground(new Color(255, 255, 255));
+		++c.gridy;
+		c.insets = new Insets(10, 10, 0, 175);
+		panelFifth.add(TrackEndPoints, c);
+
+		++c.gridy;
+		c.insets = new Insets(10, 10, 0, 175);
+		panelFifth.add(SkipframeandTrackEndPoints, c);
+		if (analyzekymo && Kymoimg != null) {
+			++c.gridy;
+			c.insets = new Insets(10, 10, 0, 0);
+			panelFifth.add(Checkres, c);
+
+			++c.gridy;
+			c.insets = new Insets(10, 175, 0, 175);
+			panelFifth.add(CheckResults, c);
+		}
+		++c.gridy;
+		c.insets = new Insets(10, 10, 0, 175);
+		panelFifth.add(RoughResults, c);
+
+		TrackEndPoints.addActionListener(new TrackendsListener());
+		SkipframeandTrackEndPoints.addActionListener(new SkipFramesandTrackendsListener());
+		CheckResults.addActionListener(new CheckResultsListener());
+		RoughResults.addItemListener(new AcceptResultsListener());
+		panelFifth.repaint();
+		panelFifth.validate();
+		Cardframe.pack();
+
+	}
+
 	protected class DeterchoiceListener implements ItemListener {
 		@Override
 		public void itemStateChanged(ItemEvent arg0) {
@@ -1793,67 +1855,125 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 				showDeterministic = false;
 			else if (arg0.getStateChange() == ItemEvent.SELECTED) {
 
-				showDeterministic = true;
-				final GridBagLayout layout = new GridBagLayout();
-				final GridBagConstraints c = new GridBagConstraints();
-				c.fill = GridBagConstraints.HORIZONTAL;
-				c.gridx = 0;
-				c.gridy = 0;
-				c.weightx = 1;
-
-				RoiManager roimanager = RoiManager.getInstance();
-
-				if (roimanager != null) {
-
-					roimanager.close();
-					roimanager = new RoiManager();
-
-				}
-				panelSeventh.removeAll();
-
-				final Label Step7 = new Label("Step 7", Label.CENTER);
-				panelSeventh.setLayout(layout);
-				panelSeventh.add(Step7, c);
-				final Button TrackEndPoints = new Button("Track EndPoints (From first to a chosen last frame)");
-				final Button SkipframeandTrackEndPoints = new Button(
-						"TrackEndPoint (User specified first and last frame)");
-				final Button CheckResults = new Button("Check Results (then click next)");
-				final Checkbox RoughResults = new Checkbox("Rates and Statistical Analysis");
-
-				final Label Checkres = new Label("The tracker now performs an internal check on the results");
-				Checkres.setBackground(new Color(1, 0, 1));
-				Checkres.setForeground(new Color(255, 255, 255));
-				++c.gridy;
-				c.insets = new Insets(10, 10, 0, 175);
-				panelSeventh.add(TrackEndPoints, c);
-
-				++c.gridy;
-				c.insets = new Insets(10, 10, 0, 175);
-				panelSeventh.add(SkipframeandTrackEndPoints, c);
-				if (analyzekymo && Kymoimg != null) {
-					++c.gridy;
-					c.insets = new Insets(10, 10, 0, 0);
-					panelSeventh.add(Checkres, c);
-
-					++c.gridy;
-					c.insets = new Insets(10, 175, 0, 175);
-					panelSeventh.add(CheckResults, c);
-				}
-				++c.gridy;
-				c.insets = new Insets(10, 10, 0, 175);
-				panelSeventh.add(RoughResults, c);
-
-				TrackEndPoints.addActionListener(new TrackendsListener());
-				SkipframeandTrackEndPoints.addActionListener(new SkipFramesandTrackendsListener());
-				CheckResults.addActionListener(new CheckResultsListener());
-				RoughResults.addItemListener(new AcceptResultsListener());
-				panelSeventh.repaint();
-				panelSeventh.validate();
-				Cardframe.pack();
-
+				Deterministic();
 			}
 
 		}
+	}
+
+	public void Kalman() {
+
+		showKalman = true;
+		final GridBagLayout layout = new GridBagLayout();
+		final GridBagConstraints c = new GridBagConstraints();
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 0;
+		c.gridy = 0;
+		c.weightx = 1;
+
+		RoiManager roimanager = RoiManager.getInstance();
+
+		if (roimanager != null) {
+
+			roimanager.close();
+			roimanager = new RoiManager();
+
+		}
+
+		panelFifth.removeAll();
+		final Label Step5 = new Label("Step 5", Label.CENTER);
+		panelFifth.setLayout(layout);
+		panelFifth.add(Step5, c);
+		final Scrollbar rad = new Scrollbar(Scrollbar.HORIZONTAL, initialSearchradiusInit, 10, 0, 10 + scrollbarSize);
+		initialSearchradius = computeValueFromScrollbarPosition(initialSearchradiusInit, initialSearchradiusMin,
+				initialSearchradiusMax, scrollbarSize);
+
+		final Label SearchText = new Label("Initial Search Radius: " + initialSearchradius, Label.CENTER);
+
+		++c.gridy;
+		c.insets = new Insets(10, 10, 0, 50);
+		panelFifth.add(SearchText, c);
+		++c.gridy;
+		c.insets = new Insets(10, 10, 0, 50);
+		panelFifth.add(rad, c);
+
+		final Scrollbar Maxrad = new Scrollbar(Scrollbar.HORIZONTAL, maxSearchradiusInit, 10, 0, 10 + scrollbarSize);
+		maxSearchradius = computeValueFromScrollbarPosition(maxSearchradiusInit, maxSearchradiusMin, maxSearchradiusMax,
+				scrollbarSize);
+		final Label MaxMovText = new Label("Max Movment of Objects per frame: " + maxSearchradius, Label.CENTER);
+		++c.gridy;
+		c.insets = new Insets(10, 10, 0, 50);
+		panelFifth.add(MaxMovText, c);
+		++c.gridy;
+		c.insets = new Insets(10, 10, 0, 50);
+		panelFifth.add(Maxrad, c);
+
+		final Scrollbar Miss = new Scrollbar(Scrollbar.HORIZONTAL, missedframesInit, 10, 0, 10 + scrollbarSize);
+		Miss.setBlockIncrement(1);
+		missedframes = (int) computeValueFromScrollbarPosition(missedframesInit, missedframesMin, missedframesMax,
+				scrollbarSize);
+		final Label LostText = new Label("Objects allowed to be lost for #frames" + missedframes, Label.CENTER);
+		++c.gridy;
+		c.insets = new Insets(10, 10, 0, 50);
+		panelFifth.add(LostText, c);
+		++c.gridy;
+		c.insets = new Insets(10, 10, 0, 50);
+		panelFifth.add(Miss, c);
+
+		// final Checkbox Costfunc = new Checkbox("Squared Distance Cost
+		// Function");
+		// ++c.gridy;
+		// c.insets = new Insets(10, 10, 0, 50);
+		// panelFifth.add(Costfunc, c);
+
+		rad.addAdjustmentListener(new SearchradiusListener(SearchText, initialSearchradiusMin, initialSearchradiusMax));
+		Maxrad.addAdjustmentListener(new maxSearchradiusListener(MaxMovText, maxSearchradiusMin, maxSearchradiusMax));
+		Miss.addAdjustmentListener(new missedFrameListener(LostText, missedframesMin, missedframesMax));
+
+		// Costfunc.addItemListener(new CostfunctionListener());
+
+		MTtrackerstart = new KFsearch(AllstartKalman, UserchosenCostFunction, maxSearchradius, initialSearchradius,
+				thirdDimension, thirdDimensionSize, missedframes);
+
+		MTtrackerend = new KFsearch(AllendKalman, UserchosenCostFunction, maxSearchradius, initialSearchradius,
+				thirdDimension, thirdDimensionSize, missedframes);
+
+		final Button TrackEndPoints = new Button("Track EndPoints (From first to a chosen last frame)");
+		final Button SkipframeandTrackEndPoints = new Button("TrackEndPoint (User specified first and last frame)");
+		final Button CheckResults = new Button("Check Results (then click next)");
+		final Checkbox RoughResults = new Checkbox("Analyze Rates");
+		final Label Checkres = new Label("The tracker now performs an internal check on the results");
+		Checkres.setBackground(new Color(1, 0, 1));
+		Checkres.setForeground(new Color(255, 255, 255));
+		++c.gridy;
+		c.insets = new Insets(10, 10, 0, 175);
+		panelFifth.add(TrackEndPoints, c);
+
+		++c.gridy;
+		c.insets = new Insets(10, 10, 0, 175);
+		panelFifth.add(SkipframeandTrackEndPoints, c);
+		if (analyzekymo && Kymoimg != null) {
+			++c.gridy;
+			c.insets = new Insets(10, 10, 0, 0);
+			panelFifth.add(Checkres, c);
+
+			++c.gridy;
+			c.insets = new Insets(10, 175, 0, 175);
+			panelFifth.add(CheckResults, c);
+		}
+		++c.gridy;
+		c.insets = new Insets(10, 175, 0, 175);
+		panelFifth.add(RoughResults, c);
+
+		TrackEndPoints.addActionListener(new TrackendsListener());
+		SkipframeandTrackEndPoints.addActionListener(new SkipFramesandTrackendsListener());
+		CheckResults.addActionListener(new CheckResultsListener());
+		RoughResults.addItemListener(new AcceptResultsListener());
+
+		panelFifth.repaint();
+		panelFifth.validate();
+		Cardframe.pack();
+
 	}
 
 	protected class KalmanchoiceListener implements ItemListener {
@@ -1866,121 +1986,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 			} else if (arg0.getStateChange() == ItemEvent.SELECTED) {
 
 				showKalman = true;
-				final GridBagLayout layout = new GridBagLayout();
-				final GridBagConstraints c = new GridBagConstraints();
-				c.fill = GridBagConstraints.HORIZONTAL;
-				c.gridx = 0;
-				c.gridy = 0;
-				c.weightx = 1;
-
-				RoiManager roimanager = RoiManager.getInstance();
-
-				if (roimanager != null) {
-
-					roimanager.close();
-					roimanager = new RoiManager();
-
-				}
-
-				panelSeventh.removeAll();
-				final Label Step7 = new Label("Step 7", Label.CENTER);
-				panelSeventh.setLayout(layout);
-				panelSeventh.add(Step7, c);
-				final Scrollbar rad = new Scrollbar(Scrollbar.HORIZONTAL, initialSearchradiusInit, 10, 0,
-						10 + scrollbarSize);
-				initialSearchradius = computeValueFromScrollbarPosition(initialSearchradiusInit, initialSearchradiusMin,
-						initialSearchradiusMax, scrollbarSize);
-
-				final Label SearchText = new Label("Initial Search Radius: " + initialSearchradius, Label.CENTER);
-
-				++c.gridy;
-				c.insets = new Insets(10, 10, 0, 50);
-				panelSeventh.add(SearchText, c);
-				++c.gridy;
-				c.insets = new Insets(10, 10, 0, 50);
-				panelSeventh.add(rad, c);
-
-				final Scrollbar Maxrad = new Scrollbar(Scrollbar.HORIZONTAL, maxSearchradiusInit, 10, 0,
-						10 + scrollbarSize);
-				maxSearchradius = computeValueFromScrollbarPosition(maxSearchradiusInit, maxSearchradiusMin,
-						maxSearchradiusMax, scrollbarSize);
-				final Label MaxMovText = new Label("Max Movment of Objects per frame: " + maxSearchradius,
-						Label.CENTER);
-				++c.gridy;
-				c.insets = new Insets(10, 10, 0, 50);
-				panelSeventh.add(MaxMovText, c);
-				++c.gridy;
-				c.insets = new Insets(10, 10, 0, 50);
-				panelSeventh.add(Maxrad, c);
-
-				final Scrollbar Miss = new Scrollbar(Scrollbar.HORIZONTAL, missedframesInit, 10, 0, 10 + scrollbarSize);
-				Miss.setBlockIncrement(1);
-				missedframes = (int) computeValueFromScrollbarPosition(missedframesInit, missedframesMin,
-						missedframesMax, scrollbarSize);
-				final Label LostText = new Label("Objects allowed to be lost for #frames" + missedframes, Label.CENTER);
-				++c.gridy;
-				c.insets = new Insets(10, 10, 0, 50);
-				panelSeventh.add(LostText, c);
-				++c.gridy;
-				c.insets = new Insets(10, 10, 0, 50);
-				panelSeventh.add(Miss, c);
-
-				// final Checkbox Costfunc = new Checkbox("Squared Distance Cost
-				// Function");
-				// ++c.gridy;
-				// c.insets = new Insets(10, 10, 0, 50);
-				// panelSeventh.add(Costfunc, c);
-
-				rad.addAdjustmentListener(
-						new SearchradiusListener(SearchText, initialSearchradiusMin, initialSearchradiusMax));
-				Maxrad.addAdjustmentListener(
-						new maxSearchradiusListener(MaxMovText, maxSearchradiusMin, maxSearchradiusMax));
-				Miss.addAdjustmentListener(new missedFrameListener(LostText, missedframesMin, missedframesMax));
-
-				// Costfunc.addItemListener(new CostfunctionListener());
-
-				MTtrackerstart = new KFsearch(AllstartKalman, UserchosenCostFunction, maxSearchradius,
-						initialSearchradius, thirdDimension, thirdDimensionSize, missedframes);
-
-				MTtrackerend = new KFsearch(AllendKalman, UserchosenCostFunction, maxSearchradius, initialSearchradius,
-						thirdDimension, thirdDimensionSize, missedframes);
-
-				final Button TrackEndPoints = new Button("Track EndPoints (From first to a chosen last frame)");
-				final Button SkipframeandTrackEndPoints = new Button(
-						"TrackEndPoint (User specified first and last frame)");
-				final Button CheckResults = new Button("Check Results (then click next)");
-				final Checkbox RoughResults = new Checkbox("Analyze Rates");
-				final Label Checkres = new Label("The tracker now performs an internal check on the results");
-				Checkres.setBackground(new Color(1, 0, 1));
-				Checkres.setForeground(new Color(255, 255, 255));
-				++c.gridy;
-				c.insets = new Insets(10, 10, 0, 175);
-				panelSeventh.add(TrackEndPoints, c);
-
-				++c.gridy;
-				c.insets = new Insets(10, 10, 0, 175);
-				panelSeventh.add(SkipframeandTrackEndPoints, c);
-				if (analyzekymo && Kymoimg != null) {
-					++c.gridy;
-					c.insets = new Insets(10, 10, 0, 0);
-					panelSeventh.add(Checkres, c);
-
-					++c.gridy;
-					c.insets = new Insets(10, 175, 0, 175);
-					panelSeventh.add(CheckResults, c);
-				}
-				++c.gridy;
-				c.insets = new Insets(10, 175, 0, 175);
-				panelSeventh.add(RoughResults, c);
-
-				TrackEndPoints.addActionListener(new TrackendsListener());
-				SkipframeandTrackEndPoints.addActionListener(new SkipFramesandTrackendsListener());
-				CheckResults.addActionListener(new CheckResultsListener());
-				RoughResults.addItemListener(new AcceptResultsListener());
-
-				panelSeventh.repaint();
-				panelSeventh.validate();
-				Cardframe.pack();
+				Kalman();
 			}
 
 		}
@@ -2008,67 +2014,9 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 			updatePreview(ValueChange.THIRDDIM);
 
-			// DialogueMethodChange();
-			CheckboxGroup Finders = new CheckboxGroup();
-			final Checkbox mser = new Checkbox("MSER", Finders, FindLinesViaMSER == false);
-			final Checkbox hough = new Checkbox("HOUGH", Finders, FindLinesViaHOUGH == false);
-			final Checkbox mserwhough = new Checkbox("MSERwHOUGH", Finders, FindLinesViaMSERwHOUGH == false);
-			final GridBagLayout layout = new GridBagLayout();
-			final GridBagConstraints c = new GridBagConstraints();
-
-			panelFourth.removeAll();
-			final Label Step4 = new Label("Step 4", Label.CENTER);
-			panelFourth.setLayout(layout);
-			c.fill = GridBagConstraints.HORIZONTAL;
-			c.gridx = 0;
-			c.gridy = 0;
-			c.weightx = 4;
-			c.weighty = 1.5;
-			panelFourth.add(Step4, c);
-			++c.gridy;
-			final Label Msertxt = new Label("Update Mser params to find MT in dynamic channel");
-			final Label Houghtxt = new Label("Update Hough params to find MT in dynamic channel");
-			final Label MserwHtxt = new Label("Update MserwHough params to find MT in dynamic channel");
-
-			++c.gridy;
-			c.insets = new Insets(10, 175, 0, 175);
-			panelFourth.add(Msertxt, c);
-
-			++c.gridy;
-			c.insets = new Insets(10, 175, 0, 175);
-			panelFourth.add(mser, c);
-
-			++c.gridy;
-			c.insets = new Insets(10, 175, 0, 175);
-			panelFourth.add(Houghtxt, c);
-
-			++c.gridy;
-			c.insets = new Insets(10, 175, 0, 175);
-			panelFourth.add(hough, c);
-
-			++c.gridy;
-			c.insets = new Insets(10, 175, 0, 175);
-			panelFourth.add(MserwHtxt, c);
-
-			++c.gridy;
-			c.insets = new Insets(10, 175, 0, 175);
-			panelFourth.add(mserwhough, c);
-
-			Msertxt.setBackground(new Color(1, 0, 1));
-			Msertxt.setForeground(new Color(255, 255, 255));
-			Houghtxt.setBackground(new Color(1, 0, 1));
-			Houghtxt.setForeground(new Color(255, 255, 255));
-			MserwHtxt.setBackground(new Color(1, 0, 1));
-			MserwHtxt.setForeground(new Color(255, 255, 255));
-
-			mser.addItemListener(new UpdateMserListener());
-			hough.addItemListener(new UpdateHoughListener());
-			mserwhough.addItemListener(new UpdateMserwHoughListener());
 			markend();
+			UpdateMser();
 
-			panelFourth.validate();
-			panelFourth.repaint();
-			Cardframe.pack();
 		}
 	}
 
@@ -2350,66 +2298,9 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 			}
 
 			updatePreview(ValueChange.THIRDDIM);
-
-			// DialogueMethodChange();
-
-			CheckboxGroup Finders = new CheckboxGroup();
-			final Checkbox mser = new Checkbox("MSER", Finders, FindLinesViaMSER);
-			final Checkbox hough = new Checkbox("HOUGH", Finders, FindLinesViaHOUGH);
-			final Checkbox mserwhough = new Checkbox("MSERwHOUGH", Finders, FindLinesViaMSERwHOUGH);
-			final GridBagLayout layout = new GridBagLayout();
-			final GridBagConstraints c = new GridBagConstraints();
-			panelFourth.removeAll();
-			final Label Step4 = new Label("Step 4", Label.CENTER);
-			panelFourth.setLayout(layout);
-			c.fill = GridBagConstraints.HORIZONTAL;
-			c.gridx = 0;
-			c.gridy = 0;
-			c.weightx = 4;
-			c.weighty = 1.5;
-			panelFourth.add(Step4, c);
-			final Label Msertxt = new Label("Update Mser params to find MT in dynamic channel");
-			final Label Houghtxt = new Label("Update Hough params to find MT in dynamic channel");
-			final Label MserwHtxt = new Label("Update MserwHough params to find MT in dynamic channel");
-
-			++c.gridy;
-			c.insets = new Insets(10, 175, 0, 175);
-			panelFourth.add(Msertxt, c);
-
-			++c.gridy;
-			c.insets = new Insets(10, 175, 0, 175);
-			panelFourth.add(mser, c);
-
-			++c.gridy;
-			c.insets = new Insets(10, 175, 0, 175);
-			panelFourth.add(Houghtxt, c);
-
-			++c.gridy;
-			c.insets = new Insets(10, 175, 0, 175);
-			panelFourth.add(hough, c);
-
-			++c.gridy;
-			c.insets = new Insets(10, 175, 0, 175);
-			panelFourth.add(MserwHtxt, c);
-
-			++c.gridy;
-			c.insets = new Insets(10, 175, 0, 175);
-			panelFourth.add(mserwhough, c);
-
-			Msertxt.setBackground(new Color(1, 0, 1));
-			Msertxt.setForeground(new Color(255, 255, 255));
-			Houghtxt.setBackground(new Color(1, 0, 1));
-			Houghtxt.setForeground(new Color(255, 255, 255));
-			MserwHtxt.setBackground(new Color(1, 0, 1));
-			MserwHtxt.setForeground(new Color(255, 255, 255));
-
-			mser.addItemListener(new UpdateMserListener());
-			hough.addItemListener(new UpdateHoughListener());
-			mserwhough.addItemListener(new UpdateMserwHoughListener());
 			markend();
-			panelFourth.validate();
-			panelFourth.repaint();
-			Cardframe.pack();
+			UpdateMser();
+
 		}
 
 	}
@@ -2429,6 +2320,8 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 		ProgressSeeds trackMT = new ProgressSeeds();
 		trackMT.execute();
+		displayBitimg = false;
+		displayWatershedimg = false;
 
 	}
 
@@ -2512,7 +2405,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 				if (dialog) {
 					// updatePreview(ValueChange.SHOWHOUGH);
 					LinefinderInteractiveHough newlineHough = new LinefinderInteractiveHough(groundframe,
-							groundframepre, intimg, Maxlabel, thetaPerPixel, rhoPerPixel, thirdDimension);
+							groundframepre, intimg, Maxlabel, thetaPerPixel, rhoPerPixel, thirdDimension, jpb);
 
 					PrevFrameparam = FindlinesVia.LinefindingMethod(groundframe, groundframepre, minlength,
 							thirdDimension, psf, newlineHough, UserChoiceModel.Line, Domask, Intensityratio, Inispacing,
@@ -2633,6 +2526,11 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 			}
 			Overlay o = preprocessedimp.getOverlay();
+
+			if (preprocessedimp.getOverlay() == null) {
+				o = new Overlay();
+				preprocessedimp.setOverlay(o);
+			}
 			for (int index = 0; index < PrevFrameparam.getA().size(); ++index) {
 
 				Seedroi = new OvalRoi(Util.round(PrevFrameparam.getA().get(index).currentpos[0] - 2.5),
@@ -2821,6 +2719,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 				int MinFrame = Allstart.get(0).get(0).Framenumber;
 
 				final ArrayList<Trackproperties> first = Allstart.get(0);
+				Collections.sort(first, Seedcomparetrack);
 				int MaxSeedLabel = first.get(first.size() - 1).seedlabel;
 				int MinSeedLabel = first.get(0).seedlabel;
 
@@ -2891,6 +2790,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 				int MinFrame = Allend.get(0).get(0).Framenumber;
 
 				final ArrayList<Trackproperties> first = Allend.get(0);
+				Collections.sort(first, Seedcomparetrack);
 				int MaxSeedLabel = first.get(first.size() - 1).seedlabel;
 				int MinSeedLabel = first.get(0).seedlabel;
 
@@ -2975,6 +2875,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 				MinFrame = Allstart.get(0).get(0).Framenumber;
 
 				final ArrayList<Trackproperties> first = Allstart.get(0);
+				Collections.sort(first, Seedcomparetrack);
 				int MaxSeedLabel = first.get(first.size() - 1).seedlabel;
 				int MinSeedLabel = first.get(0).seedlabel;
 
@@ -3026,6 +2927,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 				MinFrame = Allend.get(0).get(0).Framenumber;
 
 				final ArrayList<Trackproperties> first = Allend.get(0);
+				Collections.sort(first, Seedcomparetrack);
 				int MaxSeedLabel = first.get(first.size() - 1).seedlabel;
 				int MinSeedLabel = first.get(0).seedlabel;
 
@@ -3366,6 +3268,28 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 	}
 
+	Comparator<Indexedlength> Seedcompare = new Comparator<Indexedlength>() {
+
+		@Override
+		public int compare(final Indexedlength A, final Indexedlength B) {
+
+			return A.seedLabel - B.seedLabel;
+
+		}
+
+	};
+
+	Comparator<Trackproperties> Seedcomparetrack = new Comparator<Trackproperties>() {
+
+		@Override
+		public int compare(final Trackproperties A, final Trackproperties B) {
+
+			return A.seedlabel - B.seedlabel;
+
+		}
+
+	};
+
 	protected class finalpoint implements ItemListener {
 
 		@Override
@@ -3379,41 +3303,59 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 				preprocessedimp.getCanvas().removeMouseListener(removeml);
 				preprocessedimp.getCanvas().removeMouseListener(ml);
 
-				for (int index = 0; index < ClickedPoints.size(); ++index) {
-					for (int secindex = 0; secindex < PrevFrameparam.getA().size(); ++secindex) {
+				HashMap<Integer, double[]> endAmap = new HashMap<Integer, double[]>();
 
-						
-							
-							
-						if ((int) Math.abs(ClickedPoints.get(index)[0]
-								- PrevFrameparam.getA().get(secindex).fixedpos[0]) <= 1.0E-3
-								&& seedmap.get(PrevFrameparam.getA().get(secindex).seedLabel) == null)
+				HashMap<Integer, double[]> endBmap = new HashMap<Integer, double[]>();
 
-							seedmap.put(PrevFrameparam.getA().get(secindex).seedLabel, Whichend.start);
+				Collections.sort(PrevFrameparam.getA(), Seedcompare);
+				Collections.sort(PrevFrameparam.getB(), Seedcompare);
 
-						else if ((int) Math.abs(ClickedPoints.get(index)[0]
-								- PrevFrameparam.getB().get(secindex).fixedpos[0]) <= 1.0E-3
-								&& seedmap.get(PrevFrameparam.getA().get(secindex).seedLabel) == null)
+				int minSeed = PrevFrameparam.getA().get(0).seedLabel;
+				int maxSeed = PrevFrameparam.getA().get(PrevFrameparam.getA().size() - 1).seedLabel;
 
-							seedmap.put(PrevFrameparam.getA().get(secindex).seedLabel, Whichend.end);
+				for (int i = 0; i < PrevFrameparam.getA().size(); ++i) {
 
-						else if ( seedmap.get(PrevFrameparam.getA().get(secindex).seedLabel) == null)
-							seedmap.put(PrevFrameparam.getA().get(secindex).seedLabel, Whichend.none);
+					endAmap.put(PrevFrameparam.getA().get(i).seedLabel, PrevFrameparam.getA().get(i).fixedpos);
 
-						
+				}
 
-						else if ((int) Math.abs(ClickedPoints.get(index)[0]
-								- PrevFrameparam.getA().get(secindex).fixedpos[0]) <= 1.0E-3
-								&& seedmap.get(PrevFrameparam.getA().get(secindex).seedLabel) != null )
-							seedmap.put(PrevFrameparam.getA().get(secindex).seedLabel, Whichend.both);
-						
-						else if ((int) Math.abs(ClickedPoints.get(index)[0]
-								- PrevFrameparam.getB().get(secindex).fixedpos[0]) <= 1.0E-3
-								&& seedmap.get(PrevFrameparam.getA().get(secindex).seedLabel) != null )
-							seedmap.put(PrevFrameparam.getA().get(secindex).seedLabel, Whichend.both);
-						
+				for (int i = 0; i < PrevFrameparam.getB().size(); ++i) {
 
-						System.out.println(seedmap.get(PrevFrameparam.getA().get(secindex).seedLabel));
+					endBmap.put(PrevFrameparam.getB().get(i).seedLabel, PrevFrameparam.getB().get(i).fixedpos);
+
+				}
+
+				for (int i = minSeed; i < maxSeed + 1; ++i) {
+
+					for (int index = 0; index < ClickedPoints.size(); ++index) {
+
+						double mindistA = 0;
+						double mindistB = 0;
+
+						mindistA = util.Boundingboxes.Distance(ClickedPoints.get(index), endAmap.get(i));
+						mindistB = util.Boundingboxes.Distance(ClickedPoints.get(index), endBmap.get(i));
+
+						if (mindistA <= 1 && seedmap.get(i) != Whichend.end) {
+
+							seedmap.put(i, Whichend.start);
+
+						}
+
+						else if (mindistB <= 1 && seedmap.get(i) != Whichend.start) {
+
+							seedmap.put(i, Whichend.end);
+						}
+
+						else if (seedmap.get(i) == Whichend.start && mindistB <= 1)
+							seedmap.put(i, Whichend.both);
+
+						else if (seedmap.get(i) == Whichend.end && mindistA <= 1)
+							seedmap.put(i, Whichend.both);
+
+						else if (seedmap.get(i) == null)
+							seedmap.put(i, Whichend.none);
+
+						System.out.println(seedmap.get(i) + "" + i);
 					}
 
 				}
@@ -4243,7 +4185,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		for (int index = next; index <= thirdDimensionSize; ++index) {
 
 			Kalmancount++;
-			thirdDimension = index - 1;
+			thirdDimension = index;
 			isStarted = true;
 			CurrentPreprocessedView = util.CopyUtils.getCurrentPreView(originalPreprocessedimg, thirdDimension,
 					thirdDimensionSize);
@@ -4442,102 +4384,127 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 				// Get all the track id's
 				for (final Integer id : modelstart.trackIDs(true)) {
-					ResultsTable rt = new ResultsTable();
-					// Get the corresponding set for each id
-					modelstart.setName(id, "Track" + id);
-					final HashSet<KalmanTrackproperties> Snakeset = modelstart.trackKalmanTrackpropertiess(id);
-					ArrayList<KalmanTrackproperties> list = new ArrayList<KalmanTrackproperties>();
+					if (SaveTxt) {
+						try {
+							File fichier = new File(usefolder + "//" + addToName + "Trackid" + id + "-endA" + ".txt");
 
-					Comparator<KalmanTrackproperties> ThirdDimcomparison = new Comparator<KalmanTrackproperties>() {
+							FileWriter fw = new FileWriter(fichier);
+							BufferedWriter bw = new BufferedWriter(fw);
 
-						@Override
-						public int compare(final KalmanTrackproperties A, final KalmanTrackproperties B) {
+							bw.write(
+									"\tFramenumber\tTotal Length (pixel)\tTotal Length (real)\tSeed iD\tCurrentPosition X (px units)\tCurrentPosition Y (px units)\tCurrentPosition X (real units)\tCurrentPosition Y (real units)"
+											+ "\tLength per frame (px units)" + "\tLength per frame (real units)\n");
 
-							return A.thirdDimension - B.thirdDimension;
+							// Get the corresponding set for each id
+							modelstart.setName(id, "Track" + id);
+							final HashSet<KalmanTrackproperties> Snakeset = modelstart.trackKalmanTrackpropertiess(id);
+							ArrayList<KalmanTrackproperties> list = new ArrayList<KalmanTrackproperties>();
 
+							Comparator<KalmanTrackproperties> ThirdDimcomparison = new Comparator<KalmanTrackproperties>() {
+
+								@Override
+								public int compare(final KalmanTrackproperties A, final KalmanTrackproperties B) {
+
+									return A.thirdDimension - B.thirdDimension;
+
+								}
+
+							};
+
+							Iterator<KalmanTrackproperties> Snakeiter = Snakeset.iterator();
+
+							while (Snakeiter.hasNext()) {
+
+								KalmanTrackproperties currentsnake = Snakeiter.next();
+
+								list.add(currentsnake);
+
+							}
+							Collections.sort(list, ThirdDimcomparison);
+
+							final double[] originalpoint = list.get(0).originalpoint;
+							double startlengthreal = 0;
+							double startlengthpixel = 0;
+							for (int index = 1; index < list.size() - 1; ++index) {
+
+								final double[] currentpoint = list.get(index).currentpoint;
+								final double[] oldpoint = list.get(index - 1).currentpoint;
+								final double[] currentpointCal = new double[] { currentpoint[0] * calibration[0],
+										currentpoint[1] * calibration[1] };
+								final double[] oldpointCal = new double[] { oldpoint[0] * calibration[0],
+										oldpoint[1] * calibration[1] };
+								final double lengthpixelperframe = util.Boundingboxes.Distance(currentpoint, oldpoint);
+								final double lengthrealperframe = util.Boundingboxes.Distance(currentpointCal,
+										oldpointCal);
+								final double seedtocurrent = util.Boundingboxes.Distancesq(originalpoint, currentpoint);
+								final double seedtoold = util.Boundingboxes.Distancesq(originalpoint, oldpoint);
+								final boolean shrink = seedtoold > seedtocurrent ? true : false;
+								final boolean growth = seedtoold > seedtocurrent ? false : true;
+
+								if (shrink) {
+									// MT shrank
+
+									startlengthreal -= lengthrealperframe;
+									startlengthpixel -= lengthpixelperframe;
+
+								}
+								if (growth) {
+
+									// MT grew
+									startlengthreal += lengthrealperframe;
+									startlengthpixel += lengthpixelperframe;
+
+								}
+
+								double[] currentlocationpixel = new double[ndims];
+
+								if (list.get(index).thirdDimension == thirdDimensionsliderInit)
+									currentlocationpixel = originalpoint;
+								else
+									currentlocationpixel = currentpoint;
+
+								double[] currentlocationreal = new double[ndims];
+
+								currentlocationreal = new double[] { currentlocationpixel[0] * calibration[0],
+										currentlocationpixel[1] * calibration[1] };
+
+								ResultsMT startMT = new ResultsMT(list.get(index).thirdDimension, startlengthpixel,
+										startlengthreal, id, currentlocationpixel, currentlocationreal,
+										lengthpixelperframe, lengthrealperframe);
+
+								startlengthlist.add(startMT);
+
+								bw.write("\t" + list.get(index).thirdDimension + "\t" + "\t"
+										+ nf.format(startlengthpixel) + "\t" + "\t" + nf.format(startlengthreal) + "\t"
+										+ "\t" + nf.format(id) + "\t" + "\t" + nf.format(currentlocationpixel[0]) + "\t"
+										+ "\t" + nf.format(currentlocationpixel[1]) + "\t" + "\t"
+										+ nf.format(currentlocationreal[0]) + "\t" + "\t"
+										+ nf.format(currentlocationreal[1]) + "\t" + "\t"
+										+ nf.format(lengthpixelperframe) + "\t" + "\t" + nf.format(lengthrealperframe)
+										+ "\n");
+
+								double[] landt = { startlengthpixel, list.get(index).thirdDimension, id };
+								lengthtimestart.add(landt);
+								rtAll.incrementCounter();
+								rtAll.addValue("FrameNumber", list.get(index).thirdDimension);
+								rtAll.addValue("Total Length (pixel)", startlengthpixel);
+								rtAll.addValue("Total Length (real)", startlengthreal);
+								rtAll.addValue("Track iD", id);
+								rtAll.addValue("CurrentPosition X (px units)", currentlocationpixel[0]);
+								rtAll.addValue("CurrentPosition Y (px units)", currentlocationpixel[1]);
+								rtAll.addValue("CurrentPosition X (real units)", currentlocationreal[0]);
+								rtAll.addValue("CurrentPosition Y (real units)", currentlocationreal[1]);
+								rtAll.addValue("Length per frame (px units)", lengthpixelperframe);
+								rtAll.addValue("Length per frame (real units)", lengthrealperframe);
+
+							}
+
+							bw.close();
+							fw.close();
+
+						} catch (IOException e) {
 						}
-
-					};
-
-					Iterator<KalmanTrackproperties> Snakeiter = Snakeset.iterator();
-
-					while (Snakeiter.hasNext()) {
-
-						KalmanTrackproperties currentsnake = Snakeiter.next();
-
-						list.add(currentsnake);
-
 					}
-					Collections.sort(list, ThirdDimcomparison);
-
-					final double[] originalpoint = list.get(0).originalpoint;
-					double startlength = 0;
-					double startlengthpixel = 0;
-					for (int index = 1; index < list.size() - 1; ++index) {
-
-						final double[] currentpoint = list.get(index).currentpoint;
-						final double[] oldpoint = list.get(index - 1).currentpoint;
-						final double[] currentpointCal = new double[] { currentpoint[0] * calibration[0],
-								currentpoint[1] * calibration[1] };
-						final double[] oldpointCal = new double[] { oldpoint[0] * calibration[0],
-								oldpoint[1] * calibration[1] };
-						final double lengthpixel = util.Boundingboxes.Distance(currentpoint, oldpoint);
-						final double length = util.Boundingboxes.Distance(currentpointCal, oldpointCal);
-						final double seedtocurrent = util.Boundingboxes.Distancesq(originalpoint, currentpoint);
-						final double seedtoold = util.Boundingboxes.Distancesq(originalpoint, oldpoint);
-						final boolean shrink = seedtoold > seedtocurrent ? true : false;
-						final boolean growth = seedtoold > seedtocurrent ? false : true;
-
-						if (shrink && startlengthpixel - lengthpixel > -minlength) {
-							// MT shrank
-
-							startlength -= length;
-							startlengthpixel -= lengthpixel;
-
-						}
-						if (growth) {
-
-							// MT grew
-							startlength += length;
-							startlengthpixel += lengthpixel;
-
-						}
-
-						rt.incrementCounter();
-
-						rt.addValue("FrameNumber", list.get(index).thirdDimension);
-						rt.addValue("Track iD", id);
-						rt.addValue("PreviousPosition X (px units)", oldpoint[0]);
-						rt.addValue("PreviousPosition Y (px units)", oldpoint[1]);
-						rt.addValue("CurrentPosition X (px units)", currentpoint[0]);
-						rt.addValue("CurrentPosition Y (px units)", currentpoint[1]);
-						rt.addValue("PreviousPosition X (real units)", oldpointCal[0]);
-						rt.addValue("PreviousPosition Y (real units)", oldpointCal[1]);
-						rt.addValue("CurrentPosition X (real units)", currentpointCal[0]);
-						rt.addValue("CurrentPosition Y (real units)", currentpointCal[1]);
-						rt.addValue("lengthKymo in real units", length);
-						rt.addValue("Cummulative lengthKymo in real units", startlength);
-						double[] landt = { startlengthpixel, list.get(index).thirdDimension, id };
-						lengthtimestart.add(landt);
-						rtAll.incrementCounter();
-
-						rtAll.addValue("FrameNumber", list.get(index).thirdDimension);
-						rtAll.addValue("Track iD", id);
-						rtAll.addValue("PreviousPosition X (px units)", oldpoint[0]);
-						rtAll.addValue("PreviousPosition Y (px units)", oldpoint[1]);
-						rtAll.addValue("CurrentPosition X (px units)", currentpoint[0]);
-						rtAll.addValue("CurrentPosition Y (px units)", currentpoint[1]);
-						rtAll.addValue("PreviousPosition X (real units)", oldpointCal[0]);
-						rtAll.addValue("PreviousPosition Y (real units)", oldpointCal[1]);
-						rtAll.addValue("CurrentPosition X (real units)", currentpointCal[0]);
-						rtAll.addValue("CurrentPosition Y (real units)", currentpointCal[1]);
-						rtAll.addValue("lengthKymo in real units", length);
-						rtAll.addValue("Cummulative lengthKymo in real units", startlength);
-
-					}
-
-					if (SaveXLS)
-						saveResultsToExcel(usefolder + "//" + addToName + "KalmanStart" + id + ".xls", rt);
 
 				}
 			}
@@ -4564,104 +4531,128 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 				TrackModel modelend = new TrackModel(graphendKalman);
 				modelend.getDirectedNeighborIndex();
 				// Get all the track id's
+
 				for (final Integer id : modelend.trackIDs(true)) {
-					ResultsTable rt = new ResultsTable();
-					// Get the corresponding set for each id
-					modelend.setName(id, "Track" + id);
-					final HashSet<KalmanTrackproperties> Snakeset = modelend.trackKalmanTrackpropertiess(id);
-					ArrayList<KalmanTrackproperties> list = new ArrayList<KalmanTrackproperties>();
 
-					Comparator<KalmanTrackproperties> ThirdDimcomparison = new Comparator<KalmanTrackproperties>() {
+					if (SaveTxt) {
+						try {
+							File fichier = new File(usefolder + "//" + addToName + "Trackid" + id + "-endB" + ".txt");
 
-						@Override
-						public int compare(final KalmanTrackproperties A, final KalmanTrackproperties B) {
+							FileWriter fw = new FileWriter(fichier);
+							BufferedWriter bw = new BufferedWriter(fw);
 
-							return A.thirdDimension - B.thirdDimension;
+							bw.write(
+									"\tFramenumber\tTotal Length (pixel)\tTotal Length (real)\tSeed iD\tCurrentPosition X (px units)\tCurrentPosition Y (px units)\tCurrentPosition X (real units)\tCurrentPosition Y (real units)"
+											+ "\tLength per frame (px units)" + "\tLength per frame (real units)\n");
+							// Get the corresponding set for each id
+							modelend.setName(id, "Track" + id);
+							final HashSet<KalmanTrackproperties> Snakeset = modelend.trackKalmanTrackpropertiess(id);
+							ArrayList<KalmanTrackproperties> list = new ArrayList<KalmanTrackproperties>();
 
+							Comparator<KalmanTrackproperties> ThirdDimcomparison = new Comparator<KalmanTrackproperties>() {
+
+								@Override
+								public int compare(final KalmanTrackproperties A, final KalmanTrackproperties B) {
+
+									return A.thirdDimension - B.thirdDimension;
+
+								}
+
+							};
+
+							Iterator<KalmanTrackproperties> Snakeiter = Snakeset.iterator();
+
+							while (Snakeiter.hasNext()) {
+
+								KalmanTrackproperties currentsnake = Snakeiter.next();
+
+								list.add(currentsnake);
+
+							}
+							Collections.sort(list, ThirdDimcomparison);
+
+							double endlengthreal = 0;
+							double endlengthpixel = 0;
+							final double[] originalpoint = list.get(0).originalpoint;
+							for (int index = 1; index < list.size() - 1; ++index) {
+
+								final double[] currentpoint = list.get(index).currentpoint;
+								final double[] oldpoint = list.get(index - 1).currentpoint;
+								final double[] currentpointCal = new double[] { currentpoint[0] * calibration[0],
+										currentpoint[1] * calibration[1] };
+								final double[] oldpointCal = new double[] { oldpoint[0] * calibration[0],
+										oldpoint[1] * calibration[1] };
+								final double lengthpixelperframe = util.Boundingboxes.Distance(currentpoint, oldpoint);
+								final double lengthrealperframe = util.Boundingboxes.Distance(currentpointCal,
+										oldpointCal);
+								final double seedtocurrent = util.Boundingboxes.Distancesq(originalpoint, currentpoint);
+								final double seedtoold = util.Boundingboxes.Distancesq(originalpoint, oldpoint);
+								final boolean shrink = seedtoold > seedtocurrent ? true : false;
+								final boolean growth = seedtoold > seedtocurrent ? false : true;
+
+								if (shrink) {
+
+									// MT shrank
+									endlengthreal -= lengthrealperframe;
+									endlengthpixel -= lengthpixelperframe;
+
+								}
+								if (growth) {
+
+									// MT grew
+									endlengthreal += lengthrealperframe;
+									endlengthpixel += lengthpixelperframe;
+
+								}
+
+								double[] currentlocationpixel = new double[ndims];
+
+								if (list.get(index).thirdDimension == thirdDimensionsliderInit)
+									currentlocationpixel = originalpoint;
+								else
+									currentlocationpixel = currentpoint;
+
+								double[] currentlocationreal = new double[ndims];
+
+								currentlocationreal = new double[] { currentlocationpixel[0] * calibration[0],
+										currentlocationpixel[1] * calibration[1] };
+
+								ResultsMT endMT = new ResultsMT(list.get(index).thirdDimension, endlengthpixel,
+										endlengthreal, id, currentlocationpixel, currentlocationreal,
+										lengthpixelperframe, lengthrealperframe);
+
+								endlengthlist.add(endMT);
+
+								bw.write("\t" + list.get(index).thirdDimension + "\t" + "\t" + nf.format(endlengthpixel)
+										+ "\t" + "\t" + nf.format(endlengthreal) + "\t" + "\t" + nf.format(id) + "\t"
+										+ "\t" + nf.format(currentlocationpixel[0]) + "\t" + "\t"
+										+ nf.format(currentlocationpixel[1]) + "\t" + "\t"
+										+ nf.format(currentlocationreal[0]) + "\t" + "\t"
+										+ nf.format(currentlocationreal[1]) + "\t" + "\t"
+										+ nf.format(lengthpixelperframe) + "\t" + "\t" + nf.format(lengthrealperframe)
+										+ "\n");
+
+								double[] landt = { endlengthpixel, list.get(index).thirdDimension, id };
+								lengthtimeend.add(landt);
+								rtAll.incrementCounter();
+								rtAll.addValue("FrameNumber", list.get(index).thirdDimension);
+								rtAll.addValue("Total Length (pixel)", endlengthpixel);
+								rtAll.addValue("Total Length (real)", endlengthreal);
+								rtAll.addValue("Track iD", id);
+								rtAll.addValue("CurrentPosition X (px units)", currentlocationpixel[0]);
+								rtAll.addValue("CurrentPosition Y (px units)", currentlocationpixel[1]);
+								rtAll.addValue("CurrentPosition X (real units)", currentlocationreal[0]);
+								rtAll.addValue("CurrentPosition Y (real units)", currentlocationreal[1]);
+								rtAll.addValue("Length per frame (px units)", lengthpixelperframe);
+								rtAll.addValue("Length per frame (real units)", lengthrealperframe);
+
+							}
+							bw.close();
+							fw.close();
+
+						} catch (IOException e) {
 						}
-
-					};
-
-					Iterator<KalmanTrackproperties> Snakeiter = Snakeset.iterator();
-
-					while (Snakeiter.hasNext()) {
-
-						KalmanTrackproperties currentsnake = Snakeiter.next();
-
-						list.add(currentsnake);
-
 					}
-					Collections.sort(list, ThirdDimcomparison);
-
-					double endlength = 0;
-					double endlengthpixel = 0;
-					final double[] originalpoint = list.get(0).originalpoint;
-					for (int index = 1; index < list.size() - 1; ++index) {
-
-						final double[] currentpoint = list.get(index).currentpoint;
-						final double[] oldpoint = list.get(index - 1).currentpoint;
-						final double[] currentpointCal = new double[] { currentpoint[0] * calibration[0],
-								currentpoint[1] * calibration[1] };
-						final double[] oldpointCal = new double[] { oldpoint[0] * calibration[0],
-								oldpoint[1] * calibration[1] };
-						final double lengthpixel = util.Boundingboxes.Distance(currentpoint, oldpoint);
-						final double length = util.Boundingboxes.Distance(currentpointCal, oldpointCal);
-						final double seedtocurrent = util.Boundingboxes.Distancesq(originalpoint, currentpoint);
-						final double seedtoold = util.Boundingboxes.Distancesq(originalpoint, oldpoint);
-						final boolean shrink = seedtoold > seedtocurrent ? true : false;
-						final boolean growth = seedtoold > seedtocurrent ? false : true;
-
-						if (shrink && endlengthpixel - lengthpixel > -minlength) {
-
-							// MT shrank
-							endlength -= length;
-							endlengthpixel -= lengthpixel;
-
-						}
-						if (growth) {
-
-							// MT grew
-							endlength += length;
-							endlengthpixel += lengthpixel;
-
-						}
-
-						rt.incrementCounter();
-
-						rt.addValue("FrameNumber", list.get(index).thirdDimension);
-						rt.addValue("Track iD", id);
-						rt.addValue("PreviousPosition X (px units)", oldpoint[0]);
-						rt.addValue("PreviousPosition Y (px units)", oldpoint[1]);
-						rt.addValue("CurrentPosition X (px units)", currentpoint[0]);
-						rt.addValue("CurrentPosition Y (px units)", currentpoint[1]);
-						rt.addValue("PreviousPosition X (real units)", oldpointCal[0]);
-						rt.addValue("PreviousPosition Y (real units)", oldpointCal[1]);
-						rt.addValue("CurrentPosition X (real units)", currentpointCal[0]);
-						rt.addValue("CurrentPosition Y (real units)", currentpointCal[1]);
-						rt.addValue("lengthKymo in real units", length);
-						rt.addValue("Cummulative lengthKymo in real units", endlength);
-
-						double[] landt = { endlengthpixel, list.get(index).thirdDimension, id };
-						lengthtimeend.add(landt);
-						rtAll.incrementCounter();
-
-						rtAll.addValue("FrameNumber", list.get(index).thirdDimension);
-						rtAll.addValue("Track iD", id);
-						rtAll.addValue("PreviousPosition X (px units)", oldpoint[0]);
-						rtAll.addValue("PreviousPosition Y (px units)", oldpoint[1]);
-						rtAll.addValue("CurrentPosition X (px units)", currentpoint[0]);
-						rtAll.addValue("CurrentPosition Y (px units)", currentpoint[1]);
-						rtAll.addValue("PreviousPosition X (real units)", oldpointCal[0]);
-						rtAll.addValue("PreviousPosition Y (real units)", oldpointCal[1]);
-						rtAll.addValue("CurrentPosition X (real units)", currentpointCal[0]);
-						rtAll.addValue("CurrentPosition Y (real units)", currentpointCal[1]);
-						rtAll.addValue("lengthKymo in real units", length);
-						rtAll.addValue("Cummulative lengthKymo in real units", endlength);
-
-					}
-
-					if (SaveXLS)
-						saveResultsToExcel(usefolder + "//" + addToName + "KalmanEnd" + id + ".xls", rt);
 
 				}
 
@@ -4669,18 +4660,19 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 			rtAll.show("Results");
 		}
 		if (showDeterministic) {
-			NumberFormat nf = NumberFormat.getInstance(Locale.ENGLISH);
-			nf.setMaximumFractionDigits(3);
 
 			ResultsTable rtAll = new ResultsTable();
 			if (Allstart.get(0).size() > 0) {
 				final ArrayList<Trackproperties> first = Allstart.get(0);
+
+				Collections.sort(first, Seedcomparetrack);
+
 				int MaxSeedLabel = first.get(first.size() - 1).seedlabel;
 				int MinSeedLabel = first.get(0).seedlabel;
 				for (int currentseed = MinSeedLabel; currentseed < MaxSeedLabel + 1; ++currentseed) {
 					double startlengthreal = 0;
 					double startlengthpixel = 0;
-
+					System.out.println(currentseed);
 					for (int index = 0; index < Allstart.size(); ++index) {
 
 						final ArrayList<Trackproperties> thirdDimension = Allstart.get(index);
@@ -4723,116 +4715,94 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 								}
 
-								ResultsMT startMT = new ResultsMT(framenumber, seedID, originalpoint, oldpoint,
-										newpoint, oldpointCal, newpointCal, lengthrealperframe, startlengthreal,
-										lengthpixelperframe, startlengthpixel);
+								double[] currentlocationpixel = new double[ndims];
+
+								if (framenumber == thirdDimensionsliderInit)
+									currentlocationpixel = originalpoint;
+								else
+									currentlocationpixel = newpoint;
+
+								double[] currentlocationreal = new double[ndims];
+
+								currentlocationreal = new double[] { currentlocationpixel[0] * calibration[0],
+										currentlocationpixel[1] * calibration[1] };
+
+								ResultsMT startMT = new ResultsMT(framenumber, startlengthpixel, startlengthreal,
+										seedID, currentlocationpixel, currentlocationreal, lengthpixelperframe,
+										lengthrealperframe);
+
 								startlengthlist.add(startMT);
 
 							}
 						}
 					}
 				}
-				ResultsTable rt = new ResultsTable();
 				for (int seedID = MinSeedLabel; seedID <= MaxSeedLabel; ++seedID) {
 					if (SaveTxt) {
 						try {
 							File fichier = new File(
-									usefolder + "//" + addToName + "SeedLabel" + seedID + "-start" + ".txt");
-							File fichierMy = new File(
-									usefolder + "//" + addToName + "KymoVarun-start" + seedID + ".txt");
+									usefolder + "//" + addToName + "SeedLabel" + seedID + "-endA" + ".txt");
+
 							FileWriter fw = new FileWriter(fichier);
 							BufferedWriter bw = new BufferedWriter(fw);
 
 							bw.write(
-									"\tFramenumber\tSeedLabel\tOldX (px)\tOldY (px)\tNewX (px)\tNewY (px)\tOldX (real)\tOldY (real)"
-											+ "\tNewX (real)\tNewY (real)"
-											+ "\tlengthKymo ( real)\tCummulativelengthKymo (real)\n");
-
-							FileWriter fwmy = new FileWriter(fichierMy);
-							BufferedWriter bwmy = new BufferedWriter(fwmy);
-
-							bwmy.write("\tFramenumber\tlengthKymo\n");
+									"\tFramenumber\tTotal Length (pixel)\tTotal Length (real)\tSeed iD\tCurrentPosition X (px units)\tCurrentPosition Y (px units)\tCurrentPosition X (real units)\tCurrentPosition Y (real units)"
+											+ "\tLength per frame (px units)" + "\tLength per frame (real units)\n");
 
 							for (int index = 0; index < startlengthlist.size(); ++index) {
 								if (startlengthlist.get(index).seedid == seedID) {
-									bw.write("\t" + startlengthlist.get(index).framenumber + "\t" + "\t"
-											+ nf.format(startlengthlist.get(index).seedid) + "\t" + "\t"
-											+ nf.format(startlengthlist.get(index).oldpoint[0]) + "\t" + "\t"
-											+ nf.format(startlengthlist.get(index).oldpoint[1]) + "\t" + "\t"
-											+ nf.format(startlengthlist.get(index).newpoint[0]) + "\t" + "\t"
-											+ nf.format(startlengthlist.get(index).newpoint[1]) + "\t" + "\t"
-											+ nf.format(startlengthlist.get(index).oldpointCal[0]) + "\t" + "\t"
-											+ nf.format(startlengthlist.get(index).oldpointCal[1]) + "\t" + "\t"
-											+ nf.format(startlengthlist.get(index).newpointCal[0]) + "\t" + "\t"
-											+ nf.format(startlengthlist.get(index).newpointCal[1]) + "\t" + "\t"
-											+ nf.format(startlengthlist.get(index).lengthpixelperframe) + "\t" + "\t"
-											+ nf.format(startlengthlist.get(index).totallengthpixel) + "\t" + "\t"
-											+ nf.format(startlengthlist.get(index).lengthrealperframe) + "\t" + "\t"
-											+ nf.format(startlengthlist.get(index).totallengthreal) + "\n");
 
-									bwmy.write("\t" + startlengthlist.get(index).framenumber + "\t" + "\t"
-											+ nf.format(startlengthlist.get(index).totallengthpixel) + "\n");
+									bw.write("\t" + startlengthlist.get(index).framenumber + "\t" + "\t"
+											+ nf.format(startlengthlist.get(index).totallengthpixel) + "\t" + "\t"
+											+ nf.format(startlengthlist.get(index).totallengthreal) + "\t" + "\t"
+											+ nf.format(startlengthlist.get(index).seedid) + "\t" + "\t"
+											+ nf.format(startlengthlist.get(index).currentpointpixel[0]) + "\t" + "\t"
+											+ nf.format(startlengthlist.get(index).currentpointpixel[1]) + "\t" + "\t"
+											+ nf.format(startlengthlist.get(index).currentpointreal[0]) + "\t" + "\t"
+											+ nf.format(startlengthlist.get(index).currentpointreal[1]) + "\t" + "\t"
+											+ nf.format(startlengthlist.get(index).lengthpixelperframe) + "\t" + "\t"
+											+ nf.format(startlengthlist.get(index).lengthrealperframe) + "\n");
 
 								}
 
 							}
 							bw.close();
 							fw.close();
-							bwmy.close();
-							fwmy.close();
 
 						} catch (IOException e) {
 						}
 					}
 				}
 				for (int index = 0; index < startlengthlist.size(); ++index) {
-					rt.incrementCounter();
-					rt.addValue("FrameNumber", startlengthlist.get(index).framenumber);
-					rt.addValue("SeedLabel", startlengthlist.get(index).seedid);
-					rt.addValue("OldX in px units", startlengthlist.get(index).oldpoint[0]);
-					rt.addValue("OldY in px units", startlengthlist.get(index).oldpoint[1]);
-					rt.addValue("NewX in px units", startlengthlist.get(index).newpoint[0]);
-					rt.addValue("NewY in px units", startlengthlist.get(index).newpoint[1]);
-					rt.addValue("OldX in real units", startlengthlist.get(index).oldpointCal[0]);
-					rt.addValue("OldY in real units", startlengthlist.get(index).oldpointCal[1]);
-					rt.addValue("NewX in real units", startlengthlist.get(index).newpointCal[0]);
-					rt.addValue("NewY in real units", startlengthlist.get(index).newpointCal[1]);
-					rt.addValue("lengthPerframe in pixel units", startlengthlist.get(index).lengthpixelperframe);
-					rt.addValue("Cummulative length in pixel units", startlengthlist.get(index).totallengthpixel);
-					rt.addValue("lengthPerframe in real units", startlengthlist.get(index).lengthrealperframe);
-					rt.addValue("Cummulative length in real units", startlengthlist.get(index).totallengthreal);
+
 					double[] landt = { startlengthlist.get(index).totallengthpixel,
 							startlengthlist.get(index).framenumber, startlengthlist.get(index).seedid };
 					lengthtimestart.add(landt);
 
 					rtAll.incrementCounter();
 					rtAll.addValue("FrameNumber", startlengthlist.get(index).framenumber);
-					rtAll.addValue("SeedLabel", startlengthlist.get(index).seedid);
-					rtAll.addValue("OldX in px units", startlengthlist.get(index).oldpoint[0]);
-					rtAll.addValue("OldY in px units", startlengthlist.get(index).oldpoint[1]);
-					rtAll.addValue("NewX in px units", startlengthlist.get(index).newpoint[0]);
-					rtAll.addValue("NewY in px units", startlengthlist.get(index).newpoint[1]);
-					rtAll.addValue("OldX in real units", startlengthlist.get(index).oldpointCal[0]);
-					rtAll.addValue("OldY in real units", startlengthlist.get(index).oldpointCal[1]);
-					rtAll.addValue("NewX in real units", startlengthlist.get(index).newpointCal[0]);
-					rtAll.addValue("NewY in real units", startlengthlist.get(index).newpointCal[1]);
-					rtAll.addValue("lengthPerframe in pixel units", startlengthlist.get(index).lengthpixelperframe);
-					rtAll.addValue("Cummulative length in pixel units", startlengthlist.get(index).totallengthpixel);
-					rtAll.addValue("lengthPerframe in real units", startlengthlist.get(index).lengthrealperframe);
-					rtAll.addValue("Cummulative length in real units", startlengthlist.get(index).totallengthreal);
+					rtAll.addValue("Total Length (pixel)", startlengthlist.get(index).totallengthpixel);
+					rtAll.addValue("Total Length (real)", startlengthlist.get(index).totallengthreal);
+					rtAll.addValue("Track iD", startlengthlist.get(index).seedid);
+					rtAll.addValue("CurrentPosition X (px units)", startlengthlist.get(index).currentpointpixel[0]);
+					rtAll.addValue("CurrentPosition Y (px units)", startlengthlist.get(index).currentpointpixel[1]);
+					rtAll.addValue("CurrentPosition X (real units)", startlengthlist.get(index).currentpointreal[0]);
+					rtAll.addValue("CurrentPosition Y (real units)", startlengthlist.get(index).currentpointreal[1]);
+					rtAll.addValue("Length per frame (px units)", startlengthlist.get(index).lengthpixelperframe);
+					rtAll.addValue("Length per frame (real units)", startlengthlist.get(index).lengthrealperframe);
 
 				}
-
-				if (SaveXLS)
-					saveResultsToExcel(usefolder + "//" + addToName + "start" + ".xls", rt);
 
 			}
 
 			if (Allend.get(0).size() > 0) {
 				final ArrayList<Trackproperties> first = Allend.get(0);
+				Collections.sort(first, Seedcomparetrack);
 				int MaxSeedLabel = first.get(first.size() - 1).seedlabel;
 				int MinSeedLabel = first.get(0).seedlabel;
 				for (int currentseed = MinSeedLabel; currentseed < MaxSeedLabel + 1; ++currentseed) {
+					System.out.println(currentseed);
 					double endlengthreal = 0;
 					double endlengthpixel = 0;
 					for (int index = 0; index < Allend.size(); ++index) {
@@ -4881,9 +4851,22 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 								}
 
-								ResultsMT endMT = new ResultsMT(framenumber, seedID, originalpoint, oldpoint, newpoint,
-										oldpointCal, newpointCal, lengthrealperframe, endlengthreal,
-										lengthpixelperframe, endlengthpixel);
+								double[] currentlocationpixel = new double[ndims];
+
+								if (framenumber == thirdDimensionsliderInit)
+									currentlocationpixel = originalpoint;
+								else
+									currentlocationpixel = newpoint;
+
+								double[] currentlocationreal = new double[ndims];
+
+								currentlocationreal = new double[] { currentlocationpixel[0] * calibration[0],
+										currentlocationpixel[1] * calibration[1] };
+
+								ResultsMT endMT = new ResultsMT(framenumber, endlengthpixel, endlengthreal, seedID,
+										currentlocationpixel, currentlocationreal, lengthpixelperframe,
+										lengthrealperframe);
+
 								endlengthlist.add(endMT);
 
 							}
@@ -4891,110 +4874,62 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 					}
 
 				}
-				ResultsTable rtend = new ResultsTable();
 				for (int seedID = MinSeedLabel; seedID <= MaxSeedLabel; ++seedID) {
 					if (SaveTxt) {
 						try {
 							File fichier = new File(
-									usefolder + "//" + addToName + "SeedLabel" + seedID + "-end" + ".txt");
-
-							File fichierMy = new File(usefolder + "//" + addToName + "KymoVarun-end" + seedID + ".txt");
-							File Rates = new File(usefolder + "//" + addToName + "Rates" + seedID + ".txt");
+									usefolder + "//" + addToName + "SeedLabel" + seedID + "-endA" + ".txt");
 
 							FileWriter fw = new FileWriter(fichier);
 							BufferedWriter bw = new BufferedWriter(fw);
 
-							FileWriter fr = new FileWriter(Rates);
-							BufferedWriter br = new BufferedWriter(fr);
-
-							br.write("\tStartframe\tEndframe\trate\tShrink\n");
-
 							bw.write(
-									"\tFramenumber\tSeedLabel\tOldX (px)\tOldY (px)\tNewX (px)\tNewY (px)\tOldX (real)\tOldY (real)"
-											+ "\tNewX (real)\tNewY (real)\tlengthKymo (px)\tCummulativelengthKymo (px)"
-											+ "\tlengthKymo ( real)\tCummulativelengthKymo (real)\n");
+									"\tFramenumber\tTotal Length (pixel)\tTotal Length (real)\tSeed iD\tCurrentPosition X (px units)\tCurrentPosition Y (px units)\tCurrentPosition X (real units)\tCurrentPosition Y (real units)"
+											+ "\tLength per frame (px units)" + "\tLength per frame (real units)\n");
 
-							FileWriter fwmy = new FileWriter(fichierMy);
-							BufferedWriter bwmy = new BufferedWriter(fwmy);
-
-							bwmy.write("\tFramenumber\tlengthKymo\n");
 							for (int index = 0; index < endlengthlist.size(); ++index) {
 								if (endlengthlist.get(index).seedid == seedID) {
-									bw.write("\t" + endlengthlist.get(index).framenumber + "\t" + "\t"
-											+ nf.format(endlengthlist.get(index).seedid) + "\t" + "\t"
-											+ nf.format(endlengthlist.get(index).oldpoint[0]) + "\t" + "\t"
-											+ nf.format(endlengthlist.get(index).oldpoint[1]) + "\t" + "\t"
-											+ nf.format(endlengthlist.get(index).newpoint[0]) + "\t" + "\t"
-											+ nf.format(endlengthlist.get(index).newpoint[1]) + "\t" + "\t"
-											+ nf.format(endlengthlist.get(index).oldpointCal[0]) + "\t" + "\t"
-											+ nf.format(endlengthlist.get(index).oldpointCal[1]) + "\t" + "\t"
-											+ nf.format(endlengthlist.get(index).newpointCal[0]) + "\t" + "\t"
-											+ nf.format(endlengthlist.get(index).newpointCal[1]) + "\t" + "\t"
-											+ nf.format(endlengthlist.get(index).lengthpixelperframe) + "\t" + "\t"
-											+ nf.format(endlengthlist.get(index).totallengthpixel) + "\t" + "\t"
-											+ nf.format(endlengthlist.get(index).lengthrealperframe) + "\t" + "\t"
-											+ nf.format(endlengthlist.get(index).totallengthreal) + "\n");
 
-									bwmy.write("\t" + endlengthlist.get(index).framenumber + "\t" + "\t"
-											+ nf.format(endlengthlist.get(index).totallengthpixel) + "\n");
+									bw.write("\t" + endlengthlist.get(index).framenumber + "\t" + "\t"
+											+ nf.format(endlengthlist.get(index).totallengthpixel) + "\t" + "\t"
+											+ nf.format(endlengthlist.get(index).totallengthreal) + "\t" + "\t"
+											+ nf.format(endlengthlist.get(index).seedid) + "\t" + "\t"
+											+ nf.format(endlengthlist.get(index).currentpointpixel[0]) + "\t" + "\t"
+											+ nf.format(endlengthlist.get(index).currentpointpixel[1]) + "\t" + "\t"
+											+ nf.format(endlengthlist.get(index).currentpointreal[0]) + "\t" + "\t"
+											+ nf.format(endlengthlist.get(index).currentpointreal[1]) + "\t" + "\t"
+											+ nf.format(endlengthlist.get(index).lengthpixelperframe) + "\t" + "\t"
+											+ nf.format(endlengthlist.get(index).lengthrealperframe) + "\n");
 
 								}
 
 							}
-
-							bwmy.close();
-							fwmy.close();
 							bw.close();
 							fw.close();
-							br.close();
-							fr.close();
+
 						} catch (IOException e) {
 						}
 					}
 				}
 				for (int index = 0; index < endlengthlist.size(); ++index) {
-					rtend.incrementCounter();
-
-					rtend.addValue("FrameNumber", endlengthlist.get(index).framenumber);
-					rtend.addValue("SeedLabel", endlengthlist.get(index).seedid);
-					rtend.addValue("OldX in px units", endlengthlist.get(index).oldpoint[0]);
-					rtend.addValue("OldY in px units", endlengthlist.get(index).oldpoint[1]);
-					rtend.addValue("NewX in px units", endlengthlist.get(index).newpoint[0]);
-					rtend.addValue("NewY in px units", endlengthlist.get(index).newpoint[1]);
-					rtend.addValue("OldX in real units", endlengthlist.get(index).oldpointCal[0]);
-					rtend.addValue("OldY in real units", endlengthlist.get(index).oldpointCal[1]);
-					rtend.addValue("NewX in real units", endlengthlist.get(index).newpointCal[0]);
-					rtend.addValue("NewY in real units", endlengthlist.get(index).newpointCal[1]);
-					rtend.addValue("lengthPerframe in pixel units", endlengthlist.get(index).lengthpixelperframe);
-					rtend.addValue("Cummulative length in pixel units", endlengthlist.get(index).totallengthpixel);
-					rtend.addValue("lengthPerframe in real units", endlengthlist.get(index).lengthrealperframe);
-					rtend.addValue("Cummulative length in real units", endlengthlist.get(index).totallengthreal);
 
 					double[] landt = { endlengthlist.get(index).totallengthpixel, endlengthlist.get(index).framenumber,
 							endlengthlist.get(index).seedid };
+					lengthtimestart.add(landt);
 
-					lengthtimeend.add(landt);
 					rtAll.incrementCounter();
-
 					rtAll.addValue("FrameNumber", endlengthlist.get(index).framenumber);
-					rtAll.addValue("SeedLabel", endlengthlist.get(index).seedid);
-					rtAll.addValue("OldX in px units", endlengthlist.get(index).oldpoint[0]);
-					rtAll.addValue("OldY in px units", endlengthlist.get(index).oldpoint[1]);
-					rtAll.addValue("NewX in px units", endlengthlist.get(index).newpoint[0]);
-					rtAll.addValue("NewY in px units", endlengthlist.get(index).newpoint[1]);
-					rtAll.addValue("OldX in real units", endlengthlist.get(index).oldpointCal[0]);
-					rtAll.addValue("OldY in real units", endlengthlist.get(index).oldpointCal[1]);
-					rtAll.addValue("NewX in real units", endlengthlist.get(index).newpointCal[0]);
-					rtAll.addValue("NewY in real units", endlengthlist.get(index).newpointCal[1]);
-					rtAll.addValue("lengthPerframe in pixel units", endlengthlist.get(index).lengthpixelperframe);
-					rtAll.addValue("Cummulative length in pixel units", endlengthlist.get(index).totallengthpixel);
-					rtAll.addValue("lengthPerframe in real units", endlengthlist.get(index).lengthrealperframe);
-					rtAll.addValue("Cummulative length in real units", endlengthlist.get(index).totallengthreal);
+					rtAll.addValue("Total Length (pixel)", endlengthlist.get(index).totallengthpixel);
+					rtAll.addValue("Total Length (real)", endlengthlist.get(index).totallengthreal);
+					rtAll.addValue("Track iD", endlengthlist.get(index).seedid);
+					rtAll.addValue("CurrentPosition X (px units)", endlengthlist.get(index).currentpointpixel[0]);
+					rtAll.addValue("CurrentPosition Y (px units)", endlengthlist.get(index).currentpointpixel[1]);
+					rtAll.addValue("CurrentPosition X (real units)", endlengthlist.get(index).currentpointreal[0]);
+					rtAll.addValue("CurrentPosition Y (real units)", endlengthlist.get(index).currentpointreal[1]);
+					rtAll.addValue("Length per frame (px units)", endlengthlist.get(index).lengthpixelperframe);
+					rtAll.addValue("Length per frame (real units)", endlengthlist.get(index).lengthrealperframe);
 
 				}
-
-				if (SaveXLS)
-					saveResultsToExcel(usefolder + "//" + addToName + "end" + ".xls", rtend);
 
 			}
 
@@ -5226,361 +5161,128 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 	}
 
-	protected class UpdateHoughListener implements ItemListener {
-		@Override
-		public void itemStateChanged(final ItemEvent arg0) {
-			boolean oldState = FindLinesViaHOUGH;
+	public void UpdateMser() {
+		FindLinesViaMSER = true;
+		FindLinesViaHOUGH = false;
+		FindLinesViaMSERwHOUGH = false;
+		final GridBagLayout layout = new GridBagLayout();
+		final GridBagConstraints c = new GridBagConstraints();
+		panelFourth.removeAll();
+		final Label Step = new Label("Step 4", Label.CENTER);
+		panelFourth.setLayout(layout);
+		panelFourth.add(Step, c);
+		final Scrollbar deltaS = new Scrollbar(Scrollbar.HORIZONTAL, deltaInit, 10, 0, 10 + scrollbarSize);
+		final Scrollbar maxVarS = new Scrollbar(Scrollbar.HORIZONTAL, maxVarInit, 10, 0, 10 + scrollbarSize);
+		final Scrollbar minDiversityS = new Scrollbar(Scrollbar.HORIZONTAL, minDiversityInit, 10, 0,
+				10 + scrollbarSize);
+		final Scrollbar minSizeS = new Scrollbar(Scrollbar.HORIZONTAL, minSizeInit, 10, 0, 10 + scrollbarSize);
+		final Scrollbar maxSizeS = new Scrollbar(Scrollbar.HORIZONTAL, maxSizeInit, 10, 0, 10 + scrollbarSize);
 
-			if (arg0.getStateChange() == ItemEvent.DESELECTED)
-				FindLinesViaHOUGH = false;
-			else if (arg0.getStateChange() == ItemEvent.SELECTED) {
-				FindLinesViaMSER = false;
-				FindLinesViaHOUGH = true;
-				FindLinesViaMSERwHOUGH = false;
-				// UpdateHough();
+		final Label deltaText = new Label("delta = " + delta, Label.CENTER);
+		final Label maxVarText = new Label("maxVar = " + maxVar, Label.CENTER);
+		final Label minDiversityText = new Label("minDiversity = " + minDiversity, Label.CENTER);
+		final Label minSizeText = new Label("MinSize = " + minSize, Label.CENTER);
+		final Label maxSizeText = new Label("MaxSize = " + maxSize, Label.CENTER);
 
-				final GridBagLayout layout = new GridBagLayout();
-				final GridBagConstraints c = new GridBagConstraints();
-				panelFifth.removeAll();
-				final Label Step = new Label("Step 5", Label.CENTER);
-				panelFifth.setLayout(layout);
+		final Checkbox min = new Checkbox("Look for Minima ", darktobright);
 
-				panelFifth.add(Step, c);
-				final Label exthresholdText = new Label("threshold = threshold to create Bitimg for watershedding.",
-						Label.CENTER);
-				final Label exthetaText = new Label("thetaPerPixel = Pixel Size in theta direction for Hough space.",
-						Label.CENTER);
-				final Label exrhoText = new Label("rhoPerPixel = Pixel Size in rho direction for Hough space.",
-						Label.CENTER);
-				final Label thresholdText = new Label("thresholdValue = " + thresholdHough, Label.CENTER);
-				final Label thetaText = new Label("Size of Hough Space in Theta = " + thetaPerPixel, Label.CENTER);
-				final Label rhoText = new Label("Size of Hough Space in Rho = " + rhoPerPixel, Label.CENTER);
+		final Button ComputeTree = new Button("Compute Tree and display");
+		/* Location */
 
-				final Scrollbar threshold = new Scrollbar(Scrollbar.HORIZONTAL, (int) thresholdHoughInit, 10, 0,
-						10 + scrollbarSize);
-				thresholdHough = computeValueFromScrollbarPosition((int) thresholdHoughInit, thresholdHoughMin,
-						thresholdHoughMax, scrollbarSize);
+		final Label Update = new Label("Update parameters for dynamic channel");
+		Update.setBackground(new Color(1, 0, 1));
+		Update.setForeground(new Color(255, 255, 255));
+		panelFourth.setLayout(layout);
 
-				final Scrollbar thetaSize = new Scrollbar(Scrollbar.HORIZONTAL, (int) thetaPerPixelInit, 10, 0,
-						10 + scrollbarSize);
-				thetaPerPixel = computeValueFromScrollbarPosition((int) thetaPerPixelInit, thetaPerPixelMin,
-						thetaPerPixelMax, scrollbarSize);
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 0;
+		c.gridy = 0;
+		c.weightx = 4;
+		c.weighty = 1.5;
+		++c.gridy;
+		panelFourth.add(Update, c);
 
-				final Scrollbar rhoSize = new Scrollbar(Scrollbar.HORIZONTAL, (int) rhoPerPixelInit, 10, 0,
-						10 + scrollbarSize);
-				rhoPerPixel = computeValueFromScrollbarPosition((int) rhoPerPixelInit, rhoPerPixelMin, rhoPerPixelMax,
-						scrollbarSize);
+		++c.gridy;
+		panelFourth.add(deltaText, c);
 
-				final Checkbox displayBit = new Checkbox("Display Bitimage ", displayBitimg);
-				final Checkbox displayWatershed = new Checkbox("Display Watershedimage ", displayWatershedimg);
+		++c.gridy;
+		panelFourth.add(deltaS, c);
 
-				final Button Dowatershed = new Button("Do watershedding");
-				final Label Update = new Label("Update parameters for dynamic channel");
-				Update.setBackground(new Color(1, 0, 1));
-				Update.setForeground(new Color(255, 255, 255));
-				/* Location */
-				panelFifth.setLayout(layout);
-				c.fill = GridBagConstraints.HORIZONTAL;
-				c.gridx = 0;
-				c.gridy = 0;
-				c.weightx = 4;
-				c.weighty = 1.5;
+		++c.gridy;
 
-				++c.gridy;
-				panelFifth.add(Update, c);
+		panelFourth.add(maxVarText, c);
 
-				++c.gridy;
-				panelFifth.add(exthresholdText, c);
-				++c.gridy;
+		++c.gridy;
+		panelFourth.add(maxVarS, c);
 
-				panelFifth.add(exthetaText, c);
-				++c.gridy;
+		++c.gridy;
 
-				panelFifth.add(exrhoText, c);
-				++c.gridy;
+		panelFourth.add(minDiversityText, c);
 
-				panelFifth.add(thresholdText, c);
-				++c.gridy;
+		++c.gridy;
+		panelFourth.add(minDiversityS, c);
 
-				panelFifth.add(threshold, c);
-				++c.gridy;
+		++c.gridy;
 
-				panelFifth.add(thetaText, c);
-				++c.gridy;
-				panelFifth.add(thetaSize, c);
-				++c.gridy;
+		panelFourth.add(minSizeText, c);
 
-				panelFifth.add(rhoText, c);
+		++c.gridy;
+		panelFourth.add(minSizeS, c);
 
-				++c.gridy;
+		++c.gridy;
 
-				panelFifth.add(rhoSize, c);
+		panelFourth.add(maxSizeText, c);
 
-				++c.gridy;
-				c.insets = new Insets(10, 175, 0, 175);
-				panelFifth.add(displayBit, c);
+		++c.gridy;
+		panelFourth.add(maxSizeS, c);
 
-				++c.gridy;
-				c.insets = new Insets(10, 175, 0, 175);
-				panelFifth.add(displayWatershed, c);
-				++c.gridy;
-				c.insets = new Insets(10, 175, 0, 175);
-				panelFifth.add(Dowatershed, c);
+		++c.gridy;
+		c.insets = new Insets(10, 175, 0, 175);
+		panelFourth.add(min, c);
 
-				threshold.addAdjustmentListener(new thresholdHoughListener(thresholdText, thresholdHoughMin,
-						thresholdHoughMax, scrollbarSize, threshold));
+		++c.gridy;
+		c.insets = new Insets(10, 175, 0, 175);
+		panelFourth.add(ComputeTree, c);
 
-				thetaSize.addAdjustmentListener(new thetaSizeHoughListener(thetaText, rhoText, thetaPerPixelMin,
-						thetaPerPixelMax, scrollbarSize, thetaSize, rhoSize));
+		deltaS.addAdjustmentListener(new DeltaListener(deltaText, deltaMin, deltaMax, scrollbarSize, deltaS));
 
-				rhoSize.addAdjustmentListener(
-						new rhoSizeHoughListener(rhoText, rhoPerPixelMin, rhoPerPixelMax, scrollbarSize, rhoSize));
+		maxVarS.addAdjustmentListener(new maxVarListener(maxVarText, maxVarMin, maxVarMax, scrollbarSize, maxVarS));
 
-				displayBit.addItemListener(new ShowBitimgListener());
-				displayWatershed.addItemListener(new ShowwatershedimgListener());
-				Dowatershed.addActionListener(new DowatershedListener());
-				panelFifth.repaint();
-				panelFifth.validate();
-				Cardframe.pack();
+		minDiversityS.addAdjustmentListener(new minDiversityListener(minDiversityText, minDiversityMin, minDiversityMax,
+				scrollbarSize, minDiversityS));
 
-			}
+		minSizeS.addAdjustmentListener(
+				new minSizeListener(minSizeText, minSizemin, minSizemax, scrollbarSize, minSizeS));
 
+		maxSizeS.addAdjustmentListener(
+				new maxSizeListener(maxSizeText, maxSizemin, maxSizemax, scrollbarSize, maxSizeS));
+
+		min.addItemListener(new DarktobrightListener());
+		ComputeTree.addActionListener(new ComputeTreeListener());
+
+		if (analyzekymo && Kymoimg != null) {
+
+			Kymo();
 		}
 
+		else
+
+			Deterministic();
+
+		panelFourth.validate();
+		panelFourth.repaint();
+		Cardframe.pack();
 	}
 
 	protected class UpdateMserListener implements ItemListener {
 		@Override
 		public void itemStateChanged(final ItemEvent arg0) {
-			boolean oldState = FindLinesViaMSER;
 
 			if (arg0.getStateChange() == ItemEvent.DESELECTED)
 				FindLinesViaMSER = false;
 			else if (arg0.getStateChange() == ItemEvent.SELECTED) {
 				FindLinesViaMSER = true;
-				FindLinesViaHOUGH = false;
-				FindLinesViaMSERwHOUGH = false;
-				// UpdateMSER();
-				final GridBagLayout layout = new GridBagLayout();
-				final GridBagConstraints c = new GridBagConstraints();
-				panelFifth.removeAll();
-				final Label Step = new Label("Step 5", Label.CENTER);
-				panelFifth.setLayout(layout);
-				panelFifth.add(Step, c);
-				final Scrollbar deltaS = new Scrollbar(Scrollbar.HORIZONTAL, deltaInit, 10, 0, 10 + scrollbarSize);
-				final Scrollbar maxVarS = new Scrollbar(Scrollbar.HORIZONTAL, maxVarInit, 10, 0, 10 + scrollbarSize);
-				final Scrollbar minDiversityS = new Scrollbar(Scrollbar.HORIZONTAL, minDiversityInit, 10, 0,
-						10 + scrollbarSize);
-				final Scrollbar minSizeS = new Scrollbar(Scrollbar.HORIZONTAL, minSizeInit, 10, 0, 10 + scrollbarSize);
-				final Scrollbar maxSizeS = new Scrollbar(Scrollbar.HORIZONTAL, maxSizeInit, 10, 0, 10 + scrollbarSize);
-
-				final Label deltaText = new Label("delta = " + delta, Label.CENTER);
-				final Label maxVarText = new Label("maxVar = " + maxVar, Label.CENTER);
-				final Label minDiversityText = new Label("minDiversity = " + minDiversity, Label.CENTER);
-				final Label minSizeText = new Label("MinSize = " + minSize, Label.CENTER);
-				final Label maxSizeText = new Label("MaxSize = " + maxSize, Label.CENTER);
-
-				final Checkbox min = new Checkbox("Look for Minima ", darktobright);
-
-				final Button ComputeTree = new Button("Compute Tree and display");
-				/* Location */
-
-				final Label Update = new Label("Update parameters for dynamic channel");
-				Update.setBackground(new Color(1, 0, 1));
-				Update.setForeground(new Color(255, 255, 255));
-				panelFifth.setLayout(layout);
-
-				c.fill = GridBagConstraints.HORIZONTAL;
-				c.gridx = 0;
-				c.gridy = 0;
-				c.weightx = 4;
-				c.weighty = 1.5;
-				++c.gridy;
-				panelFifth.add(Update, c);
-
-				++c.gridy;
-				panelFifth.add(deltaText, c);
-
-				++c.gridy;
-				panelFifth.add(deltaS, c);
-
-				++c.gridy;
-
-				panelFifth.add(maxVarText, c);
-
-				++c.gridy;
-				panelFifth.add(maxVarS, c);
-
-				++c.gridy;
-
-				panelFifth.add(minDiversityText, c);
-
-				++c.gridy;
-				panelFifth.add(minDiversityS, c);
-
-				++c.gridy;
-
-				panelFifth.add(minSizeText, c);
-
-				++c.gridy;
-				panelFifth.add(minSizeS, c);
-
-				++c.gridy;
-
-				panelFifth.add(maxSizeText, c);
-
-				++c.gridy;
-				panelFifth.add(maxSizeS, c);
-
-				++c.gridy;
-				c.insets = new Insets(10, 175, 0, 175);
-				panelFifth.add(min, c);
-
-				++c.gridy;
-				c.insets = new Insets(10, 175, 0, 175);
-				panelFifth.add(ComputeTree, c);
-
-				deltaS.addAdjustmentListener(new DeltaListener(deltaText, deltaMin, deltaMax, scrollbarSize, deltaS));
-
-				maxVarS.addAdjustmentListener(
-						new maxVarListener(maxVarText, maxVarMin, maxVarMax, scrollbarSize, maxVarS));
-
-				minDiversityS.addAdjustmentListener(new minDiversityListener(minDiversityText, minDiversityMin,
-						minDiversityMax, scrollbarSize, minDiversityS));
-
-				minSizeS.addAdjustmentListener(
-						new minSizeListener(minSizeText, minSizemin, minSizemax, scrollbarSize, minSizeS));
-
-				maxSizeS.addAdjustmentListener(
-						new maxSizeListener(maxSizeText, maxSizemin, maxSizemax, scrollbarSize, maxSizeS));
-
-				min.addItemListener(new DarktobrightListener());
-				ComputeTree.addActionListener(new ComputeTreeListener());
-				panelFifth.validate();
-				panelFifth.repaint();
-
-			}
-
-		}
-
-	}
-
-	protected class UpdateMserwHoughListener implements ItemListener {
-		@Override
-		public void itemStateChanged(final ItemEvent arg0) {
-			boolean oldState = FindLinesViaMSERwHOUGH;
-
-			if (arg0.getStateChange() == ItemEvent.DESELECTED)
-				FindLinesViaMSERwHOUGH = false;
-			else if (arg0.getStateChange() == ItemEvent.SELECTED) {
-				FindLinesViaMSER = false;
-				FindLinesViaHOUGH = false;
-				FindLinesViaMSERwHOUGH = true;
-				// UpdateMSER();
-				final GridBagLayout layout = new GridBagLayout();
-				final GridBagConstraints c = new GridBagConstraints();
-				panelFifth.removeAll();
-				final Label Step = new Label("Step 5", Label.CENTER);
-				panelFifth.setLayout(layout);
-				panelFifth.add(Step, c);
-				final Scrollbar deltaS = new Scrollbar(Scrollbar.HORIZONTAL, deltaInit, 10, 0, 10 + scrollbarSize);
-				final Scrollbar maxVarS = new Scrollbar(Scrollbar.HORIZONTAL, maxVarInit, 10, 0, 10 + scrollbarSize);
-				final Scrollbar minDiversityS = new Scrollbar(Scrollbar.HORIZONTAL, minDiversityInit, 10, 0,
-						10 + scrollbarSize);
-				final Scrollbar minSizeS = new Scrollbar(Scrollbar.HORIZONTAL, minSizeInit, 10, 0, 10 + scrollbarSize);
-				final Scrollbar maxSizeS = new Scrollbar(Scrollbar.HORIZONTAL, maxSizeInit, 10, 0, 10 + scrollbarSize);
-				maxVar = computeValueFromScrollbarPosition(maxVarInit, maxVarMin, maxVarMax, scrollbarSize);
-				delta = computeValueFromScrollbarPosition(deltaInit, deltaMin, deltaMax, scrollbarSize);
-				minDiversity = computeValueFromScrollbarPosition(minDiversityInit, minDiversityMin, minDiversityMax,
-						scrollbarSize);
-				minSize = (int) computeValueFromScrollbarPosition(minSizeInit, minSizemin, minSizemax, scrollbarSize);
-				maxSize = (int) computeValueFromScrollbarPosition(maxSizeInit, maxSizemin, maxSizemax, scrollbarSize);
-
-				final Checkbox min = new Checkbox("Look for Minima ", darktobright);
-
-				final Button ComputeTree = new Button("Compute Tree and display");
-				/* Location */
-				final Label deltaText = new Label("delta = ", Label.CENTER);
-				final Label maxVarText = new Label("maxVar = ", Label.CENTER);
-				final Label minDiversityText = new Label("minDiversity = ", Label.CENTER);
-				final Label minSizeText = new Label("MinSize = ", Label.CENTER);
-				final Label maxSizeText = new Label("MaxSize = ", Label.CENTER);
-				final Label Update = new Label("Update parameters for dynamic channel");
-				Update.setBackground(new Color(1, 0, 1));
-				Update.setForeground(new Color(255, 255, 255));
-				final Label Stepfive = new Label("Step 5", Label.CENTER);
-				panelFifth.setLayout(layout);
-
-				panelFifth.add(Stepfive, c);
-				c.fill = GridBagConstraints.HORIZONTAL;
-				c.gridx = 0;
-				c.gridy = 0;
-				c.weightx = 4;
-				c.weighty = 1.5;
-
-				++c.gridy;
-				panelFifth.add(Update, c);
-
-				++c.gridy;
-				panelFifth.add(deltaText, c);
-
-				++c.gridy;
-				panelFifth.add(deltaS, c);
-
-				++c.gridy;
-
-				panelFifth.add(maxVarText, c);
-
-				++c.gridy;
-				panelFifth.add(maxVarS, c);
-
-				++c.gridy;
-
-				panelFifth.add(minDiversityText, c);
-
-				++c.gridy;
-				panelFifth.add(minDiversityS, c);
-
-				++c.gridy;
-
-				panelFifth.add(minSizeText, c);
-
-				++c.gridy;
-				panelFifth.add(minSizeS, c);
-
-				++c.gridy;
-
-				panelFifth.add(maxSizeText, c);
-
-				++c.gridy;
-				panelFifth.add(maxSizeS, c);
-
-				++c.gridy;
-				c.insets = new Insets(10, 175, 0, 175);
-				panelFifth.add(min, c);
-
-				++c.gridy;
-				c.insets = new Insets(10, 175, 0, 175);
-				panelFifth.add(ComputeTree, c);
-
-				deltaS.addAdjustmentListener(new DeltaListener(deltaText, deltaMin, deltaMax, scrollbarSize, deltaS));
-
-				maxVarS.addAdjustmentListener(
-						new maxVarListener(maxVarText, maxVarMin, maxVarMax, scrollbarSize, maxVarS));
-
-				minDiversityS.addAdjustmentListener(new minDiversityListener(minDiversityText, minDiversityMin,
-						minDiversityMax, scrollbarSize, minDiversityS));
-
-				minSizeS.addAdjustmentListener(
-						new minSizeListener(minSizeText, minSizemin, minSizemax, scrollbarSize, minSizeS));
-
-				maxSizeS.addAdjustmentListener(
-						new maxSizeListener(maxSizeText, maxSizemin, maxSizemax, scrollbarSize, maxSizeS));
-
-				min.addItemListener(new DarktobrightListener());
-				ComputeTree.addActionListener(new ComputeTreeListener());
-				panelFifth.validate();
-				panelFifth.repaint();
+				UpdateMser();
 
 			}
 
@@ -5782,12 +5484,10 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 				final Label Houghparam = new Label("Determine Hough Transform parameters");
 				Houghparam.setBackground(new Color(1, 0, 1));
 				Houghparam.setForeground(new Color(255, 255, 255));
-				final Label Stepsec = new Label("Step 1", Label.CENTER);
 
 				/* Location */
 				panelSecond.setLayout(layout);
 
-				panelSecond.add(Stepsec, c);
 				c.fill = GridBagConstraints.HORIZONTAL;
 				c.gridx = 0;
 				c.gridy = 0;
@@ -5865,71 +5565,6 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		}
 	}
 
-	protected class AnalyzekymoListener implements ItemListener {
-		@Override
-		public void itemStateChanged(final ItemEvent arg0) {
-
-			if (arg0.getStateChange() == ItemEvent.SELECTED) {
-				analyzekymo = true;
-				panelSixth.removeAll();
-
-				final GridBagLayout layout = new GridBagLayout();
-				final GridBagConstraints c = new GridBagConstraints();
-				panelSixth.setLayout(layout);
-				c.fill = GridBagConstraints.HORIZONTAL;
-				c.gridx = 0;
-				c.gridy = 0;
-				c.weightx = 1;
-				final Checkbox KalmanTracker = new Checkbox("Use Kalman Filter for tracking");
-				final Checkbox DeterTracker = new Checkbox("Use Deterministic method for tracking");
-				final Checkbox KymoExtract = new Checkbox("Extract Kymo (for the single chosen MT)");
-				final Label Kal = new Label("Use Kalman Filter for probabilistic tracking");
-				final Label Det = new Label("Use Deterministic tracker using the fixed Seed points");
-				Kal.setBackground(new Color(1, 0, 1));
-				Kal.setForeground(new Color(255, 255, 255));
-				Det.setBackground(new Color(1, 0, 1));
-				Det.setForeground(new Color(255, 255, 255));
-				final Label Step = new Label("Step 6", Label.CENTER);
-
-				panelSixth.add(Step, c);
-
-				++c.gridy;
-				c.insets = new Insets(10, 10, 0, 50);
-				panelSixth.add(Kal, c);
-
-				++c.gridy;
-				c.insets = new Insets(10, 10, 0, 50);
-				panelSixth.add(KalmanTracker, c);
-
-				++c.gridy;
-				c.insets = new Insets(10, 10, 0, 50);
-				panelSixth.add(Det, c);
-
-				++c.gridy;
-				c.insets = new Insets(10, 10, 0, 50);
-				panelSixth.add(DeterTracker, c);
-
-				++c.gridy;
-				c.insets = new Insets(10, 10, 0, 50);
-				panelSixth.add(KymoExtract, c);
-
-				KalmanTracker.addItemListener(new KalmanchoiceListener());
-				DeterTracker.addItemListener(new DeterchoiceListener());
-				KymoExtract.addItemListener(new KymoExtractListener());
-
-				panelSixth.validate();
-				panelSixth.repaint();
-				Cardframe.pack();
-			}
-			if (arg0.getStateChange() == ItemEvent.DESELECTED) {
-				analyzekymo = false;
-
-			}
-
-		}
-
-	}
-
 	protected class MserwHoughListener implements ItemListener {
 		@Override
 		public void itemStateChanged(final ItemEvent arg0) {
@@ -5968,8 +5603,10 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 				rhoPerPixel = computeValueFromScrollbarPosition((int) rhoPerPixelInit, rhoPerPixelMin, rhoPerPixelMax,
 						scrollbarSize);
 
-				final Label thetaText = new Label("Size of Hough Space in Theta = ", Label.CENTER);
-				final Label rhoText = new Label("Size of Hough Space in Rho = ", Label.CENTER);
+				final Label thetaText = new Label("Pixel size of Hough Space in Theta / Pixel Space = " + thetaPerPixel,
+						Label.CENTER);
+				final Label rhoText = new Label("Pixel size of Hough Space in Rho / Pixel Space = " + rhoPerPixel,
+						Label.CENTER);
 				final Button FindLinesListener = new Button("Find endpoints");
 				final Label Houghparam = new Label("Determine MSER and Hough Transform parameters");
 				Houghparam.setBackground(new Color(1, 0, 1));
@@ -5992,17 +5629,15 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 				final Checkbox min = new Checkbox("Look for Minima ", darktobright);
 
-				final Label deltaText = new Label("delta = ", Label.CENTER);
-				final Label maxVarText = new Label("maxVar = ", Label.CENTER);
-				final Label minDiversityText = new Label("minDiversity = ", Label.CENTER);
-				final Label minSizeText = new Label("MinSize = ", Label.CENTER);
-				final Label maxSizeText = new Label("MaxSize = ", Label.CENTER);
+				final Label deltaText = new Label("delta = " + delta, Label.CENTER);
+				final Label maxVarText = new Label("maxVar = " + maxVar, Label.CENTER);
+				final Label minDiversityText = new Label("minDiversity = " + minDiversity, Label.CENTER);
+				final Label minSizeText = new Label("MinSize = " + minSize, Label.CENTER);
+				final Label maxSizeText = new Label("MaxSize = " + maxSize, Label.CENTER);
 				/* Location */
-				final Label Stepsec = new Label("Step 2", Label.CENTER);
 
 				panelSecond.setLayout(layout);
 
-				panelSecond.add(Stepsec, c);
 				c.fill = GridBagConstraints.HORIZONTAL;
 				c.gridx = 0;
 				c.gridy = 0;
@@ -6099,6 +5734,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 				ComputeTree.addActionListener(new ComputeTreeListener());
 				panelSecond.validate();
 				panelSecond.repaint();
+				Cardframe.pack();
 			}
 
 			if (FindLinesViaMSERwHOUGH != oldState) {
@@ -6455,21 +6091,23 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 			prestack.addSlice(Localimp.getImageStack().getProcessor(i).convertToRGB());
 			cp = (ColorProcessor) (prestack.getProcessor(i).duplicate());
 
-			ArrayList<EllipseRoi> Rois = AllMSERrois.get(i);
-			for (int index = 0; index < Rois.size(); ++index) {
+			if (FindLinesViaHOUGH == false) {
+				ArrayList<EllipseRoi> Rois = AllMSERrois.get(i);
+				for (int index = 0; index < Rois.size(); ++index) {
 
-				EllipseRoi or = Rois.get(index);
+					EllipseRoi or = Rois.get(index);
 
-				or.setStrokeColor(Color.red);
+					or.setStrokeColor(Color.red);
 
-				if (displayoverlay) {
+					if (displayoverlay) {
 
-					cp.setColor(Color.red);
-					cp.setLineWidth(1);
-					cp.draw(or);
+						cp.setColor(Color.red);
+						cp.setLineWidth(1);
+						cp.draw(or);
+
+					}
 
 				}
-
 			}
 
 			ArrayList<Roi> AllBigRoi = new ArrayList<Roi>();
@@ -6480,10 +6118,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 					if (endlengthlist.get(secindex).framenumber == i) {
 						double[] newendpoint = new double[ndims];
 
-						if (i == thirdDimensionsliderInit)
-							newendpoint = endlengthlist.get(secindex).originalpoint;
-						else
-							newendpoint = endlengthlist.get(secindex).newpoint;
+						newendpoint = endlengthlist.get(secindex).currentpointpixel;
 
 						final OvalRoi Bigroi = new OvalRoi(Util.round(newendpoint[0] - 2.5),
 								Util.round(newendpoint[1] - 2.5), Util.round(5), Util.round(5));
@@ -6500,10 +6135,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 					if (startlengthlist.get(secindex).framenumber == i) {
 						double[] newstartpoint = new double[ndims];
 
-						if (i == thirdDimensionsliderInit) {
-							newstartpoint = startlengthlist.get(secindex).originalpoint;
-						} else
-							newstartpoint = startlengthlist.get(secindex).newpoint;
+						newstartpoint = startlengthlist.get(secindex).currentpointpixel;
 
 						final OvalRoi Bigroi = new OvalRoi(Util.round(newstartpoint[0] - 2.5),
 								Util.round(newstartpoint[1] - 2.5), Util.round(5), Util.round(5));

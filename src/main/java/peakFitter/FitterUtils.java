@@ -79,7 +79,15 @@ public static void SetProgressBarTime(JProgressBar jpb, double percent, int fram
 		
 	}
 	
+public static void SetProgressBarTime(JProgressBar jpb, double percent, int framenumber, int thirdDimsize, String message){
 	
+	jpb.setValue((int) percent);
+	jpb.setOpaque(true);
+	jpb.setStringPainted(true);
+	jpb.setString( message +  "= " + framenumber + "/" + thirdDimsize);
+		
+		
+	}
 	
 	
 }

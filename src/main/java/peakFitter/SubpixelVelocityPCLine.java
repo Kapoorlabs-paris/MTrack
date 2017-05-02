@@ -189,8 +189,11 @@ public class SubpixelVelocityPCLine extends BenchmarkAlgorithm
 			
 			final int oldframenumber = PrevFrameparamstart.get(PrevFrameparamstart.size() - 1).framenumber;
 			final int framediff = framenumber - oldframenumber;
+			
 			if (Trackstart.get(PrevFrameparamstart.get(index).seedLabel) == Whichend.start
 					|| Trackstart.get(PrevFrameparamstart.get(index).seedLabel) == Whichend.both ){
+				
+				
 			percent = (Math.round(100 * (index + 1) / (PrevFrameparamstart.size())));
 			
 			final double originalslope = PrevFrameparamstart.get(index).originalslope;
@@ -244,7 +247,6 @@ public class SubpixelVelocityPCLine extends BenchmarkAlgorithm
 			
 			if (Trackstart.get(PrevFrameparamend.get(index).seedLabel) == Whichend.end 
 					|| Trackstart.get(PrevFrameparamend.get(index).seedLabel) == Whichend.both ){
-				
 				
 			percent = (Math.round(100 * (index + 1) / (PrevFrameparamend.size())));
 

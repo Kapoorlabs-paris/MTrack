@@ -200,9 +200,7 @@ import preProcessing.GetLocalmaxmin;
 			
 			for (int index = 0; index < PrevFrameparamstart.size(); ++index) {
 				final int oldframenumber = PrevFrameparamstart.get(PrevFrameparamstart.size() - 1).framenumber;
-				
-				if (Trackstart.get(PrevFrameparamstart.get(index).seedLabel) == Whichend.start
-						|| Trackstart.get(PrevFrameparamstart.get(index).seedLabel) == Whichend.both){
+			
 					
 					
 				percent = (Math.round(100 * (index + 1) / (PrevFrameparamstart.size())));
@@ -260,7 +258,7 @@ import preProcessing.GetLocalmaxmin;
 				
 				
 
-			}
+			
 			}
 			
 			
@@ -270,9 +268,7 @@ import preProcessing.GetLocalmaxmin;
 				
 				
 				
-				
-				if (Trackstart.get(PrevFrameparamend.get(index).seedLabel) == Whichend.end 
-						|| Trackstart.get(PrevFrameparamend.get(index).seedLabel) == Whichend.both){
+			
 					
 				percent = (Math.round(100 * (index + 1) / (PrevFrameparamend.size())));
 				Point secondlinepoint = new Point(ndims);
@@ -329,7 +325,7 @@ import preProcessing.GetLocalmaxmin;
 				
 			}
 		
-			}
+			
 			
 
 			return true;

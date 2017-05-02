@@ -64,7 +64,6 @@ public class DisplayGraph {
 
 				
 				imp.updateAndDraw();
-				imp.setTitle("Found Tracks");
 				
 			}
 		

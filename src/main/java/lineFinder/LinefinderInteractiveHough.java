@@ -2,6 +2,7 @@ package lineFinder;
 
 import java.util.ArrayList;
 
+import javax.swing.JProgressBar;
 
 import drawandOverlay.HoughPushCurves;
 import drawandOverlay.OverlayLines;
@@ -20,6 +21,7 @@ import net.imglib2.type.logic.BitType;
 import net.imglib2.type.numeric.integer.IntType;
 import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.util.Pair;
+import peakFitter.FitterUtils;
 import preProcessing.GetLocalmaxmin;
 import preProcessing.GlobalThresholding;
 import preProcessing.Kernels;
@@ -48,12 +50,12 @@ public class LinefinderInteractiveHough implements Linefinder {
 	public int maxtheta = 240;
 	private final double thetaPerPixel;
 	private final double rhoPerPixel;
-	
-	
+	private final JProgressBar jpb;
+	double percent = 0;
 	public LinefinderInteractiveHough (final RandomAccessibleInterval<FloatType> source, 
 			final RandomAccessibleInterval<FloatType> Preprocessedsource, final RandomAccessibleInterval<IntType> intimg, 
 			final int MaxLabel, final double thetaPerPixel, final double rhoPerPixel,
-			final int framenumber){
+			final int framenumber, final JProgressBar jpb){
 		
 		this.source = source;
 		this.Preprocessedsource = Preprocessedsource;
@@ -62,6 +64,7 @@ public class LinefinderInteractiveHough implements Linefinder {
 		this.thetaPerPixel = thetaPerPixel;
 		this.rhoPerPixel = rhoPerPixel;
 		this.framenumber = framenumber;
+		this.jpb = jpb;
 		ndims = source.numDimensions();
 		
 		
@@ -87,8 +90,11 @@ public class LinefinderInteractiveHough implements Linefinder {
 		Float val = GlobalThresholding.AutomaticThresholding(Preprocessedsource);
 
 		for (int label = 1; label < Maxlabel - 1; label++) {
+			
+			percent = (Math.round(100 * (label + 1) / (Maxlabel - 1)));
+			
+			FitterUtils.SetProgressBarTime(jpb, percent, label, Maxlabel - 2, "Doing Hough Transform");
 
-           
 			Pair<RandomAccessibleInterval<FloatType>, FinalInterval> pair =  Boundingboxes.CurrentLabeloffsetImagepair(intimg, Preprocessedsource, label);
 			RandomAccessibleInterval<FloatType> ActualRoiimg = Boundingboxes.CurrentLabelImage(intimg, source, label);
 			RandomAccessibleInterval<FloatType> roiimg = pair.getA();
