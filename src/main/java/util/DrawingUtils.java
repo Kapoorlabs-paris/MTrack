@@ -1,19 +1,28 @@
 package util;
 
+import java.awt.Color;
 import java.awt.Rectangle;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
+import graphconstructs.KalmanTrackproperties;
+import graphconstructs.Trackproperties;
 import ij.ImagePlus;
 import ij.ImageStack;
 import ij.gui.EllipseRoi;
+import ij.gui.Line;
 import ij.gui.OvalRoi;
+import ij.gui.Overlay;
+import ij.gui.PointRoi;
 import ij.gui.Roi;
 import ij.process.ColorProcessor;
 import kdTreeBlobs.FlagNode;
 import kdTreeBlobs.NNFlagsearchKDtree;
+import labeledObjects.Indexedlength;
+import labeledObjects.KalmanIndexedlength;
 import net.imglib2.KDTree;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.RealPoint;
@@ -22,6 +31,7 @@ import net.imglib2.algorithm.componenttree.mser.MserTree;
 import net.imglib2.img.display.imagej.ImageJFunctions;
 import net.imglib2.type.numeric.integer.UnsignedByteType;
 import net.imglib2.type.numeric.real.FloatType;
+import net.imglib2.util.Pair;
 import peakFitter.SortListbyproperty;
 
 public class DrawingUtils {
@@ -54,14 +64,182 @@ public class DrawingUtils {
 
 		return ellipse;
 	}
-	
-	
-	public static Roi getNearestRois(ArrayList<OvalRoi> Allrois, double[] Clickedpoint) {
+	public static void Trackplot(int detcount, Pair<Pair<ArrayList<Trackproperties>, ArrayList<Trackproperties>>, Pair<ArrayList<Indexedlength>, ArrayList<Indexedlength>>> returnVector,
+			HashMap<Integer, ArrayList<Roi>> AllpreviousRois,
+			Color colorLineTrack, Color colorTrack, Overlay overlay, int maxghost) {
 
-		Roi KDtreeroi = null;
+
+		ArrayList<Roi> AllselectedRoi = new ArrayList<Roi>();
+		
+		if(returnVector!=null){
+		for (int index = 0; index < returnVector.getA().getA().size(); ++index) {
+
+			Trackproperties vector = returnVector.getA().getA().get(index);
+
+			PointRoi selectedRoi = new PointRoi(vector.newpoint[0], vector.newpoint[1]);
+			Line selectedLineRoi = new Line(vector.newpoint[0], vector.newpoint[1], vector.oldpoint[0],
+					vector.oldpoint[1]);
+			selectedLineRoi.setStrokeColor(colorLineTrack);
+			selectedLineRoi.setStrokeWidth(0.2);
+			overlay.add(selectedLineRoi);
+
+			AllselectedRoi.add(selectedRoi);
+
+		}
+
+		for (int index = 0; index < returnVector.getA().getB().size(); ++index) {
+
+			Trackproperties vector = returnVector.getA().getB().get(index);
+
+			PointRoi selectedRoi = new PointRoi(vector.newpoint[0], vector.newpoint[1]);
+			Line selectedLineRoi = new Line(vector.newpoint[0], vector.newpoint[1], vector.oldpoint[0],
+					vector.oldpoint[1]);
+			selectedLineRoi.setStrokeColor(colorLineTrack);
+			selectedLineRoi.setStrokeWidth(0.2);
+			overlay.add(selectedLineRoi);
+
+			AllselectedRoi.add(selectedRoi);
+
+		}
+		AllpreviousRois.put(detcount, AllselectedRoi);
+
+		if (detcount <= maxghost){
+			for (int i = 1; i < detcount; ++i) {
+
+				for (int index = 0; index < AllpreviousRois.get(i).size(); ++index) {
+
+					overlay.add(AllpreviousRois.get(i).get(index));
+					
+					
+
+				}
+
+			}
+		}
+		else{
+			for (int i = 1; i < detcount; ++i) {
+			for (int index = 0; index < AllpreviousRois.get(i).size(); ++index) {
+				Roi roi = AllpreviousRois.get(i).get(index);
+			overlay.remove(roi);
+
+			
+			}
+			}
+			for (int i = detcount - maxghost + 2; i < detcount; ++i) {
+			for (int index = 0; index < AllpreviousRois.get(i).size(); ++index){
+				
+				Roi oldroi = AllpreviousRois.get(i).get(index);
+				oldroi.setStrokeColor(colorTrack);
+				
+				overlay.add(oldroi);
+				
+				
+			}
+			
+		}
+
+		
+		}
+	
+
+		
+		}
+
+	
+
+	
+}
+	
+	
+	
+	public static void TrackplotKalman(int Kalmancount, Pair<Pair<ArrayList<KalmanTrackproperties>, ArrayList<KalmanTrackproperties>>, Pair<ArrayList<KalmanIndexedlength>, ArrayList<KalmanIndexedlength>>> returnVector,
+			HashMap<Integer, ArrayList<Roi>> AllpreviousRois,
+			Color colorLineTrack, Color colorTrack, Overlay overlay, int maxghost) {
+
+
+
+		
+		
+		Kalmancount++;
+		ArrayList<Roi> AllselectedRoi = new ArrayList<Roi>();
+		
+		if(returnVector!=null){
+		for (int index = 0; index < returnVector.getA().getA().size(); ++index) {
+
+			KalmanTrackproperties vector = returnVector.getA().getA().get(index);
+
+			PointRoi selectedRoi = new PointRoi(vector.currentpoint[0], vector.currentpoint[1]);
+		
+
+			AllselectedRoi.add(selectedRoi);
+
+		}
+
+		for (int index = 0; index < returnVector.getA().getB().size(); ++index) {
+
+			KalmanTrackproperties vector = returnVector.getA().getB().get(index);
+
+			PointRoi selectedRoi = new PointRoi(vector.currentpoint[0], vector.currentpoint[1]);
+			
+
+			AllselectedRoi.add(selectedRoi);
+
+		}
+		AllpreviousRois.put(Kalmancount, AllselectedRoi);
+
+		if (Kalmancount <= maxghost){
+			for (int i = 1; i < Kalmancount; ++i) {
+
+				for (int index = 0; index < AllpreviousRois.get(i).size(); ++index) {
+
+					overlay.add(AllpreviousRois.get(i).get(index));
+					
+					
+
+				}
+
+			}
+		}
+		else{
+			for (int i = 1; i < Kalmancount; ++i) {
+			for (int index = 0; index < AllpreviousRois.get(i).size(); ++index) {
+				Roi roi = AllpreviousRois.get(i).get(index);
+			overlay.remove(roi);
+
+			
+			}
+			}
+			for (int i = Kalmancount - maxghost + 2; i < Kalmancount; ++i) {
+			for (int index = 0; index < AllpreviousRois.get(i).size(); ++index){
+				
+				Roi oldroi = AllpreviousRois.get(i).get(index);
+				oldroi.setStrokeColor(colorTrack);
+				
+				overlay.add(oldroi);
+				
+				
+			}
+			
+		}
+
+		
+		}
+	
+
+		
+		}
+
+	
+
+	
+}
+	
+	public static OvalRoi getNearestRois(ArrayList<OvalRoi> Allrois, double[] Clickedpoint) {
+
+		OvalRoi KDtreeroi = null;
 
 		final List<RealPoint> targetCoords = new ArrayList<RealPoint>(Allrois.size());
-		final List<FlagNode<Roi>> targetNodes = new ArrayList<FlagNode<Roi>>(Allrois.size());
+		final List<FlagNode<OvalRoi>> targetNodes = new ArrayList<FlagNode<OvalRoi>>(Allrois.size());
 		for (int index = 0; index < Allrois.size(); ++index) {
 
 			 Roi r = Allrois.get(index);
@@ -70,21 +248,21 @@ public class DrawingUtils {
 			 targetCoords.add( new RealPoint(rect.x + rect.width/2.0, rect.y + rect.height/2.0 ) );
 			 
 
-			targetNodes.add(new FlagNode<Roi>(Allrois.get(index)));
+			targetNodes.add(new FlagNode<OvalRoi>(Allrois.get(index)));
 
 		}
 
 		if (targetNodes.size() > 0 && targetCoords.size() > 0) {
 
-			final KDTree<FlagNode<Roi>> Tree = new KDTree<FlagNode<Roi>>(targetNodes, targetCoords);
+			final KDTree<FlagNode<OvalRoi>> Tree = new KDTree<FlagNode<OvalRoi>>(targetNodes, targetCoords);
 
-			final NNFlagsearchKDtree<Roi> Search = new NNFlagsearchKDtree<Roi>(Tree);
+			final NNFlagsearchKDtree<OvalRoi> Search = new NNFlagsearchKDtree<OvalRoi>(Tree);
 
 
 				final double[] source = Clickedpoint;
 				final RealPoint sourceCoords = new RealPoint(source);
 				Search.search(sourceCoords);
-				final FlagNode<Roi> targetNode = Search.getSampler().get();
+				final FlagNode<OvalRoi> targetNode = Search.getSampler().get();
 
 				KDtreeroi = targetNode.getValue();
 

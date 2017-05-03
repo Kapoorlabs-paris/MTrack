@@ -76,7 +76,7 @@ import preProcessing.GetLocalmaxmin;
 		public double termepsilon = 1e-3;
 		// Mask fits iteration param
 		public int iterations = 500;
-		public double cutoffdistance = 5;
+		public double cutoffdistance = 15;
 		public boolean halfgaussian = false;
 		final HashMap<Integer, Whichend> Trackstart;
 		public double Intensityratio;
@@ -201,7 +201,8 @@ import preProcessing.GetLocalmaxmin;
 			for (int index = 0; index < PrevFrameparamstart.size(); ++index) {
 				final int oldframenumber = PrevFrameparamstart.get(PrevFrameparamstart.size() - 1).framenumber;
 			
-					
+				if (Trackstart.get(PrevFrameparamstart.get(index).seedLabel) == Whichend.start
+						|| Trackstart.get(PrevFrameparamstart.get(index).seedLabel) == Whichend.both) {
 					
 				percent = (Math.round(100 * (index + 1) / (PrevFrameparamstart.size())));
 				final double originalslope = PrevFrameparamstart.get(index).originalslope;
@@ -260,13 +261,14 @@ import preProcessing.GetLocalmaxmin;
 
 			
 			}
-			
+			}
 			
 				
 			for (int index = 0; index < PrevFrameparamend.size(); ++index) {
 				
 				
-				
+				if (Trackstart.get(PrevFrameparamend.get(index).seedLabel) == Whichend.end
+						|| Trackstart.get(PrevFrameparamend.get(index).seedLabel) == Whichend.both) {
 				
 			
 					
@@ -325,7 +327,7 @@ import preProcessing.GetLocalmaxmin;
 				
 			}
 		
-			
+			}
 			
 
 			return true;

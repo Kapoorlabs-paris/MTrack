@@ -105,6 +105,7 @@ import ij.gui.ImageCanvas;
 import ij.gui.Line;
 import ij.gui.OvalRoi;
 import ij.gui.Overlay;
+import ij.gui.PointRoi;
 import ij.gui.PolygonRoi;
 import ij.gui.Roi;
 import ij.io.Opener;
@@ -204,6 +205,9 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	float deltaMax = 400f;
 	float maxVarMin = 0;
 	float maxVarMax = 1;
+	
+	int radiusseed = 5;
+	
 	float thetaPerPixelMax = 2;
 	float rhoPerPixelMax = 2;
 	JProgressBar jpb;
@@ -268,6 +272,9 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	double netdeltadend = 0;
 	Color colorDraw = Color.red;
 	Color colorTrack = Color.yellow;
+	Color colorLineTrack = Color.GRAY;
+	Color colorUnselect = Color.MAGENTA;
+	Color colorConfirm = Color.GREEN;
 	FloatType minval = new FloatType(0);
 	FloatType maxval = new FloatType(1);
 	SliceObserver sliceObserver;
@@ -380,7 +387,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	private int ndims;
 	Overlay overlaysec;
 	ArrayList<Pair<Integer, double[]>> IDALL = new ArrayList<Pair<Integer, double[]>>();
-	ArrayList<double[]> ClickedPoints = new ArrayList<double[]>();
+	ArrayList<Pair<double[], Roi>> ClickedPoints = new ArrayList<Pair<double[], Roi>>();
 	Pair<ArrayList<Indexedlength>, ArrayList<Indexedlength>> PrevFrameparam;
 	Pair<ArrayList<Indexedlength>, ArrayList<Indexedlength>> NewFrameparam;
 	ArrayList<Integer> Accountedframes = new ArrayList<Integer>();
@@ -398,7 +405,8 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public FinalInterval interval;
 	RandomAccessibleInterval<UnsignedByteType> newimg;
 	ArrayList<double[]> AllmeanCovar;
-	long Cannyradius; 
+	long Cannyradius;
+	HashMap<Integer, ArrayList<Roi>> AllpreviousRois;
 	// first and last slice to process
 	int endStack, thirdDimension;
 
@@ -408,13 +416,12 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	}
 
 	public static enum ValueChange {
-		ROI, ALL, DELTA, FindLinesVia, MAXVAR, MINDIVERSITY, DARKTOBRIGHT, MINSIZE, MAXSIZE, SHOWMSER, FRAME, SHOWHOUGH, 
-		thresholdHough, DISPLAYBITIMG, DISPLAYWATERSHEDIMG, rhoPerPixel, thetaPerPixel, THIRDDIM, iniSearch, maxSearch, 
-		missedframes, THIRDDIMTrack, MEDIAN, kymo ;
+		ROI, ALL, DELTA, FindLinesVia, MAXVAR, MINDIVERSITY, DARKTOBRIGHT, MINSIZE, MAXSIZE, SHOWMSER, FRAME, SHOWHOUGH, thresholdHough, DISPLAYBITIMG, DISPLAYWATERSHEDIMG, rhoPerPixel, thetaPerPixel, THIRDDIM, iniSearch, maxSearch, missedframes, THIRDDIMTrack, MEDIAN, kymo;
 	}
 
 	boolean isFinished = false;
 	boolean wasCanceled = false;
+	int detcount = 0;
 	boolean SecondOrderSpline;
 	boolean ThirdOrderSpline;
 	HashMap<Integer, Whichend> seedmap = new HashMap<Integer, Whichend>();
@@ -650,8 +657,10 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		AllSeedrois = new ArrayList<OvalRoi>();
 		jpb = new JProgressBar();
 		UserchosenCostFunction = new SquareDistCostFunction();
+		AllpreviousRois = new HashMap<Integer, ArrayList<Roi>>();
 		Inispacing = 0.5 * Math.min(psf[0], psf[1]);
 		count = 0;
+		overlay = new Overlay();
 		nf.setMaximumFractionDigits(3);
 		setInitialmaxVar(maxVarInit);
 		setInitialDelta(deltaInit);
@@ -694,7 +703,6 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		thirdDimensionSizeOriginal = thirdDimensionSize;
 		preprocessedimp = ImageJFunctions.show(CurrentPreprocessedView);
 
-		
 		Roi roi = preprocessedimp.getRoi();
 
 		if (roi == null) {
@@ -736,6 +744,16 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	protected void updatePreview(final ValueChange change) {
 
 		boolean roiChanged = false;
+		
+		
+		overlay = preprocessedimp.getOverlay();
+		
+		if(overlay == null){
+			
+			overlay = new Overlay();
+			preprocessedimp.setOverlay(overlay);
+		}
+		
 		if (change == ValueChange.THIRDDIM) {
 			System.out.println("Current Time point: " + thirdDimension);
 
@@ -788,8 +806,6 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 			currentimg = util.CopyUtils.extractImage(CurrentView, interval);
 			currentPreprocessedimg = util.CopyUtils.extractImage(CurrentPreprocessedView, interval);
-		
-			
 
 			newimg = util.CopyUtils.copytoByteImage(Kernels.CannyEdgeandMean(currentPreprocessedimg, Cannyradius),
 					standardRectangle);
@@ -824,8 +840,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 				currentimg = util.CopyUtils.extractImage(CurrentView, interval);
 				currentPreprocessedimg = util.CopyUtils.extractImage(CurrentPreprocessedView, interval);
-				
-			
+
 				newimg = util.CopyUtils.copytoByteImage(Kernels.CannyEdgeandMean(currentPreprocessedimg, Cannyradius),
 						standardRectangle);
 
@@ -859,8 +874,6 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 				currentimg = util.CopyUtils.extractImage(CurrentView, interval);
 				currentPreprocessedimg = util.CopyUtils.extractImage(CurrentPreprocessedView, interval);
-				
-				
 
 				newimg = util.CopyUtils.copytoByteImage(Kernels.CannyEdgeandMean(currentPreprocessedimg, Cannyradius),
 						standardRectangle);
@@ -886,8 +899,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 			currentimg = util.CopyUtils.extractImage(CurrentView, interval);
 			currentPreprocessedimg = util.CopyUtils.extractImage(CurrentPreprocessedView, interval);
-			
-			
+
 			newimg = util.CopyUtils.copytoByteImage(Kernels.CannyEdgeandMean(currentPreprocessedimg, Cannyradius),
 					standardRectangle);
 
@@ -908,8 +920,6 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 		}
 
-		
-		
 		if (change == ValueChange.SHOWMSER) {
 			long[] min = { (long) standardRectangle.getMinX(), (long) standardRectangle.getMinY() };
 			long[] max = { (long) standardRectangle.getMaxX(), (long) standardRectangle.getMaxY() };
@@ -918,33 +928,28 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 			currentimg = util.CopyUtils.extractImage(CurrentView, interval);
 			currentPreprocessedimg = util.CopyUtils.extractImage(CurrentPreprocessedView, interval);
-			
-	
 
 			newimg = util.CopyUtils.copytoByteImage(Kernels.CannyEdgeandMean(currentPreprocessedimg, Cannyradius),
 					standardRectangle);
 
 			newtree = MserTree.buildMserTree(newimg, delta, minSize, maxSize, maxVar, minDiversity, darktobright);
 			Rois = util.DrawingUtils.getcurrentRois(newtree, AllmeanCovar);
-
+			
+	
 			AllMSERrois.put(thirdDimension, Rois);
 			count++;
 
 			if (count == 1)
 				startdim = thirdDimension;
-
 			if (preprocessedimp != null) {
 
-				Overlay o = preprocessedimp.getOverlay();
-
-				if (o == null) {
-					o = new Overlay();
-					preprocessedimp.setOverlay(o);
-				}
+			
 				
-				for (int i = 0; i < o.size(); ++i){
-              if (o.get(i).getStrokeColor() == colorDraw)
-				o.clear();
+				for (int i = 0; i < overlay.size(); ++i){
+              if (overlay.get(i).getStrokeColor() == colorDraw){
+				overlay.remove(i);
+				--i;
+              }
               
               
 				}
@@ -953,13 +958,14 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 					EllipseRoi or = Rois.get(index);
 
 					or.setStrokeColor(Color.red);
-					o.add(or);
+					overlay.add(or);
 
 					roimanager.addRoi(or);
 
 				}
 
 			}
+
 
 		}
 
@@ -1032,6 +1038,8 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		}
 
 	}
+
+	
 
 	// Making the card
 	JFrame Cardframe = new JFrame("MicroTubule Tracker");
@@ -1119,8 +1127,6 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		c.insets = new Insets(10, 10, 0, 0);
 		panelFirst.add(mser, c);
 
-		
-		
 		++c.gridy;
 		c.insets = new Insets(10, 10, 0, 0);
 		panelFirst.add(hough, c);
@@ -1207,23 +1213,25 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 		final Label ORText = new Label("OR", Label.CENTER);
 
-		final Label ANDText = new Label("AND", Label.CENTER);
 
 		ORText.setBackground(new Color(1, 0, 1));
 		ORText.setForeground(new Color(255, 255, 255));
 
-		ANDText.setBackground(new Color(1, 0, 1));
-		ANDText.setForeground(new Color(255, 255, 255));
+	
 
-		final Button ClickFast = new Button("Choose more");
 
-		final Button RemoveFast = new Button("Remove wrongly selected ends");
-		final Checkbox Finalize = new Checkbox("Confirm the dynamic seed end (s)");
-		final Checkbox Doseg = new Checkbox("Do Waterhshed based segmentation (slower, for crowded movies)");
-		final Checkbox DoMserseg = new Checkbox("Do MSER based segmentation (faster, choose well seperated ends to track)");
+		final Checkbox Finalize = new Checkbox("Confirm the dynamic seed end(s)");
+		
+		CheckboxGroup Segmentation = new CheckboxGroup();
+		final Checkbox Doseg = new Checkbox("Do Waterhshed based segmentation (slower, for crowded movies)", Segmentation, doSegmentation);
+		final Checkbox DoMserseg = new Checkbox(
+				"Do MSER based segmentation (faster, choose well seperated ends to track)", Segmentation, doMserSegmentation);
 		final Label MTTextHF = new Label("Select ends for tracking", Label.CENTER);
 		final Label Step3 = new Label("Step 3", Label.CENTER);
-
+		final Label SegChoice = new Label("Choose MSER or Watershed based Segmentation", Label.CENTER);
+		
+		SegChoice.setBackground(new Color(1, 0, 1));
+		SegChoice.setForeground(new Color(255, 255, 255));
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridx = 0;
 		c.gridy = 0;
@@ -1248,22 +1256,18 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		c.insets = new Insets(10, 10, 0, 180);
 		panelThird.add(JumptoFrame, c);
 
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 10);
-		panelThird.add(ANDText, c);
+		
+
+
+		
 
 		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 180);
-		panelThird.add(RemoveFast, c);
-
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 180);
-		panelThird.add(ClickFast, c);
-
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 180);
+		c.insets = new Insets(10, 10, 0, 0);
 		panelThird.add(Finalize, c);
 
+		++c.gridy;
+		c.insets = new Insets(10, 10, 0, 0);
+		panelThird.add(SegChoice, c);
 		++c.gridy;
 		c.insets = new Insets(10, 10, 0, 180);
 		panelThird.add(Doseg, c);
@@ -1271,18 +1275,16 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		++c.gridy;
 		c.insets = new Insets(10, 10, 0, 180);
 		panelThird.add(DoMserseg, c);
-		
+
 		MoveNext.addActionListener(new moveNextListener());
 		JumptoFrame.addActionListener(new moveToFrameListener());
-		RemoveFast.addActionListener(new removeendListener());
-		ClickFast.addActionListener(new chooseendListener());
+	
 		thirdDimensionslider
 				.addAdjustmentListener(new thirdDimensionsliderListener(timeText, timeMin, thirdDimensionSize));
 		Cardframe.addWindowListener(new FrameListener(Cardframe));
 		JumpinTime.addActionListener(
 				new moveInThirdDimListener(thirdDimensionslider, timeText, timeMin, thirdDimensionSize));
 
-		
 		Finalize.addItemListener(new finalpoint());
 		Doseg.addItemListener(new DoSegmentation());
 		DoMserseg.addItemListener(new DoMserSegmentation());
@@ -1500,8 +1502,6 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		c.gridy = 0;
 		c.weightx = 1;
 
-
-		
 		panelFifth.removeAll();
 		final Label Step5 = new Label("Step 5", Label.CENTER);
 		panelFifth.setLayout(layout);
@@ -1785,8 +1785,6 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		c.gridy = 0;
 		c.weightx = 1;
 
-
-		
 		panelFifth.removeAll();
 
 		final Label Step5 = new Label("Step 5", Label.CENTER);
@@ -1852,8 +1850,6 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		c.gridx = 0;
 		c.gridy = 0;
 		c.weightx = 1;
-
-		
 
 		panelFifth.removeAll();
 		final Label Step5 = new Label("Step 5", Label.CENTER);
@@ -1990,19 +1986,16 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 			updatePreview(ValueChange.THIRDDIM);
 
 			markend();
-			if(doSegmentation)
+			if (doSegmentation)
 				UpdateHough();
-			
+
 			else
-				
-			UpdateMser();
+
+				UpdateMser();
 
 		}
 	}
 
-	
-	
-	
 	private boolean moveDialogue() {
 		GenericDialog gd = new GenericDialog("Choose Frame");
 
@@ -2095,29 +2088,83 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 			@Override
 			public void mouseClicked(MouseEvent e) {
+				
+				if(SwingUtilities.isLeftMouseButton(e) && e.isShiftDown() == false){
+				
 				int x = canvas.offScreenX(e.getX());
 				int y = canvas.offScreenY(e.getY());
 
-				overlaysec = preprocessedimp.getOverlay();
+				Overlay o = preprocessedimp.getOverlay();
 
-				if (overlaysec == null) {
-					overlaysec = new Overlay();
+				if (o == null) {
+					o = new Overlay();
 
-					preprocessedimp.setOverlay(overlaysec);
+					preprocessedimp.setOverlay(o);
 
 				}
-				Roi nearestRoiCurr = util.DrawingUtils.getNearestRois(AllSeedrois, new double[] { x, y });
+				
+			
+				
+				
+				OvalRoi nearestRoiCurr = util.DrawingUtils.getNearestRois(AllSeedrois, new double[] { x, y });
 
 				Rectangle rect = nearestRoiCurr.getBounds();
 
 				double newx = rect.x + rect.width / 2.0;
 				double newy = rect.y + rect.height / 2.0;
-				final OvalRoi Bigroi = new OvalRoi(Util.round(newx - 5), Util.round(newy - 5), Util.round(10),
-						Util.round(10));
-				overlaysec.add(Bigroi);
-				ClickedPoints.add(new double[] { newx, newy });
-				System.out.println("You chose: " + newx + "," + newy);
+				final OvalRoi Bigroi = nearestRoiCurr;
+				Bigroi.setStrokeColor(colorUnselect);
+				o.add(Bigroi);
+				
+				
+				for (int index = 0; index < ClickedPoints.size(); ++index){
+					
+					if (ClickedPoints.get(index).getB() == nearestRoiCurr){
+						ClickedPoints.remove(index);
+					--index;
+					}
+					
+				}
+				
+				System.out.println("You deleted: " + newx + "," + newy);
+				}
+				
+				
+				if(SwingUtilities.isLeftMouseButton(e) && e.isShiftDown() ){
+					
+					int x = canvas.offScreenX(e.getX());
+					int y = canvas.offScreenY(e.getY());
 
+				Overlay	o = preprocessedimp.getOverlay();
+
+					if (o == null) {
+						overlaysec = new Overlay();
+
+						preprocessedimp.setOverlay(o);
+
+					}
+					
+					
+					
+					OvalRoi nearestRoiCurr = util.DrawingUtils.getNearestRois(AllSeedrois, new double[] { x, y });
+
+					Rectangle rect = nearestRoiCurr.getBounds();
+
+					double newx = rect.x + rect.width / 2.0;
+					double newy = rect.y + rect.height / 2.0;
+					final OvalRoi Bigroi = nearestRoiCurr;
+					Bigroi.setStrokeColor(colorConfirm);
+					o.add(Bigroi);
+					
+					Pair<double[], Roi> newpoint = new ValuePair<double[], Roi>(new double[]{newx, newy}, nearestRoiCurr);
+					
+					ClickedPoints.add(newpoint);
+					System.out.println("You added: " + newx + "," + newy);
+					}
+					
+				
+				
+				
 			}
 
 			@Override
@@ -2142,125 +2189,9 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		});
 	}
 
-	protected class chooseendListener implements ActionListener {
-		@Override
-		public void actionPerformed(final ActionEvent arg0) {
+	
 
-			preprocessedimp.getCanvas().addMouseListener(ml = new MouseListener() {
-				final ImageCanvas canvas = preprocessedimp.getWindow().getCanvas();
-
-				@Override
-				public void mouseClicked(MouseEvent e) {
-					int x = canvas.offScreenX(e.getX());
-					int y = canvas.offScreenY(e.getY());
-
-					overlaysec = preprocessedimp.getOverlay();
-
-					if (overlaysec == null) {
-						overlaysec = new Overlay();
-
-						preprocessedimp.setOverlay(overlaysec);
-
-					}
-					Roi nearestRoiCurr = util.DrawingUtils.getNearestRois(AllSeedrois, new double[] { x, y });
-
-					Rectangle rect = nearestRoiCurr.getBounds();
-
-					double newx = rect.x + rect.width / 2.0;
-					double newy = rect.y + rect.height / 2.0;
-					final OvalRoi Bigroi = new OvalRoi(Util.round(newx - 5), Util.round(newy - 5), Util.round(10),
-							Util.round(10));
-					overlaysec.add(Bigroi);
-					ClickedPoints.add(new double[] { newx, newy });
-					System.out.println("You chose: " + newx + "," + newy);
-				}
-
-				@Override
-				public void mousePressed(MouseEvent e) {
-
-				}
-
-				@Override
-				public void mouseReleased(MouseEvent e) {
-
-				}
-
-				@Override
-				public void mouseEntered(MouseEvent e) {
-
-				}
-
-				@Override
-				public void mouseExited(MouseEvent e) {
-
-				}
-			});
-
-		}
-
-	}
-
-	protected class removeendListener implements ActionListener {
-		@Override
-		public void actionPerformed(final ActionEvent arg0) {
-			preprocessedimp.getCanvas().removeMouseListener(ml);
-			preprocessedimp.getCanvas().addMouseListener(removeml = new MouseListener() {
-
-				@Override
-				public void mouseClicked(MouseEvent e) {
-					final ImageCanvas canvas = preprocessedimp.getWindow().getCanvas();
-					int x = canvas.offScreenX(e.getX());
-					int y = canvas.offScreenY(e.getY());
-
-					Roi nearestRoiCurr = util.DrawingUtils.getNearestRois(AllSeedrois, new double[] { x, y });
-
-					Rectangle rect = nearestRoiCurr.getBounds();
-
-					double newx = rect.x + rect.width / 2.0;
-					double newy = rect.y + rect.height / 2.0;
-					final OvalRoi Bigroi = new OvalRoi(Util.round(newx - 5), Util.round(newy - 5), Util.round(10),
-							Util.round(10));
-
-					System.out.println("You removed: " + x + "," + y);
-
-					if (Bigroi != null) {
-						ClickedPoints.remove(Bigroi);
-
-					}
-
-					if (Bigroi != null) {
-						if (overlaysec.contains(Bigroi)) {
-							overlaysec.remove(Bigroi);
-						}
-					}
-
-				}
-
-				@Override
-				public void mousePressed(MouseEvent e) {
-
-				}
-
-				@Override
-				public void mouseReleased(MouseEvent e) {
-
-				}
-
-				@Override
-				public void mouseEntered(MouseEvent e) {
-
-				}
-
-				@Override
-				public void mouseExited(MouseEvent e) {
-
-				}
-			});
-
-		}
-
-	}
-
+	
 	protected class moveToFrameListener implements ActionListener {
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
@@ -2282,13 +2213,13 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 			updatePreview(ValueChange.THIRDDIM);
 			markend();
-			
-			if(doSegmentation)
+
+			if (doSegmentation)
 				UpdateHough();
-			
+
 			else
-				
-			UpdateMser();
+
+				UpdateMser();
 
 		}
 
@@ -2324,10 +2255,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 			IJ.log("Current frame: " + thirdDimension);
 			RandomAccessibleInterval<FloatType> groundframe = currentimg;
 			RandomAccessibleInterval<FloatType> groundframepre = currentPreprocessedimg;
-			
-			
-			
-			
+
 			if (FindLinesViaMSER) {
 				boolean dialog = DialogueModelChoice();
 
@@ -2344,7 +2272,6 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 							+ " " + " maxVar " + " " + maxVar + " " + "minDIversity " + " " + minDiversity);
 					IJ.log("Optimization Parameters: " + "R" + Intensityratio + " G"
 							+ Inispacing / Math.min(psf[0], psf[1]));
-					
 
 				}
 
@@ -2365,7 +2292,6 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 					IJ.log("thetaPerPixel " + " " + thetaPerPixel + " " + "rhoPerPixel " + " " + rhoPerPixel);
 					IJ.log("Optimization Parameters: " + "R" + Intensityratio + " G"
 							+ Inispacing / Math.min(psf[0], psf[1]));
-		
 
 				}
 			}
@@ -2387,58 +2313,48 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 							thirdDimension, psf, newlineMserwHough, UserChoiceModel.Line, Domask, Intensityratio,
 							Inispacing, jpb);
 
-			
-
 				}
 
 			}
-			
-			
+
 			ArrayList<KalmanIndexedlength> start = new ArrayList<KalmanIndexedlength>();
 			ArrayList<KalmanIndexedlength> end = new ArrayList<KalmanIndexedlength>();
 
 			for (int index = 0; index < PrevFrameparam.getA().size(); ++index) {
 
-				double dx = PrevFrameparam.getA().get(index).ds / Math.sqrt(
-						1 + PrevFrameparam.getA().get(index).slope * PrevFrameparam.getA().get(index).slope);
+				double dx = PrevFrameparam.getA().get(index).ds / Math
+						.sqrt(1 + PrevFrameparam.getA().get(index).slope * PrevFrameparam.getA().get(index).slope);
 				double dy = PrevFrameparam.getA().get(index).slope * dx;
 
-				KalmanIndexedlength startPart = new KalmanIndexedlength(
-						PrevFrameparam.getA().get(index).currentLabel,
-						PrevFrameparam.getA().get(index).seedLabel,
-						PrevFrameparam.getA().get(index).framenumber, PrevFrameparam.getA().get(index).ds,
-						PrevFrameparam.getA().get(index).lineintensity,
-						PrevFrameparam.getA().get(index).background,
-						PrevFrameparam.getA().get(index).currentpos, PrevFrameparam.getA().get(index).fixedpos,
-						PrevFrameparam.getA().get(index).slope, PrevFrameparam.getA().get(index).intercept,
-						PrevFrameparam.getA().get(index).slope, PrevFrameparam.getA().get(index).intercept, 0,
-						0, new double[] { dx, dy });
+				KalmanIndexedlength startPart = new KalmanIndexedlength(PrevFrameparam.getA().get(index).currentLabel,
+						PrevFrameparam.getA().get(index).seedLabel, PrevFrameparam.getA().get(index).framenumber,
+						PrevFrameparam.getA().get(index).ds, PrevFrameparam.getA().get(index).lineintensity,
+						PrevFrameparam.getA().get(index).background, PrevFrameparam.getA().get(index).currentpos,
+						PrevFrameparam.getA().get(index).fixedpos, PrevFrameparam.getA().get(index).slope,
+						PrevFrameparam.getA().get(index).intercept, PrevFrameparam.getA().get(index).slope,
+						PrevFrameparam.getA().get(index).intercept, 0, 0, new double[] { dx, dy });
 
 				start.add(startPart);
 			}
 			for (int index = 0; index < PrevFrameparam.getB().size(); ++index) {
 
-				double dx = PrevFrameparam.getB().get(index).ds / Math.sqrt(
-						1 + PrevFrameparam.getB().get(index).slope * PrevFrameparam.getB().get(index).slope);
+				double dx = PrevFrameparam.getB().get(index).ds / Math
+						.sqrt(1 + PrevFrameparam.getB().get(index).slope * PrevFrameparam.getB().get(index).slope);
 				double dy = PrevFrameparam.getB().get(index).slope * dx;
 
-				KalmanIndexedlength endPart = new KalmanIndexedlength(
-						PrevFrameparam.getB().get(index).currentLabel,
-						PrevFrameparam.getB().get(index).seedLabel,
-						PrevFrameparam.getB().get(index).framenumber, PrevFrameparam.getB().get(index).ds,
-						PrevFrameparam.getB().get(index).lineintensity,
-						PrevFrameparam.getB().get(index).background,
-						PrevFrameparam.getB().get(index).currentpos, PrevFrameparam.getB().get(index).fixedpos,
-						PrevFrameparam.getB().get(index).slope, PrevFrameparam.getB().get(index).intercept,
-						PrevFrameparam.getB().get(index).slope, PrevFrameparam.getB().get(index).intercept, 0,
-						0, new double[] { dx, dy });
+				KalmanIndexedlength endPart = new KalmanIndexedlength(PrevFrameparam.getB().get(index).currentLabel,
+						PrevFrameparam.getB().get(index).seedLabel, PrevFrameparam.getB().get(index).framenumber,
+						PrevFrameparam.getB().get(index).ds, PrevFrameparam.getB().get(index).lineintensity,
+						PrevFrameparam.getB().get(index).background, PrevFrameparam.getB().get(index).currentpos,
+						PrevFrameparam.getB().get(index).fixedpos, PrevFrameparam.getB().get(index).slope,
+						PrevFrameparam.getB().get(index).intercept, PrevFrameparam.getB().get(index).slope,
+						PrevFrameparam.getB().get(index).intercept, 0, 0, new double[] { dx, dy });
 				end.add(endPart);
 			}
 
-			PrevFrameparamKalman = new ValuePair<ArrayList<KalmanIndexedlength>, ArrayList<KalmanIndexedlength>>(
-					start, end);
-			
-			
+			PrevFrameparamKalman = new ValuePair<ArrayList<KalmanIndexedlength>, ArrayList<KalmanIndexedlength>>(start,
+					end);
+
 			Overlay o = preprocessedimp.getOverlay();
 
 			if (preprocessedimp.getOverlay() == null) {
@@ -2447,9 +2363,9 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 			}
 			for (int index = 0; index < PrevFrameparam.getA().size(); ++index) {
 
-				Seedroi = new OvalRoi(Util.round(PrevFrameparam.getA().get(index).currentpos[0] - 2.5),
-						Util.round(PrevFrameparam.getA().get(index).currentpos[1] - 2.5), Util.round(5), Util.round(5));
-				Seedroi.setStrokeColor(Color.GREEN);
+				Seedroi = new OvalRoi(Util.round(PrevFrameparam.getA().get(index).currentpos[0] - radiusseed),
+						Util.round(PrevFrameparam.getA().get(index).currentpos[1] - radiusseed), Util.round(2 * radiusseed), Util.round(2 * radiusseed));
+				Seedroi.setStrokeColor(colorConfirm);
 				Seedroi.setStrokeWidth(0.8);
 
 				AllSeedrois.add(Seedroi);
@@ -2459,15 +2375,23 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 			for (int index = 0; index < PrevFrameparam.getB().size(); ++index) {
 
-				Seedroi = new OvalRoi(Util.round(PrevFrameparam.getB().get(index).currentpos[0] - 2.5),
-						Util.round(PrevFrameparam.getB().get(index).currentpos[1] - 2.5), Util.round(5), Util.round(5));
-				Seedroi.setStrokeColor(Color.GREEN);
+				Seedroi = new OvalRoi(Util.round(PrevFrameparam.getB().get(index).currentpos[0] - radiusseed),
+						Util.round(PrevFrameparam.getB().get(index).currentpos[1] - radiusseed), Util.round(2 * radiusseed), Util.round(2 * radiusseed));
+				Seedroi.setStrokeColor(colorConfirm);
 				Seedroi.setStrokeWidth(0.8);
 				AllSeedrois.add(Seedroi);
 				o.add(Seedroi);
 
 			}
+			for(int index = 0; index < AllSeedrois.size(); ++index){
+				
+				Rectangle rect = AllSeedrois.get(index).getBounds();
+				double newx = rect.x + rect.width / 2.0;
+				double newy = rect.y + rect.height / 2.0;
+				Pair<double[], Roi> newpoint = new ValuePair<double[], Roi>(new double[]{newx, newy}, AllSeedrois.get(index));
 
+				ClickedPoints.add(newpoint);
+			}
 			preprocessedimp.updateAndDraw();
 
 			return null;
@@ -2507,34 +2431,8 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		}
 	}
 
-	/*
-	 * protected class CostfunctionListener implements ItemListener {
-	 * 
-	 * @Override public void itemStateChanged(ItemEvent arg0) {
-	 * 
-	 * if (arg0.getStateChange() == ItemEvent.SELECTED) {
-	 * 
-	 * UserchosenCostFunction = new SquareDistCostFunction();
-	 * 
-	 * }
-	 * 
-	 * } }
-	 */
-	protected class CannyListener implements ItemListener {
-
-		@Override
-		public void itemStateChanged(ItemEvent arg0) {
-
-			if (arg0.getStateChange() == ItemEvent.DESELECTED)
-				Canny = false;
-			else if (arg0.getStateChange() == ItemEvent.SELECTED) {
-				Canny = true;
-
-			}
-		}
-
-	}
-
+	
+	
 	protected class SaveasTXT implements ItemListener {
 
 		@Override
@@ -3203,48 +3101,42 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		}
 
 	};
-	
-	
-	
-	protected class DoSegmentation implements ItemListener{
-		
+
+	protected class DoSegmentation implements ItemListener {
+
 		@Override
 		public void itemStateChanged(ItemEvent arg0) {
 			if (arg0.getStateChange() == ItemEvent.DESELECTED)
 				FindLinesViaHOUGH = false;
 
 			else if (arg0.getStateChange() == ItemEvent.SELECTED) {
-				FindLinesViaHOUGH  = true;
+				FindLinesViaHOUGH = true;
 				doSegmentation = true;
-                UpdateHough();
-				
-				
+				UpdateHough();
+
 			}
-			
+
 		}
-		
-		
+
 	}
-	protected class DoMserSegmentation implements ItemListener{
-		
+
+	protected class DoMserSegmentation implements ItemListener {
+
 		@Override
 		public void itemStateChanged(ItemEvent arg0) {
 			if (arg0.getStateChange() == ItemEvent.DESELECTED)
 				FindLinesViaMSER = false;
 
 			else if (arg0.getStateChange() == ItemEvent.SELECTED) {
-				FindLinesViaMSER  = true;
+				FindLinesViaMSER = true;
 				doMserSegmentation = true;
-                UpdateMser();
-				
-				
+				UpdateMser();
+
 			}
-			
+
 		}
-		
-		
+
 	}
-	
 
 	protected class finalpoint implements ItemListener {
 
@@ -3288,8 +3180,8 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 						double mindistA = 0;
 						double mindistB = 0;
 
-						mindistA = util.Boundingboxes.Distance(ClickedPoints.get(index), endAmap.get(i));
-						mindistB = util.Boundingboxes.Distance(ClickedPoints.get(index), endBmap.get(i));
+						mindistA = util.Boundingboxes.Distance(ClickedPoints.get(index).getA(), endAmap.get(i));
+						mindistB = util.Boundingboxes.Distance(ClickedPoints.get(index).getA(), endBmap.get(i));
 
 						if (mindistA <= 1 && seedmap.get(i) != Whichend.end) {
 
@@ -4140,6 +4032,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		for (int index = next; index <= thirdDimensionSize; ++index) {
 
 			Kalmancount++;
+
 			thirdDimension = index;
 			isStarted = true;
 			CurrentPreprocessedView = util.CopyUtils.getCurrentPreView(originalPreprocessedimg, thirdDimension,
@@ -4152,38 +4045,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 			RandomAccessibleInterval<FloatType> groundframe = currentimg;
 			RandomAccessibleInterval<FloatType> groundframepre = currentPreprocessedimg;
-			
-	       Overlay o = preprocessedimp.getOverlay();
-			
-			if(preprocessedimp.getOverlay() == null){
-				
-				o = new Overlay();
-			    preprocessedimp.setOverlay(o);	
-			}
-			for (int i = 0; i < PrevFrameparam.getA().size(); ++i){
-				
-				
-				final OvalRoi Bigroi = new OvalRoi(Util.round(PrevFrameparam.getA().get(i).currentpos[0] - 2.5),
-						Util.round(PrevFrameparam.getA().get(i).currentpos[1]  - 2.5), Util.round(5), Util.round(5));
-				Bigroi.setStrokeWidth(0.8);
-				Bigroi.setStrokeColor(colorTrack);
-				o.add(Bigroi);
-				
-			}
-			
-			for (int i = 0; i < PrevFrameparam.getB().size(); ++i){
-				
-				
-				final OvalRoi Bigroi = new OvalRoi(Util.round(PrevFrameparam.getB().get(i).currentpos[0] - 2.5),
-						Util.round(PrevFrameparam.getB().get(i).currentpos[1]   - 2.5), Util.round(5), Util.round(5));
-				Bigroi.setStrokeWidth(0.8);
-				Bigroi.setStrokeColor(colorTrack);
-				o.add(Bigroi);
-				
-			}
-             preprocessedimp.updateAndDraw();
-			
-			
+
 			if (FindLinesViaMSER) {
 				if (index == next) {
 					dialog = DialogueModelChoiceHF();
@@ -4297,6 +4159,8 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 				ArrayList<Trackproperties> startStateVectors = returnVector.getA().getA();
 				ArrayList<Trackproperties> endStateVectors = returnVector.getA().getB();
 
+		
+
 				PrevFrameparam = NewFrameparam;
 
 				Allstart.add(startStateVectors);
@@ -4314,6 +4178,9 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 				AllstartKalman.add(startStateVectorsKalman);
 				AllendKalman.add(endStateVectorsKalman);
 			}
+			
+			detcount++;
+			util.DrawingUtils.Trackplot(detcount, returnVector, AllpreviousRois, colorLineTrack, colorTrack, overlay, maxghost);
 		}
 
 		if (showDeterministic) {
@@ -4919,8 +4786,6 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 				}
 
 			}
-			
-		
 
 			rtAll.show("Start and End of MT");
 			if (lengthtimestart != null)
@@ -5150,9 +5015,8 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 	}
 
-	
-	public void UpdateHough(){
-		
+	public void UpdateHough() {
+
 		FindLinesViaMSER = false;
 		FindLinesViaHOUGH = true;
 		FindLinesViaMSERwHOUGH = false;
@@ -5165,15 +5029,11 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		panelFourth.add(Step, c);
 		final Label exthresholdText = new Label("threshold = threshold to create Bitimg for watershedding.",
 				Label.CENTER);
-	
-				
+
 		final Label thresholdText = new Label("thresholdValue = " + thresholdHough, Label.CENTER);
-		
 
 		final Scrollbar threshold = new Scrollbar(Scrollbar.HORIZONTAL, (int) thresholdHoughInit, 10, 0,
 				10 + scrollbarSize);
-		
-
 
 		final Checkbox displayBit = new Checkbox("Display Bitimage ", displayBitimg);
 		final Checkbox displayWatershed = new Checkbox("Display Watershedimage ", displayWatershedimg);
@@ -5197,15 +5057,10 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		panelFourth.add(exthresholdText, c);
 		++c.gridy;
 
-	
-	
-
 		panelFourth.add(thresholdText, c);
 		++c.gridy;
 
 		panelFourth.add(threshold, c);
-		
-	
 
 		++c.gridy;
 		c.insets = new Insets(10, 175, 0, 175);
@@ -5218,10 +5073,8 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		c.insets = new Insets(10, 175, 0, 175);
 		panelFourth.add(Dowatershed, c);
 
-		threshold.addAdjustmentListener(new thresholdHoughListener(thresholdText, thresholdHoughMin,
-				thresholdHoughMax, scrollbarSize, threshold));
-
-		
+		threshold.addAdjustmentListener(new thresholdHoughListener(thresholdText, thresholdHoughMin, thresholdHoughMax,
+				scrollbarSize, threshold));
 
 		displayBit.addItemListener(new ShowBitimgListener());
 		displayWatershed.addItemListener(new ShowwatershedimgListener());
@@ -5231,10 +5084,9 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		panelFourth.repaint();
 		panelFourth.validate();
 		Cardframe.pack();
-		
-		
+
 	}
-	
+
 	public void UpdateMser() {
 		FindLinesViaMSER = true;
 		FindLinesViaHOUGH = false;
@@ -5375,20 +5227,14 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 				FindLinesViaMSER = false;
 				FindLinesViaHOUGH = true;
 				FindLinesViaMSERwHOUGH = false;
-				 UpdateHough();
-
+				UpdateHough();
 
 			}
 
 		}
 
 	}
-	
 
-	
-
-	
-	
 	protected class MserListener implements ItemListener {
 		@Override
 		public void itemStateChanged(final ItemEvent arg0) {
@@ -5529,9 +5375,6 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 			}
 		}
 	}
-	
-	
-	
 
 	protected class HoughListener implements ItemListener {
 		@Override
@@ -5689,7 +5532,6 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 				panelSecond.setLayout(layout);
 				panelSecond.add(Step, c);
-				
 
 				final Checkbox rhoEnable = new Checkbox("Enable Manual Adjustment of rhoPerPixel", enablerhoPerPixel);
 
@@ -5936,13 +5778,10 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 			ShowMser = true;
 
 			updatePreview(ValueChange.SHOWMSER);
-			
 
 		}
 	}
-	
-	
-	
+
 	protected class DowatershedListener implements ActionListener {
 
 		@Override
