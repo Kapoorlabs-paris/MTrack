@@ -93,6 +93,7 @@ import fiji.tool.SliceListener;
 import fiji.tool.SliceObserver;
 import graphconstructs.KalmanTrackproperties;
 import graphconstructs.Trackproperties;
+import houghandWatershed.SegmentbyWatershed;
 import houghandWatershed.WatershedDistimg;
 import ij.IJ;
 import ij.ImageJ;
@@ -163,6 +164,7 @@ import peakFitter.SortListbyproperty;
 import preProcessing.GetLocalmaxmin;
 import preProcessing.Kernels;
 import preProcessing.MedianFilter2D;
+
 import trackerType.KFsearch;
 import trackerType.MTTracker;
 import trackerType.TrackModel;
@@ -277,9 +279,12 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	boolean redo = false;
 	boolean redoAccept = false;
 	boolean FindLinesViaMSER = false;
+	boolean FindLinesViaSegMSER = false;
+	boolean doSegmentation = false;
 	boolean FindLinesViaHOUGH = false;
 	boolean FindLinesViaMSERwHOUGH = false;
 	boolean ShowMser = false;
+	boolean ShowsegMser = false;
 	boolean ShowHough = false;
 	boolean update = false;
 	boolean Canny = false;
@@ -294,7 +299,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	boolean AutoDelta = false;
 	boolean Domask = false;
 	boolean DoRloop = false;
-	boolean SaveTxt = true;
+	boolean SaveTxt = false;
 	boolean SaveXLS = false;
 	boolean finalpoint = false;
 	boolean Trackstart;
@@ -393,7 +398,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public FinalInterval interval;
 	RandomAccessibleInterval<UnsignedByteType> newimg;
 	ArrayList<double[]> AllmeanCovar;
-
+	long Cannyradius; 
 	// first and last slice to process
 	int endStack, thirdDimension;
 
@@ -403,7 +408,8 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	}
 
 	public static enum ValueChange {
-		ROI, ALL, DELTA, FindLinesVia, MAXVAR, MINDIVERSITY, DARKTOBRIGHT, MINSIZE, MAXSIZE, SHOWMSER, FRAME, SHOWHOUGH, thresholdHough, DISPLAYBITIMG, DISPLAYWATERSHEDIMG, rhoPerPixel, thetaPerPixel, THIRDDIM, iniSearch, maxSearch, missedframes, THIRDDIMTrack, MEDIAN, kymo;
+		ROI, ALL, DELTA, FindLinesVia, MAXVAR, MINDIVERSITY, DARKTOBRIGHT, MINSIZE, MAXSIZE, SHOWMSER, FRAME, SHOWHOUGH, 
+		thresholdHough, DISPLAYBITIMG, DISPLAYWATERSHEDIMG, rhoPerPixel, thetaPerPixel, THIRDDIM, iniSearch, maxSearch, missedframes, THIRDDIMTrack, MEDIAN, kymo, ShowsegMSER;
 	}
 
 	boolean isFinished = false;
@@ -651,7 +657,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		setInitialrhoPerPixel(rhoPerPixelInit);
 		setInitialthetaPerPixel(thetaPerPixelInit);
 		setInitialthresholdHough(thresholdHoughInit);
-
+		Cannyradius = (long) (radiusfactor * Math.ceil(Math.sqrt(psf[0] * psf[0] + psf[1] * psf[1])));
 		if (originalimg.numDimensions() < 3) {
 
 			thirdDimensionSize = 0;
@@ -780,13 +786,8 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 			currentimg = util.CopyUtils.extractImage(CurrentView, interval);
 			currentPreprocessedimg = util.CopyUtils.extractImage(CurrentPreprocessedView, interval);
-			// Expand the image by 10 pixels
-
-			Interval spaceinterval = Intervals.createMinMax(
-					new long[] { currentimg.min(0), currentimg.min(1), currentimg.max(0), currentimg.max(1) });
-			Interval interval = Intervals.expand(spaceinterval, 10);
-			currentimg = Views.interval(Views.extendBorder(currentimg), interval);
-			currentPreprocessedimg = Views.interval(Views.extendBorder(currentPreprocessedimg), interval);
+		
+			
 
 			newimg = util.CopyUtils.copytoByteImage(Kernels.CannyEdgeandMean(currentPreprocessedimg, Cannyradius),
 					standardRectangle);
@@ -821,14 +822,8 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 				currentimg = util.CopyUtils.extractImage(CurrentView, interval);
 				currentPreprocessedimg = util.CopyUtils.extractImage(CurrentPreprocessedView, interval);
-				// Expand the image by 10 pixels
-
-				Interval spaceinterval = Intervals.createMinMax(
-						new long[] { currentimg.min(0), currentimg.min(1), currentimg.max(0), currentimg.max(1) });
-				Interval interval = Intervals.expand(spaceinterval, 10);
-				currentimg = Views.interval(Views.extendBorder(currentimg), interval);
-				currentPreprocessedimg = Views.interval(Views.extendBorder(currentPreprocessedimg), interval);
-
+				
+			
 				newimg = util.CopyUtils.copytoByteImage(Kernels.CannyEdgeandMean(currentPreprocessedimg, Cannyradius),
 						standardRectangle);
 
@@ -862,13 +857,8 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 				currentimg = util.CopyUtils.extractImage(CurrentView, interval);
 				currentPreprocessedimg = util.CopyUtils.extractImage(CurrentPreprocessedView, interval);
-				// Expand the image by 10 pixels
-
-				Interval spaceinterval = Intervals.createMinMax(
-						new long[] { currentimg.min(0), currentimg.min(1), currentimg.max(0), currentimg.max(1) });
-				Interval interval = Intervals.expand(spaceinterval, 10);
-				currentimg = Views.interval(Views.extendBorder(currentimg), interval);
-				currentPreprocessedimg = Views.interval(Views.extendBorder(currentPreprocessedimg), interval);
+				
+				
 
 				newimg = util.CopyUtils.copytoByteImage(Kernels.CannyEdgeandMean(currentPreprocessedimg, Cannyradius),
 						standardRectangle);
@@ -894,14 +884,8 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 			currentimg = util.CopyUtils.extractImage(CurrentView, interval);
 			currentPreprocessedimg = util.CopyUtils.extractImage(CurrentPreprocessedView, interval);
-			// Expand the image by 10 pixels
-
-			Interval spaceinterval = Intervals.createMinMax(
-					new long[] { currentimg.min(0), currentimg.min(1), currentimg.max(0), currentimg.max(1) });
-			Interval interval = Intervals.expand(spaceinterval, 10);
-			currentimg = Views.interval(Views.extendBorder(currentimg), interval);
-			currentPreprocessedimg = Views.interval(Views.extendBorder(currentPreprocessedimg), interval);
-
+			
+			
 			newimg = util.CopyUtils.copytoByteImage(Kernels.CannyEdgeandMean(currentPreprocessedimg, Cannyradius),
 					standardRectangle);
 
@@ -922,6 +906,83 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 		}
 
+		if(change == ValueChange.ShowsegMSER){
+			
+			long[] min = { (long) standardRectangle.getMinX(), (long) standardRectangle.getMinY() };
+			long[] max = { (long) standardRectangle.getMaxX(), (long) standardRectangle.getMaxY() };
+			interval = new FinalInterval(min, max);
+
+
+			currentimg = util.CopyUtils.extractImage(CurrentView, interval);
+			currentPreprocessedimg = util.CopyUtils.extractImage(CurrentPreprocessedView, interval);
+			
+			
+			newimg = util.CopyUtils.copytoByteImage(Kernels.CannyEdgeandMean(currentPreprocessedimg, Cannyradius),
+					standardRectangle);
+			
+			RandomAccessibleInterval<BitType> bitimg = new ArrayImgFactory<BitType>().create(newimg, new BitType());
+			GetLocalmaxmin.ThresholdingBit(newimg, bitimg, thresholdHough);
+
+			if (displayBitimg)
+				ImageJFunctions.show(bitimg);
+
+			SegmentbyWatershed<UnsignedByteType> WaterafterDisttransform = new SegmentbyWatershed<UnsignedByteType>(
+					newimg, bitimg);
+			WaterafterDisttransform.checkInput();
+			WaterafterDisttransform.process();
+			intimg = WaterafterDisttransform.getResult();
+			Maxlabel = WaterafterDisttransform.GetMaxlabelsseeded(intimg);
+			if (displayWatershedimg)
+				ImageJFunctions.show(intimg);
+			
+			
+			
+			IJ.log(" Computing the Component tree");
+			if (preprocessedimp != null) {
+
+				Overlay o = preprocessedimp.getOverlay();
+
+				if (o == null) {
+					o = new Overlay();
+					preprocessedimp.setOverlay(o);
+				}
+
+				o.clear();
+			for (int label = 1; label < Maxlabel - 1; label++) {
+
+				RandomAccessibleInterval<FloatType> currentsegimg = util.Boundingboxes.getCurrentSegment(intimg, currentPreprocessedimg, label);
+				 currentsegimg = util.CopyUtils.extractImage(currentsegimg, interval);
+				RandomAccessibleInterval<UnsignedByteType> currentnewimg = util.CopyUtils.copytoByteImage(Kernels.CannyEdgeandMean(currentsegimg, Cannyradius),
+						standardRectangle);
+				MserTree<UnsignedByteType> localtree = MserTree.buildMserTree(currentnewimg, delta, minSize,
+						maxSize, maxVar, minDiversity, darktobright);
+				Rois = util.DrawingUtils.getcurrentRois(localtree, AllmeanCovar);
+
+				AllMSERrois.put(thirdDimension, Rois);
+				count++;
+
+				if (count == 1)
+					startdim = thirdDimension;
+
+				
+					for (int index = 0; index < Rois.size(); ++index) {
+
+						EllipseRoi or = Rois.get(index);
+
+						or.setStrokeColor(Color.red);
+						o.add(or);
+
+						roimanager.addRoi(or);
+
+					}
+
+				}
+
+			}
+			
+			
+		}
+		
 		if (change == ValueChange.SHOWMSER) {
 			long[] min = { (long) standardRectangle.getMinX(), (long) standardRectangle.getMinY() };
 			long[] max = { (long) standardRectangle.getMaxX(), (long) standardRectangle.getMaxY() };
@@ -930,13 +991,9 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 			currentimg = util.CopyUtils.extractImage(CurrentView, interval);
 			currentPreprocessedimg = util.CopyUtils.extractImage(CurrentPreprocessedView, interval);
-			// Expand the image by 10 pixels
-
-			Interval spaceinterval = Intervals.createMinMax(
-					new long[] { currentimg.min(0), currentimg.min(1), currentimg.max(0), currentimg.max(1) });
-			Interval interval = Intervals.expand(spaceinterval, 10);
-			currentimg = Views.interval(Views.extendBorder(currentimg), interval);
-			currentPreprocessedimg = Views.interval(Views.extendBorder(currentPreprocessedimg), interval);
+			if(intimg!=null)
+				intimg = util.CopyUtils.extractIntImage(intimg, interval);
+	
 
 			newimg = util.CopyUtils.copytoByteImage(Kernels.CannyEdgeandMean(currentPreprocessedimg, Cannyradius),
 					standardRectangle);
@@ -1021,6 +1078,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 			addToName = filename.getText();
 
+			SaveTxt = true;
 		}
 
 	}
@@ -1097,6 +1155,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		final Checkbox mser = new Checkbox("MSER", Finders, FindLinesViaMSER);
 		final Checkbox hough = new Checkbox("HOUGH", Finders, FindLinesViaHOUGH);
 		final Checkbox mserwhough = new Checkbox("MSERwHOUGH", Finders, FindLinesViaMSERwHOUGH);
+		final Checkbox segmser = new Checkbox("Segmentation + MSER", Finders, FindLinesViaSegMSER);
 
 		final GridBagLayout layout = new GridBagLayout();
 		final GridBagConstraints c = new GridBagConstraints();
@@ -1130,6 +1189,10 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		c.insets = new Insets(10, 10, 0, 0);
 		panelFirst.add(mser, c);
 
+		++c.gridy;
+		c.insets = new Insets(10, 10, 0, 0);
+		panelFirst.add(segmser, c);
+		
 		++c.gridy;
 		c.insets = new Insets(10, 10, 0, 0);
 		panelFirst.add(hough, c);
@@ -1178,6 +1241,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		// ChoiceofTracker.addActionListener(new
 		// TrackerButtonListener(Cardframe));
 		mser.addItemListener(new MserListener());
+		segmser.addItemListener(new SegMserListener());
 		Analyzekymo.addItemListener(new AnalyzekymoListener());
 		hough.addItemListener(new HoughListener());
 		mserwhough.addItemListener(new MserwHoughListener());
@@ -1228,9 +1292,9 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 		final Button RemoveFast = new Button("Remove wrongly selected ends");
 		final Checkbox Finalize = new Checkbox("Confirm the dynamic seed end (s)");
+		final Checkbox Doseg = new Checkbox("Do Waterhshed based segmentation (for seperating ends of small MT)");
 		final Label MTTextHF = new Label("Select ends for tracking", Label.CENTER);
 		final Label Step3 = new Label("Step 3", Label.CENTER);
-		final Checkbox txtfile = new Checkbox("Save tracks as TXT file", SaveTxt);
 
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridx = 0;
@@ -1273,8 +1337,8 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		panelThird.add(Finalize, c);
 
 		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 0);
-		panelThird.add(txtfile, c);
+		c.insets = new Insets(10, 10, 0, 180);
+		panelThird.add(Doseg, c);
 
 		++c.gridy;
 		c.insets = new Insets(10, 10, 0, 0);
@@ -1288,9 +1352,10 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		JumpinTime.addActionListener(
 				new moveInThirdDimListener(thirdDimensionslider, timeText, timeMin, thirdDimensionSize));
 
-		txtfile.addItemListener(new SaveasTXT());
+		
 		Finalize.addItemListener(new finalpoint());
-		// xlsfile.addItemListener(new SaveasXLS());
+		Doseg.addItemListener(new DoSegmentation());
+	
 
 		MTText.setFont(MTText.getFont().deriveFont(Font.BOLD));
 		Pre.setBackground(new Color(1, 0, 1));
@@ -1505,15 +1570,8 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		c.gridy = 0;
 		c.weightx = 1;
 
-		RoiManager roimanager = RoiManager.getInstance();
 
-		if (roimanager != null) {
-
-			roimanager.close();
-			roimanager = new RoiManager();
-
-		}
-
+		
 		panelFifth.removeAll();
 		final Label Step5 = new Label("Step 5", Label.CENTER);
 		panelFifth.setLayout(layout);
@@ -1797,14 +1855,8 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		c.gridy = 0;
 		c.weightx = 1;
 
-		RoiManager roimanager = RoiManager.getInstance();
 
-		if (roimanager != null) {
-
-			roimanager.close();
-			roimanager = new RoiManager();
-
-		}
+		
 		panelFifth.removeAll();
 
 		final Label Step5 = new Label("Step 5", Label.CENTER);
@@ -1871,14 +1923,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		c.gridy = 0;
 		c.weightx = 1;
 
-		RoiManager roimanager = RoiManager.getInstance();
-
-		if (roimanager != null) {
-
-			roimanager.close();
-			roimanager = new RoiManager();
-
-		}
+		
 
 		panelFifth.removeAll();
 		final Label Step5 = new Label("Step 5", Label.CENTER);
@@ -2015,6 +2060,11 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 			updatePreview(ValueChange.THIRDDIM);
 
 			markend();
+			if(doSegmentation)
+				UpdateSegMser();
+			
+			else
+				
 			UpdateMser();
 
 		}
@@ -2299,6 +2349,12 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 			updatePreview(ValueChange.THIRDDIM);
 			markend();
+			
+			if(doSegmentation)
+				UpdateSegMser();
+			
+			else
+				
 			UpdateMser();
 
 		}
@@ -2335,6 +2391,50 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 			IJ.log("Current frame: " + thirdDimension);
 			RandomAccessibleInterval<FloatType> groundframe = currentimg;
 			RandomAccessibleInterval<FloatType> groundframepre = currentPreprocessedimg;
+			
+			if(FindLinesViaSegMSER){
+				
+				boolean dialog = DialogueModelChoice();
+
+				if (dialog) {
+					// updatePreview(ValueChange.SHOWMSER);
+					ArrayList<Indexedlength> pairA = new ArrayList<Indexedlength>();
+					ArrayList<Indexedlength> pairB = new ArrayList<Indexedlength>();
+					for (int label = 1; label < Maxlabel - 1; label++) {
+
+						
+						RandomAccessibleInterval<FloatType> currentsegimg = util.Boundingboxes.getCurrentSegment(intimg, currentPreprocessedimg, label);
+						 currentsegimg = util.CopyUtils.extractImage(currentsegimg, interval);
+
+						RandomAccessibleInterval<UnsignedByteType> currentnewimg = util.CopyUtils.copytoByteImage(Kernels.CannyEdgeandMean(currentsegimg, Cannyradius),
+								standardRectangle);
+						
+						MserTree<UnsignedByteType> localtree = MserTree.buildMserTree(currentnewimg, delta, minSize,
+								maxSize, maxVar, minDiversity, darktobright);
+					
+					LinefinderInteractiveMSER newlineMser = new LinefinderInteractiveMSER(groundframe, groundframepre,
+							localtree, minlength, thirdDimension);
+					
+					
+					
+					
+					Pair<ArrayList<Indexedlength>, ArrayList<Indexedlength>> localpair =  FindlinesVia.LinefindingMethod(groundframe, groundframepre, minlength,
+							thirdDimension, psf, newlineMser, UserChoiceModel.Line, Domask, Intensityratio, Inispacing,
+							jpb);
+					
+					pairA.addAll(localpair.getA());
+					pairB.addAll(localpair.getB());
+					
+					
+					}
+					
+					PrevFrameparam = new ValuePair<ArrayList<Indexedlength>, ArrayList<Indexedlength>>(pairA, pairB);
+				}
+				
+				
+			}
+			
+			
 			if (FindLinesViaMSER) {
 				boolean dialog = DialogueModelChoice();
 
@@ -2351,49 +2451,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 							+ " " + " maxVar " + " " + maxVar + " " + "minDIversity " + " " + minDiversity);
 					IJ.log("Optimization Parameters: " + "R" + Intensityratio + " G"
 							+ Inispacing / Math.min(psf[0], psf[1]));
-					ArrayList<KalmanIndexedlength> start = new ArrayList<KalmanIndexedlength>();
-					ArrayList<KalmanIndexedlength> end = new ArrayList<KalmanIndexedlength>();
-
-					for (int index = 0; index < PrevFrameparam.getA().size(); ++index) {
-
-						double dx = PrevFrameparam.getA().get(index).ds / Math.sqrt(
-								1 + PrevFrameparam.getA().get(index).slope * PrevFrameparam.getA().get(index).slope);
-						double dy = PrevFrameparam.getA().get(index).slope * dx;
-
-						KalmanIndexedlength startPart = new KalmanIndexedlength(
-								PrevFrameparam.getA().get(index).currentLabel,
-								PrevFrameparam.getA().get(index).seedLabel,
-								PrevFrameparam.getA().get(index).framenumber, PrevFrameparam.getA().get(index).ds,
-								PrevFrameparam.getA().get(index).lineintensity,
-								PrevFrameparam.getA().get(index).background,
-								PrevFrameparam.getA().get(index).currentpos, PrevFrameparam.getA().get(index).fixedpos,
-								PrevFrameparam.getA().get(index).slope, PrevFrameparam.getA().get(index).intercept,
-								PrevFrameparam.getA().get(index).slope, PrevFrameparam.getA().get(index).intercept, 0,
-								0, new double[] { dx, dy });
-
-						start.add(startPart);
-					}
-					for (int index = 0; index < PrevFrameparam.getB().size(); ++index) {
-
-						double dx = PrevFrameparam.getB().get(index).ds / Math.sqrt(
-								1 + PrevFrameparam.getB().get(index).slope * PrevFrameparam.getB().get(index).slope);
-						double dy = PrevFrameparam.getB().get(index).slope * dx;
-
-						KalmanIndexedlength endPart = new KalmanIndexedlength(
-								PrevFrameparam.getB().get(index).currentLabel,
-								PrevFrameparam.getB().get(index).seedLabel,
-								PrevFrameparam.getB().get(index).framenumber, PrevFrameparam.getB().get(index).ds,
-								PrevFrameparam.getB().get(index).lineintensity,
-								PrevFrameparam.getB().get(index).background,
-								PrevFrameparam.getB().get(index).currentpos, PrevFrameparam.getB().get(index).fixedpos,
-								PrevFrameparam.getB().get(index).slope, PrevFrameparam.getB().get(index).intercept,
-								PrevFrameparam.getB().get(index).slope, PrevFrameparam.getB().get(index).intercept, 0,
-								0, new double[] { dx, dy });
-						end.add(endPart);
-					}
-
-					PrevFrameparamKalman = new ValuePair<ArrayList<KalmanIndexedlength>, ArrayList<KalmanIndexedlength>>(
-							start, end);
+					
 
 				}
 
@@ -2414,49 +2472,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 					IJ.log("thetaPerPixel " + " " + thetaPerPixel + " " + "rhoPerPixel " + " " + rhoPerPixel);
 					IJ.log("Optimization Parameters: " + "R" + Intensityratio + " G"
 							+ Inispacing / Math.min(psf[0], psf[1]));
-					ArrayList<KalmanIndexedlength> start = new ArrayList<KalmanIndexedlength>();
-					ArrayList<KalmanIndexedlength> end = new ArrayList<KalmanIndexedlength>();
-
-					for (int index = 0; index < PrevFrameparam.getA().size(); ++index) {
-
-						double dx = PrevFrameparam.getA().get(index).ds / Math.sqrt(
-								1 + PrevFrameparam.getA().get(index).slope * PrevFrameparam.getA().get(index).slope);
-						double dy = PrevFrameparam.getA().get(index).slope * dx;
-
-						KalmanIndexedlength startPart = new KalmanIndexedlength(
-								PrevFrameparam.getA().get(index).currentLabel,
-								PrevFrameparam.getA().get(index).seedLabel,
-								PrevFrameparam.getA().get(index).framenumber, PrevFrameparam.getA().get(index).ds,
-								PrevFrameparam.getA().get(index).lineintensity,
-								PrevFrameparam.getA().get(index).background,
-								PrevFrameparam.getA().get(index).currentpos, PrevFrameparam.getA().get(index).fixedpos,
-								PrevFrameparam.getA().get(index).slope, PrevFrameparam.getA().get(index).intercept,
-								PrevFrameparam.getA().get(index).slope, PrevFrameparam.getA().get(index).intercept, 0,
-								0, new double[] { dx, dy });
-
-						start.add(startPart);
-					}
-					for (int index = 0; index < PrevFrameparam.getB().size(); ++index) {
-
-						double dx = PrevFrameparam.getB().get(index).ds / Math.sqrt(
-								1 + PrevFrameparam.getB().get(index).slope * PrevFrameparam.getB().get(index).slope);
-						double dy = PrevFrameparam.getB().get(index).slope * dx;
-
-						KalmanIndexedlength endPart = new KalmanIndexedlength(
-								PrevFrameparam.getB().get(index).currentLabel,
-								PrevFrameparam.getB().get(index).seedLabel,
-								PrevFrameparam.getB().get(index).framenumber, PrevFrameparam.getB().get(index).ds,
-								PrevFrameparam.getB().get(index).lineintensity,
-								PrevFrameparam.getB().get(index).background,
-								PrevFrameparam.getB().get(index).currentpos, PrevFrameparam.getB().get(index).fixedpos,
-								PrevFrameparam.getB().get(index).slope, PrevFrameparam.getB().get(index).intercept,
-								PrevFrameparam.getB().get(index).slope, PrevFrameparam.getB().get(index).intercept, 0,
-								0, new double[] { dx, dy });
-						end.add(endPart);
-					}
-
-					PrevFrameparamKalman = new ValuePair<ArrayList<KalmanIndexedlength>, ArrayList<KalmanIndexedlength>>(
-							start, end);
+		
 
 				}
 			}
@@ -2478,53 +2494,58 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 							thirdDimension, psf, newlineMserwHough, UserChoiceModel.Line, Domask, Intensityratio,
 							Inispacing, jpb);
 
-					ArrayList<KalmanIndexedlength> start = new ArrayList<KalmanIndexedlength>();
-					ArrayList<KalmanIndexedlength> end = new ArrayList<KalmanIndexedlength>();
-
-					for (int index = 0; index < PrevFrameparam.getA().size(); ++index) {
-
-						double dx = PrevFrameparam.getA().get(index).ds / Math.sqrt(
-								1 + PrevFrameparam.getA().get(index).slope * PrevFrameparam.getA().get(index).slope);
-						double dy = PrevFrameparam.getA().get(index).slope * dx;
-
-						KalmanIndexedlength startPart = new KalmanIndexedlength(
-								PrevFrameparam.getA().get(index).currentLabel,
-								PrevFrameparam.getA().get(index).seedLabel,
-								PrevFrameparam.getA().get(index).framenumber, PrevFrameparam.getA().get(index).ds,
-								PrevFrameparam.getA().get(index).lineintensity,
-								PrevFrameparam.getA().get(index).background,
-								PrevFrameparam.getA().get(index).currentpos, PrevFrameparam.getA().get(index).fixedpos,
-								PrevFrameparam.getA().get(index).slope, PrevFrameparam.getA().get(index).intercept,
-								PrevFrameparam.getA().get(index).slope, PrevFrameparam.getA().get(index).intercept, 0,
-								0, new double[] { dx, dy });
-
-						start.add(startPart);
-					}
-					for (int index = 0; index < PrevFrameparam.getB().size(); ++index) {
-
-						double dx = PrevFrameparam.getB().get(index).ds / Math.sqrt(
-								1 + PrevFrameparam.getB().get(index).slope * PrevFrameparam.getB().get(index).slope);
-						double dy = PrevFrameparam.getB().get(index).slope * dx;
-
-						KalmanIndexedlength endPart = new KalmanIndexedlength(
-								PrevFrameparam.getB().get(index).currentLabel,
-								PrevFrameparam.getB().get(index).seedLabel,
-								PrevFrameparam.getB().get(index).framenumber, PrevFrameparam.getB().get(index).ds,
-								PrevFrameparam.getB().get(index).lineintensity,
-								PrevFrameparam.getB().get(index).background,
-								PrevFrameparam.getB().get(index).currentpos, PrevFrameparam.getB().get(index).fixedpos,
-								PrevFrameparam.getB().get(index).slope, PrevFrameparam.getB().get(index).intercept,
-								PrevFrameparam.getB().get(index).slope, PrevFrameparam.getB().get(index).intercept, 0,
-								0, new double[] { dx, dy });
-						end.add(endPart);
-					}
-
-					PrevFrameparamKalman = new ValuePair<ArrayList<KalmanIndexedlength>, ArrayList<KalmanIndexedlength>>(
-							start, end);
+			
 
 				}
 
 			}
+			
+			
+			ArrayList<KalmanIndexedlength> start = new ArrayList<KalmanIndexedlength>();
+			ArrayList<KalmanIndexedlength> end = new ArrayList<KalmanIndexedlength>();
+
+			for (int index = 0; index < PrevFrameparam.getA().size(); ++index) {
+
+				double dx = PrevFrameparam.getA().get(index).ds / Math.sqrt(
+						1 + PrevFrameparam.getA().get(index).slope * PrevFrameparam.getA().get(index).slope);
+				double dy = PrevFrameparam.getA().get(index).slope * dx;
+
+				KalmanIndexedlength startPart = new KalmanIndexedlength(
+						PrevFrameparam.getA().get(index).currentLabel,
+						PrevFrameparam.getA().get(index).seedLabel,
+						PrevFrameparam.getA().get(index).framenumber, PrevFrameparam.getA().get(index).ds,
+						PrevFrameparam.getA().get(index).lineintensity,
+						PrevFrameparam.getA().get(index).background,
+						PrevFrameparam.getA().get(index).currentpos, PrevFrameparam.getA().get(index).fixedpos,
+						PrevFrameparam.getA().get(index).slope, PrevFrameparam.getA().get(index).intercept,
+						PrevFrameparam.getA().get(index).slope, PrevFrameparam.getA().get(index).intercept, 0,
+						0, new double[] { dx, dy });
+
+				start.add(startPart);
+			}
+			for (int index = 0; index < PrevFrameparam.getB().size(); ++index) {
+
+				double dx = PrevFrameparam.getB().get(index).ds / Math.sqrt(
+						1 + PrevFrameparam.getB().get(index).slope * PrevFrameparam.getB().get(index).slope);
+				double dy = PrevFrameparam.getB().get(index).slope * dx;
+
+				KalmanIndexedlength endPart = new KalmanIndexedlength(
+						PrevFrameparam.getB().get(index).currentLabel,
+						PrevFrameparam.getB().get(index).seedLabel,
+						PrevFrameparam.getB().get(index).framenumber, PrevFrameparam.getB().get(index).ds,
+						PrevFrameparam.getB().get(index).lineintensity,
+						PrevFrameparam.getB().get(index).background,
+						PrevFrameparam.getB().get(index).currentpos, PrevFrameparam.getB().get(index).fixedpos,
+						PrevFrameparam.getB().get(index).slope, PrevFrameparam.getB().get(index).intercept,
+						PrevFrameparam.getB().get(index).slope, PrevFrameparam.getB().get(index).intercept, 0,
+						0, new double[] { dx, dy });
+				end.add(endPart);
+			}
+
+			PrevFrameparamKalman = new ValuePair<ArrayList<KalmanIndexedlength>, ArrayList<KalmanIndexedlength>>(
+					start, end);
+			
+			
 			Overlay o = preprocessedimp.getOverlay();
 
 			if (preprocessedimp.getOverlay() == null) {
@@ -3289,6 +3310,29 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		}
 
 	};
+	
+	
+	
+	protected class DoSegmentation implements ItemListener{
+		
+		@Override
+		public void itemStateChanged(ItemEvent arg0) {
+			if (arg0.getStateChange() == ItemEvent.DESELECTED)
+				FindLinesViaSegMSER = false;
+
+			else if (arg0.getStateChange() == ItemEvent.SELECTED) {
+				FindLinesViaSegMSER  = true;
+				doSegmentation = true;
+                UpdateSegMser();
+				
+				
+			}
+			
+		}
+		
+		
+	}
+	
 
 	protected class finalpoint implements ItemListener {
 
@@ -3355,7 +3399,6 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 						else if (seedmap.get(i) == null)
 							seedmap.put(i, Whichend.none);
 
-						System.out.println(seedmap.get(i) + "" + i);
 					}
 
 				}
@@ -4197,6 +4240,120 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 			RandomAccessibleInterval<FloatType> groundframe = currentimg;
 			RandomAccessibleInterval<FloatType> groundframepre = currentPreprocessedimg;
+			
+			if(FindLinesViaSegMSER){
+				
+				
+				if (index == next) {
+					dialog = DialogueModelChoiceHF();
+
+					IJ.log("MSER parameters:" + " " + " thirdDimension: " + " " + thirdDimension);
+					IJ.log("Delta " + " " + delta + " " + "minSize " + " " + minSize + " " + "maxSize " + " " + maxSize
+							+ " " + " maxVar " + " " + maxVar + " " + "minDIversity " + " " + minDiversity);
+
+					IJ.log("Optimization Parameters: " + "R" + Intensityratio + " G"
+							+ Inispacing / Math.min(psf[0], psf[1]));
+
+				}
+
+				else
+					dialog = false;
+
+				updatePreview(ValueChange.ShowsegMSER);
+				ArrayList<Indexedlength> pairA = new ArrayList<Indexedlength>();
+				ArrayList<Indexedlength> pairB = new ArrayList<Indexedlength>();
+				
+				ArrayList<Trackproperties> pairtrackA = new ArrayList<Trackproperties>();
+				ArrayList<Trackproperties> pairtrackB = new ArrayList<Trackproperties>();
+				
+				
+				ArrayList<KalmanIndexedlength> KalmanpairA = new ArrayList<KalmanIndexedlength>();
+				ArrayList<KalmanIndexedlength> KalmanpairB = new ArrayList<KalmanIndexedlength>();
+				
+				ArrayList<KalmanTrackproperties> KalmanpairtrackA = new ArrayList<KalmanTrackproperties>();
+				ArrayList<KalmanTrackproperties> KalmanpairtrackB = new ArrayList<KalmanTrackproperties>();
+				
+				for (int label = 1; label < Maxlabel - 1; label++) {
+
+					RandomAccessibleInterval<FloatType> currentsegimg = util.Boundingboxes.getCurrentSegment(intimg, currentPreprocessedimg, label);
+					 currentsegimg = util.CopyUtils.extractImage(currentsegimg, interval);
+
+					RandomAccessibleInterval<UnsignedByteType> currentnewimg = util.CopyUtils.copytoByteImage(Kernels.CannyEdgeandMean(currentsegimg, Cannyradius),
+							standardRectangle);
+					MserTree<UnsignedByteType> localtree = MserTree.buildMserTree(currentnewimg, delta, minSize,
+							maxSize, maxVar, minDiversity, darktobright);
+				
+				LinefinderInteractiveHFMSER newlineMser = new LinefinderInteractiveHFMSER(groundframe, groundframepre,
+						localtree, minlength, thirdDimension);
+				if (showDeterministic) {
+				Pair<Pair<ArrayList<Trackproperties>, ArrayList<Trackproperties>>, Pair<ArrayList<Indexedlength>, ArrayList<Indexedlength>>> localpair
+				= FindlinesVia.LinefindingMethodHF(groundframe, groundframepre, PrevFrameparam,
+						minlength, thirdDimension, psf, newlineMser, userChoiceModel, Domask, Intensityratio,
+						Inispacing, seedmap, jpb, thirdDimensionSize);
+				Accountedframes.add(FindlinesVia.getAccountedframes());
+				
+				
+				pairA.addAll(localpair.getB().getA());
+				pairB.addAll(localpair.getB().getB());
+				
+				pairtrackA.addAll(localpair.getA().getA());
+				pairtrackA.addAll(localpair.getA().getB());
+				
+				
+				
+				
+				}
+				
+				
+				if (showKalman) {
+					Pair<Pair<ArrayList<KalmanTrackproperties>, ArrayList<KalmanTrackproperties>>, Pair<ArrayList<KalmanIndexedlength>, ArrayList<KalmanIndexedlength>>> localpairKalman
+					= FindlinesVia.LinefindingMethodHFKalman(groundframe, groundframepre,
+							PrevFrameparamKalman, minlength, thirdDimension, psf, newlineMser, userChoiceModel, Domask,
+							Kalmancount, Intensityratio, Inispacing, seedmap, jpb, thirdDimensionSize);
+
+					Accountedframes.add(FindlinesVia.getAccountedframes());
+					
+					KalmanpairA.addAll(localpairKalman.getB().getA());
+					KalmanpairB.addAll(localpairKalman.getB().getB());
+					
+					KalmanpairtrackA.addAll(localpairKalman.getA().getA());
+					KalmanpairtrackA.addAll(localpairKalman.getA().getB());
+					
+				}
+				
+				}
+				
+				if(showDeterministic){
+					
+					Pair<ArrayList<Indexedlength>, ArrayList<Indexedlength>> pairAB = new ValuePair<>(pairA, pairB);
+					Pair<ArrayList<Trackproperties>, ArrayList<Trackproperties>> TrackpairAB = new ValuePair<>(pairtrackA, pairtrackB);
+					
+					
+					returnVector = new ValuePair<Pair<ArrayList<Trackproperties>, ArrayList<Trackproperties>>, Pair<ArrayList<Indexedlength>, ArrayList<Indexedlength>>>(TrackpairAB, pairAB);
+							
+							
+							
+				}
+				
+				if(showKalman){
+					
+					Pair<ArrayList<KalmanIndexedlength>, ArrayList<KalmanIndexedlength>> KalmanpairAB = new ValuePair<>(KalmanpairA, KalmanpairB);
+					Pair<ArrayList<KalmanTrackproperties>, ArrayList<KalmanTrackproperties>> KalmanTrackpairAB = new ValuePair<>(KalmanpairtrackA, KalmanpairtrackB);
+					
+					
+					returnVectorKalman = new ValuePair<Pair<ArrayList<KalmanTrackproperties>, ArrayList<KalmanTrackproperties>>, Pair<ArrayList<KalmanIndexedlength>, ArrayList<KalmanIndexedlength>>>
+					(KalmanTrackpairAB, KalmanpairAB);
+							
+						
+					
+				}
+				
+				
+				
+			}
+			
+			
+			
 			if (FindLinesViaMSER) {
 				if (index == next) {
 					dialog = DialogueModelChoiceHF();
@@ -5164,6 +5321,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public void UpdateMser() {
 		FindLinesViaMSER = true;
 		FindLinesViaHOUGH = false;
+		FindLinesViaSegMSER = false;
 		FindLinesViaMSERwHOUGH = false;
 		final GridBagLayout layout = new GridBagLayout();
 		final GridBagConstraints c = new GridBagConstraints();
@@ -5290,6 +5448,184 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 	}
 
+	
+	public void UpdateSegMser() {
+		FindLinesViaMSER = false;
+		FindLinesViaHOUGH = false;
+		FindLinesViaSegMSER = true;
+		FindLinesViaMSERwHOUGH = false;
+		final GridBagLayout layout = new GridBagLayout();
+		final GridBagConstraints c = new GridBagConstraints();
+		panelFourth.removeAll();
+		final Label Step = new Label("Step 4", Label.CENTER);
+		panelFourth.setLayout(layout);
+		panelFourth.add(Step, c);
+		
+		
+		
+		final Label thresholdText = new Label("threshold Value = " + thresholdHough, Label.CENTER);
+		
+		final Scrollbar threshold = new Scrollbar(Scrollbar.HORIZONTAL, (int) thresholdHoughInit, 10, 0,
+				10 + scrollbarSize);
+		thresholdHough = computeValueFromScrollbarPosition((int) thresholdHoughInit, thresholdHoughMin,
+				thresholdHoughMax, scrollbarSize);
+		final Checkbox displayBit = new Checkbox("Display Bitimage ", displayBitimg);
+		final Checkbox displayWatershed = new Checkbox("Display Watershedimage ", displayWatershedimg);
+
+		final Button Dowatershed = new Button("Do watershedding");
+		
+		
+		final Scrollbar deltaS = new Scrollbar(Scrollbar.HORIZONTAL, deltaInit, 10, 0, 10 + scrollbarSize);
+		final Scrollbar maxVarS = new Scrollbar(Scrollbar.HORIZONTAL, maxVarInit, 10, 0, 10 + scrollbarSize);
+		final Scrollbar minDiversityS = new Scrollbar(Scrollbar.HORIZONTAL, minDiversityInit, 10, 0,
+				10 + scrollbarSize);
+		final Scrollbar minSizeS = new Scrollbar(Scrollbar.HORIZONTAL, minSizeInit, 10, 0, 10 + scrollbarSize);
+		final Scrollbar maxSizeS = new Scrollbar(Scrollbar.HORIZONTAL, maxSizeInit, 10, 0, 10 + scrollbarSize);
+
+		final Label deltaText = new Label("delta = " + delta, Label.CENTER);
+		final Label maxVarText = new Label("maxVar = " + maxVar, Label.CENTER);
+		final Label minDiversityText = new Label("minDiversity = " + minDiversity, Label.CENTER);
+		final Label minSizeText = new Label("MinSize = " + minSize, Label.CENTER);
+		final Label maxSizeText = new Label("MaxSize = " + maxSize, Label.CENTER);
+
+		final Checkbox min = new Checkbox("Look for Minima ", darktobright);
+
+		final Button ComputeTree = new Button("Compute Tree and display");
+		/* Location */
+
+		final Label Update = new Label("Update parameters for dynamic channel");
+		Update.setBackground(new Color(1, 0, 1));
+		Update.setForeground(new Color(255, 255, 255));
+		panelFourth.setLayout(layout);
+
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 0;
+		c.gridy = 0;
+		c.weightx = 4;
+		c.weighty = 1.5;
+		++c.gridy;
+		panelFourth.add(Update, c);
+
+		++c.gridy;
+		panelFourth.add(thresholdText, c);
+		
+		
+		++c.gridy;
+		panelFourth.add(threshold, c);
+		
+		
+		++c.gridy;
+		c.insets = new Insets(10, 175, 0, 175);
+		panelFourth.add(displayBit, c);
+
+		++c.gridy;
+		c.insets = new Insets(10, 175, 0, 175);
+		panelFourth.add(displayWatershed, c);
+		++c.gridy;
+		c.insets = new Insets(10, 175, 0, 175);
+		panelFourth.add(Dowatershed, c);
+		
+		
+		++c.gridy;
+		c.insets = new Insets(10, 10, 0, 0);
+		panelFourth.add(deltaText, c);
+
+		++c.gridy;
+		c.insets = new Insets(10, 10, 0, 0);
+		panelFourth.add(deltaS, c);
+
+		++c.gridy;
+		c.insets = new Insets(10, 10, 0, 0);
+		panelFourth.add(maxVarText, c);
+
+		++c.gridy;
+		c.insets = new Insets(10, 10, 0, 0);
+		panelFourth.add(maxVarS, c);
+
+		++c.gridy;
+		c.insets = new Insets(10, 10, 0, 0);
+		panelFourth.add(minDiversityText, c);
+
+		++c.gridy;
+		c.insets = new Insets(10, 10, 0, 0);
+		panelFourth.add(minDiversityS, c);
+
+		++c.gridy;
+		c.insets = new Insets(10, 10, 0, 0);
+		panelFourth.add(minSizeText, c);
+
+		++c.gridy;
+		c.insets = new Insets(10, 10, 0, 0);
+		panelFourth.add(minSizeS, c);
+
+		++c.gridy;
+		c.insets = new Insets(10, 10, 0, 0);
+		panelFourth.add(maxSizeText, c);
+
+		++c.gridy;
+		c.insets = new Insets(10, 10, 0, 0);
+		panelFourth.add(maxSizeS, c);
+
+		++c.gridy;
+		c.insets = new Insets(10, 175, 0, 175);
+		panelFourth.add(min, c);
+
+		++c.gridy;
+		c.insets = new Insets(10, 175, 0, 175);
+		panelFourth.add(ComputeTree, c);
+
+		deltaS.addAdjustmentListener(new DeltaListener(deltaText, deltaMin, deltaMax, scrollbarSize, deltaS));
+
+		maxVarS.addAdjustmentListener(new maxVarListener(maxVarText, maxVarMin, maxVarMax, scrollbarSize, maxVarS));
+
+		minDiversityS.addAdjustmentListener(new minDiversityListener(minDiversityText, minDiversityMin, minDiversityMax,
+				scrollbarSize, minDiversityS));
+
+		minSizeS.addAdjustmentListener(
+				new minSizeListener(minSizeText, minSizemin, minSizemax, scrollbarSize, minSizeS));
+
+		maxSizeS.addAdjustmentListener(
+				new maxSizeListener(maxSizeText, maxSizemin, maxSizemax, scrollbarSize, maxSizeS));
+		threshold.addAdjustmentListener(new thresholdHoughListener(thresholdText, thresholdHoughMin,
+				thresholdHoughMax, scrollbarSize, threshold));
+		min.addItemListener(new DarktobrightListener());
+		displayBit.addItemListener(new ShowBitimgListener());
+		displayWatershed.addItemListener(new ShowwatershedimgListener());
+		Dowatershed.addActionListener(new DowatershedListener());
+		ComputeTree.addActionListener(new ComputesegTreeListener());
+
+		if (analyzekymo && Kymoimg != null) {
+
+			Kymo();
+		}
+
+		else
+
+			Deterministic();
+
+		panelFourth.validate();
+		panelFourth.repaint();
+		Cardframe.pack();
+	}
+
+	protected class UpdateSegMserListener implements ItemListener {
+		@Override
+		public void itemStateChanged(final ItemEvent arg0) {
+
+			if (arg0.getStateChange() == ItemEvent.DESELECTED)
+				FindLinesViaSegMSER = false;
+			else if (arg0.getStateChange() == ItemEvent.SELECTED) {
+				FindLinesViaSegMSER = true;
+				UpdateSegMser();
+
+			}
+
+		}
+
+	}
+
+	
+	
 	protected class MserListener implements ItemListener {
 		@Override
 		public void itemStateChanged(final ItemEvent arg0) {
@@ -5301,6 +5637,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 				FindLinesViaMSER = true;
 				FindLinesViaHOUGH = false;
+				FindLinesViaSegMSER = false;
 				FindLinesViaMSERwHOUGH = false;
 
 				panelSecond.removeAll();
@@ -5418,6 +5755,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 				FindLinesListener.addActionListener(new FindLinesListener());
 				panelSecond.validate();
 				panelSecond.repaint();
+				Cardframe.pack();
 
 			}
 
@@ -5429,6 +5767,199 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 			}
 		}
 	}
+	
+	
+	protected class SegMserListener implements ItemListener {
+		@Override
+		public void itemStateChanged(final ItemEvent arg0) {
+			boolean oldState = FindLinesViaSegMSER;
+
+			if (arg0.getStateChange() == ItemEvent.DESELECTED)
+				FindLinesViaSegMSER = false;
+			else if (arg0.getStateChange() == ItemEvent.SELECTED) {
+
+				FindLinesViaSegMSER = true;
+				FindLinesViaMSER = false;
+				FindLinesViaHOUGH = false;
+				FindLinesViaMSERwHOUGH = false;
+
+				panelSecond.removeAll();
+
+				final GridBagLayout layout = new GridBagLayout();
+				final GridBagConstraints c = new GridBagConstraints();
+				final Label Step = new Label("Step 2", Label.CENTER);
+
+				panelSecond.setLayout(layout);
+
+				panelSecond.add(Step, c);
+				
+				final Label thresholdText = new Label("threshold Value = " + thresholdHough, Label.CENTER);
+				
+				final Scrollbar threshold = new Scrollbar(Scrollbar.HORIZONTAL, (int) thresholdHoughInit, 10, 0,
+						10 + scrollbarSize);
+				thresholdHough = computeValueFromScrollbarPosition((int) thresholdHoughInit, thresholdHoughMin,
+						thresholdHoughMax, scrollbarSize);
+				final Checkbox displayBit = new Checkbox("Display Bitimage ", displayBitimg);
+				final Checkbox displayWatershed = new Checkbox("Display Watershedimage ", displayWatershedimg);
+
+				final Button Dowatershed = new Button("Do watershedding");
+				final Scrollbar deltaS = new Scrollbar(Scrollbar.HORIZONTAL, deltaInit, 10, 0, 10 + scrollbarSize);
+				final Scrollbar maxVarS = new Scrollbar(Scrollbar.HORIZONTAL, maxVarInit, 10, 0, 10 + scrollbarSize);
+				final Scrollbar minDiversityS = new Scrollbar(Scrollbar.HORIZONTAL, minDiversityInit, 10, 0,
+						10 + scrollbarSize);
+				final Scrollbar minSizeS = new Scrollbar(Scrollbar.HORIZONTAL, minSizeInit, 10, 0, 10 + scrollbarSize);
+				final Scrollbar maxSizeS = new Scrollbar(Scrollbar.HORIZONTAL, maxSizeInit, 10, 0, 10 + scrollbarSize);
+				final Button ComputeTree = new Button("Compute Tree and display");
+				final Button FindLinesListener = new Button("Find endpoints");
+				maxVar = computeValueFromScrollbarPosition(maxVarInit, maxVarMin, maxVarMax, scrollbarSize);
+				delta = computeValueFromScrollbarPosition(deltaInit, deltaMin, deltaMax, scrollbarSize);
+				minDiversity = computeValueFromScrollbarPosition(minDiversityInit, minDiversityMin, minDiversityMax,
+						scrollbarSize);
+				minSize = (int) computeValueFromScrollbarPosition(minSizeInit, minSizemin, minSizemax, scrollbarSize);
+				maxSize = (int) computeValueFromScrollbarPosition(maxSizeInit, maxSizemin, maxSizemax, scrollbarSize);
+
+				final Label deltaText = new Label("delta = " + delta, Label.CENTER);
+				final Label maxVarText = new Label("maxVar = " + maxVar, Label.CENTER);
+				final Label minDiversityText = new Label("minDiversity = " + minDiversity, Label.CENTER);
+				final Label minSizeText = new Label("MinSize = " + minSize, Label.CENTER);
+				final Label maxSizeText = new Label("MaxSize = " + maxSize, Label.CENTER);
+
+				final Checkbox min = new Checkbox("Look for Minima ", darktobright);
+
+				final Label MSparam = new Label("Determine Threshold for segmentaiton and MSER parameters");
+				MSparam.setBackground(new Color(1, 0, 1));
+				MSparam.setForeground(new Color(255, 255, 255));
+
+				/* Location */
+				panelSecond.setLayout(layout);
+
+				c.fill = GridBagConstraints.HORIZONTAL;
+				c.gridx = 0;
+				c.gridy = 0;
+				c.weightx = 4;
+				c.weighty = 1.5;
+
+				++c.gridy;
+
+				panelSecond.add(MSparam, c);
+
+			
+				
+				++c.gridy;
+				panelSecond.add(thresholdText, c);
+				
+				
+				++c.gridy;
+				panelSecond.add(threshold, c);
+				
+				
+				++c.gridy;
+				c.insets = new Insets(10, 175, 0, 175);
+				panelSecond.add(displayBit, c);
+
+				++c.gridy;
+				c.insets = new Insets(10, 175, 0, 175);
+				panelSecond.add(displayWatershed, c);
+				++c.gridy;
+				c.insets = new Insets(10, 175, 0, 175);
+				panelSecond.add(Dowatershed, c);
+				
+				++c.gridy;
+				c.insets = new Insets(10, 10, 0, 0);
+				panelSecond.add(deltaText, c);
+
+				++c.gridy;
+				c.insets = new Insets(10, 10, 0, 0);
+				panelSecond.add(deltaS, c);
+
+				++c.gridy;
+				c.insets = new Insets(10, 10, 0, 0);
+				panelSecond.add(maxVarText, c);
+
+				++c.gridy;
+				c.insets = new Insets(10, 10, 0, 0);
+				panelSecond.add(maxVarS, c);
+
+				++c.gridy;
+				c.insets = new Insets(10, 10, 0, 0);
+				panelSecond.add(minDiversityText, c);
+
+				++c.gridy;
+				c.insets = new Insets(10, 10, 0, 0);
+				panelSecond.add(minDiversityS, c);
+
+				++c.gridy;
+				c.insets = new Insets(10, 10, 0, 0);
+				panelSecond.add(minSizeText, c);
+
+				++c.gridy;
+				c.insets = new Insets(10, 10, 0, 0);
+				panelSecond.add(minSizeS, c);
+
+				++c.gridy;
+				c.insets = new Insets(10, 10, 0, 0);
+				panelSecond.add(maxSizeText, c);
+
+				++c.gridy;
+				c.insets = new Insets(10, 10, 0, 0);
+				panelSecond.add(maxSizeS, c);
+
+				++c.gridy;
+				c.insets = new Insets(10, 175, 0, 175);
+				panelSecond.add(min, c);
+
+				++c.gridy;
+				c.insets = new Insets(10, 175, 0, 175);
+				panelSecond.add(ComputeTree, c);
+
+				++c.gridy;
+				c.insets = new Insets(10, 180, 0, 180);
+				panelSecond.add(FindLinesListener, c);
+				threshold.addAdjustmentListener(new thresholdHoughListener(thresholdText, thresholdHoughMin,
+						thresholdHoughMax, scrollbarSize, threshold));
+				
+				
+				deltaS.addAdjustmentListener(new DeltaListener(deltaText, deltaMin, deltaMax, scrollbarSize, deltaS));
+
+				maxVarS.addAdjustmentListener(
+						new maxVarListener(maxVarText, maxVarMin, maxVarMax, scrollbarSize, maxVarS));
+
+				minDiversityS.addAdjustmentListener(new minDiversityListener(minDiversityText, minDiversityMin,
+						minDiversityMax, scrollbarSize, minDiversityS));
+
+				minSizeS.addAdjustmentListener(
+						new minSizeListener(minSizeText, minSizemin, minSizemax, scrollbarSize, minSizeS));
+
+				maxSizeS.addAdjustmentListener(
+						new maxSizeListener(maxSizeText, maxSizemin, maxSizemax, scrollbarSize, maxSizeS));
+
+				min.addItemListener(new DarktobrightListener());
+				ComputeTree.addActionListener(new ComputesegTreeListener());
+				FindLinesListener.addActionListener(new FindLinesListener());
+
+				displayBit.addItemListener(new ShowBitimgListener());
+				displayWatershed.addItemListener(new ShowwatershedimgListener());
+				Dowatershed.addActionListener(new DowatershedListener());
+				
+
+				if (analyzekymo && Kymoimg != null) {
+
+					Kymo();
+				}
+
+				else
+
+					Deterministic();
+				
+				panelSecond.validate();
+				panelSecond.repaint();
+				Cardframe.pack();
+
+			}
+
+		}
+	}
+	
 
 	protected class HoughListener implements ItemListener {
 		@Override
@@ -5441,6 +5972,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 				FindLinesViaHOUGH = true;
 				FindLinesViaMSER = false;
+				FindLinesViaSegMSER = false;
 				FindLinesViaMSERwHOUGH = false;
 				/* Instantiation */
 				final GridBagLayout layout = new GridBagLayout();
@@ -5836,10 +6368,24 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 			ShowMser = true;
 
 			updatePreview(ValueChange.SHOWMSER);
+			
 
 		}
 	}
+	
+	
+	protected class ComputesegTreeListener implements ActionListener {
 
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			ShowsegMser = true;
+
+			updatePreview(ValueChange.ShowsegMSER);
+			displayBitimg = false;
+			displayWatershedimg = false;
+
+		}
+	}
 	protected class DowatershedListener implements ActionListener {
 
 		@Override
@@ -6034,7 +6580,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 			thresholdScrollbar.setValue(computeScrollbarPositionFromValue(thresholdHough, min, max, scrollbarSize));
 
-			label.setText("thresholdBitimg = " + thresholdHough);
+			label.setText("threshold Value = " + thresholdHough);
 
 			// if ( !event.getValueIsAdjusting() )
 			{

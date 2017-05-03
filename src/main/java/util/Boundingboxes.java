@@ -12,8 +12,11 @@ import net.imglib2.FinalInterval;
 import net.imglib2.Point;
 import net.imglib2.RandomAccess;
 import net.imglib2.RandomAccessibleInterval;
+import net.imglib2.TwinCursor;
 import net.imglib2.algorithm.labeling.AllConnectedComponents;
 import net.imglib2.algorithm.labeling.Watershed;
+import net.imglib2.algorithm.stats.Normalize;
+import net.imglib2.img.Img;
 import net.imglib2.img.ImgFactory;
 import net.imglib2.img.array.ArrayImgFactory;
 import net.imglib2.img.display.imagej.ImageJFunctions;
@@ -23,6 +26,7 @@ import net.imglib2.labeling.LabelingROIStrategy;
 import net.imglib2.labeling.NativeImgLabeling;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.type.numeric.integer.IntType;
+import net.imglib2.type.numeric.integer.UnsignedByteType;
 import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.util.Pair;
 import net.imglib2.util.Util;
@@ -51,9 +55,30 @@ public class Boundingboxes {
 		return realpos;
 
 	}
+	/**
+	 * Generic, type-agnostic method to create an identical copy of an Img
+	 *
+	 * @param currentPreprocessedimg2
+	 *            - the Img to copy
+	 * @return - the copy of the Img
+	 */
 	
+	
+	public static RandomAccessibleInterval<UnsignedByteType> getCurrentSegmentByte(RandomAccessibleInterval<IntType> intimg, RandomAccessibleInterval<UnsignedByteType> currentimg, final int label) {
 
+		RandomAccessibleInterval<UnsignedByteType> Roiimg = Boundingboxes.CurrentLabelImageByte(intimg, currentimg, label);
+
+		return Roiimg;
+
+	}
 	
+	public static RandomAccessibleInterval<FloatType> getCurrentSegment(RandomAccessibleInterval<IntType> intimg, RandomAccessibleInterval<FloatType> currentimg, final int label) {
+
+		RandomAccessibleInterval<FloatType> Roiimg = Boundingboxes.CurrentLabelImage(intimg, currentimg, label);
+
+		return Roiimg;
+
+	}
 	
 	public static long[] GetMaxcorners(RandomAccessibleInterval<IntType> inputimg, int label) {
 
@@ -474,21 +499,21 @@ public static FinalInterval CurrentroiInterval(RandomAccessibleInterval<FloatTyp
 
 	}
 	
-	public static RandomAccessibleInterval<FloatType> CurrentLabelImage(RandomAccessibleInterval<IntType> Intimg,
-			RandomAccessibleInterval<FloatType> originalimg, int currentLabel) {
-		int n = originalimg.numDimensions();
-		RandomAccess<FloatType> inputRA = originalimg.randomAccess();
+	public static RandomAccessibleInterval<UnsignedByteType> CurrentLabelImageByte(RandomAccessibleInterval<IntType> Intimg,
+			RandomAccessibleInterval<UnsignedByteType> currentimg, int currentLabel) {
+		int n = currentimg.numDimensions();
+		RandomAccess<UnsignedByteType> inputRA = currentimg.randomAccess();
 		long[] position = new long[n];
 		Cursor<IntType> intCursor = Views.iterable(Intimg).cursor();
-		final FloatType type = originalimg.randomAccess().get().createVariable();
-		final ImgFactory<FloatType> factory = Util.getArrayOrCellImgFactory(originalimg, type);
-		RandomAccessibleInterval<FloatType> outimg = factory.create(originalimg, type);
-		RandomAccess<FloatType> imageRA = outimg.randomAccess();
+		final UnsignedByteType type = currentimg.randomAccess().get().createVariable();
+		final ImgFactory<UnsignedByteType> factory = Util.getArrayOrCellImgFactory(currentimg, type);
+		RandomAccessibleInterval<UnsignedByteType> outimg = factory.create(currentimg, type);
+		RandomAccess<UnsignedByteType> imageRA = outimg.randomAccess();
 
 		// Go through the whole image and add every pixel, that belongs to
 		// the currently processed label
-		long[] minVal = { originalimg.max(0), originalimg.max(1) };
-		long[] maxVal = { originalimg.min(0), originalimg.min(1) };
+		long[] minVal = { currentimg.max(0), currentimg.max(1) };
+		long[] maxVal = { currentimg.min(0), currentimg.min(1) };
 		while (intCursor.hasNext()) {
 			intCursor.fwd();
 			inputRA.setPosition(intCursor);
@@ -511,8 +536,58 @@ public static FinalInterval CurrentroiInterval(RandomAccessibleInterval<FloatTyp
 
 		}
 		FinalInterval intervalsmall = new FinalInterval(minVal, maxVal) ;
-		RandomAccessibleInterval<FloatType> outimgsmall = Views.interval(outimg, intervalsmall);
+		RandomAccessibleInterval<UnsignedByteType> outimgsmall = Views.interval(outimg, intervalsmall);
 
+		return outimgsmall;
+
+	}
+	
+	public static RandomAccessibleInterval<FloatType> CurrentLabelImage(RandomAccessibleInterval<IntType> Intimg,
+			RandomAccessibleInterval<FloatType> currentimg, int currentLabel) {
+		int n = currentimg.numDimensions();
+		RandomAccess<FloatType> inputRA = currentimg.randomAccess();
+		long[] position = new long[n];
+		
+		
+		
+		Cursor<IntType> intCursor = Views.iterable(Intimg).cursor();
+		final FloatType type = currentimg.randomAccess().get().createVariable();
+		final ImgFactory<FloatType> factory = Util.getArrayOrCellImgFactory(currentimg, type);
+		RandomAccessibleInterval<FloatType> outimg = factory.create(currentimg, type);
+		RandomAccess<FloatType> imageRA = outimg.randomAccess();
+
+		// Go through the whole image and add every pixel, that belongs to
+		// the currently processed label
+		long[] minVal = { currentimg.max(0), currentimg.max(1) };
+		long[] maxVal = { currentimg.min(0), currentimg.min(1) };
+		
+		while (intCursor.hasNext()) {
+			intCursor.fwd();
+			inputRA.setPosition(intCursor);
+			imageRA.setPosition(inputRA);
+			int i = intCursor.get().get();
+			if (i == currentLabel) {
+				intCursor.localize(position);
+				for (int d = 0; d < n; ++d) {
+					if (position[d] < minVal[d]) {
+						minVal[d] = position[d];
+					}
+					if (position[d] > maxVal[d]) {
+						maxVal[d] = position[d];
+					}
+
+				}
+				
+				
+			
+				imageRA.get().set(inputRA.get());
+			}
+			
+			
+
+		}
+		FinalInterval intervalsmall = new FinalInterval(minVal, maxVal) ;
+		RandomAccessibleInterval<FloatType> outimgsmall = Views.interval(outimg, intervalsmall);
 		return outimgsmall;
 
 	}

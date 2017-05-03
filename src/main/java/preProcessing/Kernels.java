@@ -498,6 +498,7 @@ public static void addBackground(final IterableInterval<FloatType> iterable, fin
 			// compute gradient and its direction in each dimension and move
 			// along the direction
 			double gradient = 0;
+			
 			for (int d = 0; d < inputimg.numDimensions(); ++d) {
 				randomAccess.setPosition(cursor);
 				// move one pixel back in dimension d
@@ -527,7 +528,7 @@ public static void addBackground(final IterableInterval<FloatType> iterable, fin
 				else
 					direction[d] = Double.MAX_VALUE;
 			}
-
+			
 			
 			cursor.get().setReal(Math.sqrt(gradient));
 		
@@ -568,7 +569,7 @@ public static void addBackground(final IterableInterval<FloatType> iterable, fin
 		//Supress values below the low threshold
 		final Float Lowthreshold = GlobalThresholding.AutomaticThresholding(Threshcannyimg);
 		Cursor<FloatType> cannycursor = Views.iterable(Threshcannyimg).localizingCursor();
-		 Float threshold = Lowthreshold;
+		 Float threshold =  Lowthreshold;
 		
 		
 		while(cannycursor.hasNext()){
@@ -578,6 +579,8 @@ public static void addBackground(final IterableInterval<FloatType> iterable, fin
 			else
 				cannycursor.get().set(cannycursor.get());
 		}
+		
+		
 		
 		RandomAccessibleInterval<FloatType> meanimg = new ArrayImgFactory<FloatType>().create(inputimg,
 				new FloatType());
