@@ -267,7 +267,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	double netdeltadstart = 0;
 	double netdeltadend = 0;
 	Color colorDraw = Color.red;
-	Color colorTrack = Color.gray;
+	Color colorTrack = Color.yellow;
 	FloatType minval = new FloatType(0);
 	FloatType maxval = new FloatType(1);
 	SliceObserver sliceObserver;
@@ -279,12 +279,11 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	boolean redo = false;
 	boolean redoAccept = false;
 	boolean FindLinesViaMSER = false;
-	boolean FindLinesViaSegMSER = false;
 	boolean doSegmentation = false;
+	boolean doMserSegmentation = true;
 	boolean FindLinesViaHOUGH = false;
 	boolean FindLinesViaMSERwHOUGH = false;
 	boolean ShowMser = false;
-	boolean ShowsegMser = false;
 	boolean ShowHough = false;
 	boolean update = false;
 	boolean Canny = false;
@@ -364,6 +363,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	double[] calibration;
 	double radiusfactor = 1;
 	MserTree<UnsignedByteType> newtree;
+	ArrayList<MserTree<UnsignedByteType>> Alllocaltree;
 	// Image 2d at the current slice
 	RandomAccessibleInterval<FloatType> currentimg;
 	RandomAccessibleInterval<FloatType> currentPreprocessedimg;
@@ -409,7 +409,8 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 	public static enum ValueChange {
 		ROI, ALL, DELTA, FindLinesVia, MAXVAR, MINDIVERSITY, DARKTOBRIGHT, MINSIZE, MAXSIZE, SHOWMSER, FRAME, SHOWHOUGH, 
-		thresholdHough, DISPLAYBITIMG, DISPLAYWATERSHEDIMG, rhoPerPixel, thetaPerPixel, THIRDDIM, iniSearch, maxSearch, missedframes, THIRDDIMTrack, MEDIAN, kymo, ShowsegMSER;
+		thresholdHough, DISPLAYBITIMG, DISPLAYWATERSHEDIMG, rhoPerPixel, thetaPerPixel, THIRDDIM, iniSearch, maxSearch, 
+		missedframes, THIRDDIMTrack, MEDIAN, kymo ;
 	}
 
 	boolean isFinished = false;
@@ -693,6 +694,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		thirdDimensionSizeOriginal = thirdDimensionSize;
 		preprocessedimp = ImageJFunctions.show(CurrentPreprocessedView);
 
+		
 		Roi roi = preprocessedimp.getRoi();
 
 		if (roi == null) {
@@ -906,82 +908,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 		}
 
-		if(change == ValueChange.ShowsegMSER){
-			
-			long[] min = { (long) standardRectangle.getMinX(), (long) standardRectangle.getMinY() };
-			long[] max = { (long) standardRectangle.getMaxX(), (long) standardRectangle.getMaxY() };
-			interval = new FinalInterval(min, max);
-
-
-			currentimg = util.CopyUtils.extractImage(CurrentView, interval);
-			currentPreprocessedimg = util.CopyUtils.extractImage(CurrentPreprocessedView, interval);
-			
-			
-			newimg = util.CopyUtils.copytoByteImage(Kernels.CannyEdgeandMean(currentPreprocessedimg, Cannyradius),
-					standardRectangle);
-			
-			RandomAccessibleInterval<BitType> bitimg = new ArrayImgFactory<BitType>().create(newimg, new BitType());
-			GetLocalmaxmin.ThresholdingBit(newimg, bitimg, thresholdHough);
-
-			if (displayBitimg)
-				ImageJFunctions.show(bitimg);
-
-			SegmentbyWatershed<UnsignedByteType> WaterafterDisttransform = new SegmentbyWatershed<UnsignedByteType>(
-					newimg, bitimg);
-			WaterafterDisttransform.checkInput();
-			WaterafterDisttransform.process();
-			intimg = WaterafterDisttransform.getResult();
-			Maxlabel = WaterafterDisttransform.GetMaxlabelsseeded(intimg);
-			if (displayWatershedimg)
-				ImageJFunctions.show(intimg);
-			
-			
-			
-			IJ.log(" Computing the Component tree");
-			if (preprocessedimp != null) {
-
-				Overlay o = preprocessedimp.getOverlay();
-
-				if (o == null) {
-					o = new Overlay();
-					preprocessedimp.setOverlay(o);
-				}
-
-				o.clear();
-			for (int label = 1; label < Maxlabel - 1; label++) {
-
-				RandomAccessibleInterval<FloatType> currentsegimg = util.Boundingboxes.getCurrentSegment(intimg, currentPreprocessedimg, label);
-				 currentsegimg = util.CopyUtils.extractImage(currentsegimg, interval);
-				RandomAccessibleInterval<UnsignedByteType> currentnewimg = util.CopyUtils.copytoByteImage(Kernels.CannyEdgeandMean(currentsegimg, Cannyradius),
-						standardRectangle);
-				MserTree<UnsignedByteType> localtree = MserTree.buildMserTree(currentnewimg, delta, minSize,
-						maxSize, maxVar, minDiversity, darktobright);
-				Rois = util.DrawingUtils.getcurrentRois(localtree, AllmeanCovar);
-
-				AllMSERrois.put(thirdDimension, Rois);
-				count++;
-
-				if (count == 1)
-					startdim = thirdDimension;
-
-				
-					for (int index = 0; index < Rois.size(); ++index) {
-
-						EllipseRoi or = Rois.get(index);
-
-						or.setStrokeColor(Color.red);
-						o.add(or);
-
-						roimanager.addRoi(or);
-
-					}
-
-				}
-
-			}
-			
-			
-		}
+		
 		
 		if (change == ValueChange.SHOWMSER) {
 			long[] min = { (long) standardRectangle.getMinX(), (long) standardRectangle.getMinY() };
@@ -991,8 +918,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 			currentimg = util.CopyUtils.extractImage(CurrentView, interval);
 			currentPreprocessedimg = util.CopyUtils.extractImage(CurrentPreprocessedView, interval);
-			if(intimg!=null)
-				intimg = util.CopyUtils.extractIntImage(intimg, interval);
+			
 	
 
 			newimg = util.CopyUtils.copytoByteImage(Kernels.CannyEdgeandMean(currentPreprocessedimg, Cannyradius),
@@ -1015,8 +941,13 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 					o = new Overlay();
 					preprocessedimp.setOverlay(o);
 				}
-
+				
+				for (int i = 0; i < o.size(); ++i){
+              if (o.get(i).getStrokeColor() == colorDraw)
 				o.clear();
+              
+              
+				}
 				for (int index = 0; index < Rois.size(); ++index) {
 
 					EllipseRoi or = Rois.get(index);
@@ -1155,7 +1086,6 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		final Checkbox mser = new Checkbox("MSER", Finders, FindLinesViaMSER);
 		final Checkbox hough = new Checkbox("HOUGH", Finders, FindLinesViaHOUGH);
 		final Checkbox mserwhough = new Checkbox("MSERwHOUGH", Finders, FindLinesViaMSERwHOUGH);
-		final Checkbox segmser = new Checkbox("Segmentation + MSER", Finders, FindLinesViaSegMSER);
 
 		final GridBagLayout layout = new GridBagLayout();
 		final GridBagConstraints c = new GridBagConstraints();
@@ -1189,9 +1119,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		c.insets = new Insets(10, 10, 0, 0);
 		panelFirst.add(mser, c);
 
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 0);
-		panelFirst.add(segmser, c);
+		
 		
 		++c.gridy;
 		c.insets = new Insets(10, 10, 0, 0);
@@ -1241,7 +1169,6 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		// ChoiceofTracker.addActionListener(new
 		// TrackerButtonListener(Cardframe));
 		mser.addItemListener(new MserListener());
-		segmser.addItemListener(new SegMserListener());
 		Analyzekymo.addItemListener(new AnalyzekymoListener());
 		hough.addItemListener(new HoughListener());
 		mserwhough.addItemListener(new MserwHoughListener());
@@ -1292,7 +1219,8 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 		final Button RemoveFast = new Button("Remove wrongly selected ends");
 		final Checkbox Finalize = new Checkbox("Confirm the dynamic seed end (s)");
-		final Checkbox Doseg = new Checkbox("Do Waterhshed based segmentation (for seperating ends of small MT)");
+		final Checkbox Doseg = new Checkbox("Do Waterhshed based segmentation (slower, for crowded movies)");
+		final Checkbox DoMserseg = new Checkbox("Do MSER based segmentation (faster, choose well seperated ends to track)");
 		final Label MTTextHF = new Label("Select ends for tracking", Label.CENTER);
 		final Label Step3 = new Label("Step 3", Label.CENTER);
 
@@ -1341,7 +1269,9 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		panelThird.add(Doseg, c);
 
 		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 0);
+		c.insets = new Insets(10, 10, 0, 180);
+		panelThird.add(DoMserseg, c);
+		
 		MoveNext.addActionListener(new moveNextListener());
 		JumptoFrame.addActionListener(new moveToFrameListener());
 		RemoveFast.addActionListener(new removeendListener());
@@ -1355,7 +1285,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		
 		Finalize.addItemListener(new finalpoint());
 		Doseg.addItemListener(new DoSegmentation());
-	
+		DoMserseg.addItemListener(new DoMserSegmentation());
 
 		MTText.setFont(MTText.getFont().deriveFont(Font.BOLD));
 		Pre.setBackground(new Color(1, 0, 1));
@@ -2061,7 +1991,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 			markend();
 			if(doSegmentation)
-				UpdateSegMser();
+				UpdateHough();
 			
 			else
 				
@@ -2070,6 +2000,9 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		}
 	}
 
+	
+	
+	
 	private boolean moveDialogue() {
 		GenericDialog gd = new GenericDialog("Choose Frame");
 
@@ -2351,7 +2284,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 			markend();
 			
 			if(doSegmentation)
-				UpdateSegMser();
+				UpdateHough();
 			
 			else
 				
@@ -2392,47 +2325,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 			RandomAccessibleInterval<FloatType> groundframe = currentimg;
 			RandomAccessibleInterval<FloatType> groundframepre = currentPreprocessedimg;
 			
-			if(FindLinesViaSegMSER){
-				
-				boolean dialog = DialogueModelChoice();
-
-				if (dialog) {
-					// updatePreview(ValueChange.SHOWMSER);
-					ArrayList<Indexedlength> pairA = new ArrayList<Indexedlength>();
-					ArrayList<Indexedlength> pairB = new ArrayList<Indexedlength>();
-					for (int label = 1; label < Maxlabel - 1; label++) {
-
-						
-						RandomAccessibleInterval<FloatType> currentsegimg = util.Boundingboxes.getCurrentSegment(intimg, currentPreprocessedimg, label);
-						 currentsegimg = util.CopyUtils.extractImage(currentsegimg, interval);
-
-						RandomAccessibleInterval<UnsignedByteType> currentnewimg = util.CopyUtils.copytoByteImage(Kernels.CannyEdgeandMean(currentsegimg, Cannyradius),
-								standardRectangle);
-						
-						MserTree<UnsignedByteType> localtree = MserTree.buildMserTree(currentnewimg, delta, minSize,
-								maxSize, maxVar, minDiversity, darktobright);
-					
-					LinefinderInteractiveMSER newlineMser = new LinefinderInteractiveMSER(groundframe, groundframepre,
-							localtree, minlength, thirdDimension);
-					
-					
-					
-					
-					Pair<ArrayList<Indexedlength>, ArrayList<Indexedlength>> localpair =  FindlinesVia.LinefindingMethod(groundframe, groundframepre, minlength,
-							thirdDimension, psf, newlineMser, UserChoiceModel.Line, Domask, Intensityratio, Inispacing,
-							jpb);
-					
-					pairA.addAll(localpair.getA());
-					pairB.addAll(localpair.getB());
-					
-					
-					}
-					
-					PrevFrameparam = new ValuePair<ArrayList<Indexedlength>, ArrayList<Indexedlength>>(pairA, pairB);
-				}
-				
-				
-			}
+			
 			
 			
 			if (FindLinesViaMSER) {
@@ -3318,12 +3211,31 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		@Override
 		public void itemStateChanged(ItemEvent arg0) {
 			if (arg0.getStateChange() == ItemEvent.DESELECTED)
-				FindLinesViaSegMSER = false;
+				FindLinesViaHOUGH = false;
 
 			else if (arg0.getStateChange() == ItemEvent.SELECTED) {
-				FindLinesViaSegMSER  = true;
+				FindLinesViaHOUGH  = true;
 				doSegmentation = true;
-                UpdateSegMser();
+                UpdateHough();
+				
+				
+			}
+			
+		}
+		
+		
+	}
+	protected class DoMserSegmentation implements ItemListener{
+		
+		@Override
+		public void itemStateChanged(ItemEvent arg0) {
+			if (arg0.getStateChange() == ItemEvent.DESELECTED)
+				FindLinesViaMSER = false;
+
+			else if (arg0.getStateChange() == ItemEvent.SELECTED) {
+				FindLinesViaMSER  = true;
+				doMserSegmentation = true;
+                UpdateMser();
 				
 				
 			}
@@ -4241,117 +4153,35 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 			RandomAccessibleInterval<FloatType> groundframe = currentimg;
 			RandomAccessibleInterval<FloatType> groundframepre = currentPreprocessedimg;
 			
-			if(FindLinesViaSegMSER){
+	       Overlay o = preprocessedimp.getOverlay();
+			
+			if(preprocessedimp.getOverlay() == null){
+				
+				o = new Overlay();
+			    preprocessedimp.setOverlay(o);	
+			}
+			for (int i = 0; i < PrevFrameparam.getA().size(); ++i){
 				
 				
-				if (index == next) {
-					dialog = DialogueModelChoiceHF();
-
-					IJ.log("MSER parameters:" + " " + " thirdDimension: " + " " + thirdDimension);
-					IJ.log("Delta " + " " + delta + " " + "minSize " + " " + minSize + " " + "maxSize " + " " + maxSize
-							+ " " + " maxVar " + " " + maxVar + " " + "minDIversity " + " " + minDiversity);
-
-					IJ.log("Optimization Parameters: " + "R" + Intensityratio + " G"
-							+ Inispacing / Math.min(psf[0], psf[1]));
-
-				}
-
-				else
-					dialog = false;
-
-				updatePreview(ValueChange.ShowsegMSER);
-				ArrayList<Indexedlength> pairA = new ArrayList<Indexedlength>();
-				ArrayList<Indexedlength> pairB = new ArrayList<Indexedlength>();
-				
-				ArrayList<Trackproperties> pairtrackA = new ArrayList<Trackproperties>();
-				ArrayList<Trackproperties> pairtrackB = new ArrayList<Trackproperties>();
-				
-				
-				ArrayList<KalmanIndexedlength> KalmanpairA = new ArrayList<KalmanIndexedlength>();
-				ArrayList<KalmanIndexedlength> KalmanpairB = new ArrayList<KalmanIndexedlength>();
-				
-				ArrayList<KalmanTrackproperties> KalmanpairtrackA = new ArrayList<KalmanTrackproperties>();
-				ArrayList<KalmanTrackproperties> KalmanpairtrackB = new ArrayList<KalmanTrackproperties>();
-				
-				for (int label = 1; label < Maxlabel - 1; label++) {
-
-					RandomAccessibleInterval<FloatType> currentsegimg = util.Boundingboxes.getCurrentSegment(intimg, currentPreprocessedimg, label);
-					 currentsegimg = util.CopyUtils.extractImage(currentsegimg, interval);
-
-					RandomAccessibleInterval<UnsignedByteType> currentnewimg = util.CopyUtils.copytoByteImage(Kernels.CannyEdgeandMean(currentsegimg, Cannyradius),
-							standardRectangle);
-					MserTree<UnsignedByteType> localtree = MserTree.buildMserTree(currentnewimg, delta, minSize,
-							maxSize, maxVar, minDiversity, darktobright);
-				
-				LinefinderInteractiveHFMSER newlineMser = new LinefinderInteractiveHFMSER(groundframe, groundframepre,
-						localtree, minlength, thirdDimension);
-				if (showDeterministic) {
-				Pair<Pair<ArrayList<Trackproperties>, ArrayList<Trackproperties>>, Pair<ArrayList<Indexedlength>, ArrayList<Indexedlength>>> localpair
-				= FindlinesVia.LinefindingMethodHF(groundframe, groundframepre, PrevFrameparam,
-						minlength, thirdDimension, psf, newlineMser, userChoiceModel, Domask, Intensityratio,
-						Inispacing, seedmap, jpb, thirdDimensionSize);
-				Accountedframes.add(FindlinesVia.getAccountedframes());
-				
-				
-				pairA.addAll(localpair.getB().getA());
-				pairB.addAll(localpair.getB().getB());
-				
-				pairtrackA.addAll(localpair.getA().getA());
-				pairtrackA.addAll(localpair.getA().getB());
-				
-				
-				
-				
-				}
-				
-				
-				if (showKalman) {
-					Pair<Pair<ArrayList<KalmanTrackproperties>, ArrayList<KalmanTrackproperties>>, Pair<ArrayList<KalmanIndexedlength>, ArrayList<KalmanIndexedlength>>> localpairKalman
-					= FindlinesVia.LinefindingMethodHFKalman(groundframe, groundframepre,
-							PrevFrameparamKalman, minlength, thirdDimension, psf, newlineMser, userChoiceModel, Domask,
-							Kalmancount, Intensityratio, Inispacing, seedmap, jpb, thirdDimensionSize);
-
-					Accountedframes.add(FindlinesVia.getAccountedframes());
-					
-					KalmanpairA.addAll(localpairKalman.getB().getA());
-					KalmanpairB.addAll(localpairKalman.getB().getB());
-					
-					KalmanpairtrackA.addAll(localpairKalman.getA().getA());
-					KalmanpairtrackA.addAll(localpairKalman.getA().getB());
-					
-				}
-				
-				}
-				
-				if(showDeterministic){
-					
-					Pair<ArrayList<Indexedlength>, ArrayList<Indexedlength>> pairAB = new ValuePair<>(pairA, pairB);
-					Pair<ArrayList<Trackproperties>, ArrayList<Trackproperties>> TrackpairAB = new ValuePair<>(pairtrackA, pairtrackB);
-					
-					
-					returnVector = new ValuePair<Pair<ArrayList<Trackproperties>, ArrayList<Trackproperties>>, Pair<ArrayList<Indexedlength>, ArrayList<Indexedlength>>>(TrackpairAB, pairAB);
-							
-							
-							
-				}
-				
-				if(showKalman){
-					
-					Pair<ArrayList<KalmanIndexedlength>, ArrayList<KalmanIndexedlength>> KalmanpairAB = new ValuePair<>(KalmanpairA, KalmanpairB);
-					Pair<ArrayList<KalmanTrackproperties>, ArrayList<KalmanTrackproperties>> KalmanTrackpairAB = new ValuePair<>(KalmanpairtrackA, KalmanpairtrackB);
-					
-					
-					returnVectorKalman = new ValuePair<Pair<ArrayList<KalmanTrackproperties>, ArrayList<KalmanTrackproperties>>, Pair<ArrayList<KalmanIndexedlength>, ArrayList<KalmanIndexedlength>>>
-					(KalmanTrackpairAB, KalmanpairAB);
-							
-						
-					
-				}
-				
-				
+				final OvalRoi Bigroi = new OvalRoi(Util.round(PrevFrameparam.getA().get(i).currentpos[0] - 2.5),
+						Util.round(PrevFrameparam.getA().get(i).currentpos[1]  - 2.5), Util.round(5), Util.round(5));
+				Bigroi.setStrokeWidth(0.8);
+				Bigroi.setStrokeColor(colorTrack);
+				o.add(Bigroi);
 				
 			}
 			
+			for (int i = 0; i < PrevFrameparam.getB().size(); ++i){
+				
+				
+				final OvalRoi Bigroi = new OvalRoi(Util.round(PrevFrameparam.getB().get(i).currentpos[0] - 2.5),
+						Util.round(PrevFrameparam.getB().get(i).currentpos[1]   - 2.5), Util.round(5), Util.round(5));
+				Bigroi.setStrokeWidth(0.8);
+				Bigroi.setStrokeColor(colorTrack);
+				o.add(Bigroi);
+				
+			}
+             preprocessedimp.updateAndDraw();
 			
 			
 			if (FindLinesViaMSER) {
@@ -5089,6 +4919,8 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 				}
 
 			}
+			
+		
 
 			rtAll.show("Start and End of MT");
 			if (lengthtimestart != null)
@@ -5318,10 +5150,94 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 	}
 
+	
+	public void UpdateHough(){
+		
+		FindLinesViaMSER = false;
+		FindLinesViaHOUGH = true;
+		FindLinesViaMSERwHOUGH = false;
+		final GridBagLayout layout = new GridBagLayout();
+		final GridBagConstraints c = new GridBagConstraints();
+		panelFourth.removeAll();
+		final Label Step = new Label("Step 4", Label.CENTER);
+		panelFourth.setLayout(layout);
+
+		panelFourth.add(Step, c);
+		final Label exthresholdText = new Label("threshold = threshold to create Bitimg for watershedding.",
+				Label.CENTER);
+	
+				
+		final Label thresholdText = new Label("thresholdValue = " + thresholdHough, Label.CENTER);
+		
+
+		final Scrollbar threshold = new Scrollbar(Scrollbar.HORIZONTAL, (int) thresholdHoughInit, 10, 0,
+				10 + scrollbarSize);
+		
+
+
+		final Checkbox displayBit = new Checkbox("Display Bitimage ", displayBitimg);
+		final Checkbox displayWatershed = new Checkbox("Display Watershedimage ", displayWatershedimg);
+
+		final Button Dowatershed = new Button("Do watershedding");
+		final Label Update = new Label("Update parameters for dynamic channel");
+		Update.setBackground(new Color(1, 0, 1));
+		Update.setForeground(new Color(255, 255, 255));
+		/* Location */
+		panelFourth.setLayout(layout);
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 0;
+		c.gridy = 0;
+		c.weightx = 4;
+		c.weighty = 1.5;
+
+		++c.gridy;
+		panelFourth.add(Update, c);
+
+		++c.gridy;
+		panelFourth.add(exthresholdText, c);
+		++c.gridy;
+
+	
+	
+
+		panelFourth.add(thresholdText, c);
+		++c.gridy;
+
+		panelFourth.add(threshold, c);
+		
+	
+
+		++c.gridy;
+		c.insets = new Insets(10, 175, 0, 175);
+		panelFourth.add(displayBit, c);
+
+		++c.gridy;
+		c.insets = new Insets(10, 175, 0, 175);
+		panelFourth.add(displayWatershed, c);
+		++c.gridy;
+		c.insets = new Insets(10, 175, 0, 175);
+		panelFourth.add(Dowatershed, c);
+
+		threshold.addAdjustmentListener(new thresholdHoughListener(thresholdText, thresholdHoughMin,
+				thresholdHoughMax, scrollbarSize, threshold));
+
+		
+
+		displayBit.addItemListener(new ShowBitimgListener());
+		displayWatershed.addItemListener(new ShowwatershedimgListener());
+		Dowatershed.addActionListener(new DowatershedListener());
+		displayBitimg = false;
+		displayWatershedimg = false;
+		panelFourth.repaint();
+		panelFourth.validate();
+		Cardframe.pack();
+		
+		
+	}
+	
 	public void UpdateMser() {
 		FindLinesViaMSER = true;
 		FindLinesViaHOUGH = false;
-		FindLinesViaSegMSER = false;
 		FindLinesViaMSERwHOUGH = false;
 		final GridBagLayout layout = new GridBagLayout();
 		final GridBagConstraints c = new GridBagConstraints();
@@ -5448,181 +5364,28 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 	}
 
-	
-	public void UpdateSegMser() {
-		FindLinesViaMSER = false;
-		FindLinesViaHOUGH = false;
-		FindLinesViaSegMSER = true;
-		FindLinesViaMSERwHOUGH = false;
-		final GridBagLayout layout = new GridBagLayout();
-		final GridBagConstraints c = new GridBagConstraints();
-		panelFourth.removeAll();
-		final Label Step = new Label("Step 4", Label.CENTER);
-		panelFourth.setLayout(layout);
-		panelFourth.add(Step, c);
-		
-		
-		
-		final Label thresholdText = new Label("threshold Value = " + thresholdHough, Label.CENTER);
-		
-		final Scrollbar threshold = new Scrollbar(Scrollbar.HORIZONTAL, (int) thresholdHoughInit, 10, 0,
-				10 + scrollbarSize);
-		thresholdHough = computeValueFromScrollbarPosition((int) thresholdHoughInit, thresholdHoughMin,
-				thresholdHoughMax, scrollbarSize);
-		final Checkbox displayBit = new Checkbox("Display Bitimage ", displayBitimg);
-		final Checkbox displayWatershed = new Checkbox("Display Watershedimage ", displayWatershedimg);
-
-		final Button Dowatershed = new Button("Do watershedding");
-		
-		
-		final Scrollbar deltaS = new Scrollbar(Scrollbar.HORIZONTAL, deltaInit, 10, 0, 10 + scrollbarSize);
-		final Scrollbar maxVarS = new Scrollbar(Scrollbar.HORIZONTAL, maxVarInit, 10, 0, 10 + scrollbarSize);
-		final Scrollbar minDiversityS = new Scrollbar(Scrollbar.HORIZONTAL, minDiversityInit, 10, 0,
-				10 + scrollbarSize);
-		final Scrollbar minSizeS = new Scrollbar(Scrollbar.HORIZONTAL, minSizeInit, 10, 0, 10 + scrollbarSize);
-		final Scrollbar maxSizeS = new Scrollbar(Scrollbar.HORIZONTAL, maxSizeInit, 10, 0, 10 + scrollbarSize);
-
-		final Label deltaText = new Label("delta = " + delta, Label.CENTER);
-		final Label maxVarText = new Label("maxVar = " + maxVar, Label.CENTER);
-		final Label minDiversityText = new Label("minDiversity = " + minDiversity, Label.CENTER);
-		final Label minSizeText = new Label("MinSize = " + minSize, Label.CENTER);
-		final Label maxSizeText = new Label("MaxSize = " + maxSize, Label.CENTER);
-
-		final Checkbox min = new Checkbox("Look for Minima ", darktobright);
-
-		final Button ComputeTree = new Button("Compute Tree and display");
-		/* Location */
-
-		final Label Update = new Label("Update parameters for dynamic channel");
-		Update.setBackground(new Color(1, 0, 1));
-		Update.setForeground(new Color(255, 255, 255));
-		panelFourth.setLayout(layout);
-
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.gridx = 0;
-		c.gridy = 0;
-		c.weightx = 4;
-		c.weighty = 1.5;
-		++c.gridy;
-		panelFourth.add(Update, c);
-
-		++c.gridy;
-		panelFourth.add(thresholdText, c);
-		
-		
-		++c.gridy;
-		panelFourth.add(threshold, c);
-		
-		
-		++c.gridy;
-		c.insets = new Insets(10, 175, 0, 175);
-		panelFourth.add(displayBit, c);
-
-		++c.gridy;
-		c.insets = new Insets(10, 175, 0, 175);
-		panelFourth.add(displayWatershed, c);
-		++c.gridy;
-		c.insets = new Insets(10, 175, 0, 175);
-		panelFourth.add(Dowatershed, c);
-		
-		
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 0);
-		panelFourth.add(deltaText, c);
-
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 0);
-		panelFourth.add(deltaS, c);
-
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 0);
-		panelFourth.add(maxVarText, c);
-
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 0);
-		panelFourth.add(maxVarS, c);
-
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 0);
-		panelFourth.add(minDiversityText, c);
-
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 0);
-		panelFourth.add(minDiversityS, c);
-
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 0);
-		panelFourth.add(minSizeText, c);
-
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 0);
-		panelFourth.add(minSizeS, c);
-
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 0);
-		panelFourth.add(maxSizeText, c);
-
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 0);
-		panelFourth.add(maxSizeS, c);
-
-		++c.gridy;
-		c.insets = new Insets(10, 175, 0, 175);
-		panelFourth.add(min, c);
-
-		++c.gridy;
-		c.insets = new Insets(10, 175, 0, 175);
-		panelFourth.add(ComputeTree, c);
-
-		deltaS.addAdjustmentListener(new DeltaListener(deltaText, deltaMin, deltaMax, scrollbarSize, deltaS));
-
-		maxVarS.addAdjustmentListener(new maxVarListener(maxVarText, maxVarMin, maxVarMax, scrollbarSize, maxVarS));
-
-		minDiversityS.addAdjustmentListener(new minDiversityListener(minDiversityText, minDiversityMin, minDiversityMax,
-				scrollbarSize, minDiversityS));
-
-		minSizeS.addAdjustmentListener(
-				new minSizeListener(minSizeText, minSizemin, minSizemax, scrollbarSize, minSizeS));
-
-		maxSizeS.addAdjustmentListener(
-				new maxSizeListener(maxSizeText, maxSizemin, maxSizemax, scrollbarSize, maxSizeS));
-		threshold.addAdjustmentListener(new thresholdHoughListener(thresholdText, thresholdHoughMin,
-				thresholdHoughMax, scrollbarSize, threshold));
-		min.addItemListener(new DarktobrightListener());
-		displayBit.addItemListener(new ShowBitimgListener());
-		displayWatershed.addItemListener(new ShowwatershedimgListener());
-		Dowatershed.addActionListener(new DowatershedListener());
-		ComputeTree.addActionListener(new ComputesegTreeListener());
-
-		if (analyzekymo && Kymoimg != null) {
-
-			Kymo();
-		}
-
-		else
-
-			Deterministic();
-
-		panelFourth.validate();
-		panelFourth.repaint();
-		Cardframe.pack();
-	}
-
-	protected class UpdateSegMserListener implements ItemListener {
+	protected class UpdateHoughListener implements ItemListener {
 		@Override
 		public void itemStateChanged(final ItemEvent arg0) {
+			boolean oldState = FindLinesViaHOUGH;
 
 			if (arg0.getStateChange() == ItemEvent.DESELECTED)
-				FindLinesViaSegMSER = false;
+				FindLinesViaHOUGH = false;
 			else if (arg0.getStateChange() == ItemEvent.SELECTED) {
-				FindLinesViaSegMSER = true;
-				UpdateSegMser();
+				FindLinesViaMSER = false;
+				FindLinesViaHOUGH = true;
+				FindLinesViaMSERwHOUGH = false;
+				 UpdateHough();
+
 
 			}
 
 		}
 
 	}
+	
+
+	
 
 	
 	
@@ -5637,7 +5400,6 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 				FindLinesViaMSER = true;
 				FindLinesViaHOUGH = false;
-				FindLinesViaSegMSER = false;
 				FindLinesViaMSERwHOUGH = false;
 
 				panelSecond.removeAll();
@@ -5769,196 +5531,6 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	}
 	
 	
-	protected class SegMserListener implements ItemListener {
-		@Override
-		public void itemStateChanged(final ItemEvent arg0) {
-			boolean oldState = FindLinesViaSegMSER;
-
-			if (arg0.getStateChange() == ItemEvent.DESELECTED)
-				FindLinesViaSegMSER = false;
-			else if (arg0.getStateChange() == ItemEvent.SELECTED) {
-
-				FindLinesViaSegMSER = true;
-				FindLinesViaMSER = false;
-				FindLinesViaHOUGH = false;
-				FindLinesViaMSERwHOUGH = false;
-
-				panelSecond.removeAll();
-
-				final GridBagLayout layout = new GridBagLayout();
-				final GridBagConstraints c = new GridBagConstraints();
-				final Label Step = new Label("Step 2", Label.CENTER);
-
-				panelSecond.setLayout(layout);
-
-				panelSecond.add(Step, c);
-				
-				final Label thresholdText = new Label("threshold Value = " + thresholdHough, Label.CENTER);
-				
-				final Scrollbar threshold = new Scrollbar(Scrollbar.HORIZONTAL, (int) thresholdHoughInit, 10, 0,
-						10 + scrollbarSize);
-				thresholdHough = computeValueFromScrollbarPosition((int) thresholdHoughInit, thresholdHoughMin,
-						thresholdHoughMax, scrollbarSize);
-				final Checkbox displayBit = new Checkbox("Display Bitimage ", displayBitimg);
-				final Checkbox displayWatershed = new Checkbox("Display Watershedimage ", displayWatershedimg);
-
-				final Button Dowatershed = new Button("Do watershedding");
-				final Scrollbar deltaS = new Scrollbar(Scrollbar.HORIZONTAL, deltaInit, 10, 0, 10 + scrollbarSize);
-				final Scrollbar maxVarS = new Scrollbar(Scrollbar.HORIZONTAL, maxVarInit, 10, 0, 10 + scrollbarSize);
-				final Scrollbar minDiversityS = new Scrollbar(Scrollbar.HORIZONTAL, minDiversityInit, 10, 0,
-						10 + scrollbarSize);
-				final Scrollbar minSizeS = new Scrollbar(Scrollbar.HORIZONTAL, minSizeInit, 10, 0, 10 + scrollbarSize);
-				final Scrollbar maxSizeS = new Scrollbar(Scrollbar.HORIZONTAL, maxSizeInit, 10, 0, 10 + scrollbarSize);
-				final Button ComputeTree = new Button("Compute Tree and display");
-				final Button FindLinesListener = new Button("Find endpoints");
-				maxVar = computeValueFromScrollbarPosition(maxVarInit, maxVarMin, maxVarMax, scrollbarSize);
-				delta = computeValueFromScrollbarPosition(deltaInit, deltaMin, deltaMax, scrollbarSize);
-				minDiversity = computeValueFromScrollbarPosition(minDiversityInit, minDiversityMin, minDiversityMax,
-						scrollbarSize);
-				minSize = (int) computeValueFromScrollbarPosition(minSizeInit, minSizemin, minSizemax, scrollbarSize);
-				maxSize = (int) computeValueFromScrollbarPosition(maxSizeInit, maxSizemin, maxSizemax, scrollbarSize);
-
-				final Label deltaText = new Label("delta = " + delta, Label.CENTER);
-				final Label maxVarText = new Label("maxVar = " + maxVar, Label.CENTER);
-				final Label minDiversityText = new Label("minDiversity = " + minDiversity, Label.CENTER);
-				final Label minSizeText = new Label("MinSize = " + minSize, Label.CENTER);
-				final Label maxSizeText = new Label("MaxSize = " + maxSize, Label.CENTER);
-
-				final Checkbox min = new Checkbox("Look for Minima ", darktobright);
-
-				final Label MSparam = new Label("Determine Threshold for segmentaiton and MSER parameters");
-				MSparam.setBackground(new Color(1, 0, 1));
-				MSparam.setForeground(new Color(255, 255, 255));
-
-				/* Location */
-				panelSecond.setLayout(layout);
-
-				c.fill = GridBagConstraints.HORIZONTAL;
-				c.gridx = 0;
-				c.gridy = 0;
-				c.weightx = 4;
-				c.weighty = 1.5;
-
-				++c.gridy;
-
-				panelSecond.add(MSparam, c);
-
-			
-				
-				++c.gridy;
-				panelSecond.add(thresholdText, c);
-				
-				
-				++c.gridy;
-				panelSecond.add(threshold, c);
-				
-				
-				++c.gridy;
-				c.insets = new Insets(10, 175, 0, 175);
-				panelSecond.add(displayBit, c);
-
-				++c.gridy;
-				c.insets = new Insets(10, 175, 0, 175);
-				panelSecond.add(displayWatershed, c);
-				++c.gridy;
-				c.insets = new Insets(10, 175, 0, 175);
-				panelSecond.add(Dowatershed, c);
-				
-				++c.gridy;
-				c.insets = new Insets(10, 10, 0, 0);
-				panelSecond.add(deltaText, c);
-
-				++c.gridy;
-				c.insets = new Insets(10, 10, 0, 0);
-				panelSecond.add(deltaS, c);
-
-				++c.gridy;
-				c.insets = new Insets(10, 10, 0, 0);
-				panelSecond.add(maxVarText, c);
-
-				++c.gridy;
-				c.insets = new Insets(10, 10, 0, 0);
-				panelSecond.add(maxVarS, c);
-
-				++c.gridy;
-				c.insets = new Insets(10, 10, 0, 0);
-				panelSecond.add(minDiversityText, c);
-
-				++c.gridy;
-				c.insets = new Insets(10, 10, 0, 0);
-				panelSecond.add(minDiversityS, c);
-
-				++c.gridy;
-				c.insets = new Insets(10, 10, 0, 0);
-				panelSecond.add(minSizeText, c);
-
-				++c.gridy;
-				c.insets = new Insets(10, 10, 0, 0);
-				panelSecond.add(minSizeS, c);
-
-				++c.gridy;
-				c.insets = new Insets(10, 10, 0, 0);
-				panelSecond.add(maxSizeText, c);
-
-				++c.gridy;
-				c.insets = new Insets(10, 10, 0, 0);
-				panelSecond.add(maxSizeS, c);
-
-				++c.gridy;
-				c.insets = new Insets(10, 175, 0, 175);
-				panelSecond.add(min, c);
-
-				++c.gridy;
-				c.insets = new Insets(10, 175, 0, 175);
-				panelSecond.add(ComputeTree, c);
-
-				++c.gridy;
-				c.insets = new Insets(10, 180, 0, 180);
-				panelSecond.add(FindLinesListener, c);
-				threshold.addAdjustmentListener(new thresholdHoughListener(thresholdText, thresholdHoughMin,
-						thresholdHoughMax, scrollbarSize, threshold));
-				
-				
-				deltaS.addAdjustmentListener(new DeltaListener(deltaText, deltaMin, deltaMax, scrollbarSize, deltaS));
-
-				maxVarS.addAdjustmentListener(
-						new maxVarListener(maxVarText, maxVarMin, maxVarMax, scrollbarSize, maxVarS));
-
-				minDiversityS.addAdjustmentListener(new minDiversityListener(minDiversityText, minDiversityMin,
-						minDiversityMax, scrollbarSize, minDiversityS));
-
-				minSizeS.addAdjustmentListener(
-						new minSizeListener(minSizeText, minSizemin, minSizemax, scrollbarSize, minSizeS));
-
-				maxSizeS.addAdjustmentListener(
-						new maxSizeListener(maxSizeText, maxSizemin, maxSizemax, scrollbarSize, maxSizeS));
-
-				min.addItemListener(new DarktobrightListener());
-				ComputeTree.addActionListener(new ComputesegTreeListener());
-				FindLinesListener.addActionListener(new FindLinesListener());
-
-				displayBit.addItemListener(new ShowBitimgListener());
-				displayWatershed.addItemListener(new ShowwatershedimgListener());
-				Dowatershed.addActionListener(new DowatershedListener());
-				
-
-				if (analyzekymo && Kymoimg != null) {
-
-					Kymo();
-				}
-
-				else
-
-					Deterministic();
-				
-				panelSecond.validate();
-				panelSecond.repaint();
-				Cardframe.pack();
-
-			}
-
-		}
-	}
 	
 
 	protected class HoughListener implements ItemListener {
@@ -5972,7 +5544,6 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 				FindLinesViaHOUGH = true;
 				FindLinesViaMSER = false;
-				FindLinesViaSegMSER = false;
 				FindLinesViaMSERwHOUGH = false;
 				/* Instantiation */
 				final GridBagLayout layout = new GridBagLayout();
@@ -6118,10 +5689,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 				panelSecond.setLayout(layout);
 				panelSecond.add(Step, c);
-				final Label exthetaText = new Label("thetaPerPixel = Pixel Size in theta direction for Hough space.",
-						Label.CENTER);
-				final Label exrhoText = new Label("rhoPerPixel = Pixel Size in rho direction for Hough space.",
-						Label.CENTER);
+				
 
 				final Checkbox rhoEnable = new Checkbox("Enable Manual Adjustment of rhoPerPixel", enablerhoPerPixel);
 
@@ -6374,18 +5942,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	}
 	
 	
-	protected class ComputesegTreeListener implements ActionListener {
-
-		@Override
-		public void actionPerformed(ActionEvent arg0) {
-			ShowsegMser = true;
-
-			updatePreview(ValueChange.ShowsegMSER);
-			displayBitimg = false;
-			displayWatershedimg = false;
-
-		}
-	}
+	
 	protected class DowatershedListener implements ActionListener {
 
 		@Override
@@ -6418,38 +5975,24 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	protected class ShowBitimgListener implements ItemListener {
 		@Override
 		public void itemStateChanged(final ItemEvent arg0) {
-			boolean oldState = displayBitimg;
 
 			if (arg0.getStateChange() == ItemEvent.DESELECTED)
 				displayBitimg = false;
 			else if (arg0.getStateChange() == ItemEvent.SELECTED)
 				displayBitimg = true;
 
-			if (displayBitimg != oldState) {
-				while (isComputing)
-					SimpleMultiThreading.threadWait(10);
-
-				updatePreview(ValueChange.DISPLAYBITIMG);
-			}
 		}
 	}
 
 	protected class ShowwatershedimgListener implements ItemListener {
 		@Override
 		public void itemStateChanged(final ItemEvent arg0) {
-			boolean oldState = displayWatershedimg;
 
 			if (arg0.getStateChange() == ItemEvent.DESELECTED)
 				displayWatershedimg = false;
 			else if (arg0.getStateChange() == ItemEvent.SELECTED)
 				displayWatershedimg = true;
 
-			if (displayWatershedimg != oldState) {
-				while (isComputing)
-					SimpleMultiThreading.threadWait(10);
-
-				updatePreview(ValueChange.DISPLAYWATERSHEDIMG);
-			}
 		}
 	}
 

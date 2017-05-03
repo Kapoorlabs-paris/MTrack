@@ -18,7 +18,8 @@ public class FitterUtils {
 	
 	
 	
-	public static final Pair<double[], double[]> MakeinitialEndpointguess(ArrayList<CommonOutputHF> imgs, double maxintensityline, double Intensityratio, int ndims, int label){
+	public static final Pair<double[], double[]> MakeinitialEndpointguess(ArrayList<CommonOutputHF> imgs, double maxintensityline, 
+			double Intensityratio, int ndims, int label, double slope, double intercept, double Curvature, double Inflection){
 		long[] newposition = new long[ndims];
 		double[] minVal = { Double.MAX_VALUE, Double.MAX_VALUE };
 		double[] maxVal = { -Double.MIN_VALUE, -Double.MIN_VALUE };
@@ -37,21 +38,20 @@ public class FitterUtils {
 			outcursor.fwd();
 
 			outcursor.localize(newposition);
-
-
+			
 			if (outcursor.getDoublePosition(0) <= minVal[0]
-					&& outcursor.get().get() / maxintensityline > Intensityratio) {
+					&& outcursor.get().get() / maxintensityline > Intensityratio ) {
 				minVal[0] = outcursor.getDoublePosition(0);
 				minVal[1] = outcursor.getDoublePosition(1);
 			}
 
 			if (outcursor.getDoublePosition(0) >= maxVal[0]
-					&& outcursor.get().get() / maxintensityline > Intensityratio) {
+					&& outcursor.get().get() / maxintensityline > Intensityratio ) {
 				maxVal[0] = outcursor.getDoublePosition(0);
 				maxVal[1] = outcursor.getDoublePosition(1);
-			}
+			
 		}
-		
+		}
 		Pair<double[], double[]> minmaxpair = new ValuePair<double[], double[]>(minVal, maxVal);
 		
 		return minmaxpair;

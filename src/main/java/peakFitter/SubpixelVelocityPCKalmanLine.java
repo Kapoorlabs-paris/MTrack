@@ -368,7 +368,8 @@ import preProcessing.GetLocalmaxmin;
 
 
 			final double maxintensityline = GetLocalmaxmin.computeMaxIntensity(currentimg);
-			Pair<double[], double[]> minmaxpair =  FitterUtils.MakeinitialEndpointguess(imgs, maxintensityline, Intensityratio, ndims, label);
+			Pair<double[], double[]> minmaxpair =  FitterUtils.MakeinitialEndpointguess(imgs, maxintensityline, Intensityratio, ndims, label
+					,iniparam.slope, iniparam.intercept, iniparam.Curvature, iniparam.Inflection);
 			for (int d = 0; d < ndims; ++d) {
 				
 				minVal[d] = minmaxpair.getA()[d];
