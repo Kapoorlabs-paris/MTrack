@@ -129,7 +129,9 @@ import lineFinder.LinefinderInteractiveHFMSERwHough;
 import lineFinder.LinefinderInteractiveHough;
 import lineFinder.LinefinderInteractiveMSER;
 import lineFinder.LinefinderInteractiveMSERwHough;
+import listeners.AcceptResultsListener;
 import listeners.AnalyzekymoListener;
+import listeners.CheckResultsListener;
 import listeners.ComputeTreeListener;
 import listeners.DarktobrightListener;
 import listeners.DeltaListener;
@@ -137,14 +139,18 @@ import listeners.DoMserSegmentation;
 import listeners.DoSegmentation;
 import listeners.DowatershedListener;
 import listeners.HoughListener;
+import listeners.MaxSearchradiusListener;
 import listeners.MaxSizeListener;
 import listeners.MaxVarListener;
 import listeners.MinDiversityListener;
 import listeners.MinSizeListener;
+import listeners.MissedFrameListener;
 import listeners.MserListener;
 import listeners.MserwHoughListener;
+import listeners.SearchradiusListener;
 import listeners.ShowBitimgListener;
 import listeners.ShowwatershedimgListener;
+import listeners.SkipFramesandTrackendsListener;
 import listeners.ThresholdHoughListener;
 import listeners.TrackendsListener;
 
@@ -1385,11 +1391,364 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	
 
 
-	
-	
+	public void Deterministic() {
+
+		showDeterministic = true;
+		final GridBagLayout layout = new GridBagLayout();
+		final GridBagConstraints c = new GridBagConstraints();
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 0;
+		c.gridy = 0;
+		c.weightx = 1;
+
+		panelFifth.removeAll();
+
+		final Label Step5 = new Label("Step 5", Label.CENTER);
+		panelFifth.setLayout(layout);
+		panelFifth.add(Step5, c);
+		final Button TrackEndPoints = new Button("Track EndPoints (From first to a chosen last frame)");
+		final Button SkipframeandTrackEndPoints = new Button("TrackEndPoint (User specified first and last frame)");
+		final Button CheckResults = new Button("Check Results (then click next)");
+		final Checkbox RoughResults = new Checkbox("Rates and Statistical Analysis");
+
+		final Label Checkres = new Label("The tracker now performs an internal check on the results");
+		Checkres.setBackground(new Color(1, 0, 1));
+		Checkres.setForeground(new Color(255, 255, 255));
+		++c.gridy;
+		c.insets = new Insets(10, 10, 0, 175);
+		panelFifth.add(TrackEndPoints, c);
+
+		++c.gridy;
+		c.insets = new Insets(10, 10, 0, 175);
+		panelFifth.add(SkipframeandTrackEndPoints, c);
+		if (analyzekymo && Kymoimg != null) {
+			++c.gridy;
+			c.insets = new Insets(10, 10, 0, 0);
+			panelFifth.add(Checkres, c);
+
+			++c.gridy;
+			c.insets = new Insets(10, 175, 0, 175);
+			panelFifth.add(CheckResults, c);
+		}
+		++c.gridy;
+		c.insets = new Insets(10, 10, 0, 175);
+		panelFifth.add(RoughResults, c);
+
+		TrackEndPoints.addActionListener(new TrackendsListener(this));
+		SkipframeandTrackEndPoints.addActionListener(new SkipFramesandTrackendsListener(this));
+		CheckResults.addActionListener(new CheckResultsListener(this));
+		RoughResults.addItemListener(new AcceptResultsListener(this));
+		panelFifth.repaint();
+		panelFifth.validate();
+		Cardframe.pack();
+
+	}
 	
 
+	public void Kalman() {
+
+		showKalman = true;
+		final GridBagLayout layout = new GridBagLayout();
+		final GridBagConstraints c = new GridBagConstraints();
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 0;
+		c.gridy = 0;
+		c.weightx = 1;
+
+		panelFifth.removeAll();
+		final Label Step5 = new Label("Step 5", Label.CENTER);
+		panelFifth.setLayout(layout);
+		panelFifth.add(Step5, c);
+		final Scrollbar rad = new Scrollbar(Scrollbar.HORIZONTAL, initialSearchradiusInit, 10, 0, 10 + scrollbarSize);
+		initialSearchradius = computeValueFromScrollbarPosition(initialSearchradiusInit, initialSearchradiusMin,
+				initialSearchradiusMax, scrollbarSize);
+
+		final Label SearchText = new Label("Initial Search Radius: " + initialSearchradius, Label.CENTER);
+
+		++c.gridy;
+		c.insets = new Insets(10, 10, 0, 50);
+		panelFifth.add(SearchText, c);
+		++c.gridy;
+		c.insets = new Insets(10, 10, 0, 50);
+		panelFifth.add(rad, c);
+
+		final Scrollbar Maxrad = new Scrollbar(Scrollbar.HORIZONTAL, maxSearchradiusInit, 10, 0, 10 + scrollbarSize);
+		maxSearchradius = computeValueFromScrollbarPosition(maxSearchradiusInit, maxSearchradiusMin, maxSearchradiusMax,
+				scrollbarSize);
+		final Label MaxMovText = new Label("Max Movment of Objects per frame: " + maxSearchradius, Label.CENTER);
+		++c.gridy;
+		c.insets = new Insets(10, 10, 0, 50);
+		panelFifth.add(MaxMovText, c);
+		++c.gridy;
+		c.insets = new Insets(10, 10, 0, 50);
+		panelFifth.add(Maxrad, c);
+
+		final Scrollbar Miss = new Scrollbar(Scrollbar.HORIZONTAL, missedframesInit, 10, 0, 10 + scrollbarSize);
+		Miss.setBlockIncrement(1);
+		missedframes = (int) computeValueFromScrollbarPosition(missedframesInit, missedframesMin, missedframesMax,
+				scrollbarSize);
+		final Label LostText = new Label("Objects allowed to be lost for #frames" + missedframes, Label.CENTER);
+		++c.gridy;
+		c.insets = new Insets(10, 10, 0, 50);
+		panelFifth.add(LostText, c);
+		++c.gridy;
+		c.insets = new Insets(10, 10, 0, 50);
+		panelFifth.add(Miss, c);
+
+		// final Checkbox Costfunc = new Checkbox("Squared Distance Cost
+		// Function");
+		// ++c.gridy;
+		// c.insets = new Insets(10, 10, 0, 50);
+		// panelFifth.add(Costfunc, c);
+
+		rad.addAdjustmentListener(new SearchradiusListener(this, SearchText, initialSearchradiusMin, initialSearchradiusMax));
+		Maxrad.addAdjustmentListener(new MaxSearchradiusListener(this,MaxMovText, maxSearchradiusMin, maxSearchradiusMax));
+		Miss.addAdjustmentListener(new MissedFrameListener(this, LostText, missedframesMin, missedframesMax));
+
+		// Costfunc.addItemListener(new CostfunctionListener());
+
+		MTtrackerstart = new KFsearch(AllstartKalman, UserchosenCostFunction, maxSearchradius, initialSearchradius,
+				thirdDimension, thirdDimensionSize, missedframes);
+
+		MTtrackerend = new KFsearch(AllendKalman, UserchosenCostFunction, maxSearchradius, initialSearchradius,
+				thirdDimension, thirdDimensionSize, missedframes);
+
+		final Button TrackEndPoints = new Button("Track EndPoints (From first to a chosen last frame)");
+		final Button SkipframeandTrackEndPoints = new Button("TrackEndPoint (User specified first and last frame)");
+		final Button CheckResults = new Button("Check Results (then click next)");
+		final Checkbox RoughResults = new Checkbox("Analyze Rates");
+		final Label Checkres = new Label("The tracker now performs an internal check on the results");
+		Checkres.setBackground(new Color(1, 0, 1));
+		Checkres.setForeground(new Color(255, 255, 255));
+		++c.gridy;
+		c.insets = new Insets(10, 10, 0, 175);
+		panelFifth.add(TrackEndPoints, c);
+
+		++c.gridy;
+		c.insets = new Insets(10, 10, 0, 175);
+		panelFifth.add(SkipframeandTrackEndPoints, c);
+		if (analyzekymo && Kymoimg != null) {
+			++c.gridy;
+			c.insets = new Insets(10, 10, 0, 0);
+			panelFifth.add(Checkres, c);
+
+			++c.gridy;
+			c.insets = new Insets(10, 175, 0, 175);
+			panelFifth.add(CheckResults, c);
+		}
+		++c.gridy;
+		c.insets = new Insets(10, 175, 0, 175);
+		panelFifth.add(RoughResults, c);
+
+		TrackEndPoints.addActionListener(new TrackendsListener(this));
+		SkipframeandTrackEndPoints.addActionListener(new SkipFramesandTrackendsListener(this));
+		CheckResults.addActionListener(new CheckResultsListener(this));
+		RoughResults.addItemListener(new AcceptResultsListener(this));
+
+		panelFifth.repaint();
+		panelFifth.validate();
+		Cardframe.pack();
+
+	}
+
+	public void UpdateHough() {
+
+		FindLinesViaMSER = false;
+		FindLinesViaHOUGH = true;
+		FindLinesViaMSERwHOUGH = false;
+		final GridBagLayout layout = new GridBagLayout();
+		final GridBagConstraints c = new GridBagConstraints();
+		panelFourth.removeAll();
+		final Label Step = new Label("Step 4", Label.CENTER);
+		panelFourth.setLayout(layout);
+
+		panelFourth.add(Step, c);
+		final Label exthresholdText = new Label("threshold = threshold to create Bitimg for watershedding.",
+				Label.CENTER);
+
+		final Label thresholdText = new Label("thresholdValue = " + thresholdHough, Label.CENTER);
+
+		final Scrollbar threshold = new Scrollbar(Scrollbar.HORIZONTAL, (int) thresholdHoughInit, 10, 0,
+				10 + scrollbarSize);
+
+		final Checkbox displayBit = new Checkbox("Display Bitimage ", displayBitimg);
+		final Checkbox displayWatershed = new Checkbox("Display Watershedimage ", displayWatershedimg);
+
+		final Button Dowatershed = new Button("Do watershedding");
+		final Label Update = new Label("Update parameters for dynamic channel");
+		Update.setBackground(new Color(1, 0, 1));
+		Update.setForeground(new Color(255, 255, 255));
+		/* Location */
+		panelFourth.setLayout(layout);
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 0;
+		c.gridy = 0;
+		c.weightx = 4;
+		c.weighty = 1.5;
+
+		++c.gridy;
+		panelFourth.add(Update, c);
+
+		++c.gridy;
+		panelFourth.add(exthresholdText, c);
+		++c.gridy;
+
+		panelFourth.add(thresholdText, c);
+		++c.gridy;
+
+		panelFourth.add(threshold, c);
+
+		++c.gridy;
+		c.insets = new Insets(10, 175, 0, 175);
+		panelFourth.add(displayBit, c);
+
+		++c.gridy;
+		c.insets = new Insets(10, 175, 0, 175);
+		panelFourth.add(displayWatershed, c);
+		++c.gridy;
+		c.insets = new Insets(10, 175, 0, 175);
+		panelFourth.add(Dowatershed, c);
+
+		threshold.addAdjustmentListener(new ThresholdHoughListener(this, thresholdText, thresholdHoughMin, thresholdHoughMax,
+				scrollbarSize, threshold));
+
+		displayBit.addItemListener(new ShowBitimgListener(this));
+		displayWatershed.addItemListener(new ShowwatershedimgListener(this));
+		Dowatershed.addActionListener(new DowatershedListener(this));
+		displayBitimg = false;
+		displayWatershedimg = false;
+		
+		
+		
+		panelFourth.repaint();
+		panelFourth.validate();
+		Cardframe.pack();
+
+	}
 	
+
+	public void UpdateMser() {
+		FindLinesViaMSER = true;
+		FindLinesViaHOUGH = false;
+		FindLinesViaMSERwHOUGH = false;
+		final GridBagLayout layout = new GridBagLayout();
+		final GridBagConstraints c = new GridBagConstraints();
+		panelFourth.removeAll();
+		final Label Step = new Label("Step 4", Label.CENTER);
+		panelFourth.setLayout(layout);
+		panelFourth.add(Step, c);
+		final Scrollbar deltaS = new Scrollbar(Scrollbar.HORIZONTAL, deltaInit, 10, 0, 10 + scrollbarSize);
+		final Scrollbar maxVarS = new Scrollbar(Scrollbar.HORIZONTAL, maxVarInit, 10, 0, 10 + scrollbarSize);
+		final Scrollbar minDiversityS = new Scrollbar(Scrollbar.HORIZONTAL, minDiversityInit, 10, 0,
+				10 + scrollbarSize);
+		final Scrollbar minSizeS = new Scrollbar(Scrollbar.HORIZONTAL, minSizeInit, 10, 0, 10 + scrollbarSize);
+		final Scrollbar maxSizeS = new Scrollbar(Scrollbar.HORIZONTAL, maxSizeInit, 10, 0, 10 + scrollbarSize);
+
+		final Label deltaText = new Label("delta = " + delta, Label.CENTER);
+		final Label maxVarText = new Label("maxVar = " + maxVar, Label.CENTER);
+		final Label minDiversityText = new Label("minDiversity = " + minDiversity, Label.CENTER);
+		final Label minSizeText = new Label("MinSize = " + minSize, Label.CENTER);
+		final Label maxSizeText = new Label("MaxSize = " + maxSize, Label.CENTER);
+
+		final Checkbox min = new Checkbox("Look for Minima ", darktobright);
+
+		final Button ComputeTree = new Button("Compute Tree and display");
+		/* Location */
+
+		final Label Update = new Label("Update parameters for dynamic channel");
+		Update.setBackground(new Color(1, 0, 1));
+		Update.setForeground(new Color(255, 255, 255));
+		panelFourth.setLayout(layout);
+
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 0;
+		c.gridy = 0;
+		c.weightx = 4;
+		c.weighty = 1.5;
+		++c.gridy;
+		panelFourth.add(Update, c);
+
+		++c.gridy;
+		panelFourth.add(deltaText, c);
+
+		++c.gridy;
+		panelFourth.add(deltaS, c);
+
+		++c.gridy;
+
+		panelFourth.add(maxVarText, c);
+
+		++c.gridy;
+		panelFourth.add(maxVarS, c);
+
+		++c.gridy;
+
+		panelFourth.add(minDiversityText, c);
+
+		++c.gridy;
+		panelFourth.add(minDiversityS, c);
+
+		++c.gridy;
+
+		panelFourth.add(minSizeText, c);
+
+		++c.gridy;
+		panelFourth.add(minSizeS, c);
+
+		++c.gridy;
+
+		panelFourth.add(maxSizeText, c);
+
+		++c.gridy;
+		panelFourth.add(maxSizeS, c);
+
+		++c.gridy;
+		c.insets = new Insets(10, 175, 0, 175);
+		panelFourth.add(min, c);
+
+		++c.gridy;
+		c.insets = new Insets(10, 175, 0, 175);
+		panelFourth.add(ComputeTree, c);
+
+		deltaS.addAdjustmentListener(new DeltaListener(this, deltaText, deltaMin, deltaMax, scrollbarSize, deltaS));
+
+		maxVarS.addAdjustmentListener(new MaxVarListener(this, maxVarText, maxVarMin, maxVarMax, scrollbarSize, maxVarS));
+
+		minDiversityS.addAdjustmentListener(new MinDiversityListener(this, minDiversityText, minDiversityMin, minDiversityMax,
+				scrollbarSize, minDiversityS));
+
+		minSizeS.addAdjustmentListener(
+				new MinSizeListener(this, minSizeText, minSizemin, minSizemax, scrollbarSize, minSizeS));
+
+		maxSizeS.addAdjustmentListener(
+				new MaxSizeListener(this, maxSizeText, maxSizemin, maxSizemax, scrollbarSize, maxSizeS));
+
+		min.addItemListener(new DarktobrightListener(this));
+		ComputeTree.addActionListener(new ComputeTreeListener(this));
+
+		if (analyzekymo && Kymoimg != null) {
+
+			AnalyzekymoListener newkymo = new AnalyzekymoListener(this);
+			
+			newkymo.Kymo();
+		}
+
+		else{
+			
+			
+		
+			Deterministic();
+		}
+
+		
+	
+		
+
+		panelFourth.validate();
+		panelFourth.repaint();
+		Cardframe.pack();
+	}
+
 
 	
 

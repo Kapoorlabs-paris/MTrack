@@ -42,15 +42,15 @@ final Interactive_MTDoubleChannel parent;
 
 		if (parent.doSegmentation){
 			
-			UpdateHoughListener newhough = new UpdateHoughListener(parent);
-			newhough.UpdateHough();
+			
+			parent.UpdateHough();
 		}
 			
 
 		else{
 
-			UpdateMserListener newmser = new UpdateMserListener(parent);
-			newmser.UpdateMser();
+			
+			parent.UpdateMser();
 			
 		}
 
