@@ -76,7 +76,7 @@ public class DrawingUtils {
 
 			Trackproperties vector = returnVector.getA().getA().get(index);
 
-			PointRoi selectedRoi = new PointRoi(vector.newpoint[0], vector.newpoint[1]);
+			PointRoi selectedRoi = new PointRoi(vector.oldpoint[0], vector.oldpoint[1]);
 			Line selectedLineRoi = new Line(vector.newpoint[0], vector.newpoint[1], vector.oldpoint[0],
 					vector.oldpoint[1]);
 			selectedLineRoi.setStrokeColor(colorLineTrack);
@@ -91,7 +91,7 @@ public class DrawingUtils {
 
 			Trackproperties vector = returnVector.getA().getB().get(index);
 
-			PointRoi selectedRoi = new PointRoi(vector.newpoint[0], vector.newpoint[1]);
+			PointRoi selectedRoi = new PointRoi(vector.oldpoint[0], vector.oldpoint[1]);
 			Line selectedLineRoi = new Line(vector.newpoint[0], vector.newpoint[1], vector.oldpoint[0],
 					vector.oldpoint[1]);
 			selectedLineRoi.setStrokeColor(colorLineTrack);
@@ -104,7 +104,7 @@ public class DrawingUtils {
 		AllpreviousRois.put(detcount, AllselectedRoi);
 
 		if (detcount <= maxghost){
-			for (int i = 1; i < detcount; ++i) {
+			for (int i = 1; i <= detcount; ++i) {
 
 				for (int index = 0; index < AllpreviousRois.get(i).size(); ++index) {
 
@@ -117,7 +117,7 @@ public class DrawingUtils {
 			}
 		}
 		else{
-			for (int i = 1; i < detcount; ++i) {
+			for (int i = 1; i <= detcount; ++i) {
 			for (int index = 0; index < AllpreviousRois.get(i).size(); ++index) {
 				Roi roi = AllpreviousRois.get(i).get(index);
 			overlay.remove(roi);
@@ -125,7 +125,7 @@ public class DrawingUtils {
 			
 			}
 			}
-			for (int i = detcount - maxghost + 2; i < detcount; ++i) {
+			for (int i = detcount - maxghost + 2; i <= detcount; ++i) {
 			for (int index = 0; index < AllpreviousRois.get(i).size(); ++index){
 				
 				Roi oldroi = AllpreviousRois.get(i).get(index);
