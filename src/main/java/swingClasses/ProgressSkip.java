@@ -6,6 +6,7 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 
 import interactiveMT.Interactive_MTDoubleChannel;
+import updateListeners.FinalPoint;
 
 public class ProgressSkip extends SwingWorker<Void, Void> {
 
@@ -29,6 +30,9 @@ final Interactive_MTDoubleChannel parent;
 		if (next < 2)
 			next = 2;
 
+		FinalPoint finalpoint = new FinalPoint(parent);
+		finalpoint.FinalizeEnds();
+		
 		Track newtrack = new Track(parent);
 		newtrack.Trackobject(next);
 		

@@ -188,6 +188,7 @@ import swingClasses.ProgressTrack;
 import trackerType.KFsearch;
 import trackerType.MTTracker;
 import trackerType.TrackModel;
+import updateListeners.FinalPoint;
 import updateListeners.MoveNextListener;
 import updateListeners.MoveToFrameListener;
 import util.Boundingboxes;
@@ -218,7 +219,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public float thetaPerPixelMin = new Float(0.2);
 	public float rhoPerPixelMin = new Float(0.2);
 	public MouseListener ml;
-	MouseListener removeml;
+	public MouseListener removeml;
 	OvalRoi Seedroi;
 	public ArrayList<OvalRoi> AllSeedrois;
 	public float thresholdHoughMin = 0;
@@ -1214,6 +1215,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				CardLayout cl = (CardLayout) panelCont.getLayout();
+				
 				cl.previous(panelCont);
 			}
 		}));
@@ -1308,7 +1310,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		JumpinTime.addActionListener(
 				new moveInThirdDimListener(thirdDimensionslider, timeText, timeMin, thirdDimensionSize));
 
-		Finalize.addItemListener(new finalpoint());
+		Finalize.addItemListener(new FinalPoint(this));
 		Doseg.addItemListener(new DoSegmentation(this));
 		DoMserseg.addItemListener(new DoMserSegmentation(this));
 
@@ -1750,7 +1752,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 	}
 
-	Comparator<Indexedlength> Seedcompare = new Comparator<Indexedlength>() {
+	public Comparator<Indexedlength> Seedcompare = new Comparator<Indexedlength>() {
 
 		@Override
 		public int compare(final Indexedlength A, final Indexedlength B) {
@@ -1776,87 +1778,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 	
 
-	protected class finalpoint implements ItemListener {
-
-		@Override
-		public void itemStateChanged(ItemEvent arg0) {
-			if (arg0.getStateChange() == ItemEvent.DESELECTED)
-				finalpoint = false;
-
-			else if (arg0.getStateChange() == ItemEvent.SELECTED) {
-				finalpoint = true;
-
-			FinalizeEnds();
-
-		}
-
-	}
-	}
-
-	public void FinalizeEnds(){
-		
-
-		preprocessedimp.getCanvas().removeMouseListener(removeml);
-		preprocessedimp.getCanvas().removeMouseListener(ml);
-
-		HashMap<Integer, double[]> endAmap = new HashMap<Integer, double[]>();
-
-		HashMap<Integer, double[]> endBmap = new HashMap<Integer, double[]>();
-
-		Collections.sort(PrevFrameparam.getA(), Seedcompare);
-		Collections.sort(PrevFrameparam.getB(), Seedcompare);
-
-		int minSeed = PrevFrameparam.getA().get(0).seedLabel;
-		int maxSeed = PrevFrameparam.getA().get(PrevFrameparam.getA().size() - 1).seedLabel;
-
-		for (int i = 0; i < PrevFrameparam.getA().size(); ++i) {
-
-			endAmap.put(PrevFrameparam.getA().get(i).seedLabel, PrevFrameparam.getA().get(i).fixedpos);
-
-		}
-
-		for (int i = 0; i < PrevFrameparam.getB().size(); ++i) {
-
-			endBmap.put(PrevFrameparam.getB().get(i).seedLabel, PrevFrameparam.getB().get(i).fixedpos);
-
-		}
-
-		for (int i = minSeed; i < maxSeed + 1; ++i) {
-
-			for (int index = 0; index < ClickedPoints.size(); ++index) {
-
-				double mindistA = 0;
-				double mindistB = 0;
-
-				mindistA = util.Boundingboxes.Distance(ClickedPoints.get(index).getA(), endAmap.get(i));
-				mindistB = util.Boundingboxes.Distance(ClickedPoints.get(index).getA(), endBmap.get(i));
-
-				if (mindistA <= 1 && seedmap.get(i) != Whichend.end) {
-
-					seedmap.put(i, Whichend.start);
-
-				}
-
-				else if (mindistB <= 1 && seedmap.get(i) != Whichend.start) {
-
-					seedmap.put(i, Whichend.end);
-				}
-
-				else if (seedmap.get(i) == Whichend.start && mindistB <= 1)
-					seedmap.put(i, Whichend.both);
-
-				else if (seedmap.get(i) == Whichend.end && mindistA <= 1)
-					seedmap.put(i, Whichend.both);
-
-				else if (seedmap.get(i) == null)
-					seedmap.put(i, Whichend.none);
-
-			}
-
-		}
-
-	}
-
+	
 		
 	
 	protected class MedianAllListener implements ItemListener {
@@ -2353,22 +2275,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		return Util.round(((sigma - min) / (max - min)) * scrollbarSize);
 	}
 
-	public  FloatImagePlus<net.imglib2.type.numeric.real.FloatType> createImgLib2(final List<float[]> img,
-			final int w, final int h) {
-		final ImagePlus imp;
-
-		if (img.size() > 1) {
-			final ImageStack stack = new ImageStack(w, h);
-			for (int z = 0; z < img.size(); ++z)
-				stack.addSlice(new FloatProcessor(w, h, img.get(z)));
-			imp = new ImagePlus("ImgLib2 FloatImagePlus (3d)", stack);
-		} else {
-			imp = new ImagePlus("ImgLib2 FloatImagePlus (2d)", new FloatProcessor(w, h, img.get(0)));
-		}
-
-		return ImagePlusAdapter.wrapFloat(imp);
-	}
-
+	
 	public class ImagePlusListener implements SliceListener {
 		@Override
 		public void sliceChanged(ImagePlus arg0) {

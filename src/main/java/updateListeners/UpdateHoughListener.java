@@ -11,6 +11,8 @@ import java.awt.Scrollbar;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
+import javax.swing.JOptionPane;
+
 import interactiveMT.Interactive_MTDoubleChannel;
 import listeners.DowatershedListener;
 import listeners.ShowBitimgListener;
@@ -39,6 +41,7 @@ final Interactive_MTDoubleChannel parent;
 			parent.FindLinesViaHOUGH = true;
 			parent.FindLinesViaMSERwHOUGH = false;
 			UpdateHough();
+			
 
 		}
 
@@ -117,6 +120,9 @@ final Interactive_MTDoubleChannel parent;
 		Dowatershed.addActionListener(new DowatershedListener(parent));
 		parent.displayBitimg = false;
 		parent.displayWatershedimg = false;
+		
+		
+		
 		parent.panelFourth.repaint();
 		parent.panelFourth.validate();
 		parent.Cardframe.pack();

@@ -49,6 +49,8 @@ final Interactive_MTDoubleChannel parent;
 		parent.updatePreview(ValueChange.THIRDDIM);
 
 		
+		
+		
 		Markends newends = new Markends(parent);
 		newends.markend();
 		if (parent.doSegmentation){

@@ -1,6 +1,7 @@
 package updateListeners;
 
 import java.awt.Button;
+import java.awt.CardLayout;
 import java.awt.Checkbox;
 import java.awt.Color;
 import java.awt.GridBagConstraints;
@@ -10,6 +11,8 @@ import java.awt.Label;
 import java.awt.Scrollbar;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+
+import javax.swing.JOptionPane;
 
 import interactiveMT.Interactive_MTDoubleChannel;
 import listeners.AnalyzekymoListener;
@@ -41,7 +44,7 @@ public class UpdateMserListener implements ItemListener {
 		else if (arg0.getStateChange() == ItemEvent.SELECTED) {
 			parent.FindLinesViaMSER = true;
 			UpdateMser();
-
+			
 		}
 
 	}
@@ -161,7 +164,9 @@ public class UpdateMserListener implements ItemListener {
 			newdeter.Deterministic();
 		}
 
-			
+		
+	
+		
 
 		parent.panelFourth.validate();
 		parent.panelFourth.repaint();

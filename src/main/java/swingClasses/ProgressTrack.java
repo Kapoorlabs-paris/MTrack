@@ -40,6 +40,7 @@ import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.util.Pair;
 import trackerType.KFsearch;
 import trackerType.TrackModel;
+import updateListeners.FinalPoint;
 import velocityanalyser.Trackend;
 import velocityanalyser.Trackstart;
 
@@ -60,7 +61,8 @@ final Interactive_MTDoubleChannel parent;
 	protected Void doInBackground() throws Exception {
 
 		int next = 2;
-
+		FinalPoint finalpoint = new FinalPoint(parent);
+		finalpoint.FinalizeEnds();
 		Track newtrack = new Track(parent);
 		newtrack.Trackobject(next);
 
