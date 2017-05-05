@@ -26,8 +26,7 @@ final Interactive_MTDoubleChannel parent;
 			parent.doMserSegmentation = true;
 			
 			
-			UpdateMserListener newmser = new UpdateMserListener(parent);
-			newmser.UpdateMser();
+			parent.UpdateMser();
 
 		}
 

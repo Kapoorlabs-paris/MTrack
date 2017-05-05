@@ -2,8 +2,12 @@ package updateListeners;
 
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 import interactiveMT.Interactive_MTDoubleChannel;
 import interactiveMT.Interactive_MTDoubleChannel.Whichend;
@@ -32,7 +36,17 @@ final Interactive_MTDoubleChannel parent;
 
 }
 
+	public  <T> ArrayList<T> union(ArrayList<T> coll1, ArrayList<T> coll2) {
+	    ArrayList<T> union = new ArrayList<>(coll1);
+	    union.addAll(new ArrayList<>(coll2));
+	    return union;
+	}
 
+	public <T> ArrayList<T> intersect(ArrayList<T> coll1, ArrayList<T> coll2) {
+		ArrayList<T> intersection = new ArrayList<>(coll1);
+	    intersection.retainAll(new ArrayList<>(coll2));
+	    return intersection;
+	}
 public void FinalizeEnds(){
 	
 
@@ -42,6 +56,8 @@ public void FinalizeEnds(){
 	HashMap<Integer, double[]> endAmap = new HashMap<Integer, double[]>();
 
 	HashMap<Integer, double[]> endBmap = new HashMap<Integer, double[]>();
+
+	
 
 	Collections.sort(parent.PrevFrameparam.getA(), parent.Seedcompare);
 	Collections.sort(parent.PrevFrameparam.getB(), parent.Seedcompare);
@@ -63,6 +79,7 @@ public void FinalizeEnds(){
 
 	for (int i = minSeed; i < maxSeed + 1; ++i) {
 
+		
 		for (int index = 0; index < parent.ClickedPoints.size(); ++index) {
 
 			double mindistA = 0;
@@ -74,26 +91,40 @@ public void FinalizeEnds(){
 			if (mindistA <= 1 && parent.seedmap.get(i) != Whichend.end) {
 
 				parent.seedmap.put(i, Whichend.start);
+				
 
 			}
 
 			else if (mindistB <= 1 && parent.seedmap.get(i) != Whichend.start) {
 
 				parent.seedmap.put(i, Whichend.end);
+				
 			}
 
-			else if (parent.seedmap.get(i) == Whichend.start && mindistB <= 1)
+			else if (parent.seedmap.get(i) == Whichend.start && mindistB <= 1){
 				parent.seedmap.put(i, Whichend.both);
+				
+			}
 
-			else if (parent.seedmap.get(i) == Whichend.end && mindistA <= 1)
+			else if (parent.seedmap.get(i) == Whichend.end && mindistA <= 1){
 				parent.seedmap.put(i, Whichend.both);
+			}
 
-			else if (parent.seedmap.get(i) == null)
+			else if (parent.seedmap.get(i) == null){
 				parent.seedmap.put(i, Whichend.none);
+			}
 
 		}
 
 	}
+	
+	
+
+
+
+	
+	
+	
 }
 }
 

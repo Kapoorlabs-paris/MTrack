@@ -226,7 +226,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public float rhoPerPixelMin = new Float(0.2);
 	public MouseListener ml;
 	public MouseListener removeml;
-	OvalRoi Seedroi;
+	public OvalRoi Seedroi;
 	public ArrayList<OvalRoi> AllSeedrois;
 	public float thresholdHoughMin = 0;
 	public float thresholdHoughMax = 250;
@@ -300,10 +300,12 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public double netdeltadstart = 0;
 	public double netdeltadend = 0;
 	public Color colorDraw = Color.red;
+	public Color colorCurrent = Color.yellow;
 	public Color colorTrack = Color.yellow;
 	public Color colorLineTrack = Color.GRAY;
 	public Color colorUnselect = Color.MAGENTA;
 	public Color colorConfirm = Color.GREEN;
+	public Color colorUser = Color.ORANGE;
 	public FloatType minval = new FloatType(0);
 	public FloatType maxval = new FloatType(1);
 	public SliceObserver sliceObserver;
@@ -341,6 +343,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public int nbRois;
 	public Roi rorig = null;
 	public ArrayList<double[]> lengthtimestart = new ArrayList<double[]>();
+	public ArrayList<double[]> lengthtimeuser = new ArrayList<double[]>();
 	public HashMap<Integer, ArrayList<EllipseRoi>> AllMSERrois = new HashMap<Integer, ArrayList<EllipseRoi>>();
 	public HashMap<Integer, double[]> AllPoints = new HashMap<Integer, double[]>();
 
@@ -356,7 +359,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public int endtime = 0;
 	public float maxSearchradius = 15;
 	public int missedframes = 5;
-	public int maxghost = 5;
+	public int maxghost = 1;
 	public int initialSearchradiusInit = 200;
 	public float initialSearchradiusMin = 0;
 	public float initialSearchradiusMax = 100;
@@ -378,9 +381,11 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public ArrayList<float[]> finalvelocity = new ArrayList<float[]>();
 	public ArrayList<float[]> finalvelocityKymo = new ArrayList<float[]>();
 	public ArrayList<ArrayList<Trackproperties>> Allstart = new ArrayList<ArrayList<Trackproperties>>();
+	public ArrayList<ArrayList<Trackproperties>> AllUser = new ArrayList<ArrayList<Trackproperties>>();
 	public ArrayList<ArrayList<Trackproperties>> Allend = new ArrayList<ArrayList<Trackproperties>>();
 
 	public ArrayList<ResultsMT> startlengthlist = new ArrayList<ResultsMT>();
+	public ArrayList<ResultsMT> userlengthlist = new ArrayList<ResultsMT>();
 	public ArrayList<ResultsMT> endlengthlist = new ArrayList<ResultsMT>();
 
 	public ArrayList<ArrayList<KalmanTrackproperties>> AllstartKalman = new ArrayList<ArrayList<KalmanTrackproperties>>();
@@ -416,18 +421,19 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public int ndims;
 	public Overlay overlaysec;
 	public ArrayList<Pair<Integer, double[]>> IDALL = new ArrayList<Pair<Integer, double[]>>();
-	public ArrayList<Pair<double[], Roi>> ClickedPoints = new ArrayList<Pair<double[], Roi>>();
+	public ArrayList<Pair<double[], OvalRoi>> ClickedPoints = new ArrayList<Pair<double[], OvalRoi>>();
 	public Pair<ArrayList<Indexedlength>, ArrayList<Indexedlength>> PrevFrameparam;
+	public ArrayList<Indexedlength> Userframe;
 	public Pair<ArrayList<Indexedlength>, ArrayList<Indexedlength>> NewFrameparam;
 	public ArrayList<Integer> Accountedframes = new ArrayList<Integer>();
 	public ArrayList<Integer> Missedframes = new ArrayList<Integer>();
 	public Pair<Pair<ArrayList<Trackproperties>, ArrayList<Trackproperties>>, Pair<ArrayList<Indexedlength>, ArrayList<Indexedlength>>> returnVector;
+	public Pair<ArrayList<Trackproperties>,ArrayList<Indexedlength>> returnVectorUser; 
 
 	public Pair<ArrayList<KalmanIndexedlength>, ArrayList<KalmanIndexedlength>> PrevFrameparamKalman;
 	public Pair<ArrayList<KalmanIndexedlength>, ArrayList<KalmanIndexedlength>> NewFrameparamKalman;
 	public Pair<Pair<ArrayList<KalmanTrackproperties>, ArrayList<KalmanTrackproperties>>, Pair<ArrayList<KalmanIndexedlength>, ArrayList<KalmanIndexedlength>>> returnVectorKalman;
 	public NumberFormat nf = NumberFormat.getInstance(Locale.ENGLISH);
-
 	public ArrayList<CommonOutputHF> output;
 	public ImageStack prestack;
 	public Rectangle standardRectangle;
@@ -442,7 +448,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 	public static enum Whichend {
 
-		start, end, both, none;
+		start, end, both, none, user;
 	}
 
 	public static enum ValueChange {
@@ -687,6 +693,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		AllSeedrois = new ArrayList<OvalRoi>();
 		jpb = new JProgressBar();
 		UserchosenCostFunction = new SquareDistCostFunction();
+		Userframe = new ArrayList<Indexedlength>();
 		AllpreviousRois = new HashMap<Integer, ArrayList<Roi>>();
 		Inispacing = 0.5 * Math.min(psf[0], psf[1]);
 		count = 0;
@@ -976,23 +983,43 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 			
 				
 				for (int i = 0; i < overlay.size(); ++i){
-              if (overlay.get(i).getStrokeColor() == colorDraw){
+              if (overlay.get(i).getStrokeColor() == colorDraw || overlay.get(i).getStrokeColor() == colorCurrent){
 				overlay.remove(i);
 				--i;
               }
               
-              
 				}
+				
+				
+				
+				
 				for (int index = 0; index < Rois.size(); ++index) {
 
 					EllipseRoi or = Rois.get(index);
-
-					or.setStrokeColor(Color.red);
+					or.setStrokeColor(colorDraw);
+					
+					
+					for (int i = 0; i < ClickedPoints.size(); ++i){
+					
+						if(or.contains((int)Math.round(ClickedPoints.get(i).getA()[0]), (int)Math.round(ClickedPoints.get(i).getA()[1])))
+							
+						or.setStrokeColor(colorCurrent);	
+						
+					}
+					
 					overlay.add(or);
 
+					
+					
 					roimanager.addRoi(or);
 
+					
+					
+					
 				}
+				
+				
+				
 
 			}
 
@@ -1847,194 +1874,8 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 	
 	
-	public void goSeeds() {
+	
 
-		jpb.setIndeterminate(false);
-
-		jpb.setMaximum(max);
-		panel.add(label);
-		panel.add(jpb);
-		frame.add(panel);
-		frame.pack();
-		frame.setSize(200, 100);
-		frame.setLocationRelativeTo(panelCont);
-		frame.setVisible(true);
-
-		ProgressSeeds trackMT = new ProgressSeeds();
-		trackMT.execute();
-		displayBitimg = false;
-		displayWatershedimg = false;
-
-	}
-
-	class ProgressSeeds extends SwingWorker<Void, Void> {
-
-		@Override
-		protected Void doInBackground() throws Exception {
-
-			// add listener to the imageplus slice slider
-			IJ.log("Starting Chosen Line finder from the seed image (first frame should be seeds)");
-			IJ.log("Current frame: " + thirdDimension);
-			RandomAccessibleInterval<FloatType> groundframe = currentimg;
-			RandomAccessibleInterval<FloatType> groundframepre = currentPreprocessedimg;
-
-			if (FindLinesViaMSER) {
-				boolean dialog = DialogueModelChoice();
-
-				if (dialog) {
-					// updatePreview(ValueChange.SHOWMSER);
-					LinefinderInteractiveMSER newlineMser = new LinefinderInteractiveMSER(groundframe, groundframepre,
-							newtree, minlength, thirdDimension);
-
-					PrevFrameparam = FindlinesVia.LinefindingMethod(groundframe, groundframepre, minlength,
-							thirdDimension, psf, newlineMser, UserChoiceModel.Line, Domask, Intensityratio, Inispacing,
-							jpb);
-					IJ.log("MSER parameters:" + " " + " thirdDimension: " + " " + thirdDimension);
-					IJ.log("Delta " + " " + delta + " " + "minSize " + " " + minSize + " " + "maxSize " + " " + maxSize
-							+ " " + " maxVar " + " " + maxVar + " " + "minDIversity " + " " + minDiversity);
-					IJ.log("Optimization Parameters: " + "R" + Intensityratio + " G"
-							+ Inispacing / Math.min(psf[0], psf[1]));
-
-				}
-
-			}
-
-			if (FindLinesViaHOUGH) {
-
-				boolean dialog = DialogueModelChoice();
-				if (dialog) {
-					// updatePreview(ValueChange.SHOWHOUGH);
-					LinefinderInteractiveHough newlineHough = new LinefinderInteractiveHough(groundframe,
-							groundframepre, intimg, Maxlabel, thetaPerPixel, rhoPerPixel, thirdDimension, jpb);
-
-					PrevFrameparam = FindlinesVia.LinefindingMethod(groundframe, groundframepre, minlength,
-							thirdDimension, psf, newlineHough, UserChoiceModel.Line, Domask, Intensityratio, Inispacing,
-							jpb);
-					IJ.log("Hough parameters:" + " " + " thirdDimension: " + " " + thirdDimension);
-					IJ.log("thetaPerPixel " + " " + thetaPerPixel + " " + "rhoPerPixel " + " " + rhoPerPixel);
-					IJ.log("Optimization Parameters: " + "R" + Intensityratio + " G"
-							+ Inispacing / Math.min(psf[0], psf[1]));
-
-				}
-			}
-
-			if (FindLinesViaMSERwHOUGH) {
-				boolean dialog = DialogueModelChoice();
-				if (dialog) {
-					// updatePreview(ValueChange.SHOWMSER);
-					LinefinderInteractiveMSERwHough newlineMserwHough = new LinefinderInteractiveMSERwHough(groundframe,
-							groundframepre, newtree, minlength, thirdDimension, thetaPerPixel, rhoPerPixel);
-					IJ.log("MSER parameters:" + " " + " thirdDimension: " + " " + thirdDimension);
-					IJ.log("Delta " + " " + delta + " " + "minSize " + " " + minSize + " " + "maxSize " + " " + maxSize
-							+ " " + " maxVar " + " " + maxVar + " " + "minDIversity " + " " + minDiversity);
-					IJ.log("Hough parameters:" + " " + " thirdDimension: " + " " + thirdDimension);
-					IJ.log("thetaPerPixel " + " " + thetaPerPixel + " " + "rhoPerPixel " + " " + rhoPerPixel);
-					IJ.log("Optimization Parameters: " + "R" + Intensityratio + " G"
-							+ Inispacing / Math.min(psf[0], psf[1]));
-					PrevFrameparam = FindlinesVia.LinefindingMethod(groundframe, groundframepre, minlength,
-							thirdDimension, psf, newlineMserwHough, UserChoiceModel.Line, Domask, Intensityratio,
-							Inispacing, jpb);
-
-				}
-
-			}
-
-			ArrayList<KalmanIndexedlength> start = new ArrayList<KalmanIndexedlength>();
-			ArrayList<KalmanIndexedlength> end = new ArrayList<KalmanIndexedlength>();
-
-			for (int index = 0; index < PrevFrameparam.getA().size(); ++index) {
-
-				double dx = PrevFrameparam.getA().get(index).ds / Math
-						.sqrt(1 + PrevFrameparam.getA().get(index).slope * PrevFrameparam.getA().get(index).slope);
-				double dy = PrevFrameparam.getA().get(index).slope * dx;
-
-				KalmanIndexedlength startPart = new KalmanIndexedlength(PrevFrameparam.getA().get(index).currentLabel,
-						PrevFrameparam.getA().get(index).seedLabel, PrevFrameparam.getA().get(index).framenumber,
-						PrevFrameparam.getA().get(index).ds, PrevFrameparam.getA().get(index).lineintensity,
-						PrevFrameparam.getA().get(index).background, PrevFrameparam.getA().get(index).currentpos,
-						PrevFrameparam.getA().get(index).fixedpos, PrevFrameparam.getA().get(index).slope,
-						PrevFrameparam.getA().get(index).intercept, PrevFrameparam.getA().get(index).slope,
-						PrevFrameparam.getA().get(index).intercept, 0, 0, new double[] { dx, dy });
-
-				start.add(startPart);
-			}
-			for (int index = 0; index < PrevFrameparam.getB().size(); ++index) {
-
-				double dx = PrevFrameparam.getB().get(index).ds / Math
-						.sqrt(1 + PrevFrameparam.getB().get(index).slope * PrevFrameparam.getB().get(index).slope);
-				double dy = PrevFrameparam.getB().get(index).slope * dx;
-
-				KalmanIndexedlength endPart = new KalmanIndexedlength(PrevFrameparam.getB().get(index).currentLabel,
-						PrevFrameparam.getB().get(index).seedLabel, PrevFrameparam.getB().get(index).framenumber,
-						PrevFrameparam.getB().get(index).ds, PrevFrameparam.getB().get(index).lineintensity,
-						PrevFrameparam.getB().get(index).background, PrevFrameparam.getB().get(index).currentpos,
-						PrevFrameparam.getB().get(index).fixedpos, PrevFrameparam.getB().get(index).slope,
-						PrevFrameparam.getB().get(index).intercept, PrevFrameparam.getB().get(index).slope,
-						PrevFrameparam.getB().get(index).intercept, 0, 0, new double[] { dx, dy });
-				end.add(endPart);
-			}
-
-			PrevFrameparamKalman = new ValuePair<ArrayList<KalmanIndexedlength>, ArrayList<KalmanIndexedlength>>(start,
-					end);
-
-			Overlay o = preprocessedimp.getOverlay();
-
-			if (preprocessedimp.getOverlay() == null) {
-				o = new Overlay();
-				preprocessedimp.setOverlay(o);
-			}
-			for (int index = 0; index < PrevFrameparam.getA().size(); ++index) {
-
-				Seedroi = new OvalRoi(Util.round(PrevFrameparam.getA().get(index).currentpos[0] - radiusseed),
-						Util.round(PrevFrameparam.getA().get(index).currentpos[1] - radiusseed), Util.round(2 * radiusseed), Util.round(2 * radiusseed));
-				Seedroi.setStrokeColor(colorConfirm);
-				Seedroi.setStrokeWidth(0.8);
-
-				AllSeedrois.add(Seedroi);
-				o.add(Seedroi);
-
-			}
-
-			for (int index = 0; index < PrevFrameparam.getB().size(); ++index) {
-
-				Seedroi = new OvalRoi(Util.round(PrevFrameparam.getB().get(index).currentpos[0] - radiusseed),
-						Util.round(PrevFrameparam.getB().get(index).currentpos[1] - radiusseed), Util.round(2 * radiusseed), Util.round(2 * radiusseed));
-				Seedroi.setStrokeColor(colorConfirm);
-				Seedroi.setStrokeWidth(0.8);
-				AllSeedrois.add(Seedroi);
-				o.add(Seedroi);
-
-			}
-			for(int index = 0; index < AllSeedrois.size(); ++index){
-				
-				Rectangle rect = AllSeedrois.get(index).getBounds();
-				double newx = rect.x + rect.width / 2.0;
-				double newy = rect.y + rect.height / 2.0;
-				Pair<double[], Roi> newpoint = new ValuePair<double[], Roi>(new double[]{newx, newy}, AllSeedrois.get(index));
-
-				ClickedPoints.add(newpoint);
-			}
-			preprocessedimp.updateAndDraw();
-
-			return null;
-		}
-
-		@Override
-		protected void done() {
-			try {
-				jpb.setIndeterminate(false);
-				get();
-				frame.dispose();
-				// JOptionPane.showMessageDialog(jpb.getParent(), "End Points
-				// found and overlayed", "Success",
-				// JOptionPane.INFORMATION_MESSAGE);
-			} catch (ExecutionException | InterruptedException e) {
-				e.printStackTrace();
-			}
-
-		}
-
-	}
 
 	
 	

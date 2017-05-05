@@ -28,8 +28,7 @@ final Interactive_MTDoubleChannel parent;
 			parent.doSegmentation = true;
 			
 			
-			UpdateHoughListener newhough = new UpdateHoughListener(parent);
-			newhough.UpdateHough();
+			parent.UpdateHough();
 
 		}
 

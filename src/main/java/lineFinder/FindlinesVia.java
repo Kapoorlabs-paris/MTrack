@@ -26,6 +26,7 @@ import peakFitter.SubpixelLengthPCKalmanLine;
 import peakFitter.SubpixelLengthPCLine;
 import peakFitter.SubpixelVelocityPCKalmanLine;
 import peakFitter.SubpixelVelocityPCLine;
+import peakFitter.SubpixelVelocityUserSeed;
 import preProcessing.Kernels;
 
 public  class FindlinesVia {
@@ -120,6 +121,44 @@ public  class FindlinesVia {
 		return returnVector;
 
 	}
+	
+	public static Pair<ArrayList<Trackproperties>, ArrayList<Indexedlength>> 
+	LinefindingMethodHFUser(final RandomAccessibleInterval<FloatType> source,
+			final RandomAccessibleInterval<FloatType> Preprocessedsource,ArrayList<Indexedlength> PrevFrameparam,
+			final int minlength, final int framenumber, final double[] psf,  final LinefinderHF linefinder, final UserChoiceModel model,
+			final boolean DoMask, final double intensityratio, final double Inispacing, final JProgressBar jpb,
+			final int thirdDimsize) {
+
+		Pair<ArrayList<Trackproperties>,ArrayList<Indexedlength>> returnVector = null;
+		
+		
+
+			final SubpixelVelocityUserSeed growthtracker = new SubpixelVelocityUserSeed(source, linefinder,
+					PrevFrameparam, psf, framenumber, model, DoMask,jpb, thirdDimsize);
+			growthtracker.setIntensityratio(intensityratio);
+			growthtracker.setInispacing(Inispacing);
+			growthtracker.checkInput();
+			growthtracker.process();
+			Accountedframes  = growthtracker.getAccountedframes();
+			
+			ArrayList<Indexedlength> NewFrameparam = growthtracker.getResult();
+			ArrayList<Trackproperties> startStateVectors = growthtracker.getstartStateVectors();
+			returnVector = 
+					new ValuePair<ArrayList<Trackproperties>,ArrayList<Indexedlength>>(startStateVectors, NewFrameparam);
+			
+			
+			
+			
+		
+			
+		
+		
+		
+		return returnVector;
+
+	}
+	
+	
 	
 	
 	public static Pair<Pair<ArrayList<KalmanTrackproperties>, ArrayList<KalmanTrackproperties>>, Pair<ArrayList<KalmanIndexedlength>, ArrayList<KalmanIndexedlength>>> 

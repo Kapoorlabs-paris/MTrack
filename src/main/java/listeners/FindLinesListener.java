@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 import javax.swing.SwingUtilities;
 
 import interactiveMT.Interactive_MTDoubleChannel;
+import swingClasses.ProgressSeeds;
 
 public class FindLinesListener implements ActionListener {
 
@@ -23,11 +24,32 @@ final Interactive_MTDoubleChannel parent;
 			@Override
 			public void run() {
 
-				parent.goSeeds();
+				goSeeds();
 
 			}
 
 		});
+
+	}
+	
+	
+	public void goSeeds() {
+
+		parent.jpb.setIndeterminate(false);
+
+		parent.jpb.setMaximum(parent.max);
+		parent.panel.add(parent.label);
+		parent.panel.add(parent.jpb);
+		parent.frame.add(parent.panel);
+		parent.frame.pack();
+		parent.frame.setSize(200, 100);
+		parent.frame.setLocationRelativeTo(parent.panelCont);
+		parent.frame.setVisible(true);
+
+		ProgressSeeds trackMT = new ProgressSeeds(parent);
+		trackMT.execute();
+		parent.displayBitimg = false;
+		parent.displayWatershedimg = false;
 
 	}
 }

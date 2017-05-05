@@ -98,6 +98,15 @@ public  class Track {
 							parent.minlength, parent.thirdDimension, parent.psf, newlineMser, parent.userChoiceModel, parent.Domask, parent.Intensityratio,
 							parent.Inispacing, parent.seedmap, parent.jpb, parent.thirdDimensionSize);
 					parent.Accountedframes.add(FindlinesVia.getAccountedframes());
+					
+					
+					if(parent.Userframe.size() > 0){
+						
+						parent.returnVectorUser = FindlinesVia.LinefindingMethodHFUser(groundframe, groundframepre, parent.Userframe, parent.minlength, parent.thirdDimension,
+								parent.psf, newlineMser, parent.userChoiceModel, parent.Domask, parent.Intensityratio, parent.Inispacing, parent.jpb, parent.thirdDimensionSize);
+						
+						
+					}
 				}
 
 				if (parent.showKalman) {
@@ -134,6 +143,14 @@ public  class Track {
 							parent.Inispacing, parent.seedmap, parent.jpb, parent.thirdDimensionSize);
 
 					parent.Accountedframes.add(FindlinesVia.getAccountedframes());
+					
+	                          if(parent.Userframe.size() > 0){
+						
+						parent.returnVectorUser = FindlinesVia.LinefindingMethodHFUser(groundframe, groundframepre, parent.Userframe, parent.minlength, parent.thirdDimension,
+								parent.psf, newlineHough, parent.userChoiceModel, parent.Domask, parent.Intensityratio, parent.Inispacing, parent.jpb, parent.thirdDimensionSize);
+						
+						
+					}
 				}
 
 				if (parent.showKalman) {
@@ -169,6 +186,15 @@ public  class Track {
 							parent.Inispacing, parent.seedmap, parent.jpb, parent.thirdDimensionSize);
 
 					parent.Accountedframes.add(FindlinesVia.getAccountedframes());
+					
+                       if(parent.Userframe.size() > 0){
+						
+						parent.returnVectorUser = FindlinesVia.LinefindingMethodHFUser(groundframe, groundframepre, parent.Userframe, parent.minlength, parent.thirdDimension,
+								parent.psf, newlineMserwHough, parent.userChoiceModel, parent.Domask, parent.Intensityratio, parent.Inispacing, parent.jpb, parent.thirdDimensionSize);
+						
+						
+					}
+					
 				}
 				if (parent.showKalman) {
 					parent.returnVectorKalman = FindlinesVia.LinefindingMethodHFKalman(groundframe, groundframepre,
@@ -186,13 +212,19 @@ public  class Track {
 				ArrayList<Trackproperties> startStateVectors = parent.returnVector.getA().getA();
 				ArrayList<Trackproperties> endStateVectors = parent.returnVector.getA().getB();
 
+				if(parent.returnVectorUser.getA().size() > 0){
+					
+					ArrayList<Trackproperties> userStateVectors = parent.returnVectorUser.getA();
+					parent.AllUser.add(userStateVectors);
+				}
 		
 				parent.detcount++;
-				util.DrawingUtils.Trackplot(parent.detcount, parent.returnVector, parent.AllpreviousRois, parent.colorLineTrack, parent.colorTrack, parent.overlay, parent.maxghost);
+				util.DrawingUtils.Trackplot(parent.detcount, parent.returnVector, parent.returnVectorUser, parent.AllpreviousRois, parent.colorLineTrack, parent.colorTrack, parent.inactiveColor, parent.overlay, parent.maxghost);
 				
 				
 				parent.PrevFrameparam = parent.NewFrameparam;
 
+				
 				parent.Allstart.add(startStateVectors);
 				parent.Allend.add(endStateVectors);
 			}
@@ -239,6 +271,20 @@ public  class Track {
 				impendsec.draw();
 				impendsec.setTitle("Graph Start B MT");
 			}
+			
+			if (parent.AllUser.get(0).size() > 0) {
+				ImagePlus impstartsec = ImageJFunctions.show(parent.originalimg);
+				final Trackstart trackerstart = new Trackstart(parent.AllUser, parent.thirdDimensionSize - next);
+				trackerstart.process();
+				SimpleWeightedGraph<double[], DefaultWeightedEdge> graphstart = trackerstart.getResult();
+				ArrayList<Pair<Integer, double[]>> ID = trackerstart.getSeedID();
+				DisplayGraph displaygraphtrackstart = new DisplayGraph(impstartsec, graphstart, ID);
+				parent.IDALL.addAll(ID);
+				displaygraphtrackstart.getImp();
+				impstartsec.draw();
+				impstartsec.setTitle("Graph Start User MT");
+			}
+			
 
 		}
 
@@ -679,6 +725,12 @@ public  class Track {
 
 			}
 
+			
+			
+			
+			
+			
+			
 			if (parent.Allend.get(0).size() > 0) {
 				final ArrayList<Trackproperties> first = parent.Allend.get(0);
 				Collections.sort(first, parent.Seedcomparetrack);
@@ -816,6 +868,144 @@ public  class Track {
 
 			}
 
+			
+			if (parent.AllUser.get(0).size() > 0) {
+				final ArrayList<Trackproperties> first = parent.AllUser.get(0);
+
+				Collections.sort(first, parent.Seedcomparetrack);
+
+				int MaxSeedLabel = first.get(first.size() - 1).seedlabel;
+				int MinSeedLabel = first.get(0).seedlabel;
+				for (int currentseed = MinSeedLabel; currentseed < MaxSeedLabel + 1; ++currentseed) {
+					double startlengthreal = 0;
+					double startlengthpixel = 0;
+					System.out.println(currentseed);
+					for (int index = 0; index < parent.AllUser.size(); ++index) {
+
+						final ArrayList<Trackproperties> thirdDimension = parent.AllUser.get(index);
+
+						for (int frameindex = 0; frameindex < thirdDimension.size(); ++frameindex) {
+
+							final Integer seedID = thirdDimension.get(frameindex).seedlabel;
+							final int framenumber = thirdDimension.get(frameindex).Framenumber;
+							if (seedID == currentseed) {
+								final Integer[] FrameID = { framenumber, seedID };
+								final double[] originalpoint = thirdDimension.get(frameindex).originalpoint;
+								final double[] newpoint = thirdDimension.get(frameindex).newpoint;
+								final double[] oldpoint = thirdDimension.get(frameindex).oldpoint;
+								final double[] newpointCal = new double[] {
+										thirdDimension.get(frameindex).newpoint[0] * parent.calibration[0],
+										thirdDimension.get(frameindex).newpoint[1] * parent.calibration[1] };
+								final double[] oldpointCal = new double[] {
+										thirdDimension.get(frameindex).oldpoint[0] * parent.calibration[0],
+										thirdDimension.get(frameindex).oldpoint[1] * parent.calibration[1] };
+
+								final double lengthrealperframe = util.Boundingboxes.Distance(newpointCal, oldpointCal);
+								final double lengthpixelperframe = util.Boundingboxes.Distance(newpoint, oldpoint);
+								final double seedtocurrent = util.Boundingboxes.Distancesq(originalpoint, newpoint);
+								final double seedtoold = util.Boundingboxes.Distancesq(originalpoint, oldpoint);
+								final boolean shrink = seedtoold > seedtocurrent ? true : false;
+								final boolean growth = seedtoold > seedtocurrent ? false : true;
+
+								if (shrink) {
+									// MT shrank
+
+									startlengthreal -= lengthrealperframe;
+									startlengthpixel -= lengthpixelperframe;
+
+								}
+								if (growth) {
+
+									// MT grew
+									startlengthreal += lengthrealperframe;
+									startlengthpixel += lengthpixelperframe;
+
+								}
+
+								double[] currentlocationpixel = new double[parent.ndims];
+
+								if (framenumber == parent.thirdDimensionsliderInit)
+									currentlocationpixel = originalpoint;
+								else
+									currentlocationpixel = newpoint;
+
+								double[] currentlocationreal = new double[parent.ndims];
+
+								currentlocationreal = new double[] { currentlocationpixel[0] * parent.calibration[0],
+										currentlocationpixel[1] * parent.calibration[1] };
+
+								ResultsMT startMT = new ResultsMT(framenumber, startlengthpixel, startlengthreal,
+										seedID, currentlocationpixel, currentlocationreal, lengthpixelperframe,
+										lengthrealperframe);
+
+								parent.userlengthlist.add(startMT);
+
+							}
+						}
+					}
+				}
+				for (int seedID = MinSeedLabel; seedID <= MaxSeedLabel; ++seedID) {
+					if (parent.SaveTxt) {
+						try {
+							File fichier = new File(
+									parent.usefolder + "//" + parent.addToName + "SeedLabel" + seedID + "-Usermarked" + ".txt");
+
+							FileWriter fw = new FileWriter(fichier);
+							BufferedWriter bw = new BufferedWriter(fw);
+
+							bw.write(
+									"\tFramenumber\tTotal Length (pixel)\tTotal Length (real)\tSeed iD\tCurrentPosition X (px units)\tCurrentPosition Y (px units)\tCurrentPosition X (real units)\tCurrentPosition Y (real units)"
+											+ "\tLength per frame (px units)" + "\tLength per frame (real units)\n");
+
+							for (int index = 0; index < parent.userlengthlist.size(); ++index) {
+								if (parent.userlengthlist.get(index).seedid == seedID) {
+
+									bw.write("\t" + parent.startlengthlist.get(index).framenumber + "\t" + "\t"
+											+ parent.nf.format(parent.userlengthlist.get(index).totallengthpixel) + "\t" + "\t"
+											+ parent.nf.format(parent.userlengthlist.get(index).totallengthreal) + "\t" + "\t"
+											+ parent.nf.format(parent.userlengthlist.get(index).seedid) + "\t" + "\t"
+											+ parent.nf.format(parent.userlengthlist.get(index).currentpointpixel[0]) + "\t" + "\t"
+											+ parent.nf.format(parent.userlengthlist.get(index).currentpointpixel[1]) + "\t" + "\t"
+											+ parent.nf.format(parent.userlengthlist.get(index).currentpointreal[0]) + "\t" + "\t"
+											+ parent.nf.format(parent.userlengthlist.get(index).currentpointreal[1]) + "\t" + "\t"
+											+ parent.nf.format(parent.userlengthlist.get(index).lengthpixelperframe) + "\t" + "\t"
+											+ parent.nf.format(parent.userlengthlist.get(index).lengthrealperframe) + "\n");
+
+								}
+
+							}
+							bw.close();
+							fw.close();
+
+						} catch (IOException e) {
+						}
+					}
+				}
+				for (int index = 0; index < parent.userlengthlist.size(); ++index) {
+
+					double[] landt = { parent.userlengthlist.get(index).totallengthpixel,
+							parent.userlengthlist.get(index).framenumber, parent.userlengthlist.get(index).seedid };
+					parent.lengthtimeuser.add(landt);
+
+					rtAll.incrementCounter();
+					rtAll.addValue("FrameNumber", parent.userlengthlist.get(index).framenumber);
+					rtAll.addValue("Total Length (pixel)", parent.userlengthlist.get(index).totallengthpixel);
+					rtAll.addValue("Total Length (real)", parent.userlengthlist.get(index).totallengthreal);
+					rtAll.addValue("Track iD", parent.userlengthlist.get(index).seedid);
+					rtAll.addValue("CurrentPosition X (px units)", parent.userlengthlist.get(index).currentpointpixel[0]);
+					rtAll.addValue("CurrentPosition Y (px units)", parent.userlengthlist.get(index).currentpointpixel[1]);
+					rtAll.addValue("CurrentPosition X (real units)", parent.userlengthlist.get(index).currentpointreal[0]);
+					rtAll.addValue("CurrentPosition Y (real units)", parent.userlengthlist.get(index).currentpointreal[1]);
+					rtAll.addValue("Length per frame (px units)", parent.userlengthlist.get(index).lengthpixelperframe);
+					rtAll.addValue("Length per frame (real units)", parent.userlengthlist.get(index).lengthrealperframe);
+
+				}
+
+			}
+
+			
+			
+			
 			rtAll.show("Start and End of MT");
 			if (parent.lengthtimestart != null)
 				parent.lengthtime =parent. lengthtimestart;

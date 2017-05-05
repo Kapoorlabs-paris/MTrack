@@ -74,7 +74,7 @@ public static void SetProgressBarTime(JProgressBar jpb, double percent, int fram
 	jpb.setValue((int) percent);
 	jpb.setOpaque(true);
 	jpb.setStringPainted(true);
-	jpb.setString("3D point = " + framenumber + "/" + thirdDimsize);
+	jpb.setString("Time point = " + framenumber + "/" + thirdDimsize);
 		
 		
 	}
