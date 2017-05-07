@@ -162,9 +162,9 @@ final Interactive_MTDoubleChannel parent;
 					
 					
 					Indexedlength userseed = newseed.UserSeed(new double[]{x, y}, nextseed);
-					nextseed++;
-					parent.Userframe.add(userseed);
 					
+					parent.Userframe.add(userseed);
+					nextseed++;
 					
 					parent.ClickedPoints.add(newpoint);
 					

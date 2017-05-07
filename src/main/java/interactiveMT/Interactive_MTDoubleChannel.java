@@ -955,6 +955,16 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 			if (displayWatershedimg)
 				ImageJFunctions.show(intimg);
 
+			for (int i = 0; i < overlay.size(); ++i){
+	              if (overlay.get(i).getStrokeColor() == colorDraw || overlay.get(i).getStrokeColor() == colorCurrent
+	            		  || overlay.get(i).getStrokeColor() == colorUnselect){
+					overlay.remove(i);
+					--i;
+	              }
+	              
+					}
+					
+			
 		}
 
 		if (change == ValueChange.SHOWMSER) {
@@ -983,7 +993,8 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 			
 				
 				for (int i = 0; i < overlay.size(); ++i){
-              if (overlay.get(i).getStrokeColor() == colorDraw || overlay.get(i).getStrokeColor() == colorCurrent){
+              if (overlay.get(i).getStrokeColor() == colorDraw || overlay.get(i).getStrokeColor() == colorCurrent
+            		  || overlay.get(i).getStrokeColor() == colorUnselect){
 				overlay.remove(i);
 				--i;
               }
@@ -1275,8 +1286,24 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		ORText.setBackground(new Color(1, 0, 1));
 		ORText.setForeground(new Color(255, 255, 255));
 
-	
+        final Label LeftClick = new Label("Mouse left click deselects the seed end to be tracked.");
+		
+		final Label ShiftLeft = new Label("Shift + Mouse left click selects a deselected end.");
+		
+		final Label ShiftAltLeft = new Label("Shift + Alt + Mouse left click marks a user defined seed.");
+		
 
+		LeftClick.setBackground(new Color(1, 0, 1));
+		LeftClick.setForeground(new Color(255, 255, 255));
+		
+		ShiftLeft.setBackground(new Color(1, 0, 1));
+		ShiftLeft.setForeground(new Color(255, 255, 255));
+		
+		ShiftAltLeft.setBackground(new Color(1, 0, 1));
+		ShiftAltLeft.setForeground(new Color(255, 255, 255));
+		
+
+		
 
 		final Checkbox Finalize = new Checkbox("Confirm the dynamic seed end(s)");
 		
@@ -1298,6 +1325,17 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		panelThird.setLayout(layout);
 		panelThird.add(Step3, c);
 		panelEighth.setLayout(layout);
+		++c.gridy;
+		c.insets = new Insets(10, 10, 0, 0);
+		panelThird.add(LeftClick, c);
+		++c.gridy;
+		c.insets = new Insets(10, 10, 0, 0);
+		panelThird.add(ShiftLeft, c);
+		++c.gridy;
+		c.insets = new Insets(10, 10, 0, 0);
+		panelThird.add(ShiftAltLeft, c);
+
+		
 		++c.gridy;
 		c.insets = new Insets(10, 10, 0, 0);
 		panelThird.add(MTTextHF, c);
@@ -1433,6 +1471,9 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		final Label Step5 = new Label("Step 5", Label.CENTER);
 		panelFifth.setLayout(layout);
 		panelFifth.add(Step5, c);
+		
+		
+		
 		final Button TrackEndPoints = new Button("Track EndPoints (From first to a chosen last frame)");
 		final Button SkipframeandTrackEndPoints = new Button("TrackEndPoint (User specified first and last frame)");
 		final Button CheckResults = new Button("Check Results (then click next)");
@@ -1441,6 +1482,10 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		final Label Checkres = new Label("The tracker now performs an internal check on the results");
 		Checkres.setBackground(new Color(1, 0, 1));
 		Checkres.setForeground(new Color(255, 255, 255));
+		
+		
+		
+		
 		++c.gridy;
 		c.insets = new Insets(10, 10, 0, 175);
 		panelFifth.add(TrackEndPoints, c);
@@ -2279,6 +2324,24 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 						double[] newstartpoint = new double[ndims];
 
 						newstartpoint = startlengthlist.get(secindex).currentpointpixel;
+
+						final OvalRoi Bigroi = new OvalRoi(Util.round(newstartpoint[0] - 2.5),
+								Util.round(newstartpoint[1] - 2.5), Util.round(5), Util.round(5));
+
+						AllBigRoi.add(Bigroi);
+
+					}
+
+				}
+			}
+			
+			if (userlengthlist != null) {
+				for (int secindex = 0; secindex < userlengthlist.size(); ++secindex) {
+
+					if (userlengthlist.get(secindex).framenumber == i) {
+						double[] newstartpoint = new double[ndims];
+
+						newstartpoint = userlengthlist.get(secindex).currentpointpixel;
 
 						final OvalRoi Bigroi = new OvalRoi(Util.round(newstartpoint[0] - 2.5),
 								Util.round(newstartpoint[1] - 2.5), Util.round(5), Util.round(5));

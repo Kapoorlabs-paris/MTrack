@@ -159,7 +159,7 @@ public class DrawingUtils {
 
 		}
 		
-		
+		if (returnVectorUser!=null){
 		for (int index = 0; index < returnVectorUser.getA().size(); ++index){
 			
 			Trackproperties vector = returnVectorUser.getA().get(index);
@@ -175,6 +175,7 @@ public class DrawingUtils {
 			
 			
 			
+		}
 		}
 		
 		AllpreviousRois.put(detcount, AllselectedRoi);

@@ -212,7 +212,7 @@ public  class Track {
 				ArrayList<Trackproperties> startStateVectors = parent.returnVector.getA().getA();
 				ArrayList<Trackproperties> endStateVectors = parent.returnVector.getA().getB();
 
-				if(parent.returnVectorUser.getA().size() > 0){
+				if( parent.returnVectorUser != null ){
 					
 					ArrayList<Trackproperties> userStateVectors = parent.returnVectorUser.getA();
 					parent.AllUser.add(userStateVectors);
@@ -272,7 +272,7 @@ public  class Track {
 				impendsec.setTitle("Graph Start B MT");
 			}
 			
-			if (parent.AllUser.get(0).size() > 0) {
+			if (parent.returnVectorUser != null  && parent.AllUser.get(0).size() > 0) {
 				ImagePlus impstartsec = ImageJFunctions.show(parent.originalimg);
 				final Trackstart trackerstart = new Trackstart(parent.AllUser, parent.thirdDimensionSize - next);
 				trackerstart.process();
@@ -869,7 +869,7 @@ public  class Track {
 			}
 
 			
-			if (parent.AllUser.get(0).size() > 0) {
+			if (parent.returnVectorUser != null &&parent.AllUser.get(0).size() > 0) {
 				final ArrayList<Trackproperties> first = parent.AllUser.get(0);
 
 				Collections.sort(first, parent.Seedcomparetrack);

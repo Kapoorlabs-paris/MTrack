@@ -33,11 +33,15 @@ public class FitterUtils {
 		final Cursor<FloatType> outcursor = Views.iterable(currentimg).localizingCursor();
 		
 		
+		
 		while (outcursor.hasNext()) {
 
 			outcursor.fwd();
 
 			outcursor.localize(newposition);
+			
+			long pointonline = (int)Math.round(newposition[1] - slope * newposition[0] - Curvature * newposition[0]* newposition[0] - 
+					Inflection *  newposition[0]* newposition[0] * newposition[0] - intercept);
 			
 			if (outcursor.getDoublePosition(0) <= minVal[0]
 					&& outcursor.get().get() / maxintensityline > Intensityratio ) {
@@ -51,6 +55,7 @@ public class FitterUtils {
 				maxVal[1] = outcursor.getDoublePosition(1);
 			
 		}
+			
 		}
 		Pair<double[], double[]> minmaxpair = new ValuePair<double[], double[]>(minVal, maxVal);
 		
