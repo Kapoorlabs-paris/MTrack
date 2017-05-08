@@ -220,7 +220,7 @@ public class SubpixelVelocityPCLine extends BenchmarkAlgorithm
 				fixedstartpoint.setPosition(new long[] { (long) PrevFrameparamstart.get(index).fixedpos[0],
 						(long) PrevFrameparamstart.get(index).fixedpos[1] });
 
-				int labelstart = Getlabel(fixedstartpoint, originalslope, originalintercept);
+				int labelstart = FitterUtils.Getlabel(imgs, fixedstartpoint, originalslope, originalintercept);
 				Indexedlength paramnextframestart;
 
 				if (labelstart != Integer.MIN_VALUE)
@@ -277,7 +277,7 @@ public class SubpixelVelocityPCLine extends BenchmarkAlgorithm
 				final double originalslopeend = PrevFrameparamend.get(index).originalslope;
 
 				final double originalinterceptend = PrevFrameparamend.get(index).originalintercept;
-				int labelend = Getlabel(fixedendpoint, originalslopeend, originalinterceptend);
+				int labelend = FitterUtils.Getlabel(imgs, fixedendpoint, originalslopeend, originalinterceptend);
 				Indexedlength paramnextframeend;
 
 				if (labelend != Integer.MIN_VALUE)
@@ -338,32 +338,14 @@ public class SubpixelVelocityPCLine extends BenchmarkAlgorithm
 	}
 
 	
-	private final int getlabelindex(int label){
-		
-		
-		
-		int labelindex = -1;
-		for (int index = 0; index < imgs.size(); ++index){
-			
-			if (imgs.get(index).roilabel == label){
-		
-			labelindex = index;
-			
-			
-			}
-		}
-		
-		return labelindex;
-		
-		
-	}
+
 	
 	private final double[] MakerepeatedLineguess(Indexedlength iniparam, int label) {
 
 		double[] minVal = new double[ndims];
 		double[] maxVal = new double[ndims];
 		
-		int labelindex = getlabelindex(label);
+		int labelindex = FitterUtils.getlabelindex(imgs, label);
 		
 		if (labelindex!=-1){
 		
@@ -495,7 +477,7 @@ public class SubpixelVelocityPCLine extends BenchmarkAlgorithm
 			final double[] inipos = iniparam.currentpos;
 
 			
-			int labelindex = getlabelindex(label);
+			int labelindex = FitterUtils.getlabelindex(imgs,label);
 			
 			RandomAccessibleInterval<FloatType> currentimg = imgs.get(labelindex).Actualroi;
 
@@ -514,7 +496,7 @@ public class SubpixelVelocityPCLine extends BenchmarkAlgorithm
 			fixed_param[ndims + 1] = iniparam.originalintercept;
 			fixed_param[ndims + 2] = Inispacing;
 
-			PointSampleList<FloatType> datalist = gatherfullData(label);
+			PointSampleList<FloatType> datalist = FitterUtils.gatherfullData(imgs, label, ndims);
 			final Cursor<FloatType> listcursor = datalist.localizingCursor();
 			double[][] X = new double[(int) datalist.size()][ndims];
 			double[] I = new double[(int) datalist.size()];
@@ -1219,66 +1201,8 @@ public class SubpixelVelocityPCLine extends BenchmarkAlgorithm
 		}
 	}
 
-	private PointSampleList<FloatType> gatherfullData(final int label) {
-		final PointSampleList<FloatType> datalist = new PointSampleList<FloatType>(ndims);
 
-		int labelindex = getlabelindex(label);
-		RandomAccessibleInterval<FloatType> currentimg = imgs.get(labelindex).Actualroi;
-
-		FinalInterval interval = imgs.get(labelindex).interval;
-
-		currentimg = Views.interval(currentimg, interval);
-
-		Cursor<FloatType> localcursor = Views.iterable(currentimg).localizingCursor();
-
-		while (localcursor.hasNext()) {
-			localcursor.fwd();
-
-			if (localcursor.get().get() > 0) {
-				Point newpoint = new Point(localcursor);
-				datalist.add(newpoint, localcursor.get().copy());
-			}
-		}
-
-		return datalist;
-	}
-
-	public int Getlabel(final Point fixedpoint, final double originalslope, final double originalintercept) {
-
-
-		int finallabel = Integer.MIN_VALUE;
-		for (int index = 0; index < imgs.size(); ++index) {
-
-			if (imgs.get(index).intimg != null) {
-
-				RandomAccess<IntType> intranac = imgs.get(index).intimg.randomAccess();
-
-				intranac.setPosition(fixedpoint);
-				finallabel = intranac.get().get();
-
-				return finallabel;
-
-			} else {
-
-				
-				
-				
-				RandomAccessibleInterval<FloatType> currentimg = imgs.get(index).Actualroi;
-				FinalInterval interval = imgs.get(index).interval;
-				currentimg = Views.interval(currentimg, interval);
-
-				if (fixedpoint.getIntPosition(0) >= interval.min(0) && fixedpoint.getIntPosition(0) <= interval.max(0)
-						&& fixedpoint.getIntPosition(1) >= interval.min(1)
-						&& fixedpoint.getIntPosition(1) <= interval.max(1)) {
-
-					finallabel = imgs.get(index).roilabel;
-				}
-
-			}
-		}
-
-		return finallabel;
-	}
+	
 
 	public static double Distance(final double[] cordone, final double[] cordtwo) {
 

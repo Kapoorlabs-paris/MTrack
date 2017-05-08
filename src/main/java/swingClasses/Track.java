@@ -212,7 +212,7 @@ public  class Track {
 
 			if (parent.showDeterministic) {
 				parent.NewFrameparam = parent.returnVector.getB();
-
+				parent.UserframeNew = parent.returnVectorUser.getB();
 				ArrayList<Trackproperties> startStateVectors = parent.returnVector.getA().getA();
 				ArrayList<Trackproperties> endStateVectors = parent.returnVector.getA().getB();
 
@@ -220,6 +220,7 @@ public  class Track {
 					
 					ArrayList<Trackproperties> userStateVectors = parent.returnVectorUser.getA();
 					parent.AllUser.add(userStateVectors);
+					parent.Userframe = parent.UserframeNew;
 				}
 		
 				parent.detcount++;
@@ -227,6 +228,7 @@ public  class Track {
 				
 				
 				parent.PrevFrameparam = parent.NewFrameparam;
+				
 
 				
 				parent.Allstart.add(startStateVectors);

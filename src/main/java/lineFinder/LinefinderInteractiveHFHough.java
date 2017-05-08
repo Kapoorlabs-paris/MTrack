@@ -101,17 +101,14 @@ public class LinefinderInteractiveHFHough implements LinefinderHF {
 		Allrois = new ArrayList<EllipseRoi>();
 		output = new ArrayList<CommonOutputHF>();
 		
-        final FloatType type = source.randomAccess().get().createVariable();
 		
 
-		int count = 0;
 		for (int label = 1; label < Maxlabel - 1; ++label){
 		
 			Pair<RandomAccessibleInterval<FloatType>, FinalInterval> pair =  Boundingboxes.CurrentLabelImagepair(parent.intimg, Preprocessedsource, label);
 			RandomAccessibleInterval<FloatType> ActualRoiimg = Boundingboxes.CurrentLabelImage(parent.intimg, source, label);
 			RandomAccessibleInterval<FloatType> roiimg = pair.getA();
 			
-			FinalInterval Realinterval = pair.getB();
 			
 			MserTree<UnsignedByteType> tree = parent.newHoughtree.get(label);
 			LinefinderInteractiveHFMSER newlineMser = new LinefinderInteractiveHFMSER(ActualRoiimg, roiimg,
@@ -124,7 +121,8 @@ public class LinefinderInteractiveHFHough implements LinefinderHF {
 				
 				
 				
-				CommonOutputHF currentOutput = new CommonOutputHF(outputcurr.get(i).framenumber, label , outputcurr.get(i).Roi, outputcurr.get(i).Actualroi, 
+				CommonOutputHF currentOutput = new CommonOutputHF(outputcurr.get(i).framenumber, (int)(label*Math.pow(2, outputcurr.get(i).roilabel)),
+						outputcurr.get(i).Roi, outputcurr.get(i).Actualroi, outputcurr.get(i).intimg,
 						outputcurr.get(i).interval,outputcurr.get(i).Allrois);
 				output.add(currentOutput);
 				
@@ -132,8 +130,6 @@ public class LinefinderInteractiveHFHough implements LinefinderHF {
 
 			}
 			
-			
-			count++;
 		
 		
 		

@@ -218,7 +218,7 @@ import preProcessing.GetLocalmaxmin;
 				fixedstartpoint.setPosition(new long[] { (long) PrevFrameparamstart.get(index).fixedpos[0],
 						(long) PrevFrameparamstart.get(index).fixedpos[1] });
 
-				int labelstart = Getlabel(fixedstartpoint, originalslope, originalintercept);
+				int labelstart = FitterUtils.Getlabel(imgs, fixedstartpoint, originalslope, originalintercept);
 				KalmanIndexedlength paramnextframestart;
 
 				if (labelstart != Integer.MIN_VALUE)
@@ -285,7 +285,7 @@ import preProcessing.GetLocalmaxmin;
 				final double originalinterceptend = PrevFrameparamend.get(index).originalintercept;
 	
 				
-				int labelend = Getlabel(fixedendpoint, originalslopeend, originalinterceptend);
+				int labelend = FitterUtils.Getlabel(imgs, fixedendpoint, originalslopeend, originalinterceptend);
 				KalmanIndexedlength paramnextframeend;
 
 				if (labelend!= Integer.MIN_VALUE)
@@ -356,30 +356,12 @@ import preProcessing.GetLocalmaxmin;
 			
 			return Accountedframes;
 		}
-		private final int getlabelindex(int label){
-			
-			
-			
-			int labelindex = -1;
-			for (int index = 0; index < imgs.size(); ++index){
-				
-				if (imgs.get(index).roilabel == label){
-			
-				labelindex = index;
-				
-				
-				}
-			}
-			
-			return labelindex;
-			
-			
-		}
+	
 		private final double[] MakerepeatedLineguess(KalmanIndexedlength iniparam, int label) {
 
 			double[] minVal = new double[ndims];
 			double[] maxVal = new double[ndims];
-			  int labelindex = getlabelindex(label);
+			  int labelindex = FitterUtils.getlabelindex(imgs, label);
 				
 			  if (labelindex!=-1){
 				
@@ -504,7 +486,7 @@ import preProcessing.GetLocalmaxmin;
 			else {
 
 			
-				int labelindex = getlabelindex(label);
+				int labelindex = FitterUtils.getlabelindex(imgs, label);
 				final double[] inipos = iniparam.currentpos;
 			
 				RandomAccessibleInterval<FloatType> currentimg = imgs.get(labelindex).Actualroi;
@@ -1225,7 +1207,7 @@ import preProcessing.GetLocalmaxmin;
 			final PointSampleList<FloatType> datalist = new PointSampleList<FloatType>(ndims);
 
 			RandomAccessibleInterval<FloatType> currentimg = imgs.get(label).Actualroi;
-			int labelindex = getlabelindex(label);
+			int labelindex = FitterUtils.getlabelindex(imgs, label);
 			FinalInterval interval = imgs.get(labelindex).interval;
 
 			currentimg = Views.interval(currentimg, interval);
@@ -1244,50 +1226,7 @@ import preProcessing.GetLocalmaxmin;
 			return datalist;
 		}
 
-		public int Getlabel(final Point fixedpoint, final double originalslope, final double originalintercept) {
-
-			
-			
-			
-			
-
-			int finallabel = Integer.MIN_VALUE;
-			for (int index = 0; index < imgs.size(); ++index) {
-
-				if (imgs.get(index).intimg!= null){
-					
-					RandomAccess<IntType> intranac = imgs.get(index).intimg.randomAccess();
-
-					
-					intranac.setPosition(fixedpoint);
-					finallabel = intranac.get().get();
-
-					return finallabel;
-					
-				}
-				else{
-				
-				
-				RandomAccessibleInterval<FloatType> currentimg = imgs.get(index).Actualroi;
-				FinalInterval interval = imgs.get(index).interval;
-				currentimg = Views.interval(currentimg, interval);
-
-				
-				if (fixedpoint.getIntPosition(0) >= interval.min(0) && fixedpoint.getIntPosition(0) <= interval.max(0)
-						&& fixedpoint.getIntPosition(1) >= interval.min(1)
-						&& fixedpoint.getIntPosition(1) <= interval.max(1)) {
-
-					finallabel = imgs.get(index).roilabel;
-				}
-				
-
-				}
-			}
-
-			
-
-			return finallabel;
-		}
+		
 		public static double Distance(final double[] cordone, final double[] cordtwo) {
 
 			double distance = 0;
