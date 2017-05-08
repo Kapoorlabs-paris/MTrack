@@ -30,8 +30,7 @@ final Interactive_MTDoubleChannel parent;
 		if (next < 2)
 			next = 2;
 
-		FinalPoint finalpoint = new FinalPoint(parent);
-		finalpoint.FinalizeEnds();
+		
 		
 		Track newtrack = new Track(parent);
 		newtrack.Trackobject(next);

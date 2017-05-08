@@ -3,6 +3,7 @@ package lineFinder;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -57,6 +58,7 @@ public class LinefinderHFMSERwHough implements LinefinderHF{
 	private int Roiindex;
 	private final int ndims;
 	private EllipseRoi ellipseroi;
+	private ArrayList<EllipseRoi> Allrois;
 	public LinefinderHFMSERwHough (final RandomAccessibleInterval<FloatType> source, 
 			final RandomAccessibleInterval<FloatType> Preprocessedsource, final int minlength, final int framenumber){
 		
@@ -130,7 +132,7 @@ public class LinefinderHFMSERwHough implements LinefinderHF{
 	public boolean process() {
 
 		output = new ArrayList<CommonOutputHF>();
-		
+		Allrois = new ArrayList<EllipseRoi>();
         final FloatType type = source.randomAccess().get().createVariable();
 		
 
@@ -254,13 +256,13 @@ public class LinefinderHFMSERwHough implements LinefinderHF{
 				
 				
 				
-				
+				Allrois.add(ellipseroi);
 				
 				// Obtain the slope and intercept of the line by obtaining the major axis of the ellipse (super fast and accurate)
 				
 				
 				
-				CommonOutputHF currentOutput = new CommonOutputHF(framenumber, Roiindex, Roiimg, ActualRoiimg, interval);
+				CommonOutputHF currentOutput = new CommonOutputHF(framenumber, Roiindex, Roiimg, ActualRoiimg, interval, Allrois);
 				
 				
 				output.add(currentOutput);

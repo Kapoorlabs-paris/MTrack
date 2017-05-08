@@ -4,7 +4,9 @@ import java.util.ArrayList;
 
 import javax.swing.JProgressBar;
 
+import LineModels.UseLineModel.UserChoiceModel;
 import labeledObjects.CommonOutputHF;
+import labeledObjects.Indexedlength;
 import net.imglib2.Cursor;
 import net.imglib2.FinalInterval;
 import net.imglib2.RandomAccessibleInterval;
@@ -12,10 +14,10 @@ import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.util.Pair;
 import net.imglib2.util.ValuePair;
 import net.imglib2.view.Views;
+import preProcessing.GetLocalmaxmin;
 
 public class FitterUtils {
 
-	
 	
 	
 	public static final Pair<double[], double[]> MakeinitialEndpointguess(ArrayList<CommonOutputHF> imgs, double maxintensityline, 

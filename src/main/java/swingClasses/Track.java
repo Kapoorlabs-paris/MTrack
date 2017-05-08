@@ -60,6 +60,8 @@ public  class Track {
 
 			Kalmancount++;
 
+			parent.displayBitimg = false;
+			parent.displayWatershedimg = false;
 			parent.thirdDimension = index;
 			parent.isStarted = true;
 			parent.CurrentPreprocessedView = util.CopyUtils.getCurrentPreView(parent.originalPreprocessedimg, parent.thirdDimension,
@@ -137,7 +139,7 @@ public  class Track {
 				parent.updatePreview(ValueChange.SHOWHOUGH);
 				parent.updatePreview(ValueChange.SHOWMSERinHough);
 				LinefinderInteractiveHFHough newlineHough = new LinefinderInteractiveHFHough(parent,groundframe,
-						groundframepre, parent.newHoughtree, parent.Maxlabel, parent.thirdDimension);
+						groundframepre, parent.Maxlabel, parent.thirdDimension);
 				
 				if (parent.showDeterministic) {
 					parent.returnVector = FindlinesVia.LinefindingMethodHF(groundframe, groundframepre, parent.PrevFrameparam,

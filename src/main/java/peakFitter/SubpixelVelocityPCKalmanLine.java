@@ -76,7 +76,7 @@ import preProcessing.GetLocalmaxmin;
 		public double termepsilon = 1e-3;
 		// Mask fits iteration param
 		public int iterations = 500;
-		public double cutoffdistance = 15;
+		public double cutoffdistance = 5;
 		public boolean halfgaussian = false;
 		final HashMap<Integer, Whichend> Trackstart;
 		public double Intensityratio;
@@ -356,32 +356,55 @@ import preProcessing.GetLocalmaxmin;
 			
 			return Accountedframes;
 		}
-
-		private final double[] MakerepeatedLineguess(KalmanIndexedlength iniparam, int label) {
+		private final int getlabelindex(int label){
 			
+			
+			
+			int labelindex = -1;
+			for (int index = 0; index < imgs.size(); ++index){
+				
+				if (imgs.get(index).roilabel == label){
+			
+				labelindex = index;
+				
+				
+				}
+			}
+			
+			return labelindex;
+			
+			
+		}
+		private final double[] MakerepeatedLineguess(KalmanIndexedlength iniparam, int label) {
+
 			double[] minVal = new double[ndims];
 			double[] maxVal = new double[ndims];
+			  int labelindex = getlabelindex(label);
+				
+			  if (labelindex!=-1){
+				
+				RandomAccessibleInterval<FloatType> currentimg  = imgs.get(labelindex).Roi;
+				FinalInterval interval =  imgs.get(labelindex).interval;
+				 
 
-			RandomAccessibleInterval<FloatType> currentimg = imgs.get(label).Roi;
-
-			FinalInterval interval = imgs.get(label).interval;
+			
 
 			currentimg = Views.interval(currentimg, interval);
 
-
 			final double maxintensityline = GetLocalmaxmin.computeMaxIntensity(currentimg);
-			Pair<double[], double[]> minmaxpair =  FitterUtils.MakeinitialEndpointguess(imgs, maxintensityline, Intensityratio, ndims, label
-					,iniparam.slope, iniparam.intercept, iniparam.Curvature, iniparam.Inflection);
+			final double minintensityline = 0;
+			Pair<double[], double[]> minmaxpair = FitterUtils.MakeinitialEndpointguess(imgs, maxintensityline,
+					Intensityratio, ndims, labelindex, iniparam.slope, iniparam.intercept, iniparam.Curvature,
+					iniparam.Inflection);
 			for (int d = 0; d < ndims; ++d) {
-				
+
 				minVal[d] = minmaxpair.getA()[d];
 				maxVal[d] = minmaxpair.getB()[d];
-				
+
 			}
+
 			if (model == UserChoiceModel.Line) {
 
-				
-				
 				final double[] MinandMax = new double[2 * ndims + 3];
 
 				for (int d = 0; d < ndims; ++d) {
@@ -392,7 +415,7 @@ import preProcessing.GetLocalmaxmin;
 
 				MinandMax[2 * ndims] = Inispacing;
 				MinandMax[2 * ndims + 1] = maxintensityline;
-				MinandMax[2 * ndims + 2] = 0;
+				MinandMax[2 * ndims + 2] = minintensityline;
 				for (int d = 0; d < ndims; ++d) {
 
 					if (MinandMax[d] == Double.MAX_VALUE || MinandMax[d + ndims] == -Double.MIN_VALUE)
@@ -405,15 +428,8 @@ import preProcessing.GetLocalmaxmin;
 				}
 				return MinandMax;
 			}
-			
 
-			
-	
-			
 			if (model == UserChoiceModel.Splineordersec) {
-				
-
-			
 
 				final double[] MinandMax = new double[2 * ndims + 4];
 
@@ -424,10 +440,10 @@ import preProcessing.GetLocalmaxmin;
 				}
 
 				MinandMax[2 * ndims + 2] = maxintensityline;
-				MinandMax[2 * ndims + 3] = 0;
+				MinandMax[2 * ndims + 3] = minintensityline;
 				MinandMax[2 * ndims + 1] = iniparam.Curvature;
-				MinandMax[2 * ndims] =  Inispacing;
-				
+				MinandMax[2 * ndims] = Inispacing;
+
 				for (int d = 0; d < ndims; ++d) {
 
 					if (MinandMax[d] == Double.MAX_VALUE || MinandMax[d + ndims] == -Double.MIN_VALUE)
@@ -440,9 +456,7 @@ import preProcessing.GetLocalmaxmin;
 				}
 				return MinandMax;
 			}
-	         if (model == UserChoiceModel.Splineorderthird) {
-				
-
+			if (model == UserChoiceModel.Splineorderthird) {
 
 				final double[] MinandMax = new double[2 * ndims + 5];
 
@@ -454,10 +468,10 @@ import preProcessing.GetLocalmaxmin;
 
 				MinandMax[2 * ndims + 2] = iniparam.Inflection;
 				MinandMax[2 * ndims + 3] = maxintensityline;
-				MinandMax[2 * ndims + 4] = 0;
+				MinandMax[2 * ndims + 4] = minintensityline;
 				MinandMax[2 * ndims + 1] = iniparam.Curvature;
-				MinandMax[2 * ndims] =  Inispacing;
-				
+				MinandMax[2 * ndims] = Inispacing;
+
 				for (int d = 0; d < ndims; ++d) {
 
 					if (MinandMax[d] == Double.MAX_VALUE || MinandMax[d + ndims] == -Double.MIN_VALUE)
@@ -469,12 +483,16 @@ import preProcessing.GetLocalmaxmin;
 
 				}
 				return MinandMax;
-	}
+			}
 
 			else
 				return null;
-
+			}
+			
+			else 
+				return null;
 		}
+
 
 		public KalmanIndexedlength Getfinaltrackparam(final KalmanIndexedlength iniparam, final int label, final double[] psf,
 				final int rate, final StartorEnd startorend)  {
@@ -486,11 +504,12 @@ import preProcessing.GetLocalmaxmin;
 			else {
 
 			
+				int labelindex = getlabelindex(label);
 				final double[] inipos = iniparam.currentpos;
 			
-				RandomAccessibleInterval<FloatType> currentimg = imgs.get(label).Actualroi;
+				RandomAccessibleInterval<FloatType> currentimg = imgs.get(labelindex).Actualroi;
 
-				FinalInterval interval = imgs.get(label).interval;
+				FinalInterval interval = imgs.get(labelindex).interval;
 
 				currentimg = Views.interval(currentimg, interval);
 
@@ -1206,8 +1225,8 @@ import preProcessing.GetLocalmaxmin;
 			final PointSampleList<FloatType> datalist = new PointSampleList<FloatType>(ndims);
 
 			RandomAccessibleInterval<FloatType> currentimg = imgs.get(label).Actualroi;
-
-			FinalInterval interval = imgs.get(label).interval;
+			int labelindex = getlabelindex(label);
+			FinalInterval interval = imgs.get(labelindex).interval;
 
 			currentimg = Views.interval(currentimg, interval);
 
@@ -1231,10 +1250,8 @@ import preProcessing.GetLocalmaxmin;
 			
 			
 			
-			ArrayList<Integer> currentlabel = new ArrayList<Integer>();
 
 			int finallabel = Integer.MIN_VALUE;
-			int pointonline = Integer.MAX_VALUE;
 			for (int index = 0; index < imgs.size(); ++index) {
 
 				if (imgs.get(index).intimg!= null){

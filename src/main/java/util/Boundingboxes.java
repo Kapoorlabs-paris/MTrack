@@ -495,7 +495,6 @@ public static FinalInterval CurrentroiInterval(RandomAccessibleInterval<FloatTyp
 		
 		FinalInterval intervalsmall = new FinalInterval(minVal, maxVal) ;
 		RandomAccessibleInterval<FloatType> outimgsmall = util.CopyUtils.extractImage(outimg, intervalsmall);
-				//Views.interval(outimg, intervalsmall);
 
 		Pair<RandomAccessibleInterval<FloatType>, FinalInterval> pair = new ValuePair<RandomAccessibleInterval<FloatType>, FinalInterval>(outimgsmall, intervalsmall);
 		return pair;
@@ -590,7 +589,7 @@ public static FinalInterval CurrentroiInterval(RandomAccessibleInterval<FloatTyp
 
 		}
 		FinalInterval intervalsmall = new FinalInterval(minVal, maxVal) ;
-		RandomAccessibleInterval<FloatType> outimgsmall = Views.interval(outimg, intervalsmall);
+		RandomAccessibleInterval<FloatType> outimgsmall = util.CopyUtils.extractImage(outimg, intervalsmall);
 		return outimgsmall;
 
 	}

@@ -46,7 +46,7 @@ public class LinefinderInteractiveHFMSERwHough implements LinefinderHF{
 	private final int minlength;
 	private ArrayList<CommonOutputHF> output;
 	final MserTree<UnsignedByteType> newtree;
-	
+	private ArrayList<EllipseRoi> Allrois;
 
 	private int Roiindex;
 	private final int ndims;
@@ -84,6 +84,7 @@ public class LinefinderInteractiveHFMSERwHough implements LinefinderHF{
 	public boolean process() {
 
 		output = new ArrayList<CommonOutputHF>();
+		Allrois = new ArrayList<EllipseRoi>();
 		 final FloatType type = source.randomAccess().get().createVariable();
 		ArrayList<double[]> ellipselist = new ArrayList<double[]>();
 		ArrayList<double[]> meanandcovlist = new ArrayList<double[]>();
@@ -112,12 +113,13 @@ public class LinefinderInteractiveHFMSERwHough implements LinefinderHF{
 		// We do this so the ROI remains attached the the same label and is not changed if the program is run again
 	       SortListbyproperty.sortpointList(ellipselist);
 		int count = 0;
+
+		final ImgFactory<FloatType> factory = Util.getArrayOrCellImgFactory(Preprocessedsource, type);
+		RandomAccessibleInterval<FloatType>  Roiimg = factory.create(Preprocessedsource, type);
+		RandomAccessibleInterval<FloatType>  ActualRoiimg = factory.create(source, type);
 			for (int index = 0; index < ellipselist.size(); ++index) {
 				
 				
-				final ImgFactory<FloatType> factory = Util.getArrayOrCellImgFactory(Preprocessedsource, type);
-				RandomAccessibleInterval<FloatType>  Roiimg = factory.create(Preprocessedsource, type);
-				RandomAccessibleInterval<FloatType>  ActualRoiimg = factory.create(source, type);
 				
 				final double[] mean = { ellipselist.get(index)[0], ellipselist.get(index)[1] };
 				final double[] covar = { ellipselist.get(index)[2], ellipselist.get(index)[3],
@@ -176,13 +178,13 @@ public class LinefinderInteractiveHFMSERwHough implements LinefinderHF{
 				
 				
 				
-				
+				Allrois.add(ellipseroi);
 				
 				// Obtain the slope and intercept of the line by obtaining the major axis of the ellipse (super fast and accurate)
 				
 				
 				
-				CommonOutputHF currentOutput = new CommonOutputHF(framenumber, Roiindex, Roiimg, ActualRoiimg, interval);
+				CommonOutputHF currentOutput = new CommonOutputHF(framenumber, Roiindex, Roiimg, ActualRoiimg, interval, Allrois);
 				
 				
 				output.add(currentOutput);

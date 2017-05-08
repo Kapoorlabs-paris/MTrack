@@ -61,8 +61,7 @@ final Interactive_MTDoubleChannel parent;
 	protected Void doInBackground() throws Exception {
 
 		int next = 2;
-		FinalPoint finalpoint = new FinalPoint(parent);
-		finalpoint.FinalizeEnds();
+		
 		Track newtrack = new Track(parent);
 		newtrack.Trackobject(next);
 

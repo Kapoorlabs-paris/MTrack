@@ -57,6 +57,7 @@ public class LinefinderHFMSER implements LinefinderHF{
 	private int Roiindex;
 	private final int ndims;
 	private EllipseRoi ellipseroi;
+	private ArrayList<EllipseRoi> Allrois;
 	public LinefinderHFMSER (final RandomAccessibleInterval<FloatType> source, 
 			final RandomAccessibleInterval<FloatType> Preprocessedsource, final int minlength, final int framenumber){
 		
@@ -131,6 +132,7 @@ public class LinefinderHFMSER implements LinefinderHF{
 
 		output = new ArrayList<CommonOutputHF>();
 		
+		Allrois = new ArrayList<EllipseRoi>();
         final FloatType type = source.randomAccess().get().createVariable();
 		
 
@@ -253,8 +255,9 @@ public class LinefinderHFMSER implements LinefinderHF{
 
 				}
 				
+				Allrois.add(ellipseroi);
 				
-				CommonOutputHF currentOutput = new CommonOutputHF(framenumber, Roiindex, Roiimg, ActualRoiimg, interval);
+				CommonOutputHF currentOutput = new CommonOutputHF(framenumber, Roiindex, Roiimg, ActualRoiimg, interval, Allrois);
 				
 				
 				output.add(currentOutput);

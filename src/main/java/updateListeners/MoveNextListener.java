@@ -39,7 +39,7 @@ final Interactive_MTDoubleChannel parent;
 					parent.thirdDimensionSize);
 		} else {
 
-			parent.thirdDimension = parent.thirdDimension + 1;
+			parent.thirdDimension = parent.thirdDimensionsliderInit + 1;
 			parent.CurrentView = util.CopyUtils.getCurrentView(parent.originalimg, parent.thirdDimension, parent.thirdDimensionSize);
 			parent.CurrentPreprocessedView = util.CopyUtils.getCurrentPreView(parent.originalPreprocessedimg, parent.thirdDimension,
 					parent.thirdDimensionSize);

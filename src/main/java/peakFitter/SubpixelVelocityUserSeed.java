@@ -264,22 +264,45 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm
 
 		return Accountedframes;
 	}
-
+private final int getlabelindex(int label){
+		
+		
+		
+		int labelindex = -1;
+		for (int index = 0; index < imgs.size(); ++index){
+			
+			if (imgs.get(index).roilabel == label){
+		
+			labelindex = index;
+			
+			
+			}
+		}
+		
+		return labelindex;
+		
+		
+	}
 	private final double[] MakerepeatedLineguess(Indexedlength iniparam, int label) {
 
 		double[] minVal = new double[ndims];
 		double[] maxVal = new double[ndims];
+        int labelindex = getlabelindex(label);
+		
+        if (labelindex!=-1){
+		
+		RandomAccessibleInterval<FloatType> currentimg  = imgs.get(labelindex).Roi;
+		FinalInterval interval =  imgs.get(labelindex).interval;
+		 
 
-		RandomAccessibleInterval<FloatType> currentimg = imgs.get(label).Roi;
-
-		FinalInterval interval = imgs.get(label).interval;
+	
 
 		currentimg = Views.interval(currentimg, interval);
 
 		final double maxintensityline = GetLocalmaxmin.computeMaxIntensity(currentimg);
 		final double minintensityline = 0;
 		Pair<double[], double[]> minmaxpair = FitterUtils.MakeinitialEndpointguess(imgs, maxintensityline,
-				Intensityratio, ndims, label, iniparam.slope, iniparam.intercept, iniparam.Curvature,
+				Intensityratio, ndims, labelindex, iniparam.slope, iniparam.intercept, iniparam.Curvature,
 				iniparam.Inflection);
 		for (int d = 0; d < ndims; ++d) {
 
@@ -372,7 +395,10 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm
 
 		else
 			return null;
-
+		}
+		
+		else 
+			return null;
 	}
 
 	public Indexedlength Getfinaltrackparam(final Indexedlength iniparam, final int label, final double[] psf,
@@ -386,9 +412,11 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm
 
 			final double[] inipos = iniparam.currentpos;
 
-			RandomAccessibleInterval<FloatType> currentimg = imgs.get(label).Actualroi;
+			int labelindex = getlabelindex(label);
+			
+			RandomAccessibleInterval<FloatType> currentimg = imgs.get(labelindex).Actualroi;
 
-			FinalInterval interval = imgs.get(label).interval;
+			FinalInterval interval = imgs.get(labelindex).interval;
 
 			currentimg = Views.interval(currentimg, interval);
 
@@ -1112,8 +1140,8 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm
 		final PointSampleList<FloatType> datalist = new PointSampleList<FloatType>(ndims);
 
 		RandomAccessibleInterval<FloatType> currentimg = imgs.get(label).Actualroi;
-
-		FinalInterval interval = imgs.get(label).interval;
+		int labelindex = getlabelindex(label);
+		FinalInterval interval = imgs.get(labelindex).interval;
 
 		currentimg = Views.interval(currentimg, interval);
 

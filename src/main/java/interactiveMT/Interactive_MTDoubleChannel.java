@@ -406,7 +406,10 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public double[] calibration;
 	double radiusfactor = 1;
 	public MserTree<UnsignedByteType> newtree;
-	public ArrayList<MserTree<UnsignedByteType>> newHoughtree;
+	
+	public HashMap<Integer, MserTree<UnsignedByteType>> newHoughtree;
+	
+	
 	public ArrayList<MserTree<UnsignedByteType>> Alllocaltree;
 	// Image 2d at the current slice
 	public RandomAccessibleInterval<FloatType> currentimg;
@@ -696,7 +699,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		AllSeedrois = new ArrayList<OvalRoi>();
 		jpb = new JProgressBar();
 		UserchosenCostFunction = new SquareDistCostFunction();
-		newHoughtree = new ArrayList<MserTree<UnsignedByteType>>() ;
+		newHoughtree = new HashMap<Integer, MserTree<UnsignedByteType>>() ;
 		Userframe = new ArrayList<Indexedlength>();
 		AllpreviousRois = new HashMap<Integer, ArrayList<Roi>>();
 		Inispacing = 0.5 * Math.min(psf[0], psf[1]);
@@ -961,7 +964,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 				AllmeanCovar.addAll(meanCovar);
 				AllRois.addAll(Rois);
 				
-				newHoughtree.add(newtree);
+				newHoughtree.put(label, newtree);
 
 				
 				if (preprocessedimp != null) {
@@ -1390,9 +1393,9 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		final Checkbox Finalize = new Checkbox("Confirm the dynamic seed end(s)");
 		
 		CheckboxGroup Segmentation = new CheckboxGroup();
-		final Checkbox Doseg = new Checkbox("Do Waterhshed based segmentation (slower, for crowded movies)", Segmentation, doSegmentation);
+		final Checkbox Doseg = new Checkbox("Do Waterhshed + MSER based segmentation (slower, recommended for crowded movies)", Segmentation, doSegmentation);
 		final Checkbox DoMserseg = new Checkbox(
-				"Do MSER based segmentation (faster, choose well seperated ends to track)", Segmentation, doMserSegmentation);
+				"Do MSER based segmentation (faster, recommended for non-crowded movies)", Segmentation, doMserSegmentation);
 		final Label MTTextHF = new Label("Select ends for tracking", Label.CENTER);
 		final Label Step3 = new Label("Step 3", Label.CENTER);
 		final Label SegChoice = new Label("Choose MSER or Watershed based Segmentation", Label.CENTER);
@@ -1762,63 +1765,77 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		panelFourth.add(Update, c);
 
 		++c.gridy;
+		c.insets = new Insets(10, 10, 0, 0);
 		panelFourth.add(exthresholdText, c);
+		
 		++c.gridy;
-
+		c.insets = new Insets(10, 10, 0, 0);
 		panelFourth.add(thresholdText, c);
 		++c.gridy;
-
+		c.insets = new Insets(10, 10, 0, 0);
 		panelFourth.add(threshold, c);
 
 		++c.gridy;
 		c.insets = new Insets(10, 175, 0, 175);
+		c.insets = new Insets(10, 10, 0, 0);
 		panelFourth.add(displayBit, c);
 
 		++c.gridy;
 		c.insets = new Insets(10, 175, 0, 175);
+		c.insets = new Insets(10, 10, 0, 0);
 		panelFourth.add(displayWatershed, c);
+		
 		++c.gridy;
 		c.insets = new Insets(10, 175, 0, 175);
 		panelFourth.add(Dowatershed, c);
+		
 		++c.gridy;
+		c.insets = new Insets(10, 10, 0, 0);
 		panelFourth.add(deltaText, c);
 
 		++c.gridy;
+		c.insets = new Insets(10, 10, 0, 0);
 		panelFourth.add(deltaS, c);
 
 		++c.gridy;
-
+		c.insets = new Insets(10, 10, 0, 0);
 		panelFourth.add(maxVarText, c);
 
 		++c.gridy;
+		c.insets = new Insets(10, 10, 0, 0);
 		panelFourth.add(maxVarS, c);
 
 		++c.gridy;
-
+		c.insets = new Insets(10, 10, 0, 0);
 		panelFourth.add(minDiversityText, c);
 
 		++c.gridy;
+		c.insets = new Insets(10, 10, 0, 0);
 		panelFourth.add(minDiversityS, c);
 
 		++c.gridy;
-
+		c.insets = new Insets(10, 10, 0, 0);
 		panelFourth.add(minSizeText, c);
 
 		++c.gridy;
+		c.insets = new Insets(10, 10, 0, 0);
 		panelFourth.add(minSizeS, c);
 
 		++c.gridy;
-
+		c.insets = new Insets(10, 10, 0, 0);
 		panelFourth.add(maxSizeText, c);
 
 		++c.gridy;
+		c.insets = new Insets(10, 10, 0, 0);
 		panelFourth.add(maxSizeS, c);
 
 		++c.gridy;
+		c.insets = new Insets(10, 10, 0, 0);
 		c.insets = new Insets(10, 175, 0, 175);
 		panelFourth.add(min, c);
 
 		++c.gridy;
+		
 		c.insets = new Insets(10, 175, 0, 175);
 		panelFourth.add(ComputeTree, c);
 
@@ -2452,7 +2469,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 			prestack.addSlice(Localimp.getImageStack().getProcessor(i).convertToRGB());
 			cp = (ColorProcessor) (prestack.getProcessor(i).duplicate());
 
-			if (FindLinesViaHOUGH == false) {
+			
 				ArrayList<EllipseRoi> Rois = AllMSERrois.get(i);
 				for (int index = 0; index < Rois.size(); ++index) {
 
@@ -2469,7 +2486,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 					}
 
 				}
-			}
+			
 
 			ArrayList<Roi> AllBigRoi = new ArrayList<Roi>();
 
