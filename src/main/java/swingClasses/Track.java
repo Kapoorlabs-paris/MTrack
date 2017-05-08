@@ -135,8 +135,10 @@ public  class Track {
 					dialog = false;
 
 				parent.updatePreview(ValueChange.SHOWHOUGH);
-				LinefinderInteractiveHFHough newlineHough = new LinefinderInteractiveHFHough(groundframe,
-						groundframepre, parent.intimg, parent.Maxlabel, parent.thetaPerPixel, parent.rhoPerPixel, parent.thirdDimension);
+				parent.updatePreview(ValueChange.SHOWMSERinHough);
+				LinefinderInteractiveHFHough newlineHough = new LinefinderInteractiveHFHough(parent,groundframe,
+						groundframepre, parent.newHoughtree, parent.Maxlabel, parent.thirdDimension);
+				
 				if (parent.showDeterministic) {
 					parent.returnVector = FindlinesVia.LinefindingMethodHF(groundframe, groundframepre, parent.PrevFrameparam,
 							parent.minlength, parent.thirdDimension, parent.psf, newlineHough, parent.userChoiceModel,parent.Domask, parent.Intensityratio,

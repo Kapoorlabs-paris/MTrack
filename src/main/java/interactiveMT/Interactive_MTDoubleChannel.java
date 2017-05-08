@@ -132,6 +132,7 @@ import lineFinder.LinefinderInteractiveMSERwHough;
 import listeners.AcceptResultsListener;
 import listeners.AnalyzekymoListener;
 import listeners.CheckResultsListener;
+import listeners.ComputeMserinHoughListener;
 import listeners.ComputeTreeListener;
 import listeners.DarktobrightListener;
 import listeners.DeltaListener;
@@ -190,6 +191,7 @@ import peakFitter.SortListbyproperty;
 import preProcessing.GetLocalmaxmin;
 import preProcessing.Kernels;
 import preProcessing.MedianFilter2D;
+import sun.tools.java.AmbiguousMember;
 import swingClasses.ProgressTrack;
 import trackerType.KFsearch;
 import trackerType.MTTracker;
@@ -404,6 +406,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public double[] calibration;
 	double radiusfactor = 1;
 	public MserTree<UnsignedByteType> newtree;
+	public ArrayList<MserTree<UnsignedByteType>> newHoughtree;
 	public ArrayList<MserTree<UnsignedByteType>> Alllocaltree;
 	// Image 2d at the current slice
 	public RandomAccessibleInterval<FloatType> currentimg;
@@ -439,8 +442,8 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public Rectangle standardRectangle;
 	public FinalInterval interval;
 	RandomAccessibleInterval<UnsignedByteType> newimg;
-	ArrayList<double[]> AllmeanCovar;
-	long Cannyradius;
+	ArrayList<double[]> AllmeanCovar = new ArrayList<double[]>();
+	public long Cannyradius;
 	public HashMap<Integer, ArrayList<Roi>> AllpreviousRois;
 	// first and last slice to process
 	int endStack;
@@ -452,7 +455,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	}
 
 	public static enum ValueChange {
-		ROI, ALL, DELTA, FindLinesVia, MAXVAR, MINDIVERSITY, DARKTOBRIGHT, MINSIZE, MAXSIZE, SHOWMSER, FRAME, SHOWHOUGH, thresholdHough, DISPLAYBITIMG, DISPLAYWATERSHEDIMG, rhoPerPixel, thetaPerPixel, THIRDDIM, iniSearch, maxSearch, missedframes, THIRDDIMTrack, MEDIAN, kymo;
+		ROI, ALL, DELTA, FindLinesVia, MAXVAR, MINDIVERSITY, DARKTOBRIGHT, MINSIZE, MAXSIZE, SHOWMSER, FRAME, SHOWHOUGH, thresholdHough, DISPLAYBITIMG, DISPLAYWATERSHEDIMG, rhoPerPixel, thetaPerPixel, THIRDDIM, iniSearch, maxSearch, missedframes, THIRDDIMTrack, MEDIAN, kymo, SHOWMSERinHough;
 	}
 
 	public boolean isFinished = false;
@@ -693,6 +696,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		AllSeedrois = new ArrayList<OvalRoi>();
 		jpb = new JProgressBar();
 		UserchosenCostFunction = new SquareDistCostFunction();
+		newHoughtree = new ArrayList<MserTree<UnsignedByteType>>() ;
 		Userframe = new ArrayList<Indexedlength>();
 		AllpreviousRois = new HashMap<Integer, ArrayList<Roi>>();
 		Inispacing = 0.5 * Math.min(psf[0], psf[1]);
@@ -795,10 +799,10 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 			System.out.println("Current Time point: " + thirdDimension);
 
 			if (preprocessedimp == null)
-				preprocessedimp = ImageJFunctions.show(CurrentPreprocessedView);
+				preprocessedimp = ImageJFunctions.show(CurrentView);
 			else {
 				final float[] pixels = (float[]) preprocessedimp.getProcessor().getPixels();
-				final Cursor<FloatType> c = Views.iterable(CurrentPreprocessedView).cursor();
+				final Cursor<FloatType> c = Views.iterable(CurrentView).cursor();
 
 				for (int i = 0; i < pixels.length; ++i)
 					pixels[i] = c.next().get();
@@ -807,7 +811,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 			}
 
-			preprocessedimp.setTitle("Preprocessed image Current View in third dimension: " + " " + thirdDimension);
+			preprocessedimp.setTitle("Original image Current View in third dimension: " + " " + thirdDimension);
 		}
 
 		RoiManager roimanager = RoiManager.getInstance();
@@ -819,10 +823,10 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		if (change == ValueChange.THIRDDIMTrack) {
 
 			if (preprocessedimp == null)
-				preprocessedimp = ImageJFunctions.show(CurrentPreprocessedView);
+				preprocessedimp = ImageJFunctions.show(CurrentView);
 			else {
 				final float[] pixels = (float[]) preprocessedimp.getProcessor().getPixels();
-				final Cursor<FloatType> c = Views.iterable(CurrentPreprocessedView).cursor();
+				final Cursor<FloatType> c = Views.iterable(CurrentView).cursor();
 
 				for (int i = 0; i < pixels.length; ++i)
 					pixels[i] = c.next().get();
@@ -831,7 +835,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 			}
 
-			preprocessedimp.setTitle("Preprocessed image Current View in third dimension: " + " " + thirdDimension);
+			preprocessedimp.setTitle("Original image Current View in third dimension: " + " " + thirdDimension);
 
 			// check if Roi changed
 			System.out.println("Current Time point: " + thirdDimension);
@@ -839,7 +843,6 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 			long[] min = { (long) standardRectangle.getMinX(), (long) standardRectangle.getMinY() };
 			long[] max = { (long) standardRectangle.getMaxX(), (long) standardRectangle.getMaxY() };
 			interval = new FinalInterval(min, max);
-			final long Cannyradius = (long) (radiusfactor * Math.ceil(Math.sqrt(psf[0] * psf[0] + psf[1] * psf[1])));
 
 			currentimg = util.CopyUtils.extractImage(CurrentView, interval);
 			currentPreprocessedimg = util.CopyUtils.extractImage(CurrentPreprocessedView, interval);
@@ -872,8 +875,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 				long[] min = { (long) standardRectangle.getMinX(), (long) standardRectangle.getMinY() };
 				long[] max = { (long) standardRectangle.getMaxX(), (long) standardRectangle.getMaxY() };
 				interval = new FinalInterval(min, max);
-				final long Cannyradius = (long) (radiusfactor
-						* Math.ceil(Math.sqrt(psf[0] * psf[0] + psf[1] * psf[1])));
+				
 
 				currentimg = util.CopyUtils.extractImage(CurrentView, interval);
 				currentPreprocessedimg = util.CopyUtils.extractImage(CurrentPreprocessedView, interval);
@@ -906,8 +908,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 				long[] min = { (long) standardRectangle.getMinX(), (long) standardRectangle.getMinY() };
 				long[] max = { (long) standardRectangle.getMaxX(), (long) standardRectangle.getMaxY() };
 				interval = new FinalInterval(min, max);
-				final long Cannyradius = (long) (radiusfactor
-						* Math.ceil(Math.sqrt(psf[0] * psf[0] + psf[1] * psf[1])));
+				
 
 				currentimg = util.CopyUtils.extractImage(CurrentView, interval);
 				currentPreprocessedimg = util.CopyUtils.extractImage(CurrentPreprocessedView, interval);
@@ -928,6 +929,82 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		// Re-compute MSER ellipses if neccesary
 		ArrayList<EllipseRoi> Rois = new ArrayList<EllipseRoi>();
 
+		
+		
+		if (change == ValueChange.SHOWMSERinHough){
+			
+			long[] min = { (long) standardRectangle.getMinX(), (long) standardRectangle.getMinY() };
+			long[] max = { (long) standardRectangle.getMaxX(), (long) standardRectangle.getMaxY() };
+			interval = new FinalInterval(min, max);
+		currentimg = util.CopyUtils.extractImage(CurrentView, interval);
+		currentPreprocessedimg = util.CopyUtils.extractImage(CurrentPreprocessedView, interval);
+			
+			ArrayList<EllipseRoi> AllRois = new ArrayList<EllipseRoi>();
+			ArrayList<double[]> meanCovar = new ArrayList<double[]>();
+			if (count == 1)
+				startdim = thirdDimension;
+			for (int label = 1; label < Maxlabel - 1 ; label++) {
+				
+				
+				
+				Pair<RandomAccessibleInterval<FloatType>, FinalInterval> pair =  Boundingboxes.CurrentLabelImagepair(intimg, currentPreprocessedimg, label);
+				
+				RandomAccessibleInterval<FloatType> roiimg = pair.getA();
+				
+				
+				RandomAccessibleInterval<UnsignedByteType> newimg = util.CopyUtils.copytoByteImage(Kernels.CannyEdgeandMean(roiimg, Cannyradius), intimg,
+						standardRectangle, label);
+
+				MserTree<UnsignedByteType> newtree = MserTree.buildMserTree(newimg, delta, minSize, maxSize, maxVar, minDiversity, darktobright);
+				
+				Rois = util.DrawingUtils.getcurrentRois(newtree, meanCovar);
+				AllmeanCovar.addAll(meanCovar);
+				AllRois.addAll(Rois);
+				
+				newHoughtree.add(newtree);
+
+				
+				if (preprocessedimp != null) {
+
+				
+					
+					for (int index = 0; index < Rois.size(); ++index) {
+
+						EllipseRoi or = Rois.get(index);
+						or.setStrokeColor(colorDraw);
+						
+						
+						for (int i = 0; i < ClickedPoints.size(); ++i){
+						
+							if(or.contains((int)Math.round(ClickedPoints.get(i).getA()[0]), (int)Math.round(ClickedPoints.get(i).getA()[1])))
+								
+							or.setStrokeColor(colorCurrent);	
+							
+						}
+						
+						overlay.add(or);
+
+						
+						
+						roimanager.addRoi(or);
+
+						
+						
+						
+					}
+				}
+				
+				
+			}
+			
+					
+			
+			AllMSERrois.put(thirdDimension, AllRois);
+			count++;
+			
+			
+		}
+		
 		if (change == ValueChange.SHOWHOUGH) {
 			long[] min = { (long) standardRectangle.getMinX(), (long) standardRectangle.getMinY() };
 			long[] max = { (long) standardRectangle.getMaxX(), (long) standardRectangle.getMaxY() };
@@ -940,6 +1017,9 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 			newimg = util.CopyUtils.copytoByteImage(Kernels.CannyEdgeandMean(currentPreprocessedimg, Cannyradius),
 					standardRectangle);
 
+			
+			
+			
 			RandomAccessibleInterval<BitType> bitimg = new ArrayImgFactory<BitType>().create(newimg, new BitType());
 			GetLocalmaxmin.ThresholdingBit(newimg, bitimg, thresholdHough);
 
@@ -952,9 +1032,12 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 			WaterafterDisttransform.process();
 			intimg = WaterafterDisttransform.getResult();
 			Maxlabel = WaterafterDisttransform.GetMaxlabelsseeded(intimg);
+			
+			
 			if (displayWatershedimg)
 				ImageJFunctions.show(intimg);
 
+			
 			for (int i = 0; i < overlay.size(); ++i){
 	              if (overlay.get(i).getStrokeColor() == colorDraw || overlay.get(i).getStrokeColor() == colorCurrent
 	            		  || overlay.get(i).getStrokeColor() == colorUnselect){
@@ -962,8 +1045,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 					--i;
 	              }
 	              
-					}
-					
+					}	
 			
 		}
 
@@ -1648,6 +1730,24 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 		final Button Dowatershed = new Button("Do watershedding");
 		final Label Update = new Label("Update parameters for dynamic channel");
+		
+		final Scrollbar deltaS = new Scrollbar(Scrollbar.HORIZONTAL, deltaInit, 10, 0, 10 + scrollbarSize);
+		final Scrollbar maxVarS = new Scrollbar(Scrollbar.HORIZONTAL, maxVarInit, 10, 0, 10 + scrollbarSize);
+		final Scrollbar minDiversityS = new Scrollbar(Scrollbar.HORIZONTAL, minDiversityInit, 10, 0,
+				10 + scrollbarSize);
+		final Scrollbar minSizeS = new Scrollbar(Scrollbar.HORIZONTAL, minSizeInit, 10, 0, 10 + scrollbarSize);
+		final Scrollbar maxSizeS = new Scrollbar(Scrollbar.HORIZONTAL, maxSizeInit, 10, 0, 10 + scrollbarSize);
+
+		final Label deltaText = new Label("delta = " + delta, Label.CENTER);
+		final Label maxVarText = new Label("maxVar = " + maxVar, Label.CENTER);
+		final Label minDiversityText = new Label("minDiversity = " + minDiversity, Label.CENTER);
+		final Label minSizeText = new Label("MinSize = " + minSize, Label.CENTER);
+		final Label maxSizeText = new Label("MaxSize = " + maxSize, Label.CENTER);
+
+		final Checkbox min = new Checkbox("Look for Minima ", darktobright);
+
+		final Button ComputeTree = new Button("Compute Tree in each Watershed label and display");
+		
 		Update.setBackground(new Color(1, 0, 1));
 		Update.setForeground(new Color(255, 255, 255));
 		/* Location */
@@ -1680,7 +1780,80 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		++c.gridy;
 		c.insets = new Insets(10, 175, 0, 175);
 		panelFourth.add(Dowatershed, c);
+		++c.gridy;
+		panelFourth.add(deltaText, c);
 
+		++c.gridy;
+		panelFourth.add(deltaS, c);
+
+		++c.gridy;
+
+		panelFourth.add(maxVarText, c);
+
+		++c.gridy;
+		panelFourth.add(maxVarS, c);
+
+		++c.gridy;
+
+		panelFourth.add(minDiversityText, c);
+
+		++c.gridy;
+		panelFourth.add(minDiversityS, c);
+
+		++c.gridy;
+
+		panelFourth.add(minSizeText, c);
+
+		++c.gridy;
+		panelFourth.add(minSizeS, c);
+
+		++c.gridy;
+
+		panelFourth.add(maxSizeText, c);
+
+		++c.gridy;
+		panelFourth.add(maxSizeS, c);
+
+		++c.gridy;
+		c.insets = new Insets(10, 175, 0, 175);
+		panelFourth.add(min, c);
+
+		++c.gridy;
+		c.insets = new Insets(10, 175, 0, 175);
+		panelFourth.add(ComputeTree, c);
+
+		deltaS.addAdjustmentListener(new DeltaListener(this, deltaText, deltaMin, deltaMax, scrollbarSize, deltaS));
+
+		maxVarS.addAdjustmentListener(new MaxVarListener(this, maxVarText, maxVarMin, maxVarMax, scrollbarSize, maxVarS));
+
+		minDiversityS.addAdjustmentListener(new MinDiversityListener(this, minDiversityText, minDiversityMin, minDiversityMax,
+				scrollbarSize, minDiversityS));
+
+		minSizeS.addAdjustmentListener(
+				new MinSizeListener(this, minSizeText, minSizemin, minSizemax, scrollbarSize, minSizeS));
+
+		maxSizeS.addAdjustmentListener(
+				new MaxSizeListener(this, maxSizeText, maxSizemin, maxSizemax, scrollbarSize, maxSizeS));
+
+		min.addItemListener(new DarktobrightListener(this));
+		ComputeTree.addActionListener(new ComputeMserinHoughListener(this));
+
+		if (analyzekymo && Kymoimg != null) {
+
+			AnalyzekymoListener newkymo = new AnalyzekymoListener(this);
+			
+			newkymo.Kymo();
+		}
+
+		else{
+			
+			
+		
+			Deterministic();
+		}
+
+		
+	
 		threshold.addAdjustmentListener(new ThresholdHoughListener(this, thresholdText, thresholdHoughMin, thresholdHoughMax,
 				scrollbarSize, threshold));
 
@@ -2416,6 +2589,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		int indexmodel = 0;
 
 		gd.addChoice("Choose your model: ", LineModel, LineModel[indexmodel]);
+		
 		gd.addCheckbox("Do Gaussian Mask Fits", Domask);
 		gd.addCheckbox("Display rois:", displayoverlay);
 		gd.addTextAreas("Advanced Options for the optimizer", null, 1, 35);
@@ -2427,8 +2601,9 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		gd.showDialog();
 		indexmodel = gd.getNextChoiceIndex();
 		displayoverlay = gd.getNextBoolean();
+		
 		Domask = gd.getNextBoolean();
-
+         
 		if (indexmodel == 0)
 			userChoiceModel = UserChoiceModel.Line;
 		if (indexmodel == 1)

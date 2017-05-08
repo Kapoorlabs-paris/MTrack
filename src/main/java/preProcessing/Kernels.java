@@ -16,7 +16,6 @@ import net.imglib2.algorithm.region.hypersphere.HyperSphereCursor;
 import net.imglib2.img.Img;
 import net.imglib2.img.array.ArrayImgFactory;
 import net.imglib2.img.array.ArrayImgs;
-import net.imglib2.img.display.imagej.ImageJFunctions;
 import net.imglib2.type.numeric.complex.ComplexFloatType;
 import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.view.Views;
@@ -710,7 +709,7 @@ public static void addBackground(final IterableInterval<FloatType> iterable, fin
 		RandomAccessibleInterval<FloatType> gradientimg = new ArrayImgFactory<FloatType>().create(inputimg,
 				new FloatType());
 		Cursor<FloatType> cursor = Views.iterable(gradientimg).localizingCursor();
-		RandomAccessible<FloatType> view = Views.extendMirrorSingle(inputimg);
+		RandomAccessible<FloatType> view = Views.extendBorder(inputimg);
 		RandomAccess<FloatType> randomAccess = view.randomAccess();
 
 		// iterate over all pixels

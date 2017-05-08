@@ -143,6 +143,9 @@ public class SubpixelVelocityPCLine extends BenchmarkAlgorithm
 		linefinder.checkInput();
 		linefinder.process();
 		imgs = linefinder.getResult();
+		
+		
+		
 		this.source = source;
 		this.PrevFrameparamstart = PrevFrameparamstart;
 		this.PrevFrameparamend = PrevFrameparamend;

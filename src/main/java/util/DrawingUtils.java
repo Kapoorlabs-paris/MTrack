@@ -393,6 +393,55 @@ public class DrawingUtils {
 
 	}
 
+	
+	public static ArrayList<EllipseRoi> getcurrentRois(ArrayList<MserTree<UnsignedByteType>> newtree, ArrayList<double[]> AllmeanCovar) {
+
+		AllmeanCovar = new ArrayList<double[]>();
+		ArrayList<EllipseRoi> Allrois = new ArrayList<EllipseRoi>();
+
+		
+		for (int indexx = 0; indexx < newtree.size(); ++indexx){
+			
+		
+		final HashSet<Mser<UnsignedByteType>> rootset = newtree.get(indexx).roots();
+
+		
+		final Iterator<Mser<UnsignedByteType>> rootsetiterator = rootset.iterator();
+
+		
+
+		while (rootsetiterator.hasNext()) {
+
+			Mser<UnsignedByteType> rootmser = rootsetiterator.next();
+
+			if (rootmser.size() > 0) {
+
+				final double[] meanandcov = { rootmser.mean()[0], rootmser.mean()[1], rootmser.cov()[0],
+						rootmser.cov()[1], rootmser.cov()[2] };
+				AllmeanCovar.add(meanandcov);
+
+			}
+		}
+
+		// We do this so the ROI remains attached the the same label and is not
+		// changed if the program is run again
+		SortListbyproperty.sortpointList(AllmeanCovar);
+		for (int index = 0; index < AllmeanCovar.size(); ++index) {
+
+			final double[] mean = { AllmeanCovar.get(index)[0], AllmeanCovar.get(index)[1] };
+			final double[] covar = { AllmeanCovar.get(index)[2], AllmeanCovar.get(index)[3],
+					AllmeanCovar.get(index)[4] };
+
+			EllipseRoi roi = util.DrawingUtils.createEllipse(mean, covar, 3);
+
+			Allrois.add(roi);
+
+		}
+		}
+		return Allrois;
+
+	}
+	
 
 	public static OvalRoi getNearestRoisPair(ArrayList<Pair<double[], OvalRoi>> Allrois, double[] Clickedpoint) {
 		OvalRoi KDtreeroi = null;

@@ -90,6 +90,48 @@ public class CopyUtils {
 		return output;
 	}
 	
+	
+	
+	public static Img<UnsignedByteType> copytoByteImage(final RandomAccessibleInterval<FloatType> input, final FinalInterval standardInterval) {
+		// create a new Image with the same properties
+		// note that the input provides the size for the new image as it
+		// implements
+		// the Interval interface
+		RandomAccessibleInterval<FloatType> inputcopy = copyImage(input);
+		Normalize.normalize(Views.iterable(inputcopy), new FloatType(0), new FloatType(255));
+		
+		inputcopy = Views.interval(input, standardInterval);
+		final UnsignedByteType type = new UnsignedByteType();
+		final ImgFactory<UnsignedByteType> factory = net.imglib2.util.Util.getArrayOrCellImgFactory(input, type);
+		final Img<UnsignedByteType> output = factory.create(input, type);
+		// create a cursor for both images
+		RandomAccess<FloatType> ranac = inputcopy.randomAccess();
+		
+		
+		Cursor<UnsignedByteType> cursorOutput = output.cursor();
+
+		// iterate over the input
+		while (cursorOutput.hasNext()) {
+			// move both cursors forward by one pixel
+			cursorOutput.fwd();
+
+			int x = cursorOutput.getIntPosition(0);
+			int y = cursorOutput.getIntPosition(1);
+
+
+				ranac.setPosition(cursorOutput);
+
+				// set the value of this pixel of the output image to the same
+				// as
+				// the input,
+				// every Type supports T.set( T type )
+				cursorOutput.get().set((int) ranac.get().get());
+		}
+
+		// return the copy
+		return output;
+	}
+	
 	public static Img<UnsignedByteType> copytoByteImage(final RandomAccessibleInterval<FloatType> input, final RandomAccessibleInterval<IntType> intimg,
 			final Rectangle standardRectangle, int label) {
 		// create a new Image with the same properties
@@ -132,6 +174,10 @@ public class CopyUtils {
 		// return the copy
 		return output;
 	}
+	
+	
+	
+	
 	
 	
 	public static RandomAccessibleInterval<FloatType> extractImage(final RandomAccessibleInterval<FloatType> intervalView, final FinalInterval interval) {

@@ -128,7 +128,7 @@ public class LinefinderInteractiveHFMSER implements LinefinderHF{
 				
 	    		final double perimeter = ellipseroi.getLength();
 	    		final double smalleigenvalue = SmallerEigenvalue(mean, covar);
-	    		if (perimeter > 2 * Math.PI * minlength && smalleigenvalue < 30){
+	    	//	if (perimeter > 2 * Math.PI * minlength && smalleigenvalue < 30){
 	    			
 	    			Roiindex = count;
 	    			count++;
@@ -182,7 +182,7 @@ public class LinefinderInteractiveHFMSER implements LinefinderHF{
 				
 				output.add(currentOutput);
 				
-				}
+			//	}
 				
 			}
 
@@ -257,7 +257,7 @@ public class LinefinderInteractiveHFMSER implements LinefinderHF{
 	 *            (xx, xy, yy) components of covariance matrix
 	 * @return slope and intercept of the line along the major axis
 	 */
-	public  double SmallerEigenvalue( final double[] mean, final double[] cov){
+	public double SmallerEigenvalue( final double[] mean, final double[] cov){
 		
 		// For inifinite slope lines support is provided
 		final double a = cov[0];

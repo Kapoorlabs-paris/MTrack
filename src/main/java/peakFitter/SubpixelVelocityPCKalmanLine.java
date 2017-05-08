@@ -556,10 +556,10 @@ import preProcessing.GetLocalmaxmin;
 				final double[] inistartpos = { LMparam[0], LMparam[1] };
 				final double[] iniendpos = { LMparam[2], LMparam[3] };
 
-				double inicutoffdistance = Math.abs(inistartpos[1] - iniendpos[1]);
-
+				double inicutoffdistanceY = Math.abs(inistartpos[1] - iniendpos[1]);
+				double inicutoffdistanceX = Math.abs(inistartpos[0] - iniendpos[0]);
 				// LM solver part
-				if (inicutoffdistance > 0) {
+				if (inicutoffdistanceY > 0 && inicutoffdistanceX > 0)  {
 				// LM solver part
 
 				try {
