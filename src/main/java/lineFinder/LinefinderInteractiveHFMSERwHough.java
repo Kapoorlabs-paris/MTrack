@@ -43,7 +43,6 @@ public class LinefinderInteractiveHFMSERwHough implements LinefinderHF{
 	private final RandomAccessibleInterval<FloatType> source;
 	private final RandomAccessibleInterval<FloatType> Preprocessedsource;
 	private final int framenumber;
-	private final int minlength;
 	private ArrayList<CommonOutputHF> output;
 	final MserTree<UnsignedByteType> newtree;
 	private ArrayList<EllipseRoi> Allrois;
@@ -56,13 +55,12 @@ public class LinefinderInteractiveHFMSERwHough implements LinefinderHF{
 	public LinefinderInteractiveHFMSERwHough (final RandomAccessibleInterval<FloatType> source, 
 			final RandomAccessibleInterval<FloatType> Preprocessedsource, 
 			final MserTree<UnsignedByteType> newtree,
-			final int minlength, final int framenumber, final double thetaPerPixel,
+			 final int framenumber, final double thetaPerPixel,
 			final double rhoPerPixel){
 		
 		this.newtree = newtree;
 		this.source = source;
 		this.Preprocessedsource = Preprocessedsource;
-		this.minlength = minlength;
 		this.thetaPerPixel = thetaPerPixel;
 		this.rhoPerPixel = rhoPerPixel;
 		this.framenumber = framenumber;
@@ -128,7 +126,6 @@ public class LinefinderInteractiveHFMSERwHough implements LinefinderHF{
 				
 	    		final double perimeter = ellipseroi.getLength();
 	    		final double smalleigenvalue = SmallerEigenvalue(mean, covar);
-	    		if (perimeter > 2 * Math.PI * minlength && smalleigenvalue < 30){
 	    			
 	    			Roiindex = count;
 	    			count++;
@@ -191,7 +188,6 @@ public class LinefinderInteractiveHFMSERwHough implements LinefinderHF{
 				
 				}
 				
-			}
 
 		
 

@@ -44,7 +44,6 @@ public class LinefinderInteractiveHFMSER implements LinefinderHF{
 	private final RandomAccessibleInterval<FloatType> Preprocessedsource;
 	private final MserTree<UnsignedByteType> newtree;
 	private final int framenumber;
-	private final int minlength;
 	private ArrayList<CommonOutputHF> output;
 	private ArrayList<EllipseRoi> Allrois;
 	
@@ -54,12 +53,11 @@ public class LinefinderInteractiveHFMSER implements LinefinderHF{
 	private EllipseRoi ellipseroi;
 	public LinefinderInteractiveHFMSER (final RandomAccessibleInterval<FloatType> source, 
 			final RandomAccessibleInterval<FloatType> Preprocessedsource,
-			MserTree<UnsignedByteType> newtree, final int minlength, final int framenumber){
+			MserTree<UnsignedByteType> newtree,  final int framenumber){
 		
 		this.newtree = newtree;
 		this.source = source;
 		this.Preprocessedsource = Preprocessedsource;
-		this.minlength = minlength;
 		this.framenumber = framenumber;
 		ndims = source.numDimensions();
 	}

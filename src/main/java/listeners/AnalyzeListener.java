@@ -26,6 +26,8 @@ public class AnalyzeListener implements ActionListener {
 	@Override
 	public void actionPerformed(final ActionEvent arg0) {
 
+		// Needs to be fixed for analysis
+		int frametosec = 5;
 		if (parent.analyzekymo)
 			parent.numberKymo = true;
 
@@ -54,7 +56,7 @@ public class AnalyzeListener implements ActionListener {
 			velocity /= parent.endtime - parent.starttime;
 
 			float[] rates = { parent.starttime, parent.endtime, (float) velocity,
-					(float) (velocity * parent.calibration[0] / parent.frametosec) };
+					(float) (velocity * parent.calibration[0] / frametosec) };
 			parent.finalvelocityKymo.add(rates);
 
 			FileWriter vw;
@@ -173,7 +175,7 @@ public class AnalyzeListener implements ActionListener {
 
 		}
 
-		float[] rates = { parent.starttime, parent.endtime, (float) velocity, (float) (velocity * parent.calibration[0] / parent.frametosec),
+		float[] rates = { parent.starttime, parent.endtime, (float) velocity, (float) (velocity * parent.calibration[0] / frametosec),
 				parent.selectedSeed };
 		parent.finalvelocity.add(rates);
 

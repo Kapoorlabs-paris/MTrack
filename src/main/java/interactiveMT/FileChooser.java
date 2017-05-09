@@ -37,7 +37,7 @@ public class FileChooser extends JPanel {
 	JPanel panelCont = new JPanel();
 	JPanel panelIntro = new JPanel();
 	public FileChooser() {
-		final JFrame frame = new JFrame("Welcome to MT Tracker");
+		final JFrame frame = new JFrame("Welcome to MTV Tracker");
 		
 		panelCont.add(panelIntro, "1");
 		/* Instantiation */
@@ -73,9 +73,9 @@ public class FileChooser extends JPanel {
 		inputFieldY = new TextField();
 		inputFieldY.setColumns(10);
 
-		inputLabelT = new JLabel("Enter time frame to second conversion: ");
-		inputFieldT = new TextField();
-		inputFieldT.setColumns(2);
+	//	inputLabelT = new JLabel("Enter time frame to second conversion: ");
+	//	inputFieldT = new TextField();
+	//	inputFieldT.setColumns(2);
 
 		/* Location */
 
@@ -131,6 +131,7 @@ public class FileChooser extends JPanel {
 		c.insets = new Insets(10, 10, 10, 0);
 		panelIntro.add(inputFieldY, c);
 
+		/*
 		++c.gridy;
 		c.insets = new Insets(10, 10, 10, 0);
 		panelIntro.add(inputLabelT, c);
@@ -138,7 +139,8 @@ public class FileChooser extends JPanel {
 		++c.gridy;
 		c.insets = new Insets(10, 10, 10, 0);
 		panelIntro.add(inputFieldT, c);
-
+        */
+		
 		++c.gridy;
 		++c.gridy;
 		++c.gridy;
@@ -323,12 +325,12 @@ public class FileChooser extends JPanel {
 			Normalize.normalize(Views.iterable(originalPreprocessedimg), minval, maxval);
 			psf[0] = Float.parseFloat(inputFieldX.getText());
 			psf[1] = Float.parseFloat(inputFieldY.getText());
-			frametosec = Float.parseFloat(inputFieldT.getText());
+		//	frametosec = Float.parseFloat(inputFieldT.getText());
 
 			if (kymoimg!=null)
-			new Interactive_MTDoubleChannel(originalimg, originalPreprocessedimg, kymoimg, psf, calibration, 2, frametosec).run(null);
+			new Interactive_MTDoubleChannel(originalimg, originalPreprocessedimg, kymoimg, psf, calibration).run(null);
 			else
-			new Interactive_MTDoubleChannel(originalimg, originalPreprocessedimg, psf, calibration, 2, frametosec).run(null);	
+			new Interactive_MTDoubleChannel(originalimg, originalPreprocessedimg, psf, calibration).run(null);	
 			close(parent);
 		}
 	}

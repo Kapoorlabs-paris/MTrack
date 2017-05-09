@@ -6,12 +6,10 @@ import java.awt.CardLayout;
 import java.awt.Checkbox;
 import java.awt.CheckboxGroup;
 import java.awt.Color;
-import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Label;
 import java.awt.Rectangle;
@@ -27,73 +25,24 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.EnumMap;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
-import javax.swing.ComboBoxModel;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
-import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
-import javax.swing.SwingWorker;
-import javax.swing.UIManager;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.text.AttributeSet;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
-import javax.swing.text.PlainDocument;
-
-import org.jgrapht.graph.DefaultWeightedEdge;
-import org.jgrapht.graph.SimpleWeightedGraph;
-
 import LineModels.UseLineModel.UserChoiceModel;
 import MTObjects.MTcounter;
 import MTObjects.ResultsMT;
-import ch.qos.logback.core.rolling.helper.RollingCalendar;
-import costMatrix.CostFunction;
-import costMatrix.SquareDistCostFunction;
-import drawandOverlay.DisplayGraph;
-import drawandOverlay.DisplayGraphKalman;
-import drawandOverlay.DisplaysubGraphend;
-import drawandOverlay.DisplaysubGraphstart;
-import drawandOverlay.DisplaysubGraphstartKalman;
 import fiji.tool.SliceListener;
 import fiji.tool.SliceObserver;
-import graphconstructs.KalmanTrackproperties;
 import graphconstructs.Trackproperties;
-import houghandWatershed.SegmentbyWatershed;
 import houghandWatershed.WatershedDistimg;
 import ij.IJ;
 import ij.ImageJ;
@@ -101,34 +50,14 @@ import ij.ImagePlus;
 import ij.ImageStack;
 import ij.gui.EllipseRoi;
 import ij.gui.GenericDialog;
-import ij.gui.ImageCanvas;
-import ij.gui.Line;
 import ij.gui.OvalRoi;
 import ij.gui.Overlay;
-import ij.gui.PointRoi;
-import ij.gui.PolygonRoi;
 import ij.gui.Roi;
-import ij.io.Opener;
-import ij.measure.ResultsTable;
 import ij.plugin.PlugIn;
 import ij.plugin.frame.RoiManager;
 import ij.process.ColorProcessor;
-import ij.process.FloatProcessor;
-import interactiveMT.InteractiveKymoAnalyze.GetBaseCords;
-import interactiveMT.InteractiveKymoAnalyze.GetCords;
 import labeledObjects.CommonOutputHF;
 import labeledObjects.Indexedlength;
-import labeledObjects.KalmanIndexedlength;
-import labeledObjects.Shrink;
-import labeledObjects.Subgraphs;
-import labeledObjects.SubgraphsKalman;
-import lineFinder.FindlinesVia;
-import lineFinder.LinefinderInteractiveHFHough;
-import lineFinder.LinefinderInteractiveHFMSER;
-import lineFinder.LinefinderInteractiveHFMSERwHough;
-import lineFinder.LinefinderInteractiveHough;
-import lineFinder.LinefinderInteractiveMSER;
-import lineFinder.LinefinderInteractiveMSERwHough;
 import listeners.AcceptResultsListener;
 import listeners.AdvancedTrackerListener;
 import listeners.AnalyzekymoListener;
@@ -141,69 +70,41 @@ import listeners.DoMserSegmentation;
 import listeners.DoSegmentation;
 import listeners.DowatershedListener;
 import listeners.HoughListener;
-import listeners.MaxSearchradiusListener;
 import listeners.MaxSizeListener;
 import listeners.Unstability_ScoreListener;
 import listeners.MinDiversityListener;
 import listeners.MinSizeListener;
-import listeners.MissedFrameListener;
 import listeners.MserListener;
 import listeners.MserwHoughListener;
-import listeners.SearchradiusListener;
 import listeners.ShowBitimgListener;
 import listeners.ShowwatershedimgListener;
 import listeners.SkipFramesandTrackendsListener;
 import listeners.ThresholdHoughListener;
 import listeners.TrackendsListener;
 
-import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFCellStyle;
-import org.apache.poi.hssf.usermodel.HSSFDataFormat;
-import org.apache.poi.hssf.usermodel.HSSFFont;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import mpicbg.imglib.multithreading.SimpleMultiThreading;
 import mpicbg.imglib.util.Util;
 import net.imglib2.Cursor;
 import net.imglib2.FinalInterval;
-import net.imglib2.Interval;
-import net.imglib2.RandomAccess;
 import net.imglib2.RandomAccessibleInterval;
-import net.imglib2.algorithm.componenttree.mser.Mser;
 import net.imglib2.algorithm.componenttree.mser.MserTree;
-import net.imglib2.algorithm.stats.Normalize;
-import net.imglib2.img.ImagePlusAdapter;
-import net.imglib2.img.Img;
-import net.imglib2.img.ImgFactory;
 import net.imglib2.img.array.ArrayImgFactory;
 import net.imglib2.img.display.imagej.ImageJFunctions;
-import net.imglib2.img.imageplus.FloatImagePlus;
-import net.imglib2.type.Type;
 import net.imglib2.type.logic.BitType;
 import net.imglib2.type.numeric.integer.IntType;
 import net.imglib2.type.numeric.integer.UnsignedByteType;
 import net.imglib2.type.numeric.real.FloatType;
-import net.imglib2.util.Intervals;
 import net.imglib2.util.Pair;
-import net.imglib2.util.ValuePair;
 import net.imglib2.view.Views;
-import peakFitter.SortListbyproperty;
 import preProcessing.GetLocalmaxmin;
 import preProcessing.Kernels;
 import preProcessing.MedianFilter2D;
-import sun.tools.java.AmbiguousMember;
-import swingClasses.ProgressTrack;
-import trackerType.KFsearch;
 import trackerType.MTTracker;
-import trackerType.TrackModel;
 import updateListeners.DefaultModelHF;
 import updateListeners.FinalPoint;
 import updateListeners.MoveNextListener;
 import updateListeners.MoveToFrameListener;
 import util.Boundingboxes;
-import velocityanalyser.Trackend;
-import velocityanalyser.Trackstart;
 
 /**
  * An interactive tool for MT tracking using MSER and Hough Transform
@@ -291,7 +192,6 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public JLabel inputMaxdmicro;
 	public TextField Maxdpixel;
 	private TextField Maxdmicro;
-	public float frametosec;
 
 	public int minDiversityInit = 1;
 
@@ -331,7 +231,6 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public boolean ShowHough = false;
 	public boolean update = false;
 	public boolean Canny = false;
-	public boolean showKalman = false;
 	public boolean showDeterministic = true;
 	public boolean RoisViaMSER = false;
 	public boolean RoisViaWatershed = false;
@@ -358,7 +257,6 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public ArrayList<MTcounter> ALLcounts = new ArrayList<MTcounter>();
 	public MTTracker MTtrackerstart;
 	public MTTracker MTtrackerend;
-	public CostFunction<KalmanTrackproperties, KalmanTrackproperties> UserchosenCostFunction;
 
 	public float initialSearchradius = 20;
 	public int starttime = 0;
@@ -366,7 +264,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public float maxSearchradius = 15;
 	public int missedframes = 5;
 	public int maxghost = 1;
-	public int initialSearchradiusInit = 200;
+	public int initialSearchradiusInit = 20;
 	public float initialSearchradiusMin = 0;
 	public float initialSearchradiusMax = 100;
 
@@ -378,7 +276,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public float maxSearchradiusMax = 500;
 
 	public int missedframesInit = missedframes;
-	public float missedframesMin = 10;
+	public float missedframesMin = 0;
 	public float missedframesMax = 100;
 	public Overlay overlay;
 	public HashMap<Integer, Boolean> whichend = new HashMap<Integer, Boolean>();
@@ -394,8 +292,6 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public ArrayList<ResultsMT> userlengthlist = new ArrayList<ResultsMT>();
 	public ArrayList<ResultsMT> endlengthlist = new ArrayList<ResultsMT>();
 
-	public ArrayList<ArrayList<KalmanTrackproperties>> AllstartKalman = new ArrayList<ArrayList<KalmanTrackproperties>>();
-	public ArrayList<ArrayList<KalmanTrackproperties>> AllendKalman = new ArrayList<ArrayList<KalmanTrackproperties>>();
 	public int channel = 0;
 	public int thirdDimensionSize;
 	public int thirdDimensionSizeOriginal;
@@ -425,7 +321,6 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public ImagePlus preprocessedimp;
 	public double[] psf;
 	public int count, startdim;
-	public int minlength;
 	public int Maxlabel;
 	public int ndims;
 	public Overlay overlaysec;
@@ -440,9 +335,6 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public Pair<Pair<ArrayList<Trackproperties>, ArrayList<Trackproperties>>, Pair<ArrayList<Indexedlength>, ArrayList<Indexedlength>>> returnVector;
 	public Pair<ArrayList<Trackproperties>, ArrayList<Indexedlength>> returnVectorUser;
 
-	public Pair<ArrayList<KalmanIndexedlength>, ArrayList<KalmanIndexedlength>> PrevFrameparamKalman;
-	public Pair<ArrayList<KalmanIndexedlength>, ArrayList<KalmanIndexedlength>> NewFrameparamKalman;
-	public Pair<Pair<ArrayList<KalmanTrackproperties>, ArrayList<KalmanTrackproperties>>, Pair<ArrayList<KalmanIndexedlength>, ArrayList<KalmanIndexedlength>>> returnVectorKalman;
 	public NumberFormat nf = NumberFormat.getInstance(Locale.ENGLISH);
 	public ArrayList<CommonOutputHF> output;
 	public ImageStack prestack;
@@ -658,14 +550,12 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 	public Interactive_MTDoubleChannel(final RandomAccessibleInterval<FloatType> originalimg,
 			final RandomAccessibleInterval<FloatType> originalPreprocessedimg, final double[] psf,
-			final double[] imgCal, final int minlength, final float frametosec) {
+			final double[] imgCal) {
 
 		this.originalimg = originalimg;
 		this.originalPreprocessedimg = originalPreprocessedimg;
 		this.psf = psf;
 		this.Kymoimg = null;
-		this.minlength = minlength;
-		this.frametosec = frametosec;
 		standardRectangle = new Rectangle(inix, iniy, (int) originalimg.dimension(0) - 2 * inix,
 				(int) originalimg.dimension(1) - 2 * iniy);
 		imp = ImageJFunctions.show(originalimg);
@@ -678,15 +568,12 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 	public Interactive_MTDoubleChannel(final RandomAccessibleInterval<FloatType> originalimg,
 			final RandomAccessibleInterval<FloatType> originalPreprocessedimg,
-			final RandomAccessibleInterval<FloatType> kymoimg, final double[] psf, final double[] imgCal,
-			final int minlength, final float frametosec) {
+			final RandomAccessibleInterval<FloatType> kymoimg, final double[] psf, final double[] imgCal) {
 
 		this.originalimg = originalimg;
 		this.originalPreprocessedimg = originalPreprocessedimg;
 		this.Kymoimg = kymoimg;
 		this.psf = psf;
-		this.minlength = minlength;
-		this.frametosec = frametosec;
 		standardRectangle = new Rectangle(inix, iniy, (int) originalimg.dimension(0) - 2 * inix,
 				(int) originalimg.dimension(1) - 2 * iniy);
 		imp = ImageJFunctions.show(originalimg);
@@ -702,7 +589,6 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 		AllSeedrois = new ArrayList<OvalRoi>();
 		jpb = new JProgressBar();
-		UserchosenCostFunction = new SquareDistCostFunction();
 		newHoughtree = new HashMap<Integer, MserTree<UnsignedByteType>>();
 		Userframe = new ArrayList<Indexedlength>();
 		AllpreviousRois = new HashMap<Integer, ArrayList<Roi>>();
@@ -716,6 +602,10 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		setInitialthetaPerPixel(thetaPerPixelInit);
 		setInitialthresholdHough(thresholdHoughInit);
 		setInitialminDiversity(minDiversityInit);
+		
+		setInitialsearchradius(initialSearchradiusInit);
+		setInitialmaxsearchradius(maxSearchradius);
+		
 		Cannyradius = (long) (radiusfactor * Math.ceil(Math.sqrt(psf[0] * psf[0] + psf[1] * psf[1])));
 		if (originalimg.numDimensions() < 3) {
 
@@ -1333,20 +1223,13 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		ORText.setBackground(new Color(1, 0, 1));
 		ORText.setForeground(new Color(255, 255, 255));
 
-		final Label LeftClick = new Label("Mouse left click deselects the seed end to be tracked.");
+		final Label LeftClick = new Label("Left click deselects an end, Shift + left click selects a deselected end, Shift + Alt + left click marks a user defined seed.");
 
-		final Label ShiftLeft = new Label("Shift + Mouse left click selects a deselected end.");
-
-		final Label ShiftAltLeft = new Label("Shift + Alt + Mouse left click marks a user defined seed.");
 
 		LeftClick.setBackground(new Color(1, 0, 1));
 		LeftClick.setForeground(new Color(255, 255, 255));
 
-		ShiftLeft.setBackground(new Color(1, 0, 1));
-		ShiftLeft.setForeground(new Color(255, 255, 255));
-
-		ShiftAltLeft.setBackground(new Color(1, 0, 1));
-		ShiftAltLeft.setForeground(new Color(255, 255, 255));
+		
 
 		final Checkbox Finalize = new Checkbox("Confirm the dynamic seed end(s)");
 
@@ -1374,13 +1257,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		++c.gridy;
 		c.insets = new Insets(10, 10, 0, 0);
 		panelThird.add(LeftClick, c);
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 0);
-		panelThird.add(ShiftLeft, c);
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 0);
-		panelThird.add(ShiftAltLeft, c);
-
+		
 		++c.gridy;
 		c.insets = new Insets(10, 10, 0, 0);
 		panelThird.add(MTTextHF, c);
@@ -1514,11 +1391,16 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		final Button SkipframeandTrackEndPoints = new Button("TrackEndPoint (User specified first and last timepoint)");
 		final Button CheckResults = new Button("Check Results (then click next)");
 		final Checkbox RoughResults = new Checkbox("Rates and Statistical Analysis");
+		final Checkbox AdvancedOptions = new Checkbox("Advanced Optimizer Options ", AdvancedChoice);
 
 		final Label Checkres = new Label("The tracker now performs an internal check on the results");
 		Checkres.setBackground(new Color(1, 0, 1));
 		Checkres.setForeground(new Color(255, 255, 255));
-
+		
+		++c.gridy;
+		c.insets = new Insets(10, 175, 0, 175);
+		panelFifth.add(AdvancedOptions, c);
+		
 		++c.gridy;
 		c.insets = new Insets(10, 10, 0, 175);
 		panelFifth.add(TrackEndPoints, c);
@@ -1545,120 +1427,15 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		SkipframeandTrackEndPoints.addActionListener(new SkipFramesandTrackendsListener(this));
 		CheckResults.addActionListener(new CheckResultsListener(this));
 		RoughResults.addItemListener(new AcceptResultsListener(this));
-		panelFifth.repaint();
-		panelFifth.revalidate();
-		Cardframe.pack();
-
-	}
-
-	public void Kalman() {
-
-		showKalman = true;
-		final GridBagLayout layout = new GridBagLayout();
-		final GridBagConstraints c = new GridBagConstraints();
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.gridx = 0;
-		c.gridy = 0;
-		c.weightx = 1;
-
-		panelFifth.removeAll();
-		final Label Step5 = new Label("Step 5", Label.CENTER);
-		panelFifth.setLayout(layout);
-		panelFifth.add(Step5, c);
-		final Scrollbar rad = new Scrollbar(Scrollbar.HORIZONTAL, initialSearchradiusInit, 10, 0, 10 + scrollbarSize);
-		initialSearchradius = computeValueFromScrollbarPosition(initialSearchradiusInit, initialSearchradiusMin,
-				initialSearchradiusMax, scrollbarSize);
-
-		final Label SearchText = new Label("Initial Search Radius: " + initialSearchradius, Label.CENTER);
-
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 50);
-		panelFifth.add(SearchText, c);
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 50);
-		panelFifth.add(rad, c);
-
-		final Scrollbar Maxrad = new Scrollbar(Scrollbar.HORIZONTAL, maxSearchradiusInit, 10, 0, 10 + scrollbarSize);
-		maxSearchradius = computeValueFromScrollbarPosition(maxSearchradiusInit, maxSearchradiusMin, maxSearchradiusMax,
-				scrollbarSize);
-		final Label MaxMovText = new Label("Max Movment of Objects per frame: " + maxSearchradius, Label.CENTER);
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 50);
-		panelFifth.add(MaxMovText, c);
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 50);
-		panelFifth.add(Maxrad, c);
-
-		final Scrollbar Miss = new Scrollbar(Scrollbar.HORIZONTAL, missedframesInit, 10, 0, 10 + scrollbarSize);
-		Miss.setBlockIncrement(1);
-		missedframes = (int) computeValueFromScrollbarPosition(missedframesInit, missedframesMin, missedframesMax,
-				scrollbarSize);
-		final Label LostText = new Label("Objects allowed to be lost for #frames" + missedframes, Label.CENTER);
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 50);
-		panelFifth.add(LostText, c);
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 50);
-		panelFifth.add(Miss, c);
-
-		// final Checkbox Costfunc = new Checkbox("Squared Distance Cost
-		// Function");
-		// ++c.gridy;
-		// c.insets = new Insets(10, 10, 0, 50);
-		// panelFifth.add(Costfunc, c);
-
-		rad.addAdjustmentListener(
-				new SearchradiusListener(this, SearchText, initialSearchradiusMin, initialSearchradiusMax));
-		Maxrad.addAdjustmentListener(
-				new MaxSearchradiusListener(this, MaxMovText, maxSearchradiusMin, maxSearchradiusMax));
-		Miss.addAdjustmentListener(new MissedFrameListener(this, LostText, missedframesMin, missedframesMax));
-
-		// Costfunc.addItemListener(new CostfunctionListener());
-
-		MTtrackerstart = new KFsearch(AllstartKalman, UserchosenCostFunction, maxSearchradius, initialSearchradius,
-				thirdDimension, thirdDimensionSize, missedframes);
-
-		MTtrackerend = new KFsearch(AllendKalman, UserchosenCostFunction, maxSearchradius, initialSearchradius,
-				thirdDimension, thirdDimensionSize, missedframes);
-
-		final Button TrackEndPoints = new Button("Track EndPoints (From first to a chosen last frame)");
-		final Button SkipframeandTrackEndPoints = new Button("TrackEndPoint (User specified first and last frame)");
-		final Button CheckResults = new Button("Check Results (then click next)");
-		final Checkbox RoughResults = new Checkbox("Analyze Rates");
-		final Label Checkres = new Label("The tracker now performs an internal check on the results");
-		Checkres.setBackground(new Color(1, 0, 1));
-		Checkres.setForeground(new Color(255, 255, 255));
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 175);
-		panelFifth.add(TrackEndPoints, c);
-
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 175);
-		panelFifth.add(SkipframeandTrackEndPoints, c);
-		if (analyzekymo && Kymoimg != null) {
-			++c.gridy;
-			c.insets = new Insets(10, 10, 0, 0);
-			panelFifth.add(Checkres, c);
-
-			++c.gridy;
-			c.insets = new Insets(10, 175, 0, 175);
-			panelFifth.add(CheckResults, c);
-		}
-/*	
-		++c.gridy;
-		c.insets = new Insets(10, 175, 0, 175);
-		panelFifth.add(RoughResults, c);
-*/
-		TrackEndPoints.addActionListener(new TrackendsListener(this));
-		SkipframeandTrackEndPoints.addActionListener(new SkipFramesandTrackendsListener(this));
-		CheckResults.addActionListener(new CheckResultsListener(this));
-		RoughResults.addItemListener(new AcceptResultsListener(this));
+		AdvancedOptions.addItemListener(new AdvancedTrackerListener(this));
 
 		panelFifth.repaint();
 		panelFifth.validate();
 		Cardframe.pack();
 
 	}
+
+	
 
 	public void UpdateHough() {
 
@@ -1820,47 +1597,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		else {
 
 
-			final Button TrackEndPoints = new Button("Track EndPoints (From first to a chosen last timepoint)");
-			final Button SkipframeandTrackEndPoints = new Button("TrackEndPoint (User specified first and last timepoint)");
-			final Button CheckResults = new Button("Check Results (then click next)");
-			final Checkbox RoughResults = new Checkbox("Rates and Statistical Analysis");
-			final Checkbox AdvancedOptions = new Checkbox("Advanced Optimizer Options ", AdvancedChoice);
-
-			final Label Checkres = new Label("The tracker now performs an internal check on the results");
-			Checkres.setBackground(new Color(1, 0, 1));
-			Checkres.setForeground(new Color(255, 255, 255));
-			++c.gridy;
-			c.insets = new Insets(10, 175, 0, 175);
-			panelFourth.add(AdvancedOptions, c);
-			
-			++c.gridy;
-			c.insets = new Insets(10, 10, 0, 175);
-			panelFourth.add(TrackEndPoints, c);
-
-			++c.gridy;
-			c.insets = new Insets(10, 10, 0, 175);
-			panelFourth.add(SkipframeandTrackEndPoints, c);
-			if (analyzekymo && Kymoimg != null) {
-				++c.gridy;
-				c.insets = new Insets(10, 10, 0, 0);
-				panelFourth.add(Checkres, c);
-
-				++c.gridy;
-				c.insets = new Insets(10, 175, 0, 175);
-				panelFourth.add(CheckResults, c);
-			}
-/*			++c.gridy;
-			c.insets = new Insets(10, 10, 0, 175);
-			panelFourth.add(RoughResults, c);
-*/
-			
-		
-			TrackEndPoints.addActionListener(new TrackendsListener(this));
-			SkipframeandTrackEndPoints.addActionListener(new SkipFramesandTrackendsListener(this));
-			CheckResults.addActionListener(new CheckResultsListener(this));
-			AdvancedOptions.addItemListener(new AdvancedTrackerListener(this));
-			
-			RoughResults.addItemListener(new AcceptResultsListener(this));
+			Deterministic();
 		}
 
 		threshold.addAdjustmentListener(new ThresholdHoughListener(this, thresholdText, thresholdHoughMin,
@@ -1988,49 +1725,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 		else {
 
-
-			final Button TrackEndPoints = new Button("Track EndPoints (From first to a chosen last timepoint)");
-			final Button SkipframeandTrackEndPoints = new Button("TrackEndPoint (User specified first and last timepoint)");
-			final Button CheckResults = new Button("Check Results (then click next)");
-			final Checkbox RoughResults = new Checkbox("Rates and Statistical Analysis");
-			final Checkbox AdvancedOptions = new Checkbox("Advanced Optimizer Options ", AdvancedChoice);
-
-			final Label Checkres = new Label("The tracker now performs an internal check on the results");
-			Checkres.setBackground(new Color(1, 0, 1));
-			Checkres.setForeground(new Color(255, 255, 255));
-			++c.gridy;
-			c.insets = new Insets(10, 175, 0, 175);
-			panelFourth.add(AdvancedOptions, c);
-			
-			++c.gridy;
-			c.insets = new Insets(10, 10, 0, 175);
-			panelFourth.add(TrackEndPoints, c);
-
-			++c.gridy;
-			c.insets = new Insets(10, 10, 0, 175);
-			panelFourth.add(SkipframeandTrackEndPoints, c);
-			if (analyzekymo && Kymoimg != null) {
-				++c.gridy;
-				c.insets = new Insets(10, 10, 0, 0);
-				panelFourth.add(Checkres, c);
-
-				++c.gridy;
-				c.insets = new Insets(10, 175, 0, 175);
-				panelFourth.add(CheckResults, c);
-			}
-/*			++c.gridy;
-			c.insets = new Insets(10, 10, 0, 175);
-			panelFourth.add(RoughResults, c);
-*/
-			
-			
-			
-			TrackEndPoints.addActionListener(new TrackendsListener(this));
-			SkipframeandTrackEndPoints.addActionListener(new SkipFramesandTrackendsListener(this));
-			CheckResults.addActionListener(new CheckResultsListener(this));
-			AdvancedOptions.addItemListener(new AdvancedTrackerListener(this));
-			
-			RoughResults.addItemListener(new AcceptResultsListener(this));
+               Deterministic();
 		}
 
 		panelFourth.validate();
@@ -2137,19 +1832,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 	}
 
-	protected class ShowKalman implements ItemListener {
-
-		@Override
-		public void itemStateChanged(ItemEvent arg0) {
-			if (arg0.getStateChange() == ItemEvent.DESELECTED)
-				showKalman = false;
-
-			else if (arg0.getStateChange() == ItemEvent.SELECTED)
-				showKalman = true;
-
-		}
-
-	}
+	
 
 	public boolean DialogueAnalysis() {
 

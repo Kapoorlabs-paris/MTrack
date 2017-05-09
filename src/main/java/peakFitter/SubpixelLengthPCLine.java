@@ -48,7 +48,6 @@ implements OutputAlgorithm<Pair<ArrayList<Indexedlength>, ArrayList<Indexedlengt
 	private ArrayList<Indexedlength> startlist;
 	private ArrayList<Indexedlength> endlist;
 	private final double[] psf;
-	private final int minlength;
 	private final int framenumber;
 	private final boolean DoMask;
 	private final UserChoiceModel model;
@@ -155,10 +154,7 @@ implements OutputAlgorithm<Pair<ArrayList<Indexedlength>, ArrayList<Indexedlengt
     public int getMaxiter() {
 		return maxiter;
 	}
-    
-    public int getMinlength() {
-		return minlength;
-	}
+  
     
     public double getLambda() {
 		return lambda;
@@ -179,7 +175,7 @@ implements OutputAlgorithm<Pair<ArrayList<Indexedlength>, ArrayList<Indexedlengt
 	public SubpixelLengthPCLine( final RandomAccessibleInterval<FloatType> source, 
 			             final Linefinder finder,
 			             final double[] psf,
-			             final int minlength,
+			            
 			             final UserChoiceModel model,
 			             final int framenumber, 
 			             final boolean DoMask,
@@ -190,7 +186,6 @@ implements OutputAlgorithm<Pair<ArrayList<Indexedlength>, ArrayList<Indexedlengt
 		imgs = finder.getResult();
 		this.source = source;
 		this.psf = psf;
-		this.minlength = minlength;
 		this.framenumber = framenumber;
 		this.model = model;
 		this.DoMask = DoMask;
@@ -228,7 +223,7 @@ implements OutputAlgorithm<Pair<ArrayList<Indexedlength>, ArrayList<Indexedlengt
 			final double Curvature = imgs.get(index).lineparam[2];
 			final double Inflection = imgs.get(index).lineparam[3];
 			if ( slope!= Double.MAX_VALUE && intercept!= Double.MAX_VALUE){
-			final Pair<Indexedlength, Indexedlength> returnparam = Getfinallineparam(Label, slope, intercept, Curvature, Inflection, psf, minlength);
+			final Pair<Indexedlength, Indexedlength> returnparam = Getfinallineparam(Label, slope, intercept, Curvature, Inflection, psf);
 			if (returnparam!= null ){
 			startlist.add(returnparam.getA());
 			endlist.add(returnparam.getB());
@@ -410,8 +405,7 @@ public ArrayList<Indexedlength> getEndPoints(){
 	
 	// Get line parameters for fitting line to a line in a label
 
-		public Pair<Indexedlength, Indexedlength> Getfinallineparam(final int label, final double slope, final double intercept, final double Curvature, final double Inflection, final double[] psf,
-				final double minlength)  {
+		public Pair<Indexedlength, Indexedlength> Getfinallineparam(final int label, final double slope, final double intercept, final double Curvature, final double Inflection, final double[] psf)  {
 
 			PointSampleList<FloatType> datalist = gatherfullData(label);
 			if (datalist!= null){

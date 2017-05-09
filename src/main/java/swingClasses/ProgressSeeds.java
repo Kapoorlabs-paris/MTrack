@@ -49,9 +49,9 @@ final Interactive_MTDoubleChannel parent;
 		
 				// updatePreview(ValueChange.SHOWMSER);
 				LinefinderInteractiveMSER newlineMser = new LinefinderInteractiveMSER(groundframe, groundframepre,
-						parent.newtree,parent.minlength, parent.thirdDimension);
+						parent.newtree, parent.thirdDimension);
 
-				parent.PrevFrameparam = FindlinesVia.LinefindingMethod(groundframe, groundframepre, parent.minlength,
+				parent.PrevFrameparam = FindlinesVia.LinefindingMethod(groundframe, groundframepre,
 						parent.thirdDimension, parent.psf, newlineMser, UserChoiceModel.Line, parent.Domask, parent.Intensityratio, parent.Inispacing,
 						parent.jpb);
 				IJ.log("MSER parameters:" + " " + " thirdDimension: " + " " + parent.thirdDimension);
@@ -71,7 +71,7 @@ final Interactive_MTDoubleChannel parent;
 				LinefinderInteractiveHough newlineHough = new LinefinderInteractiveHough(groundframe,
 						groundframepre, parent.intimg, parent.Maxlabel, parent.thetaPerPixel, parent.rhoPerPixel, parent.thirdDimension, parent.jpb);
 
-				parent.PrevFrameparam = FindlinesVia.LinefindingMethod(groundframe, groundframepre, parent.minlength,
+				parent.PrevFrameparam = FindlinesVia.LinefindingMethod(groundframe, groundframepre,
 						parent.thirdDimension, parent.psf, newlineHough, UserChoiceModel.Line, parent.Domask, parent.Intensityratio, parent.Inispacing,
 						parent.jpb);
 				IJ.log("Hough parameters:" + " " + " thirdDimension: " + " " + parent.thirdDimension);
@@ -86,7 +86,7 @@ final Interactive_MTDoubleChannel parent;
 			
 				// updatePreview(ValueChange.SHOWMSER);
 				LinefinderInteractiveMSERwHough newlineMserwHough = new LinefinderInteractiveMSERwHough(groundframe,
-						groundframepre, parent.newtree, parent.minlength, parent.thirdDimension, parent.thetaPerPixel, parent.rhoPerPixel);
+						groundframepre, parent.newtree, parent.thirdDimension, parent.thetaPerPixel, parent.rhoPerPixel);
 				IJ.log("MSER parameters:" + " " + " thirdDimension: " + " " + parent.thirdDimension);
 				IJ.log("Delta " + " " + parent.delta + " " + "minSize " + " " + parent.minSize + " " + "maxSize " + " " + parent.maxSize
 						+ " " + " Unstability_Score " + " " + parent.Unstability_Score + " " + "minDIversity " + " " + parent.minDiversity);
@@ -94,7 +94,7 @@ final Interactive_MTDoubleChannel parent;
 				IJ.log("thetaPerPixel " + " " + parent.thetaPerPixel + " " + "rhoPerPixel " + " " + parent.rhoPerPixel);
 				IJ.log("Optimization Parameters: " + "R" + parent.Intensityratio + " G"
 						+ parent.Inispacing / Math.min(parent.psf[0], parent.psf[1]));
-				parent.PrevFrameparam = FindlinesVia.LinefindingMethod(groundframe, groundframepre, parent.minlength,
+				parent.PrevFrameparam = FindlinesVia.LinefindingMethod(groundframe, groundframepre,
 						parent.thirdDimension, parent.psf, newlineMserwHough, UserChoiceModel.Line, parent.Domask, parent.Intensityratio,
 						parent.Inispacing, parent.jpb);
 
@@ -102,43 +102,9 @@ final Interactive_MTDoubleChannel parent;
 
 		}
 
-		ArrayList<KalmanIndexedlength> start = new ArrayList<KalmanIndexedlength>();
-		ArrayList<KalmanIndexedlength> end = new ArrayList<KalmanIndexedlength>();
+	
 
-		for (int index = 0; index < parent.PrevFrameparam.getA().size(); ++index) {
-
-			double dx = parent.PrevFrameparam.getA().get(index).ds / Math
-					.sqrt(1 + parent.PrevFrameparam.getA().get(index).slope * parent.PrevFrameparam.getA().get(index).slope);
-			double dy = parent.PrevFrameparam.getA().get(index).slope * dx;
-
-			KalmanIndexedlength startPart = new KalmanIndexedlength(parent.PrevFrameparam.getA().get(index).currentLabel,
-					parent.PrevFrameparam.getA().get(index).seedLabel, parent.PrevFrameparam.getA().get(index).framenumber,
-					parent.PrevFrameparam.getA().get(index).ds, parent.PrevFrameparam.getA().get(index).lineintensity,
-					parent.PrevFrameparam.getA().get(index).background, parent.PrevFrameparam.getA().get(index).currentpos,
-					parent.PrevFrameparam.getA().get(index).fixedpos, parent.PrevFrameparam.getA().get(index).slope,
-					parent.PrevFrameparam.getA().get(index).intercept, parent.PrevFrameparam.getA().get(index).slope,
-					parent.PrevFrameparam.getA().get(index).intercept, 0, 0, new double[] { dx, dy });
-
-			start.add(startPart);
-		}
-		for (int index = 0; index < parent.PrevFrameparam.getB().size(); ++index) {
-
-			double dx = parent.PrevFrameparam.getB().get(index).ds / Math
-					.sqrt(1 + parent.PrevFrameparam.getB().get(index).slope * parent.PrevFrameparam.getB().get(index).slope);
-			double dy = parent.PrevFrameparam.getB().get(index).slope * dx;
-
-			KalmanIndexedlength endPart = new KalmanIndexedlength(parent.PrevFrameparam.getB().get(index).currentLabel,
-					parent.PrevFrameparam.getB().get(index).seedLabel, parent.PrevFrameparam.getB().get(index).framenumber,
-					parent.PrevFrameparam.getB().get(index).ds, parent.PrevFrameparam.getB().get(index).lineintensity,
-					parent.PrevFrameparam.getB().get(index).background, parent.PrevFrameparam.getB().get(index).currentpos,
-					parent.PrevFrameparam.getB().get(index).fixedpos, parent.PrevFrameparam.getB().get(index).slope,
-					parent.PrevFrameparam.getB().get(index).intercept, parent.PrevFrameparam.getB().get(index).slope,
-					parent.PrevFrameparam.getB().get(index).intercept, 0, 0, new double[] { dx, dy });
-			end.add(endPart);
-		}
-
-		parent.PrevFrameparamKalman = new ValuePair<ArrayList<KalmanIndexedlength>, ArrayList<KalmanIndexedlength>>(start,
-				end);
+	
 
 		Overlay o = parent.preprocessedimp.getOverlay();
 

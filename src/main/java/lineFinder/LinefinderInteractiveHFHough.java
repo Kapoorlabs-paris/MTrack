@@ -112,7 +112,7 @@ public class LinefinderInteractiveHFHough implements LinefinderHF {
 			
 			MserTree<UnsignedByteType> tree = parent.newHoughtree.get(label);
 			LinefinderInteractiveHFMSER newlineMser = new LinefinderInteractiveHFMSER(ActualRoiimg, roiimg,
-					tree, parent.minlength, parent.thirdDimension);
+					tree, parent.thirdDimension);
 			newlineMser.process();
 			outputcurr = newlineMser.getResult();
 			

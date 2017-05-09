@@ -43,7 +43,6 @@ public class LinefinderInteractiveMSER  implements Linefinder{
 	private final RandomAccessibleInterval<FloatType> Preprocessedsource;
 	private final MserTree<UnsignedByteType> newtree;
 	private final int framenumber;
-	private final int minlength;
 	private ArrayList<CommonOutput> output;
 
 	private int Roiindex;
@@ -53,11 +52,10 @@ public class LinefinderInteractiveMSER  implements Linefinder{
 	public LinefinderInteractiveMSER (final RandomAccessibleInterval<FloatType> source, 
 			final RandomAccessibleInterval<FloatType> Preprocessedsource, 
 			MserTree<UnsignedByteType> newtree,
-			final int minlength, final int framenumber){
+			final int framenumber){
 		this.newtree = newtree;
 		this.source = source;
 		this.Preprocessedsource = Preprocessedsource;
-		this.minlength = minlength;
 		this.framenumber = framenumber;
 		ndims = source.numDimensions();
 	}
