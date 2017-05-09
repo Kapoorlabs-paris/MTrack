@@ -9,38 +9,38 @@ import interactiveMT.Interactive_MTDoubleChannel;
 import interactiveMT.Interactive_MTDoubleChannel.ValueChange;
 import mpicbg.imglib.multithreading.SimpleMultiThreading;
 
-public class MaxVarListener implements AdjustmentListener {
+public class Unstability_ScoreListener implements AdjustmentListener {
 	final Label label;
 	final float min, max;
 	final int scrollbarSize;
 	final Interactive_MTDoubleChannel parent;
-	final Scrollbar maxVarScrollbar;
+	final Scrollbar Unstability_ScoreScrollbar;
 
-	public MaxVarListener(final Interactive_MTDoubleChannel parent, final Label label, final float min, final float max, final int scrollbarSize,
-			final Scrollbar maxVarScrollbar) {
+	public Unstability_ScoreListener(final Interactive_MTDoubleChannel parent, final Label label, final float min, final float max, final int scrollbarSize,
+			final Scrollbar Unstability_ScoreScrollbar) {
 		this.label = label;
 		this.min = min;
 		this.max = max;
 		this.parent = parent;
 		this.scrollbarSize = scrollbarSize;
-		this.maxVarScrollbar = maxVarScrollbar;
+		this.Unstability_ScoreScrollbar = Unstability_ScoreScrollbar;
 
 	}
 
 	@Override
 	public void adjustmentValueChanged(final AdjustmentEvent event) {
-		parent.maxVar = (parent.computeValueFromScrollbarPosition(event.getValue(), min, max, scrollbarSize));
+		parent.Unstability_Score = (parent.computeValueFromScrollbarPosition(event.getValue(), min, max, scrollbarSize));
 
-		maxVarScrollbar.setValue(parent.computeScrollbarPositionFromValue((float) parent.maxVar, min, max, scrollbarSize));
+		Unstability_ScoreScrollbar.setValue(parent.computeScrollbarPositionFromValue((float) parent.Unstability_Score, min, max, scrollbarSize));
 
-		label.setText("MaxVar = " + parent.maxVar);
+		label.setText("Unstability Score = " + parent.Unstability_Score);
 
 		// if ( !event.getValueIsAdjusting() )
 		{
 			while (parent.isComputing) {
 				SimpleMultiThreading.threadWait(10);
 			}
-			parent.updatePreview(ValueChange.MAXVAR);
+			parent.updatePreview(ValueChange.Unstability_Score);
 		}
 	}
 }

@@ -9,6 +9,7 @@ import labeledObjects.CommonOutput;
 import labeledObjects.LabelledImg;
 import net.imglib2.Cursor;
 import net.imglib2.FinalInterval;
+import net.imglib2.Localizable;
 import net.imglib2.Point;
 import net.imglib2.RandomAccess;
 import net.imglib2.RandomAccessibleInterval;
@@ -55,6 +56,23 @@ public class Boundingboxes {
 		return realpos;
 
 	}
+	
+	
+	public static int GetLabel(final RandomAccessibleInterval<IntType> intimg, final Localizable point){
+		
+		
+		RandomAccess<IntType> ranac = intimg.randomAccess();
+		
+		ranac.setPosition(point);
+		
+		final int label = ranac.get().get();
+		
+		
+		return label;
+		
+	}
+	
+	
 	/**
 	 * Generic, type-agnostic method to create an identical copy of an Img
 	 *
@@ -62,6 +80,8 @@ public class Boundingboxes {
 	 *            - the Img to copy
 	 * @return - the copy of the Img
 	 */
+	
+	
 	
 	
 	public static RandomAccessibleInterval<UnsignedByteType> getCurrentSegmentByte(RandomAccessibleInterval<IntType> intimg, RandomAccessibleInterval<UnsignedByteType> currentimg, final int label) {

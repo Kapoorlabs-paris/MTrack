@@ -18,7 +18,7 @@ public class GaussianMaskFitMSER {
 	public static double[] sumofgaussianMaskFit(final RandomAccessibleInterval<FloatType> signalInterval,
 			final double[] location, final double[] sigma, final int numgaussians,
 			final int iterations, final double[] dxvector, final double slope, final double intercept,
-			final double maxintensityline,  final boolean halfgaussian, final EndfitMSER startorend, int label, double noiselevel)
+			final double maxintensityline,  final boolean halfgaussian, final EndfitMSER startorend, int label, double noiselevel, double R)
 			throws Exception {
 		final int n = signalInterval.numDimensions();
 
@@ -84,7 +84,7 @@ public class GaussianMaskFitMSER {
 				
 				final double signal = cImg.get().getRealDouble();
 				final double mask = cMask.get().getRealDouble();
-				final double weight = maxintensityline;
+				final double weight = maxintensityline * R;
 
 				final double signalmask = signal * mask * weight;
 

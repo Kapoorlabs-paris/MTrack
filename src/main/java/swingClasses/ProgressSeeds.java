@@ -45,9 +45,8 @@ final Interactive_MTDoubleChannel parent;
 		RandomAccessibleInterval<FloatType> groundframepre = parent.currentPreprocessedimg;
 
 		if (parent.FindLinesViaMSER) {
-			boolean dialog = parent.DialogueModelChoice();
 
-			if (dialog) {
+		
 				// updatePreview(ValueChange.SHOWMSER);
 				LinefinderInteractiveMSER newlineMser = new LinefinderInteractiveMSER(groundframe, groundframepre,
 						parent.newtree,parent.minlength, parent.thirdDimension);
@@ -57,18 +56,17 @@ final Interactive_MTDoubleChannel parent;
 						parent.jpb);
 				IJ.log("MSER parameters:" + " " + " thirdDimension: " + " " + parent.thirdDimension);
 				IJ.log("Delta " + " " + parent.delta + " " + "minSize " + " " + parent.minSize + " " + "maxSize " + " " + parent.maxSize
-						+ " " + " maxVar " + " " + parent.maxVar + " " + "minDIversity " + " " + parent.minDiversity);
+						+ " " + " Unstability_Score " + " " + parent.Unstability_Score + " " + "minDIversity " + " " + parent.minDiversity);
 				IJ.log("Optimization Parameters: " + "R" + parent.Intensityratio + " G"
 						+ parent.Inispacing / Math.min(parent.psf[0], parent.psf[1]));
 
-			}
+			
 
 		}
 
 		if (parent.FindLinesViaHOUGH) {
 
-			boolean dialog = parent.DialogueModelChoice();
-			if (dialog) {
+			
 				// updatePreview(ValueChange.SHOWHOUGH);
 				LinefinderInteractiveHough newlineHough = new LinefinderInteractiveHough(groundframe,
 						groundframepre, parent.intimg, parent.Maxlabel, parent.thetaPerPixel, parent.rhoPerPixel, parent.thirdDimension, parent.jpb);
@@ -81,18 +79,17 @@ final Interactive_MTDoubleChannel parent;
 				IJ.log("Optimization Parameters: " + "R" + parent.Intensityratio + " G"
 						+ parent.Inispacing / Math.min(parent.psf[0], parent.psf[1]));
 
-			}
+			
 		}
 
 		if (parent.FindLinesViaMSERwHOUGH) {
-			boolean dialog = parent.DialogueModelChoice();
-			if (dialog) {
+			
 				// updatePreview(ValueChange.SHOWMSER);
 				LinefinderInteractiveMSERwHough newlineMserwHough = new LinefinderInteractiveMSERwHough(groundframe,
 						groundframepre, parent.newtree, parent.minlength, parent.thirdDimension, parent.thetaPerPixel, parent.rhoPerPixel);
 				IJ.log("MSER parameters:" + " " + " thirdDimension: " + " " + parent.thirdDimension);
 				IJ.log("Delta " + " " + parent.delta + " " + "minSize " + " " + parent.minSize + " " + "maxSize " + " " + parent.maxSize
-						+ " " + " maxVar " + " " + parent.maxVar + " " + "minDIversity " + " " + parent.minDiversity);
+						+ " " + " Unstability_Score " + " " + parent.Unstability_Score + " " + "minDIversity " + " " + parent.minDiversity);
 				IJ.log("Hough parameters:" + " " + " thirdDimension: " + " " + parent.thirdDimension);
 				IJ.log("thetaPerPixel " + " " + parent.thetaPerPixel + " " + "rhoPerPixel " + " " + parent.rhoPerPixel);
 				IJ.log("Optimization Parameters: " + "R" + parent.Intensityratio + " G"
@@ -101,7 +98,7 @@ final Interactive_MTDoubleChannel parent;
 						parent.thirdDimension, parent.psf, newlineMserwHough, UserChoiceModel.Line, parent.Domask, parent.Intensityratio,
 						parent.Inispacing, parent.jpb);
 
-			}
+			
 
 		}
 

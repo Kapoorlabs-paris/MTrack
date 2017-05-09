@@ -427,7 +427,7 @@ implements OutputAlgorithm<ArrayList<Indexedlength>> {
 					try {
 						startfit = GaussianMaskFitMSER.sumofgaussianMaskFit(currentimg,  startpos.clone(),
 								psf, numgaussians, iterations, dxvector, newslope, newintercept, maxintensityline,  halfgaussian,
-								EndfitMSER.StartfitMSER, label, background);
+								EndfitMSER.StartfitMSER, label, background, Intensityratio);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -435,7 +435,7 @@ implements OutputAlgorithm<ArrayList<Indexedlength>> {
 					try {
 						endfit = GaussianMaskFitMSER.sumofgaussianMaskFit(currentimg,  endpos.clone(), psf, numgaussians,
 								iterations, dxvector, newslope, newintercept, maxintensityline,  halfgaussian,
-								EndfitMSER.EndfitMSER, label, background);
+								EndfitMSER.EndfitMSER, label, background, Intensityratio);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}

@@ -14,6 +14,7 @@ import java.awt.event.ItemListener;
 import interactiveMT.Interactive_MTDoubleChannel;
 import interactiveMT.Interactive_MTDoubleChannel.ValueChange;
 import mpicbg.imglib.multithreading.SimpleMultiThreading;
+import updateListeners.DefaultModel;
 
 public class MserwHoughListener implements ItemListener {
 	
@@ -39,7 +40,6 @@ public class MserwHoughListener implements ItemListener {
 			parent.FindLinesViaMSERwHOUGH = true;
 			parent.FindLinesViaMSER = false;
 			parent.FindLinesViaHOUGH = false;
-			// DisplayMSERwHough();
 
 			final GridBagLayout layout = new GridBagLayout();
 			final GridBagConstraints c = new GridBagConstraints();
@@ -71,14 +71,14 @@ public class MserwHoughListener implements ItemListener {
 			Houghparam.setForeground(new Color(255, 255, 255));
 
 			final Scrollbar deltaS = new Scrollbar(Scrollbar.HORIZONTAL, parent.deltaInit, 10, 0, 10 + parent.scrollbarSize);
-			final Scrollbar maxVarS = new Scrollbar(Scrollbar.HORIZONTAL, parent.maxVarInit, 10, 0, 10 + parent.scrollbarSize);
+			final Scrollbar Unstability_ScoreS = new Scrollbar(Scrollbar.HORIZONTAL, parent.Unstability_ScoreInit, 10, 0, 10 + parent.scrollbarSize);
 			final Scrollbar minDiversityS = new Scrollbar(Scrollbar.HORIZONTAL, parent.minDiversityInit, 10, 0,
 					10 + parent.scrollbarSize);
 			final Scrollbar minSizeS = new Scrollbar(Scrollbar.HORIZONTAL, parent.minSizeInit, 10, 0, 10 + parent.scrollbarSize);
 			final Scrollbar maxSizeS = new Scrollbar(Scrollbar.HORIZONTAL, parent.maxSizeInit, 10, 0, 10 + parent.scrollbarSize);
 			final Button ComputeTree = new Button("Compute Tree and display");
 
-			parent.maxVar = parent.computeValueFromScrollbarPosition(parent.maxVarInit, parent.maxVarMin, parent.maxVarMax, parent.scrollbarSize);
+			parent.Unstability_Score = parent.computeValueFromScrollbarPosition(parent.Unstability_ScoreInit, parent.Unstability_ScoreMin, parent.Unstability_ScoreMax, parent.scrollbarSize);
 			parent.delta = parent.computeValueFromScrollbarPosition(parent.deltaInit, parent.deltaMin, parent.deltaMax, parent.scrollbarSize);
 			parent.minDiversity = parent.computeValueFromScrollbarPosition(parent.minDiversityInit, parent.minDiversityMin,parent.minDiversityMax,
 					parent.scrollbarSize);
@@ -87,11 +87,16 @@ public class MserwHoughListener implements ItemListener {
 
 			final Checkbox min = new Checkbox("Look for Minima ", parent.darktobright);
 
-			final Label deltaText = new Label("delta = " + parent.delta, Label.CENTER);
-			final Label maxVarText = new Label("maxVar = " + parent.maxVar, Label.CENTER);
-			final Label minDiversityText = new Label("minDiversity = " + parent.minDiversity, Label.CENTER);
-			final Label minSizeText = new Label("MinSize = " + parent.minSize, Label.CENTER);
-			final Label maxSizeText = new Label("MaxSize = " + parent.maxSize, Label.CENTER);
+			final Label deltaText = new Label("Grey Level Seperation between Components = " + parent.delta, Label.CENTER);
+			final Label Unstability_ScoreText = new Label("Unstability Score = " + parent.Unstability_Score, Label.CENTER);
+			final Label minDiversityText = new Label("minDiversity = " +parent.minDiversity, Label.CENTER);
+			final Label minSizeText = new Label("Min # of pixels inside MSER Ellipses = " + parent.minSize, Label.CENTER);
+			final Label maxSizeText = new Label("Max # of pixels inside MSER Ellipses = " + parent.maxSize, Label.CENTER);
+			
+			
+			final Checkbox AdvancedOptions = new Checkbox("Advanced Optimizer Options ", parent.AdvancedChoiceSeeds);
+			DefaultModel loaddefault = new DefaultModel(parent);
+			loaddefault.LoadDefault();
 			/* Location */
 
 			parent.panelSecond.setLayout(layout);
@@ -109,11 +114,12 @@ public class MserwHoughListener implements ItemListener {
 
 			++c.gridy;
 
-			parent.panelSecond.add(maxVarText, c);
+			parent.panelSecond.add(Unstability_ScoreText, c);
 
 			++c.gridy;
-			parent.panelSecond.add(maxVarS, c);
+			parent.panelSecond.add(Unstability_ScoreS, c);
 
+			/*
 			++c.gridy;
 
 			parent.panelSecond.add(minDiversityText, c);
@@ -121,6 +127,7 @@ public class MserwHoughListener implements ItemListener {
 			++c.gridy;
 			parent.panelSecond.add(minDiversityS, c);
 
+			*/
 			++c.gridy;
 
 			parent.panelSecond.add(minSizeText, c);
@@ -161,14 +168,19 @@ public class MserwHoughListener implements ItemListener {
 			c.insets = new Insets(0, 175, 0, 175);
 			parent.panelSecond.add(rhoEnable, c);
 
+			
+			++c.gridy;
+			c.insets = new Insets(10, 175, 0, 175);
+			parent.panelSecond.add(AdvancedOptions, c);
+			
 			++c.gridy;
 			c.insets = new Insets(10, 175, 0, 175);
 			parent.panelSecond.add(FindLinesListener, c);
 
 			deltaS.addAdjustmentListener(new DeltaListener(parent, deltaText, parent.deltaMin, parent.deltaMax, parent.scrollbarSize, deltaS));
 
-			maxVarS.addAdjustmentListener(
-					new MaxVarListener(parent, maxVarText, parent.maxVarMin, parent.maxVarMax, parent.scrollbarSize, maxVarS));
+			Unstability_ScoreS.addAdjustmentListener(
+					new Unstability_ScoreListener(parent, Unstability_ScoreText, parent.Unstability_ScoreMin, parent.Unstability_ScoreMax, parent.scrollbarSize, Unstability_ScoreS));
 
 			minDiversityS.addAdjustmentListener(new MinDiversityListener(parent, minDiversityText, parent.minDiversityMin,
 					parent.minDiversityMax, parent.scrollbarSize, minDiversityS));
@@ -188,7 +200,7 @@ public class MserwHoughListener implements ItemListener {
 
 			rhoSize.addAdjustmentListener(
 					new RhoSizeHoughListener(parent, rhoText, parent.rhoPerPixelMin, parent.rhoPerPixelMax, parent.scrollbarSize, rhoSize));
-
+			AdvancedOptions.addItemListener(new AdvancedSeedListener(parent));
 			ComputeTree.addActionListener(new ComputeTreeListener(parent));
 			parent.panelSecond.validate();
 			parent.panelSecond.repaint();

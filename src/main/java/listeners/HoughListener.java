@@ -14,6 +14,7 @@ import java.awt.event.ItemListener;
 import interactiveMT.Interactive_MTDoubleChannel;
 import interactiveMT.Interactive_MTDoubleChannel.ValueChange;
 import mpicbg.imglib.multithreading.SimpleMultiThreading;
+import updateListeners.DefaultModel;
 
 public class HoughListener implements ItemListener {
 	
@@ -82,7 +83,9 @@ public class HoughListener implements ItemListener {
 			final Label Houghparam = new Label("Determine Hough Transform parameters");
 			Houghparam.setBackground(new Color(1, 0, 1));
 			Houghparam.setForeground(new Color(255, 255, 255));
-
+			final Checkbox AdvancedOptions = new Checkbox("Advanced Optimizer Options ", parent.AdvancedChoiceSeeds);
+			DefaultModel loaddefault = new DefaultModel(parent);
+			loaddefault.LoadDefault();
 			/* Location */
 			parent.panelSecond.setLayout(layout);
 
@@ -131,6 +134,12 @@ public class HoughListener implements ItemListener {
 			++c.gridy;
 			c.insets = new Insets(10, 175, 0, 175);
 			parent.panelSecond.add(Dowatershed, c);
+			
+			
+			
+			++c.gridy;
+			c.insets = new Insets(10, 175, 0, 175);
+			parent.panelSecond.add(AdvancedOptions, c);
 			++c.gridy;
 
 			c.insets = new Insets(10, 175, 0, 175);
@@ -148,6 +157,7 @@ public class HoughListener implements ItemListener {
 			displayBit.addItemListener(new ShowBitimgListener(parent));
 			displayWatershed.addItemListener(new ShowwatershedimgListener(parent));
 			Dowatershed.addActionListener(new DowatershedListener(parent));
+			AdvancedOptions.addItemListener(new AdvancedSeedListener(parent));
 			FindLinesListener.addActionListener(new FindLinesListener(parent));
 			parent.panelSecond.validate();
 			parent.panelSecond.repaint();

@@ -35,7 +35,7 @@ public class DeltaListener implements AdjustmentListener {
 
 		deltaScrollbar.setValue(parent.computeScrollbarPositionFromValue(parent.delta, min, max, scrollbarSize));
 
-		label.setText("Delta = " + parent.delta);
+		label.setText("Grey Level Seperation between Components = " + parent.delta);
 
 		// if ( !event.getValueIsAdjusting() )
 		{

@@ -33,7 +33,7 @@ public class MaxSizeListener implements AdjustmentListener {
 
 		maxsizeScrollbar.setValue(parent.computeScrollbarPositionFromValue(parent.maxSize, min, max, scrollbarSize));
 
-		label.setText("MaxSize = " + parent.maxSize);
+		label.setText("Max # of pixels inside MSER Ellipses = "+ parent.maxSize);
 
 		// if ( !event.getValueIsAdjusting() )
 		{

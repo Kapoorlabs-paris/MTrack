@@ -1,0 +1,243 @@
+package peakFitter;
+
+import java.util.ArrayList;
+
+import labeledObjects.Indexedlength;
+import net.imglib2.Cursor;
+import net.imglib2.FinalInterval;
+import net.imglib2.Localizable;
+import net.imglib2.Point;
+import net.imglib2.PointSampleList;
+import net.imglib2.RandomAccess;
+import net.imglib2.RandomAccessibleInterval;
+import net.imglib2.algorithm.BenchmarkAlgorithm;
+import net.imglib2.algorithm.OutputAlgorithm;
+import net.imglib2.algorithm.region.hypersphere.HyperSphere;
+import net.imglib2.algorithm.region.hypersphere.HyperSphereCursor;
+import net.imglib2.type.numeric.integer.IntType;
+import net.imglib2.type.numeric.real.FloatType;
+import net.imglib2.util.Pair;
+import net.imglib2.view.Views;
+import pointModels.GaussianPoints;
+import psf_Tookit.GaussianFitParam;
+
+public class SubpixelLocationPoint extends BenchmarkAlgorithm
+implements OutputAlgorithm<GaussianFitParam> {
+
+	
+	private final RandomAccessibleInterval<FloatType> source;
+	private final RandomAccessibleInterval<IntType> intimg;
+	private final Localizable point;
+	private final long radius;
+	private final int ndims;
+	private static final String BASE_ERROR_MSG = "[SubpixelLocationPoint] ";
+	private GaussianFitParam Params;
+	
+	public SubpixelLocationPoint(RandomAccessibleInterval<FloatType> source, RandomAccessibleInterval<IntType> intimg, final Localizable point, final long radius ) {
+
+		this.source = source;
+		this.intimg = intimg;
+		this.point = point;
+		this.radius = radius;
+		this.ndims = source.numDimensions();
+		assert source.numDimensions() == intimg.numDimensions();
+
+	}
+
+
+	@Override
+	public boolean checkInput() {
+		
+		return true;
+	}
+
+
+	@Override
+	public boolean process() {
+		
+		
+		int currentlabel = util.Boundingboxes.GetLabel(intimg, point);
+		
+		try {
+			
+			
+			Params = Getfinalparam(point, currentlabel, radius);
+		
+		
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		
+		
+		return true;
+	}
+
+
+	@Override
+	public GaussianFitParam getResult() {
+		
+		return Params;
+	}
+	
+	
+	public GaussianFitParam Getfinalparam(final Localizable point, final int label, final long radius) throws Exception {
+
+		PointSampleList<FloatType> datalist = gatherfullData(point, label, radius);
+
+		final Cursor<FloatType> listcursor = datalist.localizingCursor();
+		double[] sigma = new double[ndims];
+		double[][] X = new double[(int) datalist.size()][ndims];
+		double[] I = new double[(int) datalist.size()];
+		int index = 0;
+		while (listcursor.hasNext()) {
+			listcursor.fwd();
+
+			for (int d = 0; d < ndims; d++) {
+				X[index][d] = listcursor.getDoublePosition(d);
+			}
+
+			I[index] = listcursor.get().getRealDouble();
+
+			index++;
+		}
+
+		final double[] start_param = makeBestGuess(point, X, I);
+
+		final double[] finalparam = start_param.clone();
+		int maxiter = 1000;
+		double lambda = 1e-3;
+		double termepsilon = 1e-3;
+
+		LevenbergMarquardtSolverLine.solve(X, finalparam, null, I, new GaussianPoints(), lambda,
+				termepsilon, maxiter);
+
+		// NaN protection: we prefer returning the crude estimate than NaN
+		for (int j = 0; j < finalparam.length; j++) {
+			if (Double.isNaN(finalparam[j]))
+				finalparam[j] = start_param[j];
+		}
+		for (int j = 0; j < ndims; j++) {
+			
+			sigma[j] = finalparam[ndims + j + 1];
+			
+		}
+		GaussianFitParam guessparams = new GaussianFitParam(label, finalparam[0], sigma, finalparam[ 2 * ndims + 1]);
+
+		return guessparams;
+
+	}
+	
+	private final double[] makeBestGuess(final Localizable point, final double[][] X, final double[] I) {
+
+		double[] start_param = new double[2 * ndims + 2];
+
+		double[] sigma = new double[ndims];
+		double I_sum = 0;
+		double[] X_sum = new double[ndims];
+		for (int j = 0; j < ndims; j++) {
+			X_sum[j] = 0;
+			for (int i = 0; i < X.length; i++) {
+				X_sum[j] += X[i][j] * I[i];
+			}
+		}
+		double max_I = Double.NEGATIVE_INFINITY;
+		for (int i = 0; i < X.length; i++) {
+			I_sum += I[i];
+			if (I[i] > max_I) {
+				max_I = I[i];
+			}
+
+		}
+
+		start_param[0] = max_I;
+
+		for (int j = 0; j < ndims; j++) {
+			start_param[j + 1] = X_sum[j] / I_sum;
+		}
+
+		for (int j = 0; j < ndims; j++) {
+			double C = 0;
+			double dx;
+			for (int i = 0; i < X.length; i++) {
+				dx = X[i][j] - start_param[j + 1];
+				C += I[i] * dx * dx;
+			}
+			C /= I_sum;
+			start_param[ndims + j + 1] = 1 / C;
+			sigma[j] = 1 / C;
+		}
+		start_param[2 * ndims + 1] = 0;
+		
+		
+		
+
+		return start_param;
+	}
+
+	
+	private PointSampleList<FloatType> gatherfullData(final Localizable point, final int label, final long radius) {
+		final PointSampleList<FloatType> datalist = new PointSampleList<FloatType>(ndims);
+
+		Pair<RandomAccessibleInterval<FloatType>, FinalInterval> currentimgpair = util.Boundingboxes.CurrentLabelImagepair(intimg, source, label);
+		RandomAccess<IntType> intranac = intimg.randomAccess();
+
+		
+		intranac.setPosition(point);
+		RandomAccessibleInterval<FloatType> currentimg = currentimgpair.getA();
+		FinalInterval interval = currentimgpair.getB();
+		currentimg = Views.interval(currentimg, interval);	
+		
+		Cursor<FloatType> localcursor = Views.iterable(currentimg).localizingCursor();
+		HyperSphere<FloatType> region = new HyperSphere<FloatType>(source, point, radius);
+
+		HyperSphereCursor<FloatType> localcursorsphere = region.localizingCursor();
+		// Gather data around the point
+		boolean outofbounds = false;
+		for (int d = 0; d < ndims; d++) {
+			
+			if (point.getDoublePosition(d) <= 0 || point.getDoublePosition(d)>= source.dimension(d)){
+				
+				outofbounds = true;
+				break;
+			}
+		}
+		
+		while(localcursorsphere.hasNext()){
+			
+			localcursorsphere.fwd();
+			for (int d = 0; d < ndims; d++) {
+
+				if (localcursor.getDoublePosition(d) < 0 || localcursor.getDoublePosition(d) >= source.dimension(d)) {
+					outofbounds = true;
+					break;
+				}
+			}
+			if (outofbounds) {
+				outofbounds = false;
+				continue;
+			}
+			intranac.setPosition(localcursor);
+			int i = intranac.get().get();
+			if (i == label) {
+
+				Point newpoint = new Point(localcursor);
+				datalist.add(newpoint, localcursor.get().copy());
+
+			}
+			
+			
+		}
+		
+		
+
+		
+		return datalist;
+      
+      
+	}
+	
+	
+}

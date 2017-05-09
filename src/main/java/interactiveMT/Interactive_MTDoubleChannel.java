@@ -130,6 +130,7 @@ import lineFinder.LinefinderInteractiveHough;
 import lineFinder.LinefinderInteractiveMSER;
 import lineFinder.LinefinderInteractiveMSERwHough;
 import listeners.AcceptResultsListener;
+import listeners.AdvancedTrackerListener;
 import listeners.AnalyzekymoListener;
 import listeners.CheckResultsListener;
 import listeners.ComputeMserinHoughListener;
@@ -142,7 +143,7 @@ import listeners.DowatershedListener;
 import listeners.HoughListener;
 import listeners.MaxSearchradiusListener;
 import listeners.MaxSizeListener;
-import listeners.MaxVarListener;
+import listeners.Unstability_ScoreListener;
 import listeners.MinDiversityListener;
 import listeners.MinSizeListener;
 import listeners.MissedFrameListener;
@@ -196,6 +197,7 @@ import swingClasses.ProgressTrack;
 import trackerType.KFsearch;
 import trackerType.MTTracker;
 import trackerType.TrackModel;
+import updateListeners.DefaultModelHF;
 import updateListeners.FinalPoint;
 import updateListeners.MoveNextListener;
 import updateListeners.MoveToFrameListener;
@@ -220,6 +222,8 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public ArrayList<float[]> lengthKymo;
 	public final int scrollbarSize = 1000;
 	public final int scrollbarSizebig = 1000;
+	public boolean AdvancedChoice = false;
+	public boolean AdvancedChoiceSeeds = false;
 	// steps per octave
 	public static int standardSensitivity = 4;
 	public int sensitivity = standardSensitivity;
@@ -233,8 +237,8 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public float thresholdHoughMin = 0;
 	public float thresholdHoughMax = 250;
 	public float deltaMax = 400f;
-	public float maxVarMin = 0;
-	public float maxVarMax = 1;
+	public float Unstability_ScoreMin = 0;
+	public float Unstability_ScoreMax = 1;
 
 	public int radiusseed = 5;
 
@@ -275,7 +279,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public float delta = 1f;
 
 	public int deltaInit = 20;
-	public int maxVarInit = 1;
+	public int Unstability_ScoreInit = 1;
 
 	public int minSizeInit = 100;
 	public int maxSizeInit = 500;
@@ -289,14 +293,14 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	private TextField Maxdmicro;
 	public float frametosec;
 
-	public int minDiversityInit = 100;
+	public int minDiversityInit = 1;
 
 	public int radius = 1;
 	public long Size = 1;
 	public float thetaPerPixel = 1;
 	public float rhoPerPixel = 1;
 	public boolean enablerhoPerPixel = false;
-	public float maxVar = 1;
+	public float Unstability_Score = 1;
 	public float minDiversity = 1;
 	public float thresholdHough = 1;
 	public double netdeltadstart = 0;
@@ -458,7 +462,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	}
 
 	public static enum ValueChange {
-		ROI, ALL, DELTA, FindLinesVia, MAXVAR, MINDIVERSITY, DARKTOBRIGHT, MINSIZE, MAXSIZE, SHOWMSER, FRAME, SHOWHOUGH, thresholdHough, DISPLAYBITIMG, DISPLAYWATERSHEDIMG, rhoPerPixel, thetaPerPixel, THIRDDIM, iniSearch, maxSearch, missedframes, THIRDDIMTrack, MEDIAN, kymo, SHOWMSERinHough;
+		ROI, ALL, DELTA, FindLinesVia, Unstability_Score, MINDIVERSITY, DARKTOBRIGHT, MINSIZE, MAXSIZE, SHOWMSER, FRAME, SHOWHOUGH, thresholdHough, DISPLAYBITIMG, DISPLAYWATERSHEDIMG, rhoPerPixel, thetaPerPixel, THIRDDIM, iniSearch, maxSearch, missedframes, THIRDDIMTrack, MEDIAN, kymo, SHOWMSERinHough;
 	}
 
 	public boolean isFinished = false;
@@ -559,14 +563,14 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 	}
 
-	public void setInitialmaxVar(final float value) {
-		maxVar = value;
-		maxVarInit = computeScrollbarPositionFromValue(maxVar, maxVarMin, maxVarMax, scrollbarSize);
+	public void setInitialUnstability_Score(final float value) {
+		Unstability_Score = value;
+		Unstability_ScoreInit = computeScrollbarPositionFromValue(Unstability_Score, Unstability_ScoreMin, Unstability_ScoreMax, scrollbarSize);
 	}
 
-	public double getInitialmaxVar(final float value) {
+	public double getInitialUnstability_Score(final float value) {
 
-		return maxVar;
+		return Unstability_Score;
 
 	}
 
@@ -706,11 +710,12 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		count = 0;
 		overlay = new Overlay();
 		nf.setMaximumFractionDigits(3);
-		setInitialmaxVar(maxVarInit);
+		setInitialUnstability_Score(Unstability_ScoreInit);
 		setInitialDelta(deltaInit);
 		setInitialrhoPerPixel(rhoPerPixelInit);
 		setInitialthetaPerPixel(thetaPerPixelInit);
 		setInitialthresholdHough(thresholdHoughInit);
+		setInitialminDiversity(minDiversityInit);
 		Cannyradius = (long) (radiusfactor * Math.ceil(Math.sqrt(psf[0] * psf[0] + psf[1] * psf[1])));
 		if (originalimg.numDimensions() < 3) {
 
@@ -951,7 +956,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 				RandomAccessibleInterval<UnsignedByteType> newimg = util.CopyUtils.copytoByteImage(
 						Kernels.CannyEdgeandMean(roiimg, Cannyradius), intimg, standardRectangle, label);
 
-				MserTree<UnsignedByteType> newtree = MserTree.buildMserTree(newimg, delta, minSize, maxSize, maxVar,
+				MserTree<UnsignedByteType> newtree = MserTree.buildMserTree(newimg, delta, minSize, maxSize, Unstability_Score,
 						minDiversity, darktobright);
 
 				Rois = util.DrawingUtils.getcurrentRois(newtree, meanCovar);
@@ -1040,7 +1045,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 			newimg = util.CopyUtils.copytoByteImage(Kernels.CannyEdgeandMean(currentPreprocessedimg, Cannyradius),
 					standardRectangle);
 
-			newtree = MserTree.buildMserTree(newimg, delta, minSize, maxSize, maxVar, minDiversity, darktobright);
+			newtree = MserTree.buildMserTree(newimg, delta, minSize, maxSize, Unstability_Score, minDiversity, darktobright);
 			Rois = util.DrawingUtils.getcurrentRois(newtree, AllmeanCovar);
 
 			AllMSERrois.put(thirdDimension, Rois);
@@ -1211,7 +1216,6 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		final GridBagConstraints c = new GridBagConstraints();
 
 		panelFirst.setLayout(layout);
-		panelSecond.setLayout(layout);
 		panelFirst.add(Step, c);
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridx = 0;
@@ -1505,8 +1509,9 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		panelFifth.setLayout(layout);
 		panelFifth.add(Step5, c);
 
-		final Button TrackEndPoints = new Button("Track EndPoints (From first to a chosen last frame)");
-		final Button SkipframeandTrackEndPoints = new Button("TrackEndPoint (User specified first and last frame)");
+		
+		final Button TrackEndPoints = new Button("Track EndPoints (From first to a chosen last timepoint)");
+		final Button SkipframeandTrackEndPoints = new Button("TrackEndPoint (User specified first and last timepoint)");
 		final Button CheckResults = new Button("Check Results (then click next)");
 		final Checkbox RoughResults = new Checkbox("Rates and Statistical Analysis");
 
@@ -1530,16 +1535,18 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 			c.insets = new Insets(10, 175, 0, 175);
 			panelFifth.add(CheckResults, c);
 		}
+	
+		/*
 		++c.gridy;
 		c.insets = new Insets(10, 10, 0, 175);
 		panelFifth.add(RoughResults, c);
-
+*/
 		TrackEndPoints.addActionListener(new TrackendsListener(this));
 		SkipframeandTrackEndPoints.addActionListener(new SkipFramesandTrackendsListener(this));
 		CheckResults.addActionListener(new CheckResultsListener(this));
 		RoughResults.addItemListener(new AcceptResultsListener(this));
 		panelFifth.repaint();
-		panelFifth.validate();
+		panelFifth.revalidate();
 		Cardframe.pack();
 
 	}
@@ -1637,10 +1644,11 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 			c.insets = new Insets(10, 175, 0, 175);
 			panelFifth.add(CheckResults, c);
 		}
+/*	
 		++c.gridy;
 		c.insets = new Insets(10, 175, 0, 175);
 		panelFifth.add(RoughResults, c);
-
+*/
 		TrackEndPoints.addActionListener(new TrackendsListener(this));
 		SkipframeandTrackEndPoints.addActionListener(new SkipFramesandTrackendsListener(this));
 		CheckResults.addActionListener(new CheckResultsListener(this));
@@ -1679,18 +1687,17 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		final Label Update = new Label("Update parameters for dynamic channel");
 
 		final Scrollbar deltaS = new Scrollbar(Scrollbar.HORIZONTAL, deltaInit, 10, 0, 10 + scrollbarSize);
-		final Scrollbar maxVarS = new Scrollbar(Scrollbar.HORIZONTAL, maxVarInit, 10, 0, 10 + scrollbarSize);
+		final Scrollbar Unstability_ScoreS = new Scrollbar(Scrollbar.HORIZONTAL, Unstability_ScoreInit, 10, 0, 10 + scrollbarSize);
 		final Scrollbar minDiversityS = new Scrollbar(Scrollbar.HORIZONTAL, minDiversityInit, 10, 0,
 				10 + scrollbarSize);
 		final Scrollbar minSizeS = new Scrollbar(Scrollbar.HORIZONTAL, minSizeInit, 10, 0, 10 + scrollbarSize);
 		final Scrollbar maxSizeS = new Scrollbar(Scrollbar.HORIZONTAL, maxSizeInit, 10, 0, 10 + scrollbarSize);
 
-		final Label deltaText = new Label("delta = " + delta, Label.CENTER);
-		final Label maxVarText = new Label("maxVar = " + maxVar, Label.CENTER);
+		final Label deltaText = new Label("Grey Level Seperation between Components = " + delta, Label.CENTER);
+		final Label Unstability_ScoreText = new Label("Unstability Score = " + Unstability_Score, Label.CENTER);
 		final Label minDiversityText = new Label("minDiversity = " + minDiversity, Label.CENTER);
-		final Label minSizeText = new Label("MinSize = " + minSize, Label.CENTER);
-		final Label maxSizeText = new Label("MaxSize = " + maxSize, Label.CENTER);
-
+		final Label minSizeText = new Label("Min # of pixels inside MSER Ellipses = " + minSize, Label.CENTER);
+		final Label maxSizeText = new Label("Max # of pixels inside MSER Ellipses = " + maxSize, Label.CENTER);
 		final Checkbox min = new Checkbox("Look for Minima ", darktobright);
 
 		final Button ComputeTree = new Button("Compute Tree in each Watershed label and display");
@@ -1743,12 +1750,12 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 		++c.gridy;
 		c.insets = new Insets(10, 10, 0, 0);
-		panelFourth.add(maxVarText, c);
+		panelFourth.add(Unstability_ScoreText, c);
 
 		++c.gridy;
 		c.insets = new Insets(10, 10, 0, 0);
-		panelFourth.add(maxVarS, c);
-
+		panelFourth.add(Unstability_ScoreS, c);
+/*
 		++c.gridy;
 		c.insets = new Insets(10, 10, 0, 0);
 		panelFourth.add(minDiversityText, c);
@@ -1756,7 +1763,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		++c.gridy;
 		c.insets = new Insets(10, 10, 0, 0);
 		panelFourth.add(minDiversityS, c);
-
+*/
 		++c.gridy;
 		c.insets = new Insets(10, 10, 0, 0);
 		panelFourth.add(minSizeText, c);
@@ -1772,12 +1779,12 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		++c.gridy;
 		c.insets = new Insets(10, 10, 0, 0);
 		panelFourth.add(maxSizeS, c);
-
+/*
 		++c.gridy;
 		c.insets = new Insets(10, 10, 0, 0);
 		c.insets = new Insets(10, 175, 0, 175);
 		panelFourth.add(min, c);
-
+*/
 		++c.gridy;
 
 		c.insets = new Insets(10, 175, 0, 175);
@@ -1785,8 +1792,8 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 		deltaS.addAdjustmentListener(new DeltaListener(this, deltaText, deltaMin, deltaMax, scrollbarSize, deltaS));
 
-		maxVarS.addAdjustmentListener(
-				new MaxVarListener(this, maxVarText, maxVarMin, maxVarMax, scrollbarSize, maxVarS));
+		Unstability_ScoreS.addAdjustmentListener(
+				new Unstability_ScoreListener(this, Unstability_ScoreText, Unstability_ScoreMin, Unstability_ScoreMax, scrollbarSize, Unstability_ScoreS));
 
 		minDiversityS.addAdjustmentListener(new MinDiversityListener(this, minDiversityText, minDiversityMin,
 				minDiversityMax, scrollbarSize, minDiversityS));
@@ -1799,7 +1806,10 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 		min.addItemListener(new DarktobrightListener(this));
 		ComputeTree.addActionListener(new ComputeMserinHoughListener(this));
-
+		
+		DefaultModelHF loaddefault = new DefaultModelHF(this);
+		loaddefault.LoadDefault();
+		
 		if (analyzekymo && Kymoimg != null) {
 
 			AnalyzekymoListener newkymo = new AnalyzekymoListener(this);
@@ -1809,7 +1819,48 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 		else {
 
-			Deterministic();
+
+			final Button TrackEndPoints = new Button("Track EndPoints (From first to a chosen last timepoint)");
+			final Button SkipframeandTrackEndPoints = new Button("TrackEndPoint (User specified first and last timepoint)");
+			final Button CheckResults = new Button("Check Results (then click next)");
+			final Checkbox RoughResults = new Checkbox("Rates and Statistical Analysis");
+			final Checkbox AdvancedOptions = new Checkbox("Advanced Optimizer Options ", AdvancedChoice);
+
+			final Label Checkres = new Label("The tracker now performs an internal check on the results");
+			Checkres.setBackground(new Color(1, 0, 1));
+			Checkres.setForeground(new Color(255, 255, 255));
+			++c.gridy;
+			c.insets = new Insets(10, 175, 0, 175);
+			panelFourth.add(AdvancedOptions, c);
+			
+			++c.gridy;
+			c.insets = new Insets(10, 10, 0, 175);
+			panelFourth.add(TrackEndPoints, c);
+
+			++c.gridy;
+			c.insets = new Insets(10, 10, 0, 175);
+			panelFourth.add(SkipframeandTrackEndPoints, c);
+			if (analyzekymo && Kymoimg != null) {
+				++c.gridy;
+				c.insets = new Insets(10, 10, 0, 0);
+				panelFourth.add(Checkres, c);
+
+				++c.gridy;
+				c.insets = new Insets(10, 175, 0, 175);
+				panelFourth.add(CheckResults, c);
+			}
+/*			++c.gridy;
+			c.insets = new Insets(10, 10, 0, 175);
+			panelFourth.add(RoughResults, c);
+*/
+			
+		
+			TrackEndPoints.addActionListener(new TrackendsListener(this));
+			SkipframeandTrackEndPoints.addActionListener(new SkipFramesandTrackendsListener(this));
+			CheckResults.addActionListener(new CheckResultsListener(this));
+			AdvancedOptions.addItemListener(new AdvancedTrackerListener(this));
+			
+			RoughResults.addItemListener(new AcceptResultsListener(this));
 		}
 
 		threshold.addAdjustmentListener(new ThresholdHoughListener(this, thresholdText, thresholdHoughMin,
@@ -1838,17 +1889,17 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		panelFourth.setLayout(layout);
 		panelFourth.add(Step, c);
 		final Scrollbar deltaS = new Scrollbar(Scrollbar.HORIZONTAL, deltaInit, 10, 0, 10 + scrollbarSize);
-		final Scrollbar maxVarS = new Scrollbar(Scrollbar.HORIZONTAL, maxVarInit, 10, 0, 10 + scrollbarSize);
+		final Scrollbar Unstability_ScoreS = new Scrollbar(Scrollbar.HORIZONTAL, Unstability_ScoreInit, 10, 0, 10 + scrollbarSize);
 		final Scrollbar minDiversityS = new Scrollbar(Scrollbar.HORIZONTAL, minDiversityInit, 10, 0,
 				10 + scrollbarSize);
 		final Scrollbar minSizeS = new Scrollbar(Scrollbar.HORIZONTAL, minSizeInit, 10, 0, 10 + scrollbarSize);
 		final Scrollbar maxSizeS = new Scrollbar(Scrollbar.HORIZONTAL, maxSizeInit, 10, 0, 10 + scrollbarSize);
 
-		final Label deltaText = new Label("delta = " + delta, Label.CENTER);
-		final Label maxVarText = new Label("maxVar = " + maxVar, Label.CENTER);
+		final Label deltaText = new Label("Grey Level Seperation between Components = " + delta, Label.CENTER);
+		final Label Unstability_ScoreText = new Label("Unstability Score = " + Unstability_Score, Label.CENTER);
 		final Label minDiversityText = new Label("minDiversity = " + minDiversity, Label.CENTER);
-		final Label minSizeText = new Label("MinSize = " + minSize, Label.CENTER);
-		final Label maxSizeText = new Label("MaxSize = " + maxSize, Label.CENTER);
+		final Label minSizeText = new Label("Min # of pixels inside MSER Ellipses = " + minSize, Label.CENTER);
+		final Label maxSizeText = new Label("Max # of pixels inside MSER Ellipses = " + maxSize, Label.CENTER);
 
 		final Checkbox min = new Checkbox("Look for Minima ", darktobright);
 
@@ -1876,18 +1927,18 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 		++c.gridy;
 
-		panelFourth.add(maxVarText, c);
+		panelFourth.add(Unstability_ScoreText, c);
 
 		++c.gridy;
-		panelFourth.add(maxVarS, c);
-
+		panelFourth.add(Unstability_ScoreS, c);
+/*
 		++c.gridy;
 
 		panelFourth.add(minDiversityText, c);
 
 		++c.gridy;
 		panelFourth.add(minDiversityS, c);
-
+*/
 		++c.gridy;
 
 		panelFourth.add(minSizeText, c);
@@ -1901,19 +1952,19 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 		++c.gridy;
 		panelFourth.add(maxSizeS, c);
-
+/*
 		++c.gridy;
 		c.insets = new Insets(10, 175, 0, 175);
 		panelFourth.add(min, c);
-
+*/
 		++c.gridy;
 		c.insets = new Insets(10, 175, 0, 175);
 		panelFourth.add(ComputeTree, c);
 
 		deltaS.addAdjustmentListener(new DeltaListener(this, deltaText, deltaMin, deltaMax, scrollbarSize, deltaS));
 
-		maxVarS.addAdjustmentListener(
-				new MaxVarListener(this, maxVarText, maxVarMin, maxVarMax, scrollbarSize, maxVarS));
+		Unstability_ScoreS.addAdjustmentListener(
+				new Unstability_ScoreListener(this, Unstability_ScoreText, Unstability_ScoreMin, Unstability_ScoreMax, scrollbarSize, Unstability_ScoreS));
 
 		minDiversityS.addAdjustmentListener(new MinDiversityListener(this, minDiversityText, minDiversityMin,
 				minDiversityMax, scrollbarSize, minDiversityS));
@@ -1926,7 +1977,8 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 		min.addItemListener(new DarktobrightListener(this));
 		ComputeTree.addActionListener(new ComputeTreeListener(this));
-
+		DefaultModelHF loaddefault = new DefaultModelHF(this);
+		loaddefault.LoadDefault();
 		if (analyzekymo && Kymoimg != null) {
 
 			AnalyzekymoListener newkymo = new AnalyzekymoListener(this);
@@ -1936,7 +1988,49 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 		else {
 
-			Deterministic();
+
+			final Button TrackEndPoints = new Button("Track EndPoints (From first to a chosen last timepoint)");
+			final Button SkipframeandTrackEndPoints = new Button("TrackEndPoint (User specified first and last timepoint)");
+			final Button CheckResults = new Button("Check Results (then click next)");
+			final Checkbox RoughResults = new Checkbox("Rates and Statistical Analysis");
+			final Checkbox AdvancedOptions = new Checkbox("Advanced Optimizer Options ", AdvancedChoice);
+
+			final Label Checkres = new Label("The tracker now performs an internal check on the results");
+			Checkres.setBackground(new Color(1, 0, 1));
+			Checkres.setForeground(new Color(255, 255, 255));
+			++c.gridy;
+			c.insets = new Insets(10, 175, 0, 175);
+			panelFourth.add(AdvancedOptions, c);
+			
+			++c.gridy;
+			c.insets = new Insets(10, 10, 0, 175);
+			panelFourth.add(TrackEndPoints, c);
+
+			++c.gridy;
+			c.insets = new Insets(10, 10, 0, 175);
+			panelFourth.add(SkipframeandTrackEndPoints, c);
+			if (analyzekymo && Kymoimg != null) {
+				++c.gridy;
+				c.insets = new Insets(10, 10, 0, 0);
+				panelFourth.add(Checkres, c);
+
+				++c.gridy;
+				c.insets = new Insets(10, 175, 0, 175);
+				panelFourth.add(CheckResults, c);
+			}
+/*			++c.gridy;
+			c.insets = new Insets(10, 10, 0, 175);
+			panelFourth.add(RoughResults, c);
+*/
+			
+			
+			
+			TrackEndPoints.addActionListener(new TrackendsListener(this));
+			SkipframeandTrackEndPoints.addActionListener(new SkipFramesandTrackendsListener(this));
+			CheckResults.addActionListener(new CheckResultsListener(this));
+			AdvancedOptions.addItemListener(new AdvancedTrackerListener(this));
+			
+			RoughResults.addItemListener(new AcceptResultsListener(this));
 		}
 
 		panelFourth.validate();
@@ -2444,13 +2538,12 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		gd.addChoice("Choose your model: ", LineModel, LineModel[indexmodel]);
 		gd.addCheckbox("Do Gaussian Mask Fits", Domask);
 
-		gd.addTextAreas("Advanced Options for the optimizer", null, 1, 35);
-		gd.addNumericField("Min Intensity = R * Max Intensity along MT, R (enter 0.2 to 0.9) = ", Intensityratio, 2);
-		gd.addNumericField("Spacing between Gaussians = G * Min(Psf), G (enter 0.3 to 1.0) = ",
+		gd.addNumericField("Initial guess for Min Pixel Intensity (MinPI) belonging to MT (  R =  MinPI / MaxPI), R (enter 0.2 to 0.9) = ", Intensityratio, 2);
+		gd.addNumericField("Initial Spacing between Gaussians along the Polynomial curve = G * Min(Psf), G (enter 0.3 to 1.0) = ",
 				Inispacing / Math.min(psf[0], psf[1]), 2);
 
 		if (analyzekymo && Kymoimg != null) {
-			gd.addNumericField("Average max difference between Kymo and tracker = ", deltadcutoff, 2);
+			gd.addNumericField("On an average, maximum difference in pixels between Kymograph and Program generated curve = ", deltadcutoff, 2);
 		}
 
 		gd.showDialog();
@@ -2482,10 +2575,9 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		gd.addChoice("Choose your model: ", LineModel, LineModel[indexmodel]);
 
 		gd.addCheckbox("Do Gaussian Mask Fits", Domask);
-		gd.addCheckbox("Display rois:", displayoverlay);
-		gd.addTextAreas("Advanced Options for the optimizer", null, 1, 35);
-		gd.addNumericField("Min Intensity = R * Max Intensity along MT, R (enter 0.2 to 0.9) = ", Intensityratio, 2);
-		gd.addNumericField("Spacing between Gaussians = G * Min(Psf), G (enter 0.3 to 1.0) = ",
+		gd.addCheckbox("DisplayRoi stack (after tracking)", displayoverlay);
+		gd.addNumericField("Initial guess for Min Pixel Intensity (MinPI) belonging to MT (  R =  MinPI / MaxPI), R (enter 0.2 to 0.9) = ", Intensityratio, 2);
+		gd.addNumericField("Initial Spacing between Gaussians along the Polynomial curve = G * Min(Psf), G (enter 0.3 to 1.0) = ",
 				Inispacing / Math.min(psf[0], psf[1]), 2);
 		gd.addStringField("Choose a different Directory?:", usefolder);
 		gd.addStringField("Choose a different filename?:", addToName);

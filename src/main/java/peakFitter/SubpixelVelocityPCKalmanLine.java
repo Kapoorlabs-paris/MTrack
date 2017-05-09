@@ -625,10 +625,10 @@ import preProcessing.GetLocalmaxmin;
 						try {
 							startfit = GaussianMaskFitMSER.sumofgaussianMaskFit(currentimg, startpos.clone(), psf, numgaussians,
 									iterations, dxvector, newslope, newintercept, Intensity, halfgaussian,
-									EndfitMSER.StartfitMSER, label, background);
+									EndfitMSER.StartfitMSER, label, background, Intensityratio);
 							endfit = GaussianMaskFitMSER.sumofgaussianMaskFit(currentimg, endpos.clone(), psf, numgaussians,
 									iterations, dxvector, newslope, newintercept, Intensity, halfgaussian,
-									EndfitMSER.EndfitMSER, label, background);
+									EndfitMSER.EndfitMSER, label, background, Intensityratio);
 							
 						} catch (Exception e) {
 							e.printStackTrace();
@@ -708,11 +708,11 @@ import preProcessing.GetLocalmaxmin;
 						try {
 							endfit = GaussianMaskFitMSER.sumofgaussianMaskFit(currentimg, endpos.clone(), psf, numgaussians, iterations,
 									dxvector, newslope, newintercept, Intensity, halfgaussian, EndfitMSER.EndfitMSER,
-									label, background);
+									label, background, Intensityratio);
 							
 							startfit = GaussianMaskFitMSER.sumofgaussianMaskFit(currentimg, startpos.clone(), psf, numgaussians, iterations,
 									dxvector, newslope, newintercept, Intensity, halfgaussian, EndfitMSER.StartfitMSER,
-									label, background);
+									label, background, Intensityratio);
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
@@ -810,10 +810,10 @@ import preProcessing.GetLocalmaxmin;
 						try {
 							startfit = GaussianMaskFitMSER.sumofgaussianMaskFit(currentimg, startpos.clone(), psf, numgaussians,
 									iterations, dxvectorstart, newslope, currentintercept, lineIntensity, halfgaussian,
-									EndfitMSER.StartfitMSER, label, background);
+									EndfitMSER.StartfitMSER, label, background, Intensityratio);
 							endfit = GaussianMaskFitMSER.sumofgaussianMaskFit(currentimg, endpos.clone(), psf, numgaussians,
 									iterations, dxvectorend, newslope, currentintercept, lineIntensity, halfgaussian,
-									EndfitMSER.EndfitMSER, label, background);
+									EndfitMSER.EndfitMSER, label, background, Intensityratio);
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
@@ -909,10 +909,10 @@ import preProcessing.GetLocalmaxmin;
 						try {
 							startfit = GaussianMaskFitMSER.sumofgaussianMaskFit(currentimg, startpos.clone(), psf, numgaussians,
 									iterations, dxvectorstart, newslope, currentintercept, lineIntensity, halfgaussian,
-									EndfitMSER.StartfitMSER, label, background);
+									EndfitMSER.StartfitMSER, label, background, Intensityratio);
 							endfit = GaussianMaskFitMSER.sumofgaussianMaskFit(currentimg, endpos.clone(), psf, numgaussians, iterations,
 									dxvectorend, newslope, currentintercept, lineIntensity, halfgaussian,
-									EndfitMSER.EndfitMSER, label, background);
+									EndfitMSER.EndfitMSER, label, background, Intensityratio);
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
@@ -1015,10 +1015,10 @@ import preProcessing.GetLocalmaxmin;
 						try {
 							startfit = GaussianMaskFitMSER.sumofgaussianMaskFit(currentimg, startpos.clone(), psf, numgaussians,
 									iterations, dxvectorstart, newslope, currentintercept, lineIntensity, halfgaussian,
-									EndfitMSER.StartfitMSER, label, background);
+									EndfitMSER.StartfitMSER, label, background, Intensityratio);
 							endfit = GaussianMaskFitMSER.sumofgaussianMaskFit(currentimg, endpos.clone(), psf, numgaussians,
 									iterations, dxvectorend, newslope, currentintercept, lineIntensity, halfgaussian,
-									EndfitMSER.EndfitMSER, label, background);
+									EndfitMSER.EndfitMSER, label, background, Intensityratio);
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
@@ -1120,11 +1120,11 @@ import preProcessing.GetLocalmaxmin;
 						try {
 							startfit = GaussianMaskFitMSER.sumofgaussianMaskFit(currentimg, startpos.clone(), psf, numgaussians,
 									iterations, dxvectorstart, newslope, currentintercept, lineIntensity, halfgaussian,
-									EndfitMSER.StartfitMSER, label, background);
+									EndfitMSER.StartfitMSER, label, background, Intensityratio);
 							
 							endfit = GaussianMaskFitMSER.sumofgaussianMaskFit(currentimg, endpos.clone(), psf, numgaussians, iterations,
 									dxvectorend, newslope, currentintercept, lineIntensity, halfgaussian,
-									EndfitMSER.EndfitMSER, label, background);
+									EndfitMSER.EndfitMSER, label, background, Intensityratio);
 						} catch (Exception e) {
 							e.printStackTrace();
 						}

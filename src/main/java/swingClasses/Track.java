@@ -69,28 +69,26 @@ public  class Track {
 			parent.CurrentView = util.CopyUtils.getCurrentView(parent.originalimg, parent.thirdDimension, parent.thirdDimensionSize);
 			parent.updatePreview(ValueChange.THIRDDIMTrack);
 
-			boolean dialog;
-			boolean dialogupdate;
+		
 
 			RandomAccessibleInterval<FloatType> groundframe = parent.currentimg;
 			RandomAccessibleInterval<FloatType> groundframepre = parent.currentPreprocessedimg;
 
 			if (parent.FindLinesViaMSER) {
 				if (index == next) {
-					dialog = parent.DialogueModelChoiceHF();
 
 					IJ.log("MSER parameters:" + " " + " thirdDimension: " + " " + parent.thirdDimension);
 					IJ.log("Delta " + " " + parent.delta + " " + "minSize " + " " + parent.minSize + " " + "maxSize " + " " + parent.maxSize
-							+ " " + " maxVar " + " " + parent.maxVar + " " + "minDIversity " + " " + parent.minDiversity);
+							+ " " + " Unstability_Score " + " " + parent.Unstability_Score + " " + "minDIversity " + " " + parent.minDiversity);
 
 					IJ.log("Optimization Parameters: " + "R" + parent.Intensityratio + " G"
 							+ parent.Inispacing / Math.min(parent.psf[0], parent.psf[1]));
 
 				}
 
-				else
-					dialog = false;
+				
 
+				System.out.println(parent.userChoiceModel);
 				parent.updatePreview(ValueChange.SHOWMSER);
 
 				LinefinderInteractiveHFMSER newlineMser = new LinefinderInteractiveHFMSER(groundframe, groundframepre,
@@ -117,6 +115,8 @@ public  class Track {
 							Kalmancount, parent.Intensityratio, parent.Inispacing, parent.seedmap, parent.jpb, parent.thirdDimensionSize);
 
 					parent.Accountedframes.add(FindlinesVia.getAccountedframes());
+					
+					
 				}
 
 			}
@@ -124,7 +124,6 @@ public  class Track {
 			if (parent.FindLinesViaHOUGH) {
 
 				if (index == next) {
-					dialog = parent.DialogueModelChoiceHF();
 
 					IJ.log("Hough parameters:" + " " + " thirdDimension: " + " " + parent.thirdDimension);
 					IJ.log("thetaPerPixel " + " " + parent.thetaPerPixel + " " + "rhoPerPixel " + " " + parent.rhoPerPixel);
@@ -133,8 +132,7 @@ public  class Track {
 
 				}
 
-				else
-					dialog = false;
+				
 
 				parent.updatePreview(ValueChange.SHOWHOUGH);
 				parent.updatePreview(ValueChange.SHOWMSERinHough);
@@ -168,19 +166,16 @@ public  class Track {
 
 			if (parent.FindLinesViaMSERwHOUGH) {
 				if (index == next) {
-					dialog = parent.DialogueModelChoice();
 
 					IJ.log("MSER parameters:" + " " + " thirdDimension: " + " " + parent.thirdDimension);
 					IJ.log("Delta " + " " + parent.delta + " " + "minSize " + " " + parent.minSize + " " + "maxSize " + " " + parent.maxSize
-							+ " " + " maxVar " + " " + parent.maxVar + " " + "minDIversity " + " " + parent.minDiversity);
+							+ " " + " Unstability_Score " + " " + parent.Unstability_Score + " " + "minDIversity " + " " + parent.minDiversity);
 					IJ.log("Hough parameters:" + " " + " thirdDimension: " + " " + parent.thirdDimension);
 					IJ.log("thetaPerPixel " + " " + parent.thetaPerPixel + " " + "rhoPerPixel " + " " + parent.rhoPerPixel);
 					IJ.log("Optimization Parameters: " + "R" + parent.Intensityratio + " G"
 							+ parent.Inispacing / Math.min(parent.psf[0], parent.psf[1]));
 
-				} else
-					dialog = false;
-
+				} 
 				parent.updatePreview(ValueChange.SHOWMSER);
 				LinefinderInteractiveHFMSERwHough newlineMserwHough = new LinefinderInteractiveHFMSERwHough(groundframe,
 						groundframepre, parent.newtree, parent.minlength, parent.thirdDimension, parent.thetaPerPixel, parent.rhoPerPixel);
@@ -212,12 +207,12 @@ public  class Track {
 
 			if (parent.showDeterministic) {
 				parent.NewFrameparam = parent.returnVector.getB();
-				parent.UserframeNew = parent.returnVectorUser.getB();
+				
 				ArrayList<Trackproperties> startStateVectors = parent.returnVector.getA().getA();
 				ArrayList<Trackproperties> endStateVectors = parent.returnVector.getA().getB();
 
 				if( parent.returnVectorUser != null ){
-					
+					parent.UserframeNew = parent.returnVectorUser.getB();
 					ArrayList<Trackproperties> userStateVectors = parent.returnVectorUser.getA();
 					parent.AllUser.add(userStateVectors);
 					parent.Userframe = parent.UserframeNew;
