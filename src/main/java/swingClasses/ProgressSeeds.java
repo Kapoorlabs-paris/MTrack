@@ -120,6 +120,8 @@ final Interactive_MTDoubleChannel parent;
 			parent.Seedroi.setStrokeColor(parent.colorConfirm);
 			parent.Seedroi.setStrokeWidth(0.8);
 
+			
+			
 			parent.AllSeedrois.add(parent.Seedroi);
 			o.add(parent.Seedroi);
 
@@ -131,6 +133,9 @@ final Interactive_MTDoubleChannel parent;
 					Util.round(parent.PrevFrameparam.getB().get(index).currentpos[1] - parent.radiusseed), Util.round(2 * parent.radiusseed), Util.round(2 * parent.radiusseed));
 			parent.Seedroi.setStrokeColor(parent.colorConfirm);
 			parent.Seedroi.setStrokeWidth(0.8);
+			
+			
+			
 			parent.AllSeedrois.add(parent.Seedroi);
 			o.add(parent.Seedroi);
 

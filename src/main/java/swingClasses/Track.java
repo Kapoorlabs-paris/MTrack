@@ -221,9 +221,7 @@ public  class Track {
 				final Trackstart trackerstart = new Trackstart(parent.Allstart, parent.thirdDimensionSize - next);
 				trackerstart.process();
 				SimpleWeightedGraph<double[], DefaultWeightedEdge> graphstart = trackerstart.getResult();
-				ArrayList<Pair<Integer, double[]>> ID = trackerstart.getSeedID();
-				DisplayGraph displaygraphtrackstart = new DisplayGraph(impstartsec, graphstart, ID);
-				parent.IDALL.addAll(ID);
+				DisplayGraph displaygraphtrackstart = new DisplayGraph(impstartsec, graphstart);
 				displaygraphtrackstart.getImp();
 				impstartsec.draw();
 				impstartsec.setTitle("Graph Start A MT");
@@ -234,9 +232,7 @@ public  class Track {
 
 				trackerend.process();
 				SimpleWeightedGraph<double[], DefaultWeightedEdge> graphend = trackerend.getResult();
-				ArrayList<Pair<Integer, double[]>> ID = trackerend.getSeedID();
-				DisplayGraph displaygraphtrackend = new DisplayGraph(impendsec, graphend, ID);
-				parent.IDALL.addAll(ID);
+				DisplayGraph displaygraphtrackend = new DisplayGraph(impendsec, graphend);
 				displaygraphtrackend.getImp();
 				impendsec.draw();
 				impendsec.setTitle("Graph Start B MT");
@@ -247,9 +243,7 @@ public  class Track {
 				final Trackstart trackerstart = new Trackstart(parent.AllUser, parent.thirdDimensionSize - next);
 				trackerstart.process();
 				SimpleWeightedGraph<double[], DefaultWeightedEdge> graphstart = trackerstart.getResult();
-				ArrayList<Pair<Integer, double[]>> ID = trackerstart.getSeedID();
-				DisplayGraph displaygraphtrackstart = new DisplayGraph(impstartsec, graphstart, ID);
-				parent.IDALL.addAll(ID);
+				DisplayGraph displaygraphtrackstart = new DisplayGraph(impstartsec, graphstart);
 				displaygraphtrackstart.getImp();
 				impstartsec.draw();
 				impstartsec.setTitle("Graph Start User MT");

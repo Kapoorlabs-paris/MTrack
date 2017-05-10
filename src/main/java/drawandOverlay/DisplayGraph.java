@@ -20,12 +20,10 @@ public class DisplayGraph {
 	// add listener to the imageplus slice slider
 	private ImagePlus imp;
 	private final SimpleWeightedGraph<double[], DefaultWeightedEdge> graph;
-	private final ArrayList<Pair<Integer, double[]>> ID;
-	public DisplayGraph(final ImagePlus imp, SimpleWeightedGraph<double[], DefaultWeightedEdge> graph, ArrayList<Pair<Integer, double[]>> ID){
+	public DisplayGraph(final ImagePlus imp, SimpleWeightedGraph<double[], DefaultWeightedEdge> graph){
 		
 		this.imp = imp;
 		this.graph = graph;
-		this.ID = ID;
 		// add listener to the imageplus slice slider
 				SliceObserver sliceObserver = new SliceObserver( imp, new ImagePlusListener() );
 	}

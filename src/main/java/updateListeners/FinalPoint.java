@@ -11,6 +11,8 @@ import java.util.Set;
 
 import interactiveMT.Interactive_MTDoubleChannel;
 import interactiveMT.Interactive_MTDoubleChannel.Whichend;
+import net.imglib2.util.Pair;
+import net.imglib2.util.ValuePair;
 
 public class FinalPoint implements ItemListener {
 
@@ -36,17 +38,7 @@ final Interactive_MTDoubleChannel parent;
 
 }
 
-	public  <T> ArrayList<T> union(ArrayList<T> coll1, ArrayList<T> coll2) {
-	    ArrayList<T> union = new ArrayList<>(coll1);
-	    union.addAll(new ArrayList<>(coll2));
-	    return union;
-	}
-
-	public <T> ArrayList<T> intersect(ArrayList<T> coll1, ArrayList<T> coll2) {
-		ArrayList<T> intersection = new ArrayList<>(coll1);
-	    intersection.retainAll(new ArrayList<>(coll2));
-	    return intersection;
-	}
+	
 public void FinalizeEnds(){
 	
 
@@ -77,6 +69,7 @@ public void FinalizeEnds(){
 
 	}
 
+	
 	for (int i = minSeed; i < maxSeed + 1; ++i) {
 
 		
@@ -90,19 +83,30 @@ public void FinalizeEnds(){
 
 			if (mindistA <= 1 && parent.seedmap.get(i) != Whichend.end) {
 
+				
 				parent.seedmap.put(i, Whichend.start);
 				
-
+				int seedid = i;
+				double[] seedpos = parent.ClickedPoints.get(index).getA();
+				Pair<Integer, double[]> seedpair = new ValuePair<Integer, double[]>(seedid, seedpos);
+				parent.IDALL.add(seedpair);
 			}
 
 			else if (mindistB <= 1 && parent.seedmap.get(i) != Whichend.start) {
 
 				parent.seedmap.put(i, Whichend.end);
 				
+				int seedid = i;
+				double[] seedpos = parent.ClickedPoints.get(index).getA();
+				Pair<Integer, double[]> seedpair = new ValuePair<Integer, double[]>(seedid, seedpos);
+				parent.IDALL.add(seedpair);
+				
 			}
 
 			else if (parent.seedmap.get(i) == Whichend.start && mindistB <= 1){
 				parent.seedmap.put(i, Whichend.both);
+				
+				
 				
 			}
 
@@ -118,9 +122,17 @@ public void FinalizeEnds(){
 
 	}
 	
+
+	for (int index = 0 ; index < parent.Userframe.size(); ++index){
+		
+		int seedid = parent.Userframe.get(index).seedLabel;
+		double[] seedpos = parent.Userframe.get(index).fixedpos;
+		Pair<Integer, double[]> seedpair = new ValuePair<Integer, double[]>(seedid, seedpos);
+
+		
+	parent.IDALL.add(seedpair);
 	
-
-
+	}
 
 	
 	

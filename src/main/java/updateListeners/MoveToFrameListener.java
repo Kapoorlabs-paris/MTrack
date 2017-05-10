@@ -40,19 +40,7 @@ final Interactive_MTDoubleChannel parent;
 		Markends newends = new Markends(parent);
 		newends.markend();
 
-		if (parent.doSegmentation){
-			
-			
-			parent.UpdateHough();
-		}
-			
-
-		else{
-
-			
-			parent.UpdateMser();
-			
-		}
+		
 
 	}
 

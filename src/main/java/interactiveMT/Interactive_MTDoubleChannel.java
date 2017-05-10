@@ -27,11 +27,13 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Locale;
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -76,6 +78,7 @@ import listeners.MinDiversityListener;
 import listeners.MinSizeListener;
 import listeners.MserListener;
 import listeners.MserwHoughListener;
+import listeners.SeedDisplayListener;
 import listeners.ShowBitimgListener;
 import listeners.ShowwatershedimgListener;
 import listeners.SkipFramesandTrackendsListener;
@@ -224,7 +227,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public boolean redoAccept = false;
 	public boolean FindLinesViaMSER = false;
 	public boolean doSegmentation = false;
-	public boolean doMserSegmentation = true;
+	public boolean doMserSegmentation = false;
 	public boolean FindLinesViaHOUGH = false;
 	public boolean FindLinesViaMSERwHOUGH = false;
 	public boolean ShowMser = false;
@@ -1215,7 +1218,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 			}
 		}));
 		// Panel Third
-		final Button MoveNext = new Button("Choose first image in the dynamic channel)");
+		final Button MoveNext = new Button("Choose first image in the dynamic channel");
 		final Button JumptoFrame = new Button("Dynamic end not visible? Choose image at another time point");
 
 		final Label ORText = new Label("OR", Label.CENTER);
@@ -1386,6 +1389,33 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		panelFifth.setLayout(layout);
 		panelFifth.add(Step5, c);
 
+		JLabel lbltrack = new JLabel("Select the seedID of the MT for displaying tracks");
+
+		String[] choicestrack = new String[IDALL.size() + 1];
+		choicestrack[0] = "Display All";
+		Comparator<Pair<Integer, double[]>> seedIDcomparison = new Comparator<Pair<Integer, double[]>>() {
+
+			@Override
+			public int compare(final Pair<Integer, double[]> A, final Pair<Integer, double[]> B) {
+
+				return A.getA() - B.getA();
+
+			}
+
+		};
+
+		Collections.sort(IDALL, seedIDcomparison);
+		for (int index = 0; index < IDALL.size(); ++index) {
+
+			String currentseed = Double.toString(IDALL.get(index).getA());
+
+			choicestrack[index + 1] = "Seed " + currentseed;
+		}
+
+
+		JComboBox<String> cbtrack = new JComboBox<String>(choicestrack);
+		
+		
 		
 		final Button TrackEndPoints = new Button("Track EndPoints (From first to a chosen last timepoint)");
 		final Button SkipframeandTrackEndPoints = new Button("TrackEndPoint (User specified first and last timepoint)");
@@ -1417,7 +1447,15 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 			c.insets = new Insets(10, 175, 0, 175);
 			panelFifth.add(CheckResults, c);
 		}
-	
+		
+
+		++c.gridy;
+		c.insets = new Insets(10, 10, 0, 50);
+		panelFifth.add(lbltrack, c);
+		
+		++c.gridy;
+		c.insets = new Insets(10, 10, 0, 50);
+		panelFifth.add(cbtrack, c);
 		/*
 		++c.gridy;
 		c.insets = new Insets(10, 10, 0, 175);
@@ -1428,7 +1466,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		CheckResults.addActionListener(new CheckResultsListener(this));
 		RoughResults.addItemListener(new AcceptResultsListener(this));
 		AdvancedOptions.addItemListener(new AdvancedTrackerListener(this));
-
+		cbtrack.addActionListener(new SeedDisplayListener(cbtrack, Views.hyperSlice(originalimg, 2, 1),this));
 		panelFifth.repaint();
 		panelFifth.validate();
 		Cardframe.pack();

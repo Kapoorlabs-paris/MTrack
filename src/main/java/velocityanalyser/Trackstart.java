@@ -39,10 +39,7 @@ public class Trackstart implements Linetracker {
 			return Framedgraph;
 		}
 		
-		public ArrayList<Pair<Integer, double[]>> getSeedID() {
-
-			return ID;
-		}
+		
 
 		@Override
 		public boolean process() {
@@ -85,10 +82,7 @@ public class Trackstart implements Linetracker {
 						
 					}
 					
-					if (frame == 1){
-					Pair<Integer, double[]> currentid = new ValuePair<Integer, double[]>(source.seedlabel, source.oldpoint);
-					ID.add(currentid);
-					}
+					
 					subgraph.addVertex(source.oldpoint);
 					subgraph.addVertex(source.newpoint);
 					final DefaultWeightedEdge subedge = subgraph.addEdge(source.oldpoint, source.newpoint);
