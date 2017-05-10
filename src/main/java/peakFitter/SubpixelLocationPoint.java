@@ -56,12 +56,11 @@ implements OutputAlgorithm<GaussianFitParam> {
 	public boolean process() {
 		
 		
-		int currentlabel = util.Boundingboxes.GetLabel(intimg, point);
 		
 		try {
 			
 			
-			Params = Getfinalparam(point, currentlabel, radius);
+			Params = Getfinalparam(point, radius);
 		
 		
 		} catch (Exception e) {
@@ -83,9 +82,9 @@ implements OutputAlgorithm<GaussianFitParam> {
 	}
 	
 	
-	public GaussianFitParam Getfinalparam(final Localizable point, final int label, final long radius) throws Exception {
+	public GaussianFitParam Getfinalparam(final Localizable point, final long radius) throws Exception {
 
-		PointSampleList<FloatType> datalist = gatherfullData(point, label, radius);
+		PointSampleList<FloatType> datalist = gatherfullData(point, radius);
 
 		final Cursor<FloatType> listcursor = datalist.localizingCursor();
 		double[] sigma = new double[ndims];
@@ -124,7 +123,7 @@ implements OutputAlgorithm<GaussianFitParam> {
 			sigma[j] = finalparam[ndims + j + 1];
 			
 		}
-		GaussianFitParam guessparams = new GaussianFitParam(label, finalparam[0], sigma, finalparam[ 2 * ndims + 1]);
+		GaussianFitParam guessparams = new GaussianFitParam(point, finalparam[0], sigma, finalparam[ 2 * ndims + 1]);
 
 		return guessparams;
 
@@ -178,19 +177,9 @@ implements OutputAlgorithm<GaussianFitParam> {
 	}
 
 	
-	private PointSampleList<FloatType> gatherfullData(final Localizable point, final int label, final long radius) {
+	private PointSampleList<FloatType> gatherfullData(final Localizable point, final long radius) {
 		final PointSampleList<FloatType> datalist = new PointSampleList<FloatType>(ndims);
 
-		Pair<RandomAccessibleInterval<FloatType>, FinalInterval> currentimgpair = util.Boundingboxes.CurrentLabelImagepair(intimg, source, label);
-		RandomAccess<IntType> intranac = intimg.randomAccess();
-
-		
-		intranac.setPosition(point);
-		RandomAccessibleInterval<FloatType> currentimg = currentimgpair.getA();
-		FinalInterval interval = currentimgpair.getB();
-		currentimg = Views.interval(currentimg, interval);	
-		
-		Cursor<FloatType> localcursor = Views.iterable(currentimg).localizingCursor();
 		HyperSphere<FloatType> region = new HyperSphere<FloatType>(source, point, radius);
 
 		HyperSphereCursor<FloatType> localcursorsphere = region.localizingCursor();
@@ -210,7 +199,7 @@ implements OutputAlgorithm<GaussianFitParam> {
 			localcursorsphere.fwd();
 			for (int d = 0; d < ndims; d++) {
 
-				if (localcursor.getDoublePosition(d) < 0 || localcursor.getDoublePosition(d) >= source.dimension(d)) {
+				if (localcursorsphere.getDoublePosition(d) < 0 || localcursorsphere.getDoublePosition(d) >= source.dimension(d)) {
 					outofbounds = true;
 					break;
 				}
@@ -219,14 +208,12 @@ implements OutputAlgorithm<GaussianFitParam> {
 				outofbounds = false;
 				continue;
 			}
-			intranac.setPosition(localcursor);
-			int i = intranac.get().get();
-			if (i == label) {
+		
 
-				Point newpoint = new Point(localcursor);
-				datalist.add(newpoint, localcursor.get().copy());
+				Point newpoint = new Point(localcursorsphere);
+				datalist.add(newpoint, localcursorsphere.get().copy());
 
-			}
+			
 			
 			
 		}

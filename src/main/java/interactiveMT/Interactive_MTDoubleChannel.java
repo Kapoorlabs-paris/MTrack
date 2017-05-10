@@ -61,6 +61,7 @@ import ij.process.ColorProcessor;
 import labeledObjects.CommonOutputHF;
 import labeledObjects.Indexedlength;
 import listeners.AcceptResultsListener;
+import listeners.AdvancedSeedListener;
 import listeners.AdvancedTrackerListener;
 import listeners.AnalyzekymoListener;
 import listeners.CheckResultsListener;
@@ -71,6 +72,7 @@ import listeners.DeltaListener;
 import listeners.DoMserSegmentation;
 import listeners.DoSegmentation;
 import listeners.DowatershedListener;
+import listeners.FindLinesListener;
 import listeners.HoughListener;
 import listeners.MaxSizeListener;
 import listeners.Unstability_ScoreListener;
@@ -103,6 +105,7 @@ import preProcessing.GetLocalmaxmin;
 import preProcessing.Kernels;
 import preProcessing.MedianFilter2D;
 import trackerType.MTTracker;
+import updateListeners.DefaultModel;
 import updateListeners.DefaultModelHF;
 import updateListeners.FinalPoint;
 import updateListeners.MoveNextListener;
@@ -185,8 +188,8 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public int deltaInit = 20;
 	public int Unstability_ScoreInit = 1;
 
-	public int minSizeInit = 100;
-	public int maxSizeInit = 500;
+	public int minSizeInit = 10;
+	public int maxSizeInit = 5000;
 
 	public float thresholdHoughInit = 100;
 	public float rhoPerPixelInit = new Float(1);
@@ -605,7 +608,8 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		setInitialthetaPerPixel(thetaPerPixelInit);
 		setInitialthresholdHough(thresholdHoughInit);
 		setInitialminDiversity(minDiversityInit);
-		
+		setInitialmaxSize(maxSizeInit);
+		setInitialminSize(minSizeInit);
 		setInitialsearchradius(initialSearchradiusInit);
 		setInitialmaxsearchradius(maxSearchradius);
 		
@@ -675,6 +679,11 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 	}
 
+
+	
+	
+	
+	
 	/**
 	 * Updates the Preview with the current parameters (sigma, threshold, roi,
 	 * slicenumber)
@@ -796,13 +805,11 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 				roiChanged = true;
 			}
 
-			Rectangle rect = roi.getBounds();
+			
 
 			if (roiChanged || currentimg == null || currentPreprocessedimg == null || newimg == null
-					|| change == ValueChange.FRAME || rect.getMinX() != standardRectangle.getMinX()
-					|| rect.getMaxX() != standardRectangle.getMaxX() || rect.getMinY() != standardRectangle.getMinY()
-					|| rect.getMaxY() != standardRectangle.getMaxY() || change == ValueChange.ALL) {
-				standardRectangle = rect;
+					|| change == ValueChange.FRAME  || change == ValueChange.ALL) {
+				
 
 				long[] min = { (long) standardRectangle.getMinX(), (long) standardRectangle.getMinY() };
 				long[] max = { (long) standardRectangle.getMaxX(), (long) standardRectangle.getMaxY() };
@@ -1052,7 +1059,8 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	}
 
 	// Making the card
-	public JFrame Cardframe = new JFrame("MicroTubule Tracker");
+	public JFrame Cardframe = new JFrame("MicroTubule Velocity Tracker (Advanced Mode)");
+	
 	public JPanel panelCont = new JPanel();
 	public JPanel panelFirst = new JPanel();
 	public JPanel panelSecond = new JPanel();
@@ -1065,6 +1073,19 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public JPanel panelNinth = new JPanel();
 	public JPanel panelTenth = new JPanel();
 
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	public void Card() {
 
 		CardLayout cl = new CardLayout();
@@ -1076,12 +1097,15 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		panelCont.add(panelThird, "3");
 		panelCont.add(panelFourth, "4");
 		panelCont.add(panelFifth, "5");
+		/*
 		panelCont.add(panelSixth, "6");
 		panelCont.add(panelSeventh, "7");
 		panelCont.add(panelEighth, "8");
 		panelCont.add(panelNinth, "9");
 		panelCont.add(panelTenth, "10");
-
+*/
+		//Insets for labels : c.insets = new Insets(20, 100, 0, 200);
+		
 		// First Panel
 		panelFirst.setName("Preprocess and Determine Seeds");
 
@@ -1218,10 +1242,10 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 			}
 		}));
 		// Panel Third
-		final Button MoveNext = new Button("Choose first image in the dynamic channel");
-		final Button JumptoFrame = new Button("Dynamic end not visible? Choose image at another time point");
+		final Button MoveNext = new Button("Choose first image in the dynamic channel to mark ends to track");
+		final Button JumptoFrame = new Button("Choose a later time point in the dynamic channel to mark ends to track");
 
-		final Label ORText = new Label("OR", Label.CENTER);
+		final Label ORText = new Label("If the dynamic ends are not visible", Label.CENTER);
 
 		ORText.setBackground(new Color(1, 0, 1));
 		ORText.setForeground(new Color(255, 255, 255));
@@ -1252,7 +1276,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridx = 0;
 		c.gridy = 0;
-		c.weightx = 1;
+		c.weightx = 0.5;
 
 		panelThird.setLayout(layout);
 		panelThird.add(Step3, c);
@@ -1266,15 +1290,15 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		panelThird.add(MTTextHF, c);
 
 		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 180);
+		c.insets = new Insets(10, 10, 0, 150);
 		panelThird.add(MoveNext, c);
 
 		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 10);
+		c.insets = new Insets(20, 100, 0, 200);
 		panelThird.add(ORText, c);
 
 		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 180);
+		c.insets = new Insets(10, 10, 0, 150);
 		panelThird.add(JumptoFrame, c);
 
 		++c.gridy;
@@ -1282,7 +1306,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		panelThird.add(Finalize, c);
 
 		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 0);
+		c.insets = new Insets(20, 100, 0, 200);
 		panelThird.add(SegChoice, c);
 		++c.gridy;
 		c.insets = new Insets(10, 10, 0, 180);
@@ -1389,7 +1413,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		panelFifth.setLayout(layout);
 		panelFifth.add(Step5, c);
 
-		JLabel lbltrack = new JLabel("Select the seedID of the MT for displaying tracks");
+		JLabel lbltrack = new JLabel("Display SeedID's");
 
 		String[] choicestrack = new String[IDALL.size() + 1];
 		choicestrack[0] = "Display All";
@@ -1426,7 +1450,13 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		final Label Checkres = new Label("The tracker now performs an internal check on the results");
 		Checkres.setBackground(new Color(1, 0, 1));
 		Checkres.setForeground(new Color(255, 255, 255));
-		
+		final Label Done = new Label("Hope that everything was to your satisfaction!");
+		final Button Exit = new Button("Close and exit");
+
+		Done.setBackground(new Color(1, 0, 1));
+		Done.setForeground(new Color(255, 255, 255));
+	
+
 		++c.gridy;
 		c.insets = new Insets(10, 175, 0, 175);
 		panelFifth.add(AdvancedOptions, c);
@@ -1461,6 +1491,16 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		c.insets = new Insets(10, 10, 0, 175);
 		panelFifth.add(RoughResults, c);
 */
+		++c.gridy;
+		c.insets = new Insets(10, 10, 0, 50);
+		panelFifth.add(Done, c);
+
+		++c.gridy;
+		c.insets = new Insets(10, 10, 0, 50);
+		panelFifth.add(Exit, c);
+
+		Exit.addActionListener(new FinishedButtonListener(Cardframe, true));
+		
 		TrackEndPoints.addActionListener(new TrackendsListener(this));
 		SkipframeandTrackEndPoints.addActionListener(new SkipFramesandTrackendsListener(this));
 		CheckResults.addActionListener(new CheckResultsListener(this));
@@ -1473,7 +1513,6 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 	}
 
-	
 
 	public void UpdateHough() {
 

@@ -36,6 +36,9 @@ public class FileChooser extends JPanel {
 	private TextField inputFieldX, inputFieldY, inputFieldT;
 	JPanel panelCont = new JPanel();
 	JPanel panelIntro = new JPanel();
+	boolean Simplemode = false;
+	boolean Advancedmode = false;
+	
 	public FileChooser() {
 		final JFrame frame = new JFrame("Welcome to MTV Tracker");
 		
@@ -45,10 +48,17 @@ public class FileChooser extends JPanel {
 		final GridBagConstraints c = new GridBagConstraints();
 
 		panelIntro.setLayout(layout);
+		
+		CheckboxGroup Mode = new CheckboxGroup();
+		
 		final Label LoadtrackText = new Label("Load pre-processed tracking image");
 		final Label LoadMeasureText = new Label("Load original image");
 		final Label KymoText = new Label("Kymo mode (only 1 MT, pick Kymograph image) else skip");
 		final Label StartText = new Label("Input Microscope parameters");
+		final Checkbox Simple = new Checkbox("Run in Simple mode ", Mode,  Simplemode);
+		final Checkbox Advanced = new Checkbox("Run in Advanced mode ", Mode,  Advancedmode);
+		
+		
 		LoadtrackText.setBackground(new Color(1, 0, 1));
 		LoadtrackText.setForeground(new Color(255, 255, 255));
 
@@ -84,6 +94,18 @@ public class FileChooser extends JPanel {
 		c.gridy = 0;
 		c.weightx = 1;
 		c.weighty = 1.5;
+		
+		++c.gridy;
+		c.insets = new Insets(10, 10, 10, 0);
+		panelIntro.add(Simple, c);
+		
+		
+		++c.gridy;
+		c.insets = new Insets(10, 10, 10, 0);
+		panelIntro.add(Advanced, c);
+		
+		
+		
 		++c.gridy;
 		c.insets = new Insets(10, 10, 10, 0);
 		panelIntro.add(LoadtrackText, c);
@@ -152,6 +174,7 @@ public class FileChooser extends JPanel {
 		Measure.addActionListener(new MeasureListener(frame));
 		Kymo.addActionListener(new KymoListener(frame));
 		Done.addActionListener(new DoneButtonListener(frame, true));
+		Simple.addItemListener(new RunSimpleListener());
 		frame.addWindowListener(new FrameListener(frame));
 		frame.add(panelCont, BorderLayout.CENTER);
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -173,6 +196,37 @@ public class FileChooser extends JPanel {
 		}
 	}
 
+	
+	protected class RunSimpleListener implements ItemListener{
+		
+		
+		@Override
+		public void itemStateChanged(final ItemEvent arg0) {
+
+			if (arg0.getStateChange() == ItemEvent.DESELECTED)
+				Simplemode = false;
+			else if (arg0.getStateChange() == ItemEvent.SELECTED)
+				Simplemode = true;
+		
+		}
+		
+	}
+	
+	protected class RunAdvancedListener implements ItemListener{
+		
+		
+		@Override
+		public void itemStateChanged(final ItemEvent arg0) {
+
+			if (arg0.getStateChange() == ItemEvent.DESELECTED)
+				Advancedmode = false;
+			else if (arg0.getStateChange() == ItemEvent.SELECTED)
+				Advancedmode = true;
+		
+		}
+		
+	}
+	
 	protected class OpenTrackListener implements ActionListener {
 
 		final Frame parent;
@@ -327,10 +381,25 @@ public class FileChooser extends JPanel {
 			psf[1] = Float.parseFloat(inputFieldY.getText());
 		//	frametosec = Float.parseFloat(inputFieldT.getText());
 
-			if (kymoimg!=null)
-			new Interactive_MTDoubleChannel(originalimg, originalPreprocessedimg, kymoimg, psf, calibration).run(null);
-			else
-			new Interactive_MTDoubleChannel(originalimg, originalPreprocessedimg, psf, calibration).run(null);	
+			if (kymoimg!=null){
+				
+				
+			   
+			    if(Simplemode)
+			    new Interactive_MTDoubleChannelBasic(new Interactive_MTDoubleChannel(originalimg, originalPreprocessedimg, kymoimg, psf, calibration)).run(null);	
+			    else
+			    new Interactive_MTDoubleChannel(originalimg, originalPreprocessedimg, kymoimg, psf, calibration).run(null);	
+			
+			}
+			else{
+
+				
+				if(Simplemode)
+				new Interactive_MTDoubleChannelBasic(new Interactive_MTDoubleChannel(originalimg, originalPreprocessedimg, psf, calibration)).run(null);
+				else
+				new Interactive_MTDoubleChannel(originalimg, originalPreprocessedimg, psf, calibration).run(null);		
+			
+			}
 			close(parent);
 		}
 	}
