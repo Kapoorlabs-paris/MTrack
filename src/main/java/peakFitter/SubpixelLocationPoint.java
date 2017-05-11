@@ -2,6 +2,10 @@ package peakFitter;
 
 import java.util.ArrayList;
 
+import javax.swing.JProgressBar;
+
+import beadFinder.Beadfinder;
+import beadObjects.Beadprop;
 import labeledObjects.Indexedlength;
 import net.imglib2.Cursor;
 import net.imglib2.FinalInterval;
@@ -22,25 +26,25 @@ import pointModels.GaussianPoints;
 import psf_Tookit.GaussianFitParam;
 
 public class SubpixelLocationPoint extends BenchmarkAlgorithm
-implements OutputAlgorithm<GaussianFitParam> {
+implements OutputAlgorithm<ArrayList<GaussianFitParam>> {
 
 	
 	private final RandomAccessibleInterval<FloatType> source;
-	private final RandomAccessibleInterval<IntType> intimg;
-	private final Localizable point;
-	private final long radius;
+	
 	private final int ndims;
 	private static final String BASE_ERROR_MSG = "[SubpixelLocationPoint] ";
-	private GaussianFitParam Params;
-	
-	public SubpixelLocationPoint(RandomAccessibleInterval<FloatType> source, RandomAccessibleInterval<IntType> intimg, final Localizable point, final long radius ) {
+	private ArrayList<GaussianFitParam> Params;
+	private final ArrayList<Beadprop> Allbeads;
+	final JProgressBar jpb;
+	 double percent = 0;
+	public SubpixelLocationPoint(RandomAccessibleInterval<FloatType> source, Beadfinder beadfinder,final JProgressBar jpb ) {
 
+		beadfinder.process();
+		Allbeads = beadfinder.getResult();
+		
 		this.source = source;
-		this.intimg = intimg;
-		this.point = point;
-		this.radius = radius;
+		this.jpb = jpb;
 		this.ndims = source.numDimensions();
-		assert source.numDimensions() == intimg.numDimensions();
 
 	}
 
@@ -60,8 +64,18 @@ implements OutputAlgorithm<GaussianFitParam> {
 		try {
 			
 			
-			Params = Getfinalparam(point, radius);
+			for (int index = 0; index < Allbeads.size(); ++index){
+			
+				
+				
+				percent = (Math.round(100 * (index + 1) / (Allbeads.size())));
+				
+				Localizable point = Allbeads.get(index).point;
+				long radius = Allbeads.get(index).radius;
+				
+			    Params.add(Getfinalparam(point, radius));
 		
+			}
 		
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -76,7 +90,7 @@ implements OutputAlgorithm<GaussianFitParam> {
 
 
 	@Override
-	public GaussianFitParam getResult() {
+	public ArrayList<GaussianFitParam> getResult() {
 		
 		return Params;
 	}

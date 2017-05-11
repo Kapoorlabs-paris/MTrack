@@ -23,11 +23,14 @@ import kdTreeBlobs.FlagNode;
 import kdTreeBlobs.NNFlagsearchKDtree;
 import labeledObjects.Indexedlength;
 import labeledObjects.KalmanIndexedlength;
+import mpicbg.imglib.util.Util;
 import net.imglib2.KDTree;
+import net.imglib2.Point;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.RealPoint;
 import net.imglib2.algorithm.componenttree.mser.Mser;
 import net.imglib2.algorithm.componenttree.mser.MserTree;
+import net.imglib2.algorithm.localextrema.RefinedPeak;
 import net.imglib2.img.display.imagej.ImageJFunctions;
 import net.imglib2.type.numeric.integer.UnsignedByteType;
 import net.imglib2.type.numeric.real.FloatType;
@@ -36,6 +39,29 @@ import peakFitter.SortListbyproperty;
 
 public class DrawingUtils {
 
+	
+	
+	
+	public static ArrayList<Roi> getcurrentDoGRois(ArrayList<RefinedPeak<Point>> peaks, double sigma, double sigma2) {
+
+		ArrayList<Roi> Allrois = new ArrayList<Roi>();
+
+		for (final RefinedPeak<Point> peak : peaks) {
+			float x = (float) (peak.getFloatPosition(0));
+			float y = (float) (peak.getFloatPosition(1));
+
+			final OvalRoi or = new OvalRoi(Util.round(x - sigma), Util.round(y - sigma), Util.round(sigma + sigma2),
+					Util.round(sigma + sigma2));
+
+			Allrois.add(or);
+
+		}
+
+		return Allrois;
+
+	}
+
+	
 	/**
 	 * 2D correlated Gaussian
 	 * 

@@ -203,10 +203,14 @@ public class FileChooser extends JPanel {
 		@Override
 		public void itemStateChanged(final ItemEvent arg0) {
 
-			if (arg0.getStateChange() == ItemEvent.DESELECTED)
+			if (arg0.getStateChange() == ItemEvent.DESELECTED){
 				Simplemode = false;
-			else if (arg0.getStateChange() == ItemEvent.SELECTED)
+			    Advancedmode = true;	
+			}
+			else if (arg0.getStateChange() == ItemEvent.SELECTED){
 				Simplemode = true;
+			    Advancedmode = false;	
+			}
 		
 		}
 		
@@ -218,10 +222,14 @@ public class FileChooser extends JPanel {
 		@Override
 		public void itemStateChanged(final ItemEvent arg0) {
 
-			if (arg0.getStateChange() == ItemEvent.DESELECTED)
+			if (arg0.getStateChange() == ItemEvent.DESELECTED){
 				Advancedmode = false;
-			else if (arg0.getStateChange() == ItemEvent.SELECTED)
+			    Simplemode = true;	
+			}
+			else if (arg0.getStateChange() == ItemEvent.SELECTED){
 				Advancedmode = true;
+			    Simplemode = false;	
+			}
 		
 		}
 		

@@ -346,8 +346,8 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public ImageStack prestack;
 	public Rectangle standardRectangle;
 	public FinalInterval interval;
-	RandomAccessibleInterval<UnsignedByteType> newimg;
-	ArrayList<double[]> AllmeanCovar = new ArrayList<double[]>();
+	public RandomAccessibleInterval<UnsignedByteType> newimg;
+	public ArrayList<double[]> AllmeanCovar = new ArrayList<double[]>();
 	public long Cannyradius;
 	public HashMap<Integer, ArrayList<Roi>> AllpreviousRois;
 	// first and last slice to process
