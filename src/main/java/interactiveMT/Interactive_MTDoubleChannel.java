@@ -65,6 +65,7 @@ import listeners.AdvancedSeedListener;
 import listeners.AdvancedTrackerListener;
 import listeners.AnalyzekymoListener;
 import listeners.CheckResultsListener;
+import listeners.ChooseDirectoryListener;
 import listeners.ComputeMserinHoughListener;
 import listeners.ComputeTreeListener;
 import listeners.DarktobrightListener;
@@ -647,7 +648,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		output = new ArrayList<CommonOutputHF>();
 		endStack = thirdDimensionSize;
 		thirdDimensionSizeOriginal = thirdDimensionSize;
-		preprocessedimp = ImageJFunctions.show(CurrentPreprocessedView);
+		preprocessedimp = ImageJFunctions.show(CurrentView);
 
 		Roi roi = preprocessedimp.getRoi();
 
@@ -1014,30 +1015,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 	}
 
-	protected class ChooseDirectoryListener implements ActionListener {
-		final TextField filename;
-
-		public ChooseDirectoryListener(TextField filename) {
-
-			this.filename = filename;
-
-		}
-
-		@Override
-		public void actionPerformed(final ActionEvent arg0) {
-
-			JFileChooser chooserA = new JFileChooser();
-			chooserA.setCurrentDirectory(new java.io.File("."));
-			chooserA.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-			chooserA.showOpenDialog(panelFirst);
-			usefolder = chooserA.getSelectedFile().getAbsolutePath();
-
-			addToName = filename.getText();
-
-			SaveTxt = true;
-		}
-
-	}
+	
 
 	protected class ConfirmDirectoryListener implements ActionListener {
 
@@ -1211,7 +1189,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		Analyzekymo.addItemListener(new AnalyzekymoListener(this));
 		hough.addItemListener(new HoughListener(this));
 		mserwhough.addItemListener(new MserwHoughListener(this));
-		ChooseDirectory.addActionListener(new ChooseDirectoryListener(inputField));
+		ChooseDirectory.addActionListener(new ChooseDirectoryListener(this, inputField));
 		JPanel control = new JPanel();
 
 		control.add(new JButton(new AbstractAction("\u22b2Prev") {

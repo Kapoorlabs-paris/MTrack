@@ -1,24 +1,24 @@
-package listeners;
+package beadListener;
 
 import java.awt.Label;
 import java.awt.Scrollbar;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 
-import interactiveMT.Interactive_MTDoubleChannel;
-import interactiveMT.Interactive_MTDoubleChannel.ValueChange;
+
 import interactiveMT.Interactive_PSFAnalyze;
+import interactiveMT.Interactive_PSFAnalyze.ValueChange;
 import mpicbg.imglib.multithreading.SimpleMultiThreading;
 
 public class DeltaListener implements AdjustmentListener {
 	final Label label;
-	 Interactive_MTDoubleChannel parent;
+	 Interactive_PSFAnalyze parent;
 	final float min, max;
 	final int scrollbarSize;
 
 	final Scrollbar deltaScrollbar;
 
-	public DeltaListener(	final Interactive_MTDoubleChannel parent, final Label label, final float min, final float max, final int scrollbarSize,
+	public DeltaListener(	final Interactive_PSFAnalyze parent, final Label label, final float min, final float max, final int scrollbarSize,
 			final Scrollbar deltaScrollbar) {
 		this.label = label;
 		this.parent = parent;

@@ -1,23 +1,23 @@
-package listeners;
+package beadListener;
 
 import java.awt.Label;
 import java.awt.Scrollbar;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 
-import interactiveMT.Interactive_MTDoubleChannel;
-import interactiveMT.Interactive_MTDoubleChannel.ValueChange;
+
 import interactiveMT.Interactive_PSFAnalyze;
+import interactiveMT.Interactive_PSFAnalyze.ValueChange;
 import mpicbg.imglib.multithreading.SimpleMultiThreading;
 
 public class Unstability_ScoreListener implements AdjustmentListener {
 	final Label label;
 	final float min, max;
 	final int scrollbarSize;
-	Interactive_MTDoubleChannel parent;
+	Interactive_PSFAnalyze parent;
 	final Scrollbar Unstability_ScoreScrollbar;
 
-	public Unstability_ScoreListener(final Interactive_MTDoubleChannel parent, final Label label, final float min, final float max, final int scrollbarSize,
+	public Unstability_ScoreListener(final Interactive_PSFAnalyze parent, final Label label, final float min, final float max, final int scrollbarSize,
 			final Scrollbar Unstability_ScoreScrollbar) {
 		this.label = label;
 		this.min = min;

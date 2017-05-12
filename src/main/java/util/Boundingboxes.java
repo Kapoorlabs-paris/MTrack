@@ -724,7 +724,9 @@ public static FinalInterval CurrentroiInterval(RandomAccessibleInterval<FloatTyp
 		
 		return Velocity;
 	}
+
 	
+
 	public static double VelocityY(final double[] oldpoint, final double[] newpoint) {
 
 		double Velocity = 0;

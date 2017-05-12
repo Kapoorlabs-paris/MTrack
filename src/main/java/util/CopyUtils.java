@@ -177,8 +177,7 @@ public class CopyUtils {
 	
 	
 	
-	
-	
+
 	
 	public static RandomAccessibleInterval<FloatType> extractImage(final RandomAccessibleInterval<FloatType> intervalView, final FinalInterval interval) {
 

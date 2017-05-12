@@ -1,4 +1,4 @@
-package listeners;
+package beadListener;
 
 import java.awt.Button;
 import java.awt.Checkbox;
@@ -14,8 +14,8 @@ import java.awt.event.ItemListener;
 import javax.swing.JPanel;
 
 import interactiveMT.Interactive_MTDoubleChannel;
-import interactiveMT.Interactive_MTDoubleChannel.ValueChange;
 import interactiveMT.Interactive_PSFAnalyze;
+import interactiveMT.Interactive_PSFAnalyze.ValueChange;
 import mpicbg.imglib.multithreading.SimpleMultiThreading;
 import updateListeners.DefaultModel;
 import updateListeners.DefaultModelHF;
@@ -26,9 +26,9 @@ import updateListeners.DefaultModelHF;
 	public class MserListener implements ItemListener {
 		
 		
-		Interactive_MTDoubleChannel parent;
+		Interactive_PSFAnalyze parent;
 		
-		public MserListener(final Interactive_MTDoubleChannel parent){
+		public MserListener(final Interactive_PSFAnalyze parent){
 		
 			this.parent = parent;
 		}
@@ -37,15 +37,14 @@ import updateListeners.DefaultModelHF;
 		
 		@Override
 		public void itemStateChanged(final ItemEvent arg0) {
-			boolean oldState = parent.FindLinesViaMSER;
+			boolean oldState = parent.FindBeadsViaMSER;
 
 			if (arg0.getStateChange() == ItemEvent.DESELECTED)
-				parent.FindLinesViaMSER = false;
+				parent.FindBeadsViaMSER = false;
 			else if (arg0.getStateChange() == ItemEvent.SELECTED) {
 
-				parent.FindLinesViaMSER = true;
-				parent.FindLinesViaHOUGH = false;
-				parent.FindLinesViaMSERwHOUGH = false;
+				parent.FindBeadsViaMSER = true;
+				parent.FindBeadsViaDOG = false;
 
 				parent.panelSecond.removeAll();
 
@@ -63,7 +62,7 @@ import updateListeners.DefaultModelHF;
 				final Scrollbar minSizeS = new Scrollbar(Scrollbar.HORIZONTAL, parent.minSizeInit, 10, 0, 10 + parent.scrollbarSize);
 				final Scrollbar maxSizeS = new Scrollbar(Scrollbar.HORIZONTAL, parent.maxSizeInit, 10, 0, 10 + parent.scrollbarSize);
 				final Button ComputeTree = new Button("Compute Tree and display");
-				final Button FindLinesListener = new Button("Find endpoints");
+				final Button FindLinesListener = new Button("Fit Gaussian Function");
 				parent.Unstability_Score = parent.computeValueFromScrollbarPosition(parent.Unstability_ScoreInit, parent.Unstability_ScoreMin, parent.Unstability_ScoreMax, 
 						parent.scrollbarSize);
 				parent.delta = parent.computeValueFromScrollbarPosition(parent.deltaInit, 
@@ -88,9 +87,7 @@ import updateListeners.DefaultModelHF;
 				MSparam.setBackground(new Color(1, 0, 1));
 				MSparam.setForeground(new Color(255, 255, 255));
 
-				final Checkbox AdvancedOptions = new Checkbox("Advanced Optimizer Options ", parent.AdvancedChoiceSeeds);
-				DefaultModel loaddefault = new DefaultModel(parent);
-				loaddefault.LoadDefault();
+			
 				
 				/* Location */
 				parent.panelSecond.setLayout(layout);
@@ -141,9 +138,7 @@ import updateListeners.DefaultModelHF;
 				parent.panelSecond.add(maxSizeS, c);
 
 				
-				++c.gridy;
-				c.insets = new Insets(10, 175, 0, 175);
-				parent.panelSecond.add(AdvancedOptions, c);
+			
 
 				++c.gridy;
 				c.insets = new Insets(10, 175, 0, 175);
@@ -171,20 +166,19 @@ import updateListeners.DefaultModelHF;
 						new MaxSizeListener(parent,maxSizeText,parent. maxSizemin, parent.maxSizemax, 
 								parent.scrollbarSize, maxSizeS));
 
-				AdvancedOptions.addItemListener(new AdvancedSeedListener(parent));
 				ComputeTree.addActionListener(new ComputeTreeListener(parent));
-				FindLinesListener.addActionListener(new FindLinesListener(parent));
+				FindLinesListener.addActionListener(new FindBeadsListener(parent));
 				parent.panelSecond.validate();
 				parent.panelSecond.repaint();
 				parent.Cardframe.pack();
 
 			}
 
-			if (parent.FindLinesViaMSER != oldState) {
+			if (parent.FindBeadsViaMSER != oldState) {
 				while (parent.isComputing)
 					SimpleMultiThreading.threadWait(10);
 
-				parent.updatePreview(ValueChange.FindLinesVia);
+				parent.updatePreview(ValueChange.FindBeadsVia);
 			}
 		}
 	}

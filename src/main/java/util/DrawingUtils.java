@@ -380,6 +380,9 @@ public class DrawingUtils {
 
 	}
 
+	
+	
+	
 	public static ArrayList<EllipseRoi> getcurrentRois(ArrayList<MserTree<UnsignedByteType>> newtree,
 			ArrayList<double[]> AllmeanCovar) {
 

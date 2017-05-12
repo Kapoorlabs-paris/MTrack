@@ -38,7 +38,6 @@ import ij.gui.OvalRoi;
 import ij.gui.Overlay;
 import ij.gui.Roi;
 import ij.plugin.PlugIn;
-import interactiveMT.Interactive_MTDoubleChannel.ChooseDirectoryListener;
 import interactiveMT.Interactive_MTDoubleChannel.FinishedButtonListener;
 import interactiveMT.Interactive_MTDoubleChannel.FrameListener;
 import interactiveMT.Interactive_MTDoubleChannel.ImagePlusListener;
