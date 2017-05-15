@@ -16,6 +16,10 @@ import java.awt.*;
 import java.util.*;
 
 public class BeadFileChooser extends JPanel {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	boolean wasDone = false;
 	boolean isFinished = false;
 	JButton Track;
@@ -35,6 +39,13 @@ public class BeadFileChooser extends JPanel {
 	JPanel panelCont = new JPanel();
 	JPanel panelIntro = new JPanel();
 	
+	public enum whichModel{
+		
+		Bead, Filament;
+		
+	}
+	
+	whichModel UserModel;
 	
 	public BeadFileChooser() {
 		final JFrame frame = new JFrame("Welcome to PSF Analyzer");
@@ -47,6 +58,14 @@ public class BeadFileChooser extends JPanel {
 		panelIntro.setLayout(layout);
 		
 		CheckboxGroup Mode = new CheckboxGroup();
+
+		JLabel lbltrack = new JLabel("Objects in the image");
+
+		String[] choicestrack = new String[2];
+		
+		choicestrack[0] = "Beads";
+		choicestrack[1] = "Filaments";
+		JComboBox<String> cbtrack = new JComboBox<String>(choicestrack);
 		
 		final Label LoadtrackText = new Label("Load pre-processed bead/filament image");
 		final Label LoadMeasureText = new Label("Load original image");
@@ -79,7 +98,13 @@ public class BeadFileChooser extends JPanel {
 		c.weighty = 1.5;
 		
 		
-		
+		++c.gridy;
+		c.insets = new Insets(10, 10, 0, 50);
+		panelIntro.add(lbltrack, c);
+
+		++c.gridy;
+		c.insets = new Insets(10, 10, 0, 50);
+		panelIntro.add(cbtrack, c);
 		
 		
 		++c.gridy;
@@ -109,6 +134,7 @@ public class BeadFileChooser extends JPanel {
 		Track.addActionListener(new OpenTrackListener(frame));
 		Measure.addActionListener(new MeasureListener(frame));
 		Done.addActionListener(new DoneButtonListener(frame, true));
+		cbtrack.addActionListener(new ModelListener(cbtrack));
 		frame.addWindowListener(new FrameListener(frame));
 		frame.add(panelCont, BorderLayout.CENTER);
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -116,6 +142,37 @@ public class BeadFileChooser extends JPanel {
 		frame.setVisible(true);
 	}
 
+	
+	protected class ModelListener implements ActionListener{
+
+		
+		final JComboBox<String> cb;
+		
+		public ModelListener(final JComboBox<String> cb){
+			
+			this.cb = cb;
+		}
+		
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			
+			if(cb.getSelectedItem() == "Beads" ){
+				
+				UserModel = whichModel.Bead;
+			}
+			
+			else
+				UserModel = whichModel.Filament;
+				
+			
+			
+		}
+		
+		
+		
+		
+	}
+	
 	protected class FrameListener extends WindowAdapter {
 		final Frame parent;
 
@@ -245,7 +302,7 @@ public class BeadFileChooser extends JPanel {
 			Normalize.normalize(Views.iterable(originalimg), minval, maxval);
 			Normalize.normalize(Views.iterable(originalPreprocessedimg), minval, maxval);
 		
-		    new Interactive_PSFAnalyze(originalimg, originalPreprocessedimg).run(null);
+		    new Interactive_PSFAnalyze(originalimg, originalPreprocessedimg, UserModel).run(null);
 			
 		    close(parent);
 		}

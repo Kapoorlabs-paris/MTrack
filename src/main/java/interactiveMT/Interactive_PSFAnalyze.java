@@ -49,6 +49,7 @@ import ij.gui.RoiListener;
 import ij.plugin.PlugIn;
 import ij.plugin.frame.RoiManager;
 import ij.process.ColorProcessor;
+import interactiveMT.BeadFileChooser.whichModel;
 import interactiveMT.Interactive_MTDoubleChannel.ValueChange;
 import interactiveMT.Interactive_MTDoubleChannel.moveInThirdDimListener;
 import mpicbg.imglib.multithreading.SimpleMultiThreading;
@@ -167,7 +168,7 @@ public class Interactive_PSFAnalyze implements PlugIn {
 	public long minSizemax = 1000;
 	public long maxSizemin = 100;
 	public long maxSizemax = 10000;
-	
+	public  whichModel Usermodel;
 	public ArrayList<double[]> AllmeanCovar = new ArrayList<double[]>();
 	public ArrayList<Pair<double[], OvalRoi>> ClickedPoints = new ArrayList<Pair<double[], OvalRoi>>();
 	public HashMap<Integer, ArrayList<EllipseRoi>> AllMSERrois = new HashMap<Integer, ArrayList<EllipseRoi>>();
@@ -298,13 +299,14 @@ public class Interactive_PSFAnalyze implements PlugIn {
 	
 	
 	public Interactive_PSFAnalyze(final RandomAccessibleInterval<FloatType> originalimg,
-			final RandomAccessibleInterval<FloatType> originalPreprocessedimg){
+			final RandomAccessibleInterval<FloatType> originalPreprocessedimg, final whichModel model){
 		
 		this.originalimg = originalimg;
 		this.originalPreprocessedimg = originalPreprocessedimg;
 		standardRectangle = new Rectangle(inix, iniy, (int) originalimg.dimension(0) - 2 * inix,
 				(int) originalimg.dimension(1) - 2 * iniy);
 		imp = ImageJFunctions.show(originalimg);
+		this.Usermodel = model;
 		impcopy = imp.duplicate();
 	};
 	
@@ -762,10 +764,11 @@ public class Interactive_PSFAnalyze implements PlugIn {
 			c.insets = new Insets(10, 10, 0, 0);
 			panelFirst.add(mser, c);
 
+			if(Usermodel == whichModel.Bead){
 			++c.gridy;
 			c.insets = new Insets(10, 10, 0, 0);
 			panelFirst.add(dog, c);
-
+			}
 			if (thirdDimensionSize > 1) {
 				++c.gridy;
 				panelFirst.add(thirdDimensionsliderS, c);
