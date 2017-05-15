@@ -460,9 +460,12 @@ public ArrayList<Indexedlength> getEndPoints(){
 					UserChoiceFunction = new GaussianLineds();
 
 				}
+				final double[] inistartpos = { start_param[0], start_param[1] };
+				final double[] iniendpos = { start_param[2], start_param[3] };
+				double inicutoffdistanceY = Math.abs(inistartpos[1] - iniendpos[1]);
+				double inicutoffdistanceX = Math.abs(inistartpos[0] - iniendpos[0]);
 					
-					
-				
+				if (inicutoffdistanceY > 0 && inicutoffdistanceX > 0) {
 				
 					try {
 						LevenbergMarquardtSolverLine.solve(X, finalparamstart, fixed_param, I, UserChoiceFunction, lambda,
@@ -470,6 +473,17 @@ public ArrayList<Indexedlength> getEndPoints(){
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
+				}
+				
+				else{
+					
+					
+					for (int j = 0; j < finalparamstart.length; j++) {
+
+						finalparamstart[j] = start_param[j];
+					}
+					
+				}
 
 					final double[] startpos = { finalparamstart[0], finalparamstart[1] };
 					final double[] endpos = { finalparamstart[2], finalparamstart[3] };

@@ -28,20 +28,18 @@ public class BeadfinderInteractiveDoG implements Beadfinder {
 	private final int zplane;
 	private final int ndims;
 	private final ArrayList<RefinedPeak<Point>> peaks;
-	public final boolean lookforMaxima;
-	public final boolean lookforMinima;
+
 	public final double sigma;
 	public final double sigma2;
 	
 	
-	public BeadfinderInteractiveDoG(final RandomAccessibleInterval<FloatType> source, final RandomAccessibleInterval<FloatType> target, boolean lookforMaxima, boolean lookforMinima,
+	public BeadfinderInteractiveDoG(final RandomAccessibleInterval<FloatType> source, final RandomAccessibleInterval<FloatType> target,
 			final double sigma, final double sigma2, ArrayList<RefinedPeak<Point>> peaks,
 		  final int zplane){
 		
 		this.source = source;
 		this.target = target;
-		this.lookforMaxima = lookforMaxima;
-		this.lookforMinima = lookforMinima;
+	
 		this.sigma = sigma;
 		this.sigma2 = sigma2;
 		this.peaks = peaks;
@@ -115,10 +113,9 @@ public class BeadfinderInteractiveDoG implements Beadfinder {
 			final OvalRoi or = new OvalRoi(Util.round(x - sigma), Util.round(y - sigma), Util.round(sigma + sigma2),
 					Util.round(sigma + sigma2));
 
-			if (lookforMaxima)
+			
 				or.setStrokeColor(Color.red);
-			else
-				or.setStrokeColor(Color.green);
+			
 
 			ovalrois.add(or);
 			

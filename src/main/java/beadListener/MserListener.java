@@ -62,7 +62,7 @@ import updateListeners.DefaultModelHF;
 				final Scrollbar minSizeS = new Scrollbar(Scrollbar.HORIZONTAL, parent.minSizeInit, 10, 0, 10 + parent.scrollbarSize);
 				final Scrollbar maxSizeS = new Scrollbar(Scrollbar.HORIZONTAL, parent.maxSizeInit, 10, 0, 10 + parent.scrollbarSize);
 				final Button ComputeTree = new Button("Compute Tree and display");
-				final Button FindLinesListener = new Button("Fit Gaussian Function");
+				final Button FindBeadsListener = new Button("Fit Gaussian Function");
 				parent.Unstability_Score = parent.computeValueFromScrollbarPosition(parent.Unstability_ScoreInit, parent.Unstability_ScoreMin, parent.Unstability_ScoreMax, 
 						parent.scrollbarSize);
 				parent.delta = parent.computeValueFromScrollbarPosition(parent.deltaInit, 
@@ -146,7 +146,7 @@ import updateListeners.DefaultModelHF;
 
 				++c.gridy;
 				c.insets = new Insets(10, 180, 0, 180);
-				parent.panelSecond.add(FindLinesListener, c);
+				parent.panelSecond.add(FindBeadsListener, c);
 
 				deltaS.addAdjustmentListener(new DeltaListener(parent, deltaText, parent.deltaMin, parent.deltaMax, 
 						parent.scrollbarSize, deltaS));
@@ -167,7 +167,7 @@ import updateListeners.DefaultModelHF;
 								parent.scrollbarSize, maxSizeS));
 
 				ComputeTree.addActionListener(new ComputeTreeListener(parent));
-				FindLinesListener.addActionListener(new FindBeadsListener(parent));
+				FindBeadsListener.addActionListener(new FindBeadsListener(parent));
 				parent.panelSecond.validate();
 				parent.panelSecond.repaint();
 				parent.Cardframe.pack();

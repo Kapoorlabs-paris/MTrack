@@ -67,6 +67,7 @@ import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.util.Pair;
 import net.imglib2.view.Views;
 import preProcessing.Kernels;
+import psf_Tookit.GaussianFitParam;
 
 
 public class Interactive_PSFAnalyze implements PlugIn {
@@ -93,6 +94,8 @@ public class Interactive_PSFAnalyze implements PlugIn {
 	public float deltaMax = 400f;
 	public float Unstability_ScoreMin = 0;
 	public float Unstability_ScoreMax = 1;
+	
+	public ArrayList<GaussianFitParam> FittedBeads;
 	
 	public RandomAccessibleInterval<FloatType> currentimg;
 	public RandomAccessibleInterval<FloatType> currentPreprocessedimg;
@@ -168,7 +171,7 @@ public class Interactive_PSFAnalyze implements PlugIn {
 	public ArrayList<double[]> AllmeanCovar = new ArrayList<double[]>();
 	public ArrayList<Pair<double[], OvalRoi>> ClickedPoints = new ArrayList<Pair<double[], OvalRoi>>();
 	public HashMap<Integer, ArrayList<EllipseRoi>> AllMSERrois = new HashMap<Integer, ArrayList<EllipseRoi>>();
-	ArrayList<RefinedPeak<Point>> peaks;
+	public ArrayList<RefinedPeak<Point>> peaks;
 	public int Unstability_ScoreInit = 1;
 	public boolean isFinished() {
 		return isFinished;
@@ -774,10 +777,7 @@ public class Interactive_PSFAnalyze implements PlugIn {
 				c.insets = new Insets(0, 175, 0, 175);
 				panelFirst.add(JumpFrame, c);
 			}
-			
-			++c.gridy;
-			c.insets = new Insets(10, 10, 0, 0);
-			panelFirst.add(ChooseWorkspace, c);
+		
 
 			++c.gridy;
 			c.insets = new Insets(10, 10, 10, 0);

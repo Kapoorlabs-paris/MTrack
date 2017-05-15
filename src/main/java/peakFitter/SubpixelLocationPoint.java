@@ -59,7 +59,7 @@ implements OutputAlgorithm<ArrayList<GaussianFitParam>> {
 	@Override
 	public boolean process() {
 		
-		
+		Params = new ArrayList<GaussianFitParam>();
 		
 		try {
 			
@@ -134,7 +134,7 @@ implements OutputAlgorithm<ArrayList<GaussianFitParam>> {
 		}
 		for (int j = 0; j < ndims; j++) {
 			
-			sigma[j] = finalparam[ndims + j + 1];
+			sigma[j] = 1.0 / finalparam[ndims + j + 1];
 			
 		}
 		GaussianFitParam guessparams = new GaussianFitParam(point, finalparam[0], sigma, finalparam[ 2 * ndims + 1]);

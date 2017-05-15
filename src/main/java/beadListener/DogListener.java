@@ -61,6 +61,7 @@ public class DogListener implements ItemListener {
 				parent.sigma2 = parent.computeSigma2(parent.sigma, parent.sensitivity);
 				final int sigma2init = parent.computeScrollbarPositionFromValue(parent.sigma2, parent.sigmaMin, parent.sigmaMax, parent.scrollbarSize);
 				final Scrollbar sigma2S = new Scrollbar(Scrollbar.HORIZONTAL, sigma2init, 10, 0, 10 + parent.scrollbarSize);
+				final Button FindBeadsListener = new Button("Fit Gaussian Function");
 
 				final Label sigmaText1 = new Label("Sigma 1 = " + parent.sigma, Label.CENTER);
 				final Label sigmaText2 = new Label("Sigma 2 = " + parent.sigma2, Label.CENTER);
@@ -114,6 +115,10 @@ public class DogListener implements ItemListener {
 				c.insets = new Insets(0, 180, 0, 180);
 				parent.panelSecond.add(DisplayBlobs, c);
 
+				++c.gridy;
+				c.insets = new Insets(10, 180, 0, 180);
+				parent.panelSecond.add(FindBeadsListener, c);
+				
 				/* Configuration */
 				sigma1.addAdjustmentListener(
 						new SigmaListener(sigmaText1, parent.sigmaMin, parent.sigmaMax, parent.scrollbarSize, sigma1, sigma2S, sigmaText2));
@@ -121,6 +126,7 @@ public class DogListener implements ItemListener {
 				thresholdS.addAdjustmentListener(new ThresholdListener(thresholdText, parent.thresholdMin, parent.thresholdMax));
 			
 				DisplayBlobs.addActionListener(new DisplayBlobsListener());
+				FindBeadsListener.addActionListener(new FindBeadsListener(parent));
 				parent.panelSecond.repaint();
 				parent.panelSecond.validate();
 				parent.Cardframe.pack();

@@ -17,12 +17,12 @@ public class GaussianPoints implements MTFitFunction {
 			return E(x, a);
 
 		} else if (k <= ndims) {
-			// With respect to xi
+			// With respect to xi (mean)
 			int dim = k - 1;
 			return 2 * a[dim+ndims] * (x[dim] - a[dim+1]) * a[0] * E(x, a);
 
 		} else if (k > ndims && k < 2*ndims + 1)  {
-			// With respect to ai
+			// With respect to ai (sigma)
 			int dim = k - ndims - 1;
 			double di = x[dim] - a[dim+1];
 			return - di * di * a[0] * E(x, a);
@@ -31,6 +31,7 @@ public class GaussianPoints implements MTFitFunction {
         else if (k == 2* ndims + 1)
 
         return 1.0;	
+		
 		else{
 			
 			return 0;

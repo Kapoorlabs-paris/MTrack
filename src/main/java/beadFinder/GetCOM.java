@@ -11,7 +11,7 @@ public class GetCOM {
 	public static long[] getProps(final RandomAccessibleInterval<FloatType> source, final RandomAccessibleInterval<FloatType> target, final Roi roi, final int zplane) {
 
 		// 3 co-ordinates for COM 
-		long[] center = new long[ 3 ];
+		long[] center = new long[ target.numDimensions() ];
 
 		double Intensity = 0;
 		
@@ -23,7 +23,7 @@ public class GetCOM {
 		Cursor<FloatType> currentcursor = Views.iterable(source).localizingCursor();
 
 		RandomAccess<FloatType> targetran = target.randomAccess();
-		final double[] position = new double[ 2 ];
+		final double[] position = new double[ target.numDimensions() ];
 
 		while (currentcursor.hasNext()) {
 
@@ -51,7 +51,6 @@ public class GetCOM {
 		center[ 0 ] = (long)(SumX / Intensity);
 		center[ 1 ] = (long)(SumY / Intensity);
 		
-		center[ 2 ] = zplane;
 		
 		
 
