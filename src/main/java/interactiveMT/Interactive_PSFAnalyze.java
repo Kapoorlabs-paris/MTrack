@@ -6,6 +6,7 @@ import java.awt.CardLayout;
 import java.awt.Checkbox;
 import java.awt.CheckboxGroup;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -18,6 +19,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.File;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -86,8 +88,8 @@ public class Interactive_PSFAnalyze implements PlugIn {
 	public String addToName = "PSFAnalysis";
 	public JFrame frame = new JFrame();
 	public JPanel panel = new JPanel();
-	public int thirdDimensionslider = 1;
-	public int thirdDimensionsliderInit = 1;
+	public int thirdDimensionslider = 0;
+	public int thirdDimensionsliderInit = 0;
 	public int thirdDimensionSize;
 	public int thirdDimensionSizeOriginal;
 	public int thirdDimension;
@@ -139,6 +141,7 @@ public class Interactive_PSFAnalyze implements PlugIn {
 	public boolean RoisViaMSER = false;
 	public boolean RoisViaWatershed = false;
 	public boolean isComputing = false;
+	
 	public float minDiversityMin = 0;
 	public float minDiversityMax = 1;
 	public int minSizeInit = 10;
@@ -167,10 +170,14 @@ public class Interactive_PSFAnalyze implements PlugIn {
 	public float delta = 1f;
 	public long minSize = 1;
 	public long maxSize = 1000;
+	public File dir;
+	public File name;
 	public long minSizemin = 0;
 	public long minSizemax = 1000;
 	public long maxSizemin = 100;
 	public long maxSizemax = 10000;
+	public int numchannels;
+	public final boolean batchprocess;
 	public double[] initialpsf;
 	public  whichModel Usermodel;
 	public ArrayList<double[]> AllmeanCovar = new ArrayList<double[]>();
@@ -304,19 +311,25 @@ public class Interactive_PSFAnalyze implements PlugIn {
 	
 	
 	public Interactive_PSFAnalyze() {
+		this.batchprocess = false;
 	};
 	
 	
 	public Interactive_PSFAnalyze(final RandomAccessibleInterval<FloatType> originalimg,
-			final RandomAccessibleInterval<FloatType> originalPreprocessedimg, final whichModel model){
+			final RandomAccessibleInterval<FloatType> originalPreprocessedimg, final whichModel model, final boolean batchprocess, File dir, File name){
 		
 		this.originalimg = originalimg;
 		this.originalPreprocessedimg = originalPreprocessedimg;
+		this.dir = dir;
+		this.name = name;
+		
 		standardRectangle = new Rectangle(inix, iniy, (int) originalimg.dimension(0) - 2 * inix,
 				(int) originalimg.dimension(1) - 2 * iniy);
 		imp = ImageJFunctions.show(originalimg);
 		this.Usermodel = model;
+		this.batchprocess = batchprocess;
 		impcopy = imp.duplicate();
+		numchannels = imp.getNChannels();
 	};
 	
 	
@@ -482,11 +495,13 @@ public class Interactive_PSFAnalyze implements PlugIn {
 				roiChanged = true;
 			}
 
-			
+			Rectangle rect = roi.getBounds();
 
 			if (roiChanged || currentimg == null || currentPreprocessedimg == null || newimg == null
-					|| change == ValueChange.FRAME  || change == ValueChange.ALL) {
-				
+					|| change == ValueChange.FRAME || rect.getMinX() != standardRectangle.getMinX()
+							|| rect.getMaxX() != standardRectangle.getMaxX() || rect.getMinY() != standardRectangle.getMinY()
+							|| rect.getMaxY() != standardRectangle.getMaxY() ||   change == ValueChange.ALL) {
+				standardRectangle = rect;
 
 				long[] min = { (long) standardRectangle.getMinX(), (long) standardRectangle.getMinY() };
 				long[] max = { (long) standardRectangle.getMaxX(), (long) standardRectangle.getMaxY() };
@@ -507,36 +522,7 @@ public class Interactive_PSFAnalyze implements PlugIn {
 			isComputing = false;
 			return;
 		}
-		if (change != ValueChange.THIRDDIMTrack) {
-
-			overlay = preprocessedimp.getOverlay();
-			Roi roi = preprocessedimp.getRoi();
-			if (roi == null || roi.getType() != Roi.RECTANGLE) {
-				preprocessedimp.setRoi(new Rectangle(standardRectangle));
-				roi = preprocessedimp.getRoi();
-				roiChanged = true;
-			}
-
-			
-
-			if (roiChanged || currentimg == null || currentPreprocessedimg == null || newimg == null
-					|| change == ValueChange.FRAME  || change == ValueChange.ALL) {
-				
-
-				long[] min = { (long) standardRectangle.getMinX(), (long) standardRectangle.getMinY() };
-				long[] max = { (long) standardRectangle.getMaxX(), (long) standardRectangle.getMaxY() };
-				interval = new FinalInterval(min, max);
-
-				currentimg = util.CopyUtils.extractImage(CurrentView, interval);
-				currentPreprocessedimg = util.CopyUtils.extractImage(CurrentPreprocessedView, interval);
-
-				newimg = util.CopyUtils.copytoByteImage(Kernels.CannyEdgeandMean(currentPreprocessedimg, 2),
-						standardRectangle);
-
-				roiChanged = true;
-
-			}
-		}
+		
 		if (change == ValueChange.THIRDDIMTrack ) {
 
 			if (preprocessedimp == null)
@@ -770,12 +756,12 @@ public class Interactive_PSFAnalyze implements PlugIn {
 		public JPanel panelCont = new JPanel();
 		public JPanel panelFirst = new JPanel();
 		public JPanel panelSecond = new JPanel();
-	
+		
 	
 		public void Card() {
 
 			CardLayout cl = new CardLayout();
-
+			Cardframe.setMinimumSize( new Dimension(400, 400));
 			cl.preferredLayoutSize(Cardframe);
 			panelCont.setLayout(cl);
 
@@ -790,7 +776,6 @@ public class Interactive_PSFAnalyze implements PlugIn {
 			final Checkbox dog = new Checkbox("DoG", Finders, FindBeadsViaDOG);
 			
 
-			final JButton ChooseWorkspace = new JButton("Choose Directory");
 			final JLabel outputfilename = new JLabel("Enter output filename: ");
 			TextField inputField = new TextField();
 			inputField.setColumns(10);
@@ -807,22 +792,28 @@ public class Interactive_PSFAnalyze implements PlugIn {
 
 			
 
+			
 			/* Instantiation */
 			final GridBagLayout layout = new GridBagLayout();
 			final GridBagConstraints c = new GridBagConstraints();
-
-			panelFirst.setLayout(layout);
+			
 
 			final Label Name = new Label("Step 1", Label.CENTER);
-			panelFirst.add(Name, c);
-
+			
+			panelFirst.setLayout(layout);
 			c.fill = GridBagConstraints.HORIZONTAL;
-			c.gridx = 0;
+			c.gridx = 1;
 			c.gridy = 4;
 			c.weightx = 1;
 
 			final Label Ends = new Label("Method Choice for finding Blobs");
-
+			
+			++c.gridy;
+			++c.gridy;
+			++c.gridy;
+			panelFirst.add(Name, c);
+			
+			
 			++c.gridy;
 			panelFirst.add(Ends, c);
 

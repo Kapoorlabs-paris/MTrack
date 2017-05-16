@@ -171,7 +171,7 @@ import updateListeners.DefaultModelHF;
 					parent.panelSecond.add(parent.inputLabelX, c);
 
 					++c.gridy;
-					c.insets = new Insets(10, 10, 10, 0);
+					c.insets = new Insets(10, 10, 0, 180);
 					parent.panelSecond.add(parent.inputFieldX, c);
 
 					++c.gridy;
@@ -179,7 +179,7 @@ import updateListeners.DefaultModelHF;
 					parent.panelSecond.add(parent.inputLabelY, c);
 
 					++c.gridy;
-					c.insets = new Insets(10, 10, 10, 0);
+					c.insets = new Insets(10, 10, 0, 180);
 					parent.panelSecond.add(parent.inputFieldY, c);	
 					
 					

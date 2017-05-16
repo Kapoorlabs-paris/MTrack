@@ -90,6 +90,7 @@ public class DrawPoints {
 		display( histXchart, new Dimension( 500, 500 ) );
 		display( histYchart, new Dimension( 500, 500 ) );
 		
+		
 		return seriesname;
 	}
 	

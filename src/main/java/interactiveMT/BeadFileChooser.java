@@ -3,6 +3,7 @@ package interactiveMT;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+
 import ij.ImagePlus;
 import ij.io.Opener;
 import net.imglib2.RandomAccessibleInterval;
@@ -12,6 +13,7 @@ import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.view.Views;
 
 import java.awt.event.*;
+import java.io.File;
 import java.awt.*;
 import java.util.*;
 
@@ -27,7 +29,9 @@ public class BeadFileChooser extends JPanel {
 	JButton Done;
 	JFileChooser chooserA;
 	String choosertitleA;
-
+	public JLabel inputLabelX, inputLabelY, inputLabelT;
+	public TextField inputFieldX, inputFieldY, inputFieldT;
+	boolean batchprocess;
 	JFileChooser chooserB;
 	String choosertitleB;
 	double[] calibration = new double[2];
@@ -45,7 +49,7 @@ public class BeadFileChooser extends JPanel {
 		
 	}
 	
-	whichModel UserModel;
+	whichModel UserModel = whichModel.Bead;
 	
 	public BeadFileChooser() {
 		final JFrame frame = new JFrame("Welcome to PSF Analyzer");
@@ -69,6 +73,7 @@ public class BeadFileChooser extends JPanel {
 		final Label LoadtrackText = new Label("Load pre-processed bead/filament image");
 		final Label LoadMeasureText = new Label("Load original image");
 		
+		final Checkbox batch = new Checkbox("Split Channels and do Batch Processing", false);
 		
 		
 		LoadtrackText.setBackground(new Color(1, 0, 1));
@@ -77,7 +82,9 @@ public class BeadFileChooser extends JPanel {
 		LoadMeasureText.setBackground(new Color(1, 0, 1));
 		LoadMeasureText.setForeground(new Color(255, 255, 255));
 		
-		
+		inputLabelX = new JLabel("If batch processing (beads) enter first common characters of filename: ");
+		inputFieldX = new TextField();
+		inputFieldX.setColumns(10);
 
 		Track = new JButton("Open pre-processed bead/ filament image");
 		Measure = new JButton("Open image for performing measurments");
@@ -126,14 +133,29 @@ public class BeadFileChooser extends JPanel {
 		panelIntro.add(Measure, c);
 
 		++c.gridy;
+		c.insets = new Insets(10, 10, 0, 50);
+		panelIntro.add(batch, c);
+		++c.gridy;
+		c.insets = new Insets(10, 10, 10, 0);
+		panelIntro.add(inputLabelX, c);
+
+		++c.gridy;
+		c.insets = new Insets(10, 10, 0, 180);
+		panelIntro.add(inputFieldX, c);
+		
+		++c.gridy;
 		c.insets = new Insets(10, 10, 10, 0);
 		panelIntro.add(Done, c);
+		
+		
+		
 		
 		panelIntro.setVisible(true);
 		Track.addActionListener(new OpenTrackListener(frame));
 		Measure.addActionListener(new MeasureListener(frame));
 		Done.addActionListener(new DoneButtonListener(frame, true));
 		cbtrack.addActionListener(new ModelListener(cbtrack));
+		inputFieldX.addTextListener(new StringFilesListener());
 		frame.addWindowListener(new FrameListener(frame));
 		frame.add(panelCont, BorderLayout.CENTER);
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -141,6 +163,36 @@ public class BeadFileChooser extends JPanel {
 		frame.setVisible(true);
 	}
 
+	
+	
+	protected class StringFilesListener implements TextListener{
+
+		@Override
+		public void textValueChanged(TextEvent e) {
+		
+		  TextComponent tc = (TextComponent) e.getSource();
+		  String s = tc.getText();
+		 
+		  File folder = new File(chooserB.getCurrentDirectory().getAbsolutePath());
+		  File[] listofFiles = folder.listFiles();
+		  
+		  for (int i = 0; i < listofFiles.length; ++i){
+			  
+			  String filename = listofFiles[i].getName();
+			  if(filename.startsWith(s)){
+				  
+				  // Now you have a bunch of image files and you have to do something with them
+				  
+			  }
+			  
+		  }
+			
+		}
+		
+		
+		
+		
+	}
 	
 	protected class ModelListener implements ActionListener{
 
@@ -301,7 +353,7 @@ public class BeadFileChooser extends JPanel {
 			Normalize.normalize(Views.iterable(originalimg), minval, maxval);
 			Normalize.normalize(Views.iterable(originalPreprocessedimg), minval, maxval);
 		
-		    new Interactive_PSFAnalyze(originalimg, originalPreprocessedimg, UserModel).run(null);
+		    new Interactive_PSFAnalyze(originalimg, originalPreprocessedimg, UserModel, batchprocess, chooserB.getCurrentDirectory(), chooserB.getSelectedFile()).run(null);
 			
 		    close(parent);
 		}
