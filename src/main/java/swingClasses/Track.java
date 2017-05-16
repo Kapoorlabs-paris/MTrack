@@ -479,7 +479,7 @@ public  class Track {
 					if (parent.SaveTxt) {
 						try {
 							File fichier = new File(
-									parent.usefolder + "//" + parent.addToName + "SeedLabel" + seedID + "-endA" + ".txt");
+									parent.usefolder + "//" + parent.addToName + "SeedLabel" + seedID + "-endB" + ".txt");
 
 							FileWriter fw = new FileWriter(fichier);
 							BufferedWriter bw = new BufferedWriter(fw);

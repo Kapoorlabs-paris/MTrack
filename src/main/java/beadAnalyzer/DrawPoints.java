@@ -30,6 +30,7 @@ import org.jfree.util.ShapeUtilities;
 
 import net.imglib2.util.ValuePair;
 import psf_Tookit.GaussianFitParam;
+import psf_Tookit.GaussianLineFitParam;
 
 public class DrawPoints {
 
@@ -39,6 +40,14 @@ public class DrawPoints {
 	public DrawPoints (){
 		
 	};
+	
+	
+     public  XYSeries drawLinePoints(final ArrayList<GaussianLineFitParam> beadLineparams){
+		
+		return drawLinePoints(beadLineparams, "Sigma", 10);
+	}
+	
+	
 	
 	public  XYSeries drawPoints(final ArrayList<GaussianFitParam> beadparams){
 		
@@ -84,6 +93,45 @@ public class DrawPoints {
 		return seriesname;
 	}
 	
+	
+public  XYSeries drawLinePoints(final ArrayList<GaussianLineFitParam> beadLineparams, final String name, final int numBins){
+		
+		final XYSeriesCollection dataset = new XYSeriesCollection();
+		
+		
+		XYSeries seriesname = new XYSeries(name);
+		
+		List<Double> Xvalues = new ArrayList<Double>();
+		List<Double> Yvalues =  new ArrayList<Double>();
+		
+		
+		if (name == "Sigma"){
+		
+		for (final GaussianLineFitParam param : beadLineparams ){
+			
+			seriesname.add(param.Sigma[0], param.Sigma[1]);
+			Xvalues.add(param.Sigma[0]);
+			Yvalues.add(param.Sigma[1]);
+			
+		}
+		
+		}
+		
+		dataset.addSeries(seriesname);
+	
+		
+		
+		final JFreeChart histXchart = makehistXChart(Xvalues, numBins);
+		final JFreeChart histYchart = makehistYChart(Yvalues, numBins);
+		
+		
+		
+		
+		display( histXchart, new Dimension( 500, 500 ) );
+		display( histYchart, new Dimension( 500, 500 ) );
+		
+		return seriesname;
+	}
 	
 	
 	

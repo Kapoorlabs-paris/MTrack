@@ -64,7 +64,6 @@ public class LevenbergMarquardtSolverLine {
 
 			do {
 				++iter;
-
 				// hessian approximation
 				for( int r = 0; r < nparm; r++ ) {
 					for( int c = 0; c < nparm; c++ ) {

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import javax.swing.JProgressBar;
 
 import LineModels.UseLineModel.UserChoiceModel;
+import labeledObjects.CommonOutput;
 import labeledObjects.CommonOutputHF;
 import labeledObjects.Indexedlength;
 import net.imglib2.Cursor;
@@ -88,6 +89,51 @@ public class FitterUtils {
 		
 	}
 	
+public static int getlabelindexSeed(final ArrayList<CommonOutput> imgs, int label){
+		
+		
+		
+		int labelindex = -1;
+		for (int index = 0; index < imgs.size(); ++index){
+			
+			if (imgs.get(index).roilabel == label){
+		
+			labelindex = index;
+			
+			
+			}
+		}
+		
+		return labelindex;
+		
+		
+	}
+	public static PointSampleList<FloatType> gatherfullDataSeed(final ArrayList<CommonOutput> imgs, final int label, final int ndims) {
+		final PointSampleList<FloatType> datalist = new PointSampleList<FloatType>(ndims);
+
+		
+		int labelindex = getlabelindexSeed(imgs, label);
+		
+		RandomAccessibleInterval<FloatType> currentimg = imgs.get(labelindex).Actualroi;
+		
+		FinalInterval interval = imgs.get(labelindex).interval;
+
+		currentimg = Views.interval(currentimg, interval);
+
+		Cursor<FloatType> localcursor = Views.iterable(currentimg).localizingCursor();
+
+		while (localcursor.hasNext()) {
+			
+			localcursor.fwd();
+
+			if (localcursor.get().get() > 0) {
+				Point newpoint = new Point(localcursor);
+				datalist.add(newpoint, localcursor.get().copy());
+			}
+		}
+
+		return datalist;
+	}
 	public static PointSampleList<FloatType> gatherfullData(final ArrayList<CommonOutputHF> imgs, final int label, final int ndims) {
 		final PointSampleList<FloatType> datalist = new PointSampleList<FloatType>(ndims);
 

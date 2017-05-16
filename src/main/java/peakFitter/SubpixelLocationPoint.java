@@ -74,7 +74,7 @@ implements OutputAlgorithm<ArrayList<GaussianFitParam>> {
 				long radius = Allbeads.get(index).radius;
 				
 			    Params.add(Getfinalparam(point, radius));
-		
+			    FitterUtils.SetProgressBar(jpb, percent);
 			}
 		
 		} catch (Exception e) {

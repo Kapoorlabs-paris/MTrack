@@ -271,7 +271,7 @@ public ArrayList<Indexedlength> getEndPoints(){
            
 
            
-           if (model ==  UserChoiceModel.Line){
+          
         	   
         	   while(inputcursor.hasNext()){
        			
@@ -334,80 +334,15 @@ public ArrayList<Indexedlength> getEndPoints(){
        
            
           
-           if (model ==  UserChoiceModel.Splineordersec ) {
-        	   while(inputcursor.hasNext()){
-       			
-       			inputcursor.fwd();
-       			
-       			
-       				// To get the min and max co-rodinates along the line so we have
-       				// starting points to
-       				// move on the line smoothly
-       				
-
-       				if (inputcursor.getDoublePosition(0) <= minVal[0]
-    						&& inputcursor.get().get() / maxintensityline > Intensityratio) {
-    					minVal[0] = inputcursor.getDoublePosition(0);
-    					minVal[1] = inputcursor.getDoublePosition(1);
-    				}
-
-    				if (inputcursor.getDoublePosition(0) >= maxVal[0]
-    						&& inputcursor.get().get() / maxintensityline > Intensityratio) {
-    					maxVal[0] = inputcursor.getDoublePosition(0);
-    					maxVal[1] = inputcursor.getDoublePosition(1);
-    				}
-
-       			
-                  }
-   			final double[] MinandMax = new double[2 * ndims + 6];
-   			
-   				for (int d = 0; d < ndims; ++d) {
-
-   					MinandMax[d] = minVal[d];
-   					MinandMax[d + ndims] = maxVal[d];
-   				}
-
-   			
-
-   			// This parameter is guess estimate for spacing between the Gaussians
-   			MinandMax[2 * ndims] =  Inispacing;
-   			MinandMax[2 * ndims + 1] = maxintensityline; 
-   			// This parameter guess estimates the background noise level
-   			MinandMax[2 * ndims + 2] = 0; 
-   			
-   			MinandMax[2 * ndims + 3] = slope; 
-   			MinandMax[2 * ndims + 4] = Curvature; 
-   			MinandMax[2 * ndims + 5] = intercept; 
-   			System.out.println("Label: " + label + " " + "Detection: " + " StartX: " + MinandMax[0] + " StartY: "
-   					+ MinandMax[1] + " EndX: " + MinandMax[2] + " EndY: " + MinandMax[3]);
-
-   			
-   			
-   				for (int d = 0; d < ndims; ++d) {
-
-   					if (MinandMax[d] == Double.MAX_VALUE || MinandMax[d + ndims] == -Double.MIN_VALUE)
-   						return null;
-   					if (MinandMax[d] >= source.dimension(d) || MinandMax[d + ndims] >= source.dimension(d))
-   						return null;
-   					if (MinandMax[d] <= 0 || MinandMax[d + ndims] <= 0)
-   						return null;
-
-   				}
-   			
-
-   			return MinandMax;
-   	           }
            
-           else 
-        	   return null;
-           
-	}
+	
 	
 	// Get line parameters for fitting line to a line in a label
 
 		public Pair<Indexedlength, Indexedlength> Getfinallineparam(final int label, final double slope, final double intercept, final double Curvature, final double Inflection, final double[] psf)  {
 
-			PointSampleList<FloatType> datalist = gatherfullData(label);
+			PointSampleList<FloatType> datalist = FitterUtils.gatherfullDataSeed(imgs, label, ndims);
+
 			if (datalist!= null){
 			final Cursor<FloatType> listcursor = datalist.localizingCursor();
 			double[][] X = new double[(int) datalist.size()][ndims];

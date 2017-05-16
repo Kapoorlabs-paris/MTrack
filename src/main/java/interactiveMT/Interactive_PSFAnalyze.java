@@ -51,6 +51,7 @@ import ij.plugin.frame.RoiManager;
 import ij.process.ColorProcessor;
 import interactiveMT.BeadFileChooser.whichModel;
 import interactiveMT.Interactive_MTDoubleChannel.ValueChange;
+import interactiveMT.Interactive_MTDoubleChannel.Whichend;
 import interactiveMT.Interactive_MTDoubleChannel.moveInThirdDimListener;
 import mpicbg.imglib.multithreading.SimpleMultiThreading;
 import mpicbg.imglib.util.Util;
@@ -69,6 +70,7 @@ import net.imglib2.util.Pair;
 import net.imglib2.view.Views;
 import preProcessing.Kernels;
 import psf_Tookit.GaussianFitParam;
+import psf_Tookit.GaussianLineFitParam;
 
 
 public class Interactive_PSFAnalyze implements PlugIn {
@@ -97,7 +99,7 @@ public class Interactive_PSFAnalyze implements PlugIn {
 	public float Unstability_ScoreMax = 1;
 	
 	public ArrayList<GaussianFitParam> FittedBeads;
-	
+	public ArrayList<GaussianLineFitParam> FittedLineBeads;
 	public RandomAccessibleInterval<FloatType> currentimg;
 	public RandomAccessibleInterval<FloatType> currentPreprocessedimg;
 	public RandomAccessibleInterval<FloatType> originalimg;
@@ -118,7 +120,8 @@ public class Interactive_PSFAnalyze implements PlugIn {
 	public int thresholdInit = 1;
 	public float sigmaMin = 0.5f;
 	public float sigmaMax = 100f;
-	
+	public double Intensityratio = 0.5;
+	public double Inispacing = 0.5;
 	public ImagePlus imp;
 	public ImagePlus impcopy;
 	public ImagePlus preprocessedimp;
@@ -168,12 +171,18 @@ public class Interactive_PSFAnalyze implements PlugIn {
 	public long minSizemax = 1000;
 	public long maxSizemin = 100;
 	public long maxSizemax = 10000;
+	public double[] initialpsf;
 	public  whichModel Usermodel;
 	public ArrayList<double[]> AllmeanCovar = new ArrayList<double[]>();
 	public ArrayList<Pair<double[], OvalRoi>> ClickedPoints = new ArrayList<Pair<double[], OvalRoi>>();
 	public HashMap<Integer, ArrayList<EllipseRoi>> AllMSERrois = new HashMap<Integer, ArrayList<EllipseRoi>>();
 	public ArrayList<RefinedPeak<Point>> peaks;
 	public int Unstability_ScoreInit = 1;
+	
+	
+	public JLabel inputLabelX, inputLabelY, inputLabelT;
+	public TextField inputFieldX, inputFieldY, inputFieldT;
+	
 	public boolean isFinished() {
 		return isFinished;
 	}
@@ -332,16 +341,27 @@ public class Interactive_PSFAnalyze implements PlugIn {
 			thirdDimensionSize = 0;
 		}
 
-		if (originalimg.numDimensions() == 3) {
+		if (originalimg.numDimensions() == 3 && Usermodel == whichModel.Bead) {
 
 			thirdDimension = 1;
 			thirdDimensionSize = (int) originalimg.dimension(2);
 
 		}
+		
+		if (originalimg.numDimensions() == 3 && Usermodel == whichModel.Filament) {
+
+			DialogChoose();
+
+			
+			originalimg = Views.hyperSlice(originalimg, 2, thirdDimension);
+			originalPreprocessedimg = Views.hyperSlice(originalPreprocessedimg, 2, thirdDimension);
+			initialpsf = new double[2];
+		}
+		
 
 		if (originalimg.numDimensions() > 3) {
 
-			System.out.println("Image has wrong dimensionality, upload an XYT image");
+			System.out.println("Image has wrong dimensionality, upload an XYZ image");
 			return;
 		}
 		
@@ -384,6 +404,23 @@ public class Interactive_PSFAnalyze implements PlugIn {
 		
 	}
 
+	
+	
+	public boolean DialogChoose(){
+		
+		GenericDialog gd = new GenericDialog("For filament PSF calculation only use 2D image");
+		
+		
+		gd.addNumericField("Choose a slice", thirdDimension, 0);
+		
+		gd.showDialog();
+		
+		thirdDimension = (int) gd.getNextNumber();
+
+		
+		return !gd.wasCanceled();
+		
+	}
 	
 	/**
 	 * Updates the Preview with the current parameters (sigma, threshold, roi,
@@ -470,7 +507,36 @@ public class Interactive_PSFAnalyze implements PlugIn {
 			isComputing = false;
 			return;
 		}
-		
+		if (change != ValueChange.THIRDDIMTrack) {
+
+			overlay = preprocessedimp.getOverlay();
+			Roi roi = preprocessedimp.getRoi();
+			if (roi == null || roi.getType() != Roi.RECTANGLE) {
+				preprocessedimp.setRoi(new Rectangle(standardRectangle));
+				roi = preprocessedimp.getRoi();
+				roiChanged = true;
+			}
+
+			
+
+			if (roiChanged || currentimg == null || currentPreprocessedimg == null || newimg == null
+					|| change == ValueChange.FRAME  || change == ValueChange.ALL) {
+				
+
+				long[] min = { (long) standardRectangle.getMinX(), (long) standardRectangle.getMinY() };
+				long[] max = { (long) standardRectangle.getMaxX(), (long) standardRectangle.getMaxY() };
+				interval = new FinalInterval(min, max);
+
+				currentimg = util.CopyUtils.extractImage(CurrentView, interval);
+				currentPreprocessedimg = util.CopyUtils.extractImage(CurrentPreprocessedView, interval);
+
+				newimg = util.CopyUtils.copytoByteImage(Kernels.CannyEdgeandMean(currentPreprocessedimg, 2),
+						standardRectangle);
+
+				roiChanged = true;
+
+			}
+		}
 		if (change == ValueChange.THIRDDIMTrack ) {
 
 			if (preprocessedimp == null)

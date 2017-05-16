@@ -1,5 +1,6 @@
 package beadFinder;
 
+import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -132,9 +133,13 @@ public class BeadfinderInteractiveMSER implements Beadfinder {
 
 			}
 
-			final long radius = LargerEigenvalue(mean, covar);
+			
 			final long[] center = GetCOM.getProps(source, target, ellipseroi, zplane);
 
+			Rectangle rect = ellipseroi.getBounds();
+			final long radius = (long) (0.5 * Math.sqrt(rect.height * rect.height + rect.width * rect.width));
+			
+			
 			Beadprop currentbead = new Beadprop(zplane, new Point(center), ellipseroi, radius);
 
 			ProbBlobs.add(currentbead);
@@ -186,7 +191,7 @@ public class BeadfinderInteractiveMSER implements Beadfinder {
 	}
 
 	/**
-	 * Returns the smallest eigenvalue of the ellipse
+	 * Returns the largest eigenvalue of the ellipse
 	 * 
 	 * 
 	 * @param mean

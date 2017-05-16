@@ -57,9 +57,8 @@ public class BeadFileChooser extends JPanel {
 
 		panelIntro.setLayout(layout);
 		
-		CheckboxGroup Mode = new CheckboxGroup();
 
-		JLabel lbltrack = new JLabel("Objects in the image");
+		JLabel lbltrack = new JLabel("Choose object type in the image");
 
 		String[] choicestrack = new String[2];
 		

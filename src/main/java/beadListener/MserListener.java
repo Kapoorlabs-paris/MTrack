@@ -8,11 +8,14 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Label;
 import java.awt.Scrollbar;
+import java.awt.TextField;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import interactiveMT.BeadFileChooser.whichModel;
 import interactiveMT.Interactive_MTDoubleChannel;
 import interactiveMT.Interactive_PSFAnalyze;
 import interactiveMT.Interactive_PSFAnalyze.ValueChange;
@@ -32,8 +35,7 @@ import updateListeners.DefaultModelHF;
 		
 			this.parent = parent;
 		}
-		
-		
+	
 		
 		@Override
 		public void itemStateChanged(final ItemEvent arg0) {
@@ -62,7 +64,8 @@ import updateListeners.DefaultModelHF;
 				final Scrollbar minSizeS = new Scrollbar(Scrollbar.HORIZONTAL, parent.minSizeInit, 10, 0, 10 + parent.scrollbarSize);
 				final Scrollbar maxSizeS = new Scrollbar(Scrollbar.HORIZONTAL, parent.maxSizeInit, 10, 0, 10 + parent.scrollbarSize);
 				final Button ComputeTree = new Button("Compute Tree and display");
-				final Button FindBeadsListener = new Button("Fit Gaussian Function");
+				final Button FindBeadsListener = new Button("Fit Gaussian bead Function");
+				final Button FindPolynomialListener = new Button("Fit Gaussian Polynomial Function");
 				parent.Unstability_Score = parent.computeValueFromScrollbarPosition(parent.Unstability_ScoreInit, parent.Unstability_ScoreMin, parent.Unstability_ScoreMax, 
 						parent.scrollbarSize);
 				parent.delta = parent.computeValueFromScrollbarPosition(parent.deltaInit, 
@@ -81,7 +84,13 @@ import updateListeners.DefaultModelHF;
 				final Label minSizeText = new Label("Min # of pixels inside MSER Ellipses = " + parent.minSize, Label.CENTER);
 				final Label maxSizeText = new Label("Max # of pixels inside MSER Ellipses = " + parent.maxSize, Label.CENTER);
 
-				
+				parent.inputLabelX = new JLabel("Enter a guess for sigmaX of Microscope PSF (pixel units): ");
+				parent.inputFieldX = new TextField();
+				parent.inputFieldX.setColumns(10);
+
+				parent.inputLabelY = new JLabel("Enter a guess for sigmaY of Microscope PSF (pixel units): ");
+				parent.inputFieldY = new TextField();
+				parent.inputFieldY.setColumns(10);
 
 				final Label MSparam = new Label("Determine MSER parameters");
 				MSparam.setBackground(new Color(1, 0, 1));
@@ -144,10 +153,46 @@ import updateListeners.DefaultModelHF;
 				c.insets = new Insets(10, 175, 0, 175);
 				parent.panelSecond.add(ComputeTree, c);
 
+				if(parent.Usermodel == whichModel.Bead){
+					
+					
+					
+					
 				++c.gridy;
 				c.insets = new Insets(10, 180, 0, 180);
 				parent.panelSecond.add(FindBeadsListener, c);
+				}
+				
+				else{
+					
+					
+					++c.gridy;
+					c.insets = new Insets(10, 10, 10, 0);
+					parent.panelSecond.add(parent.inputLabelX, c);
 
+					++c.gridy;
+					c.insets = new Insets(10, 10, 10, 0);
+					parent.panelSecond.add(parent.inputFieldX, c);
+
+					++c.gridy;
+					c.insets = new Insets(10, 10, 10, 0);
+					parent.panelSecond.add(parent.inputLabelY, c);
+
+					++c.gridy;
+					c.insets = new Insets(10, 10, 10, 0);
+					parent.panelSecond.add(parent.inputFieldY, c);	
+					
+					
+				
+				++c.gridy;
+				c.insets = new Insets(10, 180, 0, 180);
+				parent.panelSecond.add(FindPolynomialListener, c);	
+				
+				
+				
+				
+				}
+				
 				deltaS.addAdjustmentListener(new DeltaListener(parent, deltaText, parent.deltaMin, parent.deltaMax, 
 						parent.scrollbarSize, deltaS));
 
@@ -168,6 +213,8 @@ import updateListeners.DefaultModelHF;
 
 				ComputeTree.addActionListener(new ComputeTreeListener(parent));
 				FindBeadsListener.addActionListener(new FindBeadsListener(parent));
+				FindPolynomialListener.addActionListener(new FindPolynomialListener(parent));
+				
 				parent.panelSecond.validate();
 				parent.panelSecond.repaint();
 				parent.Cardframe.pack();
