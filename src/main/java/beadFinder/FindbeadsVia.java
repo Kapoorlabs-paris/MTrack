@@ -25,10 +25,10 @@ public class FindbeadsVia {
 	
 	protected BeadfindingMethod MSER, DOG;
 	
-	public static ArrayList<GaussianFitParam> BeadfindingMethod(RandomAccessibleInterval<FloatType> source, final Beadfinder beadfinder, JProgressBar jpb){
+	public static ArrayList<GaussianFitParam> BeadfindingMethod(RandomAccessibleInterval<FloatType> source, final Beadfinder beadfinder, JProgressBar jpb, final int framenumber, final int thirdDimensionsize){
 		
 		
-		SubpixelLocationPoint Beadpoint = new SubpixelLocationPoint(source, beadfinder, jpb);
+		SubpixelLocationPoint Beadpoint = new SubpixelLocationPoint(source, beadfinder, jpb, framenumber, thirdDimensionsize);
 		Beadpoint.process();
 		ArrayList<GaussianFitParam> Allbeads = Beadpoint.getResult();
 		
@@ -36,10 +36,11 @@ public class FindbeadsVia {
 		
 	}
 	
-    public static ArrayList<GaussianLineFitParam> BeadfindingMethod(RandomAccessibleInterval<FloatType> source, final Linefinder linefinder, JProgressBar jpb, final double[] initialpsf, double Intensityratio, double Inispacing){
+    public static ArrayList<GaussianLineFitParam> BeadfindingMethod(RandomAccessibleInterval<FloatType> source, final Linefinder linefinder, JProgressBar jpb, final double[] initialpsf,
+    		double Intensityratio, double Inispacing, final int framenumber, final int thirdDimensionsize){
 		
     	
-		SubpixelLocationLine BeadLinepoint = new SubpixelLocationLine(source, linefinder, initialpsf, jpb);
+		SubpixelLocationLine BeadLinepoint = new SubpixelLocationLine(source, linefinder, initialpsf, jpb, framenumber, thirdDimensionsize);
 		BeadLinepoint.setIntensityratio(Intensityratio);
 		BeadLinepoint.setInispacing(Inispacing);
 		BeadLinepoint.process();
@@ -48,6 +49,8 @@ public class FindbeadsVia {
 		return AllLinebeads;
 		
 	}
+    
+    
 	
 	
 }

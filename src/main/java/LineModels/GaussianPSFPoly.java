@@ -38,25 +38,16 @@ public class GaussianPSFPoly implements MTFitFunction {
 		else if (k == 2 * ndims + 2)
 			return 1.0;
 
+	
+	
+
 		else if (k == 2 * ndims + 3)
 			return a[2 * ndims + 1] * EsigmaX(x, a, b);
 		
 		
 		else if (k == 2 * ndims + 4)
 			return a[2 * ndims + 1] * EsigmaY(x, a, b);
-	/*	
-		else if (k > 2 * ndims + 2 && k < 2 * ndims + 5){
-			
-			
-			// With respect to ai (sigma)
-						int dim = k - 2 * ndims - 3;
-						double di = x[dim] - a[dim];
-						double dii = x[dim] - a[dim + ndims];
-						return - di * di * a[2 * ndims + 1] * Estart(x, a, b)
-								- dii * dii * a[2 * ndims + 1] * Eend(x, a, b);
-			
-		}
-		*/
+		
 		else
 			return 0;
 
@@ -72,7 +63,7 @@ public class GaussianPSFPoly implements MTFitFunction {
 	 * 
 	 */
 
-	private static final double EsigmaX(final double[] x, final double[] a, final double[] b){
+private static final double EsigmaX(final double[] x, final double[] a, final double[] b){
 		
 		double sum = 0, dsum = 0, sumofgaussians = 0;
 		double di;

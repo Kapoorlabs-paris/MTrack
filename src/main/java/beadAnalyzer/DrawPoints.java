@@ -44,14 +44,14 @@ public class DrawPoints {
 	
      public  XYSeries drawLinePoints(final ArrayList<GaussianLineFitParam> beadLineparams){
 		
-		return drawLinePoints(beadLineparams, "Sigma", 10);
+		return drawLinePoints(beadLineparams, "Sigma", 20);
 	}
 	
 	
 	
 	public  XYSeries drawPoints(final ArrayList<GaussianFitParam> beadparams){
 		
-		return drawPoints(beadparams, "Sigma", 10);
+		return drawPoints(beadparams, "Sigma", 20);
 	}
 	
 	public  XYSeries drawPoints(final ArrayList<GaussianFitParam> beadparams, final String name, final int numBins){
@@ -94,8 +94,8 @@ public class DrawPoints {
 		return seriesname;
 	}
 	
-	
-public  XYSeries drawLinePoints(final ArrayList<GaussianLineFitParam> beadLineparams, final String name, final int numBins){
+	 
+       public  XYSeries drawLinePoints(final ArrayList<GaussianLineFitParam> beadLineparams, final String name, final int numBins){
 		
 		final XYSeriesCollection dataset = new XYSeriesCollection();
 		
@@ -109,11 +109,11 @@ public  XYSeries drawLinePoints(final ArrayList<GaussianLineFitParam> beadLinepa
 		if (name == "Sigma"){
 		
 		for (final GaussianLineFitParam param : beadLineparams ){
-			
+			if (param!=null){
 			seriesname.add(param.Sigma[0], param.Sigma[1]);
 			Xvalues.add(param.Sigma[0]);
 			Yvalues.add(param.Sigma[1]);
-			
+			}
 		}
 		
 		}

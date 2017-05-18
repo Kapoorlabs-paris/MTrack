@@ -48,11 +48,12 @@ public class SubpixelLocationLine extends BenchmarkAlgorithm
 	private final ArrayList<CommonOutput> imgs;
 	private final int ndims;
 	private ArrayList<GaussianLineFitParam> startlist;
-	private final int framenumber = 0;
+	private final int framenumber;
+	private final int thirdDimensionSize;
 	// LM solver iteration params
 	public int maxiter = 500;
-	public double lambda = 1e-3;
-	public double termepsilon = 1e-1;
+	public double lambda = 1e-5;
+	public double termepsilon = 1e-3;
 	// Mask fits iteration param
 	public int iterations = 500;
 	public double cutoffdistance = 10;
@@ -171,14 +172,16 @@ public class SubpixelLocationLine extends BenchmarkAlgorithm
 		return termepsilon;
 	}
 
-	public SubpixelLocationLine(final RandomAccessibleInterval<FloatType> source, final Linefinder finder, final double[] initialpsf, final JProgressBar jpb) {
+	public SubpixelLocationLine(final RandomAccessibleInterval<FloatType> source, final Linefinder finder, final double[] initialpsf, final JProgressBar jpb, 
+			final int framenumber, final int thirdDimensionSize) {
 
 		finder.checkInput();
 		finder.process();
 		imgs = finder.getResult();
 		this.source = source;
 		this.initialpsf = initialpsf;
-
+        this.framenumber = framenumber;
+        this.thirdDimensionSize = thirdDimensionSize;
 		
 		this.jpb = jpb;
 		this.ndims = source.numDimensions();
@@ -200,9 +203,12 @@ public class SubpixelLocationLine extends BenchmarkAlgorithm
 		Intensityratio = getIntensityratio();
 		Inispacing = getInispacing();
 		startlist = new ArrayList<GaussianLineFitParam>();
+		
+		percent = (Math.round(100 * (framenumber + 1) / (thirdDimensionSize)));
+		
 		for (int index = 0; index < imgs.size(); ++index) {
 
-			percent = (Math.round(100 * (index + 1) / (imgs.size())));
+			
 
 			final int Label = imgs.get(index).roilabel;
 			final double slope = imgs.get(index).lineparam[0];
@@ -236,7 +242,7 @@ public class SubpixelLocationLine extends BenchmarkAlgorithm
 	
 
 	private final double[] MakeimprovedLineguess(double slope, double intercept,
-			int label, final double[] initialpsf) {
+			int label, final double[] initialpsf, final double[][] X, final double[] I) {
 
 		long[] newposition = new long[ndims];
 		double[] minVal = { Double.MAX_VALUE, Double.MAX_VALUE };
@@ -280,7 +286,7 @@ public class SubpixelLocationLine extends BenchmarkAlgorithm
 		}
 
 		// This parameter is guess estimate for spacing between the Gaussians
-		MinandMax[2 * ndims] = Inispacing * Math.min(initialpsf[0], initialpsf[1]);
+		MinandMax[2 * ndims] = Inispacing;
 		MinandMax[2 * ndims + 1] = maxintensityline;
 		// This parameter guess estimates the background noise level
 		MinandMax[2 * ndims + 2] = 0.0;
@@ -291,10 +297,9 @@ public class SubpixelLocationLine extends BenchmarkAlgorithm
 				
 		}
 		
-		
-		
+
 		System.out.println("Label: " + label + " " + "Detection: " + " StartX: " + MinandMax[0] + " StartY: "
-				+ MinandMax[1] + " EndX: " + MinandMax[2] + " EndY: " + MinandMax[3] );
+				+ MinandMax[1] + " EndX: " + MinandMax[2] + " EndY: " + MinandMax[3] + " Initial Sigma X: " + 1 /Math.sqrt(MinandMax[7]) + " Initial Sigma Y: " + 1 /Math.sqrt(MinandMax[8]));
 
 		for (int d = 0; d < ndims; ++d) {
 
@@ -317,7 +322,6 @@ public class SubpixelLocationLine extends BenchmarkAlgorithm
 			final double intercept, final double[] initialpsf) throws Exception {
 
 		PointSampleList<FloatType> datalist = FitterUtils.gatherfullDataSeed(imgs, label, ndims);
-	
 		if (datalist != null) {
 			final Cursor<FloatType> listcursor = datalist.localizingCursor();
 			double[][] X = new double[(int) datalist.size()][ndims];
@@ -335,11 +339,11 @@ public class SubpixelLocationLine extends BenchmarkAlgorithm
 				index++;
 			}
 
-			final double[] start_param = MakeimprovedLineguess(slope, intercept,  label, initialpsf);
+			final double[] start_param = MakeimprovedLineguess(slope, intercept,  label, initialpsf, X, I);
 		
 			
 
-				final double[] finalparamstart = start_param.clone();
+				double[] finalparamstart = start_param.clone();
 				// LM solver part
 
 				RandomAccessibleInterval<FloatType> currentimg = imgs.get(label).Actualroi;
@@ -354,7 +358,7 @@ public class SubpixelLocationLine extends BenchmarkAlgorithm
 				double inicutoffdistanceY = Math.abs(inistartpos[1] - iniendpos[1]);
 				double inicutoffdistanceX = Math.abs(inistartpos[0] - iniendpos[0]);
 					
-				if (inicutoffdistanceY > 2 && inicutoffdistanceX > 2) {
+				if (inicutoffdistanceY > 1 && inicutoffdistanceX > 1) {
 				
 
 
@@ -364,6 +368,8 @@ public class SubpixelLocationLine extends BenchmarkAlgorithm
 				
 
 				}
+				else
+					finalparamstart = start_param;
 
 
 				final double[] startpos = { finalparamstart[0], finalparamstart[1] };
@@ -373,6 +379,7 @@ public class SubpixelLocationLine extends BenchmarkAlgorithm
 				for (int j = 0; j < finalparamstart.length; j++) {
 					if (Double.isNaN(finalparamstart[j]))
 						finalparamstart[j] = start_param[j];
+					
 				}
 				
 
@@ -384,7 +391,7 @@ public class SubpixelLocationLine extends BenchmarkAlgorithm
 				
 				for (int d = 0; d < ndims; ++d ){
 					
-					sigma[d] = 1.0 / Math.sqrt(finalparamstart[2 * ndims + 3 + d]);
+					sigma[d] =  1.0 /Math.sqrt(finalparamstart[2 * ndims + 3 + d]);
 					
 				}
 
@@ -392,10 +399,11 @@ public class SubpixelLocationLine extends BenchmarkAlgorithm
 				double[] endfit = endpos;
 
 				
-				FitterUtils.SetProgressBar(jpb, percent);
+				FitterUtils.SetProgressBarTime(jpb, percent, framenumber, thirdDimensionSize);
 
 				
 
+				if(finalparamstart!=start_param){
 			
 				GaussianLineFitParam PointofInterest = new GaussianLineFitParam(startfit, endfit, lineIntensity, sigma, background);
 				
@@ -413,7 +421,10 @@ public class SubpixelLocationLine extends BenchmarkAlgorithm
 					
 			
 					return PointofInterest;
-
+				}
+				
+				else
+					return null;
 		
 		}
 		else

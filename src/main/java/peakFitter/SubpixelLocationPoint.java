@@ -35,13 +35,16 @@ implements OutputAlgorithm<ArrayList<GaussianFitParam>> {
 	private static final String BASE_ERROR_MSG = "[SubpixelLocationPoint] ";
 	private ArrayList<GaussianFitParam> Params;
 	private final ArrayList<Beadprop> Allbeads;
+	private final int framenumber;
+	private final int thirdDimensionsize;
 	final JProgressBar jpb;
 	 double percent = 0;
-	public SubpixelLocationPoint(RandomAccessibleInterval<FloatType> source, Beadfinder beadfinder,final JProgressBar jpb ) {
+	public SubpixelLocationPoint(RandomAccessibleInterval<FloatType> source, Beadfinder beadfinder,final JProgressBar jpb, final int framenumber, final int thirdDimensionsize) {
 
 		beadfinder.process();
 		Allbeads = beadfinder.getResult();
-		
+		this.framenumber = framenumber;
+		this.thirdDimensionsize = thirdDimensionsize;
 		this.source = source;
 		this.jpb = jpb;
 		this.ndims = source.numDimensions();
@@ -63,18 +66,19 @@ implements OutputAlgorithm<ArrayList<GaussianFitParam>> {
 		
 		try {
 			
-			
+			percent = (Math.round(100 * (framenumber + 1) / (thirdDimensionsize)));
 			for (int index = 0; index < Allbeads.size(); ++index){
 			
 				
 				
-				percent = (Math.round(100 * (index + 1) / (Allbeads.size())));
+				
 				
 				Localizable point = Allbeads.get(index).point;
 				long radius = Allbeads.get(index).radius;
 				
 			    Params.add(Getfinalparam(point, radius));
-			    FitterUtils.SetProgressBar(jpb, percent);
+				FitterUtils.SetProgressBarTime(jpb, percent, framenumber, thirdDimensionsize);
+
 			}
 		
 		} catch (Exception e) {
@@ -134,7 +138,7 @@ implements OutputAlgorithm<ArrayList<GaussianFitParam>> {
 		}
 		for (int j = 0; j < ndims; j++) {
 			
-			sigma[j] = 1.0 / finalparam[ndims + j + 1];
+			sigma[j] =  1.0 / Math.sqrt(finalparam[ndims + j + 1]);
 			
 		}
 		GaussianFitParam guessparams = new GaussianFitParam(point, finalparam[0], sigma, finalparam[ 2 * ndims + 1]);

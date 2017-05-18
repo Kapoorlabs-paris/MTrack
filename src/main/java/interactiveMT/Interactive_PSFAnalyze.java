@@ -102,6 +102,11 @@ public class Interactive_PSFAnalyze implements PlugIn {
 	
 	public ArrayList<GaussianFitParam> FittedBeads;
 	public ArrayList<GaussianLineFitParam> FittedLineBeads;
+	
+	public ArrayList<GaussianFitParam> AllFittedBeads;
+	public ArrayList<GaussianLineFitParam> AllFittedLineBeads;
+	
+	
 	public RandomAccessibleInterval<FloatType> currentimg;
 	public RandomAccessibleInterval<FloatType> currentPreprocessedimg;
 	public RandomAccessibleInterval<FloatType> originalimg;
@@ -123,7 +128,7 @@ public class Interactive_PSFAnalyze implements PlugIn {
 	public float sigmaMin = 0.5f;
 	public float sigmaMax = 100f;
 	public double Intensityratio = 0.5;
-	public double Inispacing = 0.5;
+	public double Inispacing = 1;
 	public ImagePlus imp;
 	public ImagePlus impcopy;
 	public ImagePlus preprocessedimp;
@@ -340,7 +345,8 @@ public class Interactive_PSFAnalyze implements PlugIn {
 		jpb = new JProgressBar();
 	
 		peaks = new ArrayList<RefinedPeak<Point>>();
-		
+		AllFittedLineBeads = new ArrayList<GaussianLineFitParam>();
+		AllFittedBeads = new ArrayList<GaussianFitParam>();
 		nf.setMaximumFractionDigits(3);
 		setInitialUnstability_Score(Unstability_ScoreInit);
 		setInitialDelta(deltaInit);
@@ -362,12 +368,8 @@ public class Interactive_PSFAnalyze implements PlugIn {
 		}
 		
 		if (originalimg.numDimensions() == 3 && Usermodel == whichModel.Filament) {
-
-			DialogChoose();
-
-			
-			originalimg = Views.hyperSlice(originalimg, 2, thirdDimension);
-			originalPreprocessedimg = Views.hyperSlice(originalPreprocessedimg, 2, thirdDimension);
+			thirdDimension = 1;
+			thirdDimensionSize = (int) originalimg.dimension(2);
 			initialpsf = new double[2];
 		}
 		
@@ -419,21 +421,7 @@ public class Interactive_PSFAnalyze implements PlugIn {
 
 	
 	
-	public boolean DialogChoose(){
-		
-		GenericDialog gd = new GenericDialog("For filament PSF calculation only use 2D image");
-		
-		
-		gd.addNumericField("Choose a slice", thirdDimension, 0);
-		
-		gd.showDialog();
-		
-		thirdDimension = (int) gd.getNextNumber();
-
-		
-		return !gd.wasCanceled();
-		
-	}
+	
 	
 	/**
 	 * Updates the Preview with the current parameters (sigma, threshold, roi,
@@ -487,6 +475,9 @@ public class Interactive_PSFAnalyze implements PlugIn {
 
 		if (change != ValueChange.THIRDDIMTrack) {
 
+			
+			
+			
 			overlay = preprocessedimp.getOverlay();
 			Roi roi = preprocessedimp.getRoi();
 			if (roi == null || roi.getType() != Roi.RECTANGLE) {
@@ -524,7 +515,7 @@ public class Interactive_PSFAnalyze implements PlugIn {
 		}
 		
 		if (change == ValueChange.THIRDDIMTrack ) {
-
+			overlay.clear();
 			if (preprocessedimp == null)
 				preprocessedimp = ImageJFunctions.show(CurrentView);
 			else {
@@ -551,7 +542,7 @@ public class Interactive_PSFAnalyze implements PlugIn {
 			
 			if (FindBeadsViaMSER) {
 
-				overlay.clear();
+				
 				IJ.log(" Computing the Component tree");
 
 				newtree = MserTree.buildMserTree(newimg, delta, minSize, maxSize, Unstability_Score, minDiversity, darktobright);
@@ -929,7 +920,7 @@ public class Interactive_PSFAnalyze implements PlugIn {
 					}
 
 					// compute first version
-					updatePreview(ValueChange.THIRDDIM);
+					updatePreview(ValueChange.THIRDDIMTrack);
 
 				}
 			}

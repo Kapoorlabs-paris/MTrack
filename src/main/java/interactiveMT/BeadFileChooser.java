@@ -131,7 +131,7 @@ public class BeadFileChooser extends JPanel {
 		++c.gridy;
 		c.insets = new Insets(10, 10, 10, 0);
 		panelIntro.add(Measure, c);
-
+        /*
 		++c.gridy;
 		c.insets = new Insets(10, 10, 0, 50);
 		panelIntro.add(batch, c);
@@ -142,7 +142,7 @@ public class BeadFileChooser extends JPanel {
 		++c.gridy;
 		c.insets = new Insets(10, 10, 0, 180);
 		panelIntro.add(inputFieldX, c);
-		
+		*/
 		++c.gridy;
 		c.insets = new Insets(10, 10, 10, 0);
 		panelIntro.add(Done, c);

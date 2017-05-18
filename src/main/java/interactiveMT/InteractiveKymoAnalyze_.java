@@ -34,7 +34,7 @@ import net.imglib2.img.array.ArrayImgFactory;
 import net.imglib2.img.display.imagej.ImageJFunctions;
 import net.imglib2.type.numeric.real.FloatType;
 
-public class InteractiveKymoAnalyze implements PlugIn {
+public class InteractiveKymoAnalyze_ implements PlugIn {
 
 	final RandomAccessibleInterval<FloatType> Kymoimg;
 	
@@ -50,7 +50,7 @@ public class InteractiveKymoAnalyze implements PlugIn {
   	
 	
     
-	public InteractiveKymoAnalyze (final RandomAccessibleInterval<FloatType> Kymoimg , File fichier){
+	public InteractiveKymoAnalyze_ (final RandomAccessibleInterval<FloatType> Kymoimg , File fichier){
 		
 		this.Kymoimg = Kymoimg;
 		this.fichier = fichier;
@@ -425,7 +425,7 @@ public class InteractiveKymoAnalyze implements PlugIn {
 		File fichier = new File(usefolder + "//" + addToName + "ID" + 0 + ".txt");
 		
 		
-		new InteractiveKymoAnalyze(img, fichier).run(null);
+		new InteractiveKymoAnalyze_(img, fichier).run(null);
 		
 	}
 	
