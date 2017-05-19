@@ -52,8 +52,8 @@ public class SubpixelLocationLine extends BenchmarkAlgorithm
 	private final int thirdDimensionSize;
 	// LM solver iteration params
 	public int maxiter = 500;
-	public double lambda = 1e-5;
-	public double termepsilon = 1e-3;
+	public double lambda = 1e-3;
+	public double termepsilon = 1e-1;
 	// Mask fits iteration param
 	public int iterations = 500;
 	public double cutoffdistance = 10;

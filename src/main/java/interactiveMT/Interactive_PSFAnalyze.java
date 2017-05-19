@@ -35,8 +35,16 @@ import javax.swing.UIManager;
 
 import LineModels.UseLineModel.UserChoiceModel;
 import beadListener.ChooseDirectoryListener;
+import beadListener.ComputeTreeListener;
+import beadListener.DeltaListener;
 import beadListener.DogListener;
+import beadListener.FindBeadsListener;
+import beadListener.FindPolynomialListener;
+import beadListener.MaxSizeListener;
+import beadListener.MinDiversityListener;
+import beadListener.MinSizeListener;
 import beadListener.MserListener;
+import beadListener.Unstability_ScoreListener;
 import fiji.tool.SliceListener;
 import fiji.tool.SliceObserver;
 import ij.IJ;
@@ -88,15 +96,15 @@ public class Interactive_PSFAnalyze implements PlugIn {
 	public String addToName = "PSFAnalysis";
 	public JFrame frame = new JFrame();
 	public JPanel panel = new JPanel();
-	public int thirdDimensionslider = 0;
-	public int thirdDimensionsliderInit = 0;
+	public int thirdDimensionslider = 1;
+	public int thirdDimensionsliderInit = 1;
 	public int thirdDimensionSize;
 	public int thirdDimensionSizeOriginal;
 	public int thirdDimension;
 	public final int scrollbarSize = 1000;
 	public final int scrollbarSizebig = 1000;
 	
-	public float deltaMax = 400f;
+	public float deltaMax = 255f;
 	public float Unstability_ScoreMin = 0;
 	public float Unstability_ScoreMax = 1;
 	
@@ -162,8 +170,8 @@ public class Interactive_PSFAnalyze implements PlugIn {
 	public boolean wasCanceled = false;
 	public boolean darktobright = false;
 	FinalInterval interval;
-	int inix = 20;
-	int iniy = 20;
+	int inix = 15;
+	int iniy = 15;
 	public Color colorDraw = Color.red;
 	public Color colorCurrent = Color.yellow;
 	public Color colorTrack = Color.yellow;
@@ -530,7 +538,7 @@ public class Interactive_PSFAnalyze implements PlugIn {
 			}
 			preprocessedimp.setTitle("Original image Current View in third dimension: " + " " + thirdDimension);
 
-
+			
 			long[] min = { (long) standardRectangle.getMinX(), (long) standardRectangle.getMinY() };
 			long[] max = { (long) standardRectangle.getMaxX(), (long) standardRectangle.getMaxY() };
 			interval = new FinalInterval(min, max);
@@ -538,6 +546,8 @@ public class Interactive_PSFAnalyze implements PlugIn {
 			currentimg = util.CopyUtils.extractImage(CurrentView, interval);
 			currentPreprocessedimg = util.CopyUtils.extractImage(CurrentPreprocessedView, interval);
 
+			
+			
 			newimg = util.CopyUtils.copytoByteImage(currentPreprocessedimg, interval);
 			
 			if (FindBeadsViaMSER) {
@@ -547,6 +557,7 @@ public class Interactive_PSFAnalyze implements PlugIn {
 
 				newtree = MserTree.buildMserTree(newimg, delta, minSize, maxSize, Unstability_Score, minDiversity, darktobright);
 				MSERRois =  util.DrawingUtils.getcurrentRois(newtree, AllmeanCovar);
+				
 				AllMSERrois.put(thirdDimension, MSERRois);
 
 				if (preprocessedimp != null) {
@@ -626,12 +637,12 @@ public class Interactive_PSFAnalyze implements PlugIn {
 			long[] min = { (long) standardRectangle.getMinX(), (long) standardRectangle.getMinY() };
 			long[] max = { (long) standardRectangle.getMaxX(), (long) standardRectangle.getMaxY() };
 			interval = new FinalInterval(min, max);
-			final long Cannyradius = 2;
+			final long Cannyradius = 1;
 
 			currentimg = util.CopyUtils.extractImage(CurrentView, interval);
 			currentPreprocessedimg = util.CopyUtils.extractImage(CurrentPreprocessedView, interval);
 
-			newimg = util.CopyUtils.copytoByteImage(Kernels.CannyEdgeandMean(currentPreprocessedimg, Cannyradius),
+			newimg = util.CopyUtils.copytoByteImage(currentPreprocessedimg,
 					standardRectangle);
 
 			newtree = MserTree.buildMserTree(newimg, delta, minSize, maxSize, Unstability_Score, minDiversity, darktobright);
@@ -679,7 +690,7 @@ public class Interactive_PSFAnalyze implements PlugIn {
 			long[] min = { (long) standardRectangle.getMinX(), (long) standardRectangle.getMinY() };
 			long[] max = { (long) standardRectangle.getMaxX(), (long) standardRectangle.getMaxY() };
 			interval = new FinalInterval(min, max);
-			final long Cannyradius = 2;
+			final long Cannyradius = 1;
 
 			currentimg = util.CopyUtils.extractImage(CurrentView, interval);
 			currentPreprocessedimg = util.CopyUtils.extractImage(CurrentPreprocessedView, interval);
@@ -757,103 +768,170 @@ public class Interactive_PSFAnalyze implements PlugIn {
 			panelCont.setLayout(cl);
 
 			panelCont.add(panelFirst, "1");
-			panelCont.add(panelSecond, "2");
-		
-			CheckboxGroup Finders = new CheckboxGroup();
-			
-			
 
-			final Checkbox mser = new Checkbox("MSER", Finders, FindBeadsViaMSER);
-			final Checkbox dog = new Checkbox("DoG", Finders, FindBeadsViaDOG);
-			
+			FindBeadsViaMSER = true;
 
-			final JLabel outputfilename = new JLabel("Enter output filename: ");
-			TextField inputField = new TextField();
-			inputField.setColumns(10);
-			final JButton ChooseDirectory = new JButton("Choose Directory");
-			final Button JumpFrame = new Button("Jump in third dimension to :");
-			
-			final Scrollbar thirdDimensionsliderS = new Scrollbar(Scrollbar.HORIZONTAL, thirdDimensionsliderInit, 0, 0,
-					thirdDimensionSize);
-			thirdDimensionsliderS.setBlockIncrement(1);
-			this.thirdDimensionslider = (int) computeValueFromScrollbarPosition(thirdDimensionsliderInit, thirdDimensionsliderInit,
-					thirdDimensionSize, thirdDimensionSize);
-			
-			final Label zText = new Label("Third Dimensíonal slice = " + this.thirdDimensionslider, Label.CENTER);
-
-			
-
-			
-			/* Instantiation */
 			final GridBagLayout layout = new GridBagLayout();
 			final GridBagConstraints c = new GridBagConstraints();
-			
+			final Label Step = new Label("Step 1", Label.CENTER);
 
-			final Label Name = new Label("Step 1", Label.CENTER);
-			
 			panelFirst.setLayout(layout);
+
+			panelFirst.add(Step, c);
+			final Scrollbar deltaS = new Scrollbar(Scrollbar.HORIZONTAL, deltaInit, 10, 0, 10 + scrollbarSize);
+			final Scrollbar Unstability_ScoreS = new Scrollbar(Scrollbar.HORIZONTAL, Unstability_ScoreInit, 10, 0, 10 + scrollbarSize);
+			final Scrollbar minDiversityS = new Scrollbar(Scrollbar.HORIZONTAL, minDiversityInit, 10, 0,
+					10 + scrollbarSize);
+			final Scrollbar minSizeS = new Scrollbar(Scrollbar.HORIZONTAL, minSizeInit, 10, 0, 10 + scrollbarSize);
+			final Scrollbar maxSizeS = new Scrollbar(Scrollbar.HORIZONTAL, maxSizeInit, 10, 0, 10 + scrollbarSize);
+			final Button ComputeTree = new Button("Compute Tree and display");
+			final Button FindBeadsListener = new Button("Fit Gaussian bead Function");
+			final Button FindPolynomialListener = new Button("Fit Gaussian Polynomial Function");
+			Unstability_Score = computeValueFromScrollbarPosition(Unstability_ScoreInit, Unstability_ScoreMin, Unstability_ScoreMax, 
+					scrollbarSize);
+			delta = computeValueFromScrollbarPosition(deltaInit, 
+					deltaMin, deltaMax, scrollbarSize);
+			minDiversity = computeValueFromScrollbarPosition(minDiversityInit, minDiversityMin, 
+					minDiversityMax,
+					scrollbarSize);
+			minSize = (int) computeValueFromScrollbarPosition(minSizeInit, 
+					minSizemin, minSizemax, scrollbarSize);
+			maxSize = (int) computeValueFromScrollbarPosition(maxSizeInit, 
+					maxSizemin, maxSizemax, scrollbarSize);
+
+			final Label deltaText = new Label("Grey Level Seperation between Components = " + delta, Label.CENTER);
+			final Label Unstability_ScoreText = new Label("Unstability Score = " + Unstability_Score, Label.CENTER);
+			final Label minDiversityText = new Label("minDiversity = " +minDiversity, Label.CENTER);
+			final Label minSizeText = new Label("Min # of pixels inside MSER Ellipses = " + minSize, Label.CENTER);
+			final Label maxSizeText = new Label("Max # of pixels inside MSER Ellipses = " + maxSize, Label.CENTER);
+
+			inputLabelX = new JLabel("Enter a guess for sigma of Microscope PSF (pixel units): ");
+			inputFieldX = new TextField();
+			inputFieldX.setColumns(10);
+
+			inputLabelY = new JLabel("Enter a guess for sigmaY of Microscope PSF (pixel units): ");
+			inputFieldY = new TextField();
+			inputFieldY.setColumns(10);
+
+			final Label MSparam = new Label("Determine MSER parameters");
+			MSparam.setBackground(new Color(1, 0, 1));
+			MSparam.setForeground(new Color(255, 255, 255));
+
+		
+			
+			/* Location */
+			panelFirst.setLayout(layout);
+
 			c.fill = GridBagConstraints.HORIZONTAL;
-			c.gridx = 1;
-			c.gridy = 4;
-			c.weightx = 1;
+			c.gridx = 0;
+			c.gridy = 0;
+			c.weightx = 4;
+			c.weighty = 1.5;
 
-			final Label Ends = new Label("Method Choice for finding Blobs");
+			++c.gridy;
+
+			panelFirst.add(MSparam, c);
+
+			++c.gridy;
+
+			panelFirst.add(deltaText, c);
+
+			++c.gridy;
+			panelFirst.add(deltaS, c);
+
+			++c.gridy;
+
+			panelFirst.add(Unstability_ScoreText, c);
+
+			++c.gridy;
+			panelFirst.add(Unstability_ScoreS, c);
+/*
+			++c.gridy;
+
+			panelFirst.add(minDiversityText, c);
+
+			++c.gridy;
+			panelFirst.add(minDiversityS, c);
+*/
+			++c.gridy;
+
+			panelFirst.add(minSizeText, c);
+
+			++c.gridy;
+			panelFirst.add(minSizeS, c);
+
+			++c.gridy;
+
+			panelFirst.add(maxSizeText, c);
+
+			++c.gridy;
+			panelFirst.add(maxSizeS, c);
+
 			
-			++c.gridy;
-			++c.gridy;
-			++c.gridy;
-			panelFirst.add(Name, c);
-			
-			
-			++c.gridy;
-			panelFirst.add(Ends, c);
-
-			++c.gridy;
-			c.insets = new Insets(10, 10, 0, 0);
-			panelFirst.add(mser, c);
-
-			if(Usermodel == whichModel.Bead){
-			++c.gridy;
-			c.insets = new Insets(10, 10, 0, 0);
-			panelFirst.add(dog, c);
-			}
-			if (thirdDimensionSize > 1) {
-				++c.gridy;
-				panelFirst.add(thirdDimensionsliderS, c);
-
-				++c.gridy;
-				panelFirst.add(zText, c);
-
-				++c.gridy;
-				c.insets = new Insets(0, 175, 0, 175);
-				panelFirst.add(JumpFrame, c);
-			}
 		
 
 			++c.gridy;
-			c.insets = new Insets(10, 10, 10, 0);
-			panelFirst.add(outputfilename, c);
+			c.insets = new Insets(10, 175, 0, 175);
+			panelFirst.add(ComputeTree, c);
+
+			if(Usermodel == whichModel.Bead){
+				
+				
+				
+				
+			++c.gridy;
+			c.insets = new Insets(10, 180, 0, 180);
+			panelFirst.add(FindBeadsListener, c);
+			}
+			
+			else{
+			
+				
+				++c.gridy;
+				c.insets = new Insets(10, 10, 10, 0);
+				panelFirst.add(inputLabelX, c);
+
+				++c.gridy;
+				c.insets = new Insets(10, 10, 0, 180);
+				panelFirst.add(inputFieldX, c);
+
+			
+				
+				inputFieldY = inputFieldX;
 			
 			++c.gridy;
-			c.insets = new Insets(10, 10, 10, 0);
-			panelFirst.add(inputField, c);
-			
-			++c.gridy;
-			c.insets = new Insets(10, 10, 0, 0);
-			panelFirst.add(ChooseDirectory, c);
+			c.insets = new Insets(10, 180, 0, 180);
+			panelFirst.add(FindPolynomialListener, c);	
 			
 			
 			
-			panelFirst.setVisible(true);
+			
+			}
+			
+			deltaS.addAdjustmentListener(new DeltaListener(this, deltaText, deltaMin, deltaMax, 
+					scrollbarSize, deltaS));
 
-			cl.show(panelCont, "1");
+			Unstability_ScoreS.addAdjustmentListener(
+					new Unstability_ScoreListener(this, Unstability_ScoreText, Unstability_ScoreMin, Unstability_ScoreMax, 
+							scrollbarSize, Unstability_ScoreS));
 
-			mser.addItemListener(new MserListener(this));
-			dog.addItemListener(new DogListener(this));
-			JumpFrame.addActionListener(
-					new moveInThirdDimListener(thirdDimensionsliderS, zText, thirdDimensionsliderInit, thirdDimensionSize));
-			ChooseDirectory.addActionListener(new ChooseDirectoryListener(this, inputField));
+			minDiversityS.addAdjustmentListener(new MinDiversityListener(this, minDiversityText, minDiversityMin,
+					minDiversityMax, scrollbarSize, minDiversityS));
+
+			minSizeS.addAdjustmentListener(
+					new MinSizeListener(this, minSizeText,minSizemin, minSizemax,
+                  scrollbarSize, minSizeS));
+
+			maxSizeS.addAdjustmentListener(
+					new MaxSizeListener(this,maxSizeText, maxSizemin, maxSizemax, 
+							scrollbarSize, maxSizeS));
+
+			ComputeTree.addActionListener(new ComputeTreeListener(this));
+			FindBeadsListener.addActionListener(new FindBeadsListener(this));
+			FindPolynomialListener.addActionListener(new FindPolynomialListener(this));
 			
+			/*
+
 			JPanel control = new JPanel();
 			control.add(new JButton(new AbstractAction("\u22b2Prev") {
 
@@ -871,9 +949,9 @@ public class Interactive_PSFAnalyze implements PlugIn {
 					cl.next(panelCont);
 				}
 			}));
-			
+			*/
 			Cardframe.add(panelCont, BorderLayout.CENTER);
-			Cardframe.add(control, BorderLayout.SOUTH);
+		//	Cardframe.add(control, BorderLayout.SOUTH);
 			Cardframe.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 			Cardframe.pack();
 			Cardframe.setVisible(true);

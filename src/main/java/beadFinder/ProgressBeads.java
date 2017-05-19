@@ -25,6 +25,8 @@ public class ProgressBeads extends SwingWorker<Void, Void> {
 	@Override
 	protected Void doInBackground() throws Exception {
 
+		
+		parent.AllFittedBeads.clear();
 		if (parent.thirdDimensionSize > 1) {
 			for (int index = parent.thirdDimensionsliderInit; index < parent.thirdDimensionSize; ++index) {
 

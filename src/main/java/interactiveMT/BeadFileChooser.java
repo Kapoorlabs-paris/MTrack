@@ -143,9 +143,9 @@ public class BeadFileChooser extends JPanel {
 		c.insets = new Insets(10, 10, 0, 180);
 		panelIntro.add(inputFieldX, c);
 		*/
-		++c.gridy;
-		c.insets = new Insets(10, 10, 10, 0);
-		panelIntro.add(Done, c);
+	//	++c.gridy;
+	//	c.insets = new Insets(10, 10, 10, 0);
+	//	panelIntro.add(Done, c);
 		
 		
 		
@@ -315,12 +315,36 @@ public class BeadFileChooser extends JPanel {
 				System.out.println("No Selection ");
 			}
 
+			Done(parent, true);
 		}
 
 	}
 
 	
 
+	protected void Done(final Frame parent, boolean Done){
+		
+		wasDone = Done;
+
+		ImagePlus impA = new Opener().openImage(chooserA.getSelectedFile().getPath());
+		ImagePlus impB = new Opener().openImage(chooserB.getSelectedFile().getPath());
+		
+		// Tracking is done with imageA measurment is performed on both the
+		// images
+		calibration[0] = impA.getCalibration().pixelWidth;
+		calibration[1] = impA.getCalibration().pixelHeight;
+
+		RandomAccessibleInterval<FloatType> originalPreprocessedimg = ImageJFunctions.convertFloat(impA);
+		RandomAccessibleInterval<FloatType> originalimg = ImageJFunctions.convertFloat(impB);
+	
+
+		
+	
+	    new Interactive_PSFAnalyze(originalimg, originalPreprocessedimg, UserModel, batchprocess, chooserB.getCurrentDirectory(), chooserB.getSelectedFile()).run(null);
+		
+	    close(parent);
+		
+	}
 	protected class DoneButtonListener implements ActionListener {
 		final Frame parent;
 		final boolean Done;

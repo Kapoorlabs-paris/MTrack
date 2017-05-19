@@ -77,7 +77,7 @@ public class LevenbergMarquardtSolverLine {
 
 				// boost diagonal towards gradient descent
 				for( int r = 0; r < nparm; r++ )
-					H[r][r] *= (1. + lambda);
+					H[r][r] *= (1.0 + lambda);
 
 				// gradient
 				for( int r = 0; r < nparm; r++ ) {
@@ -95,7 +95,7 @@ public class LevenbergMarquardtSolverLine {
 					d = (new Matrix(H)).lu().solve(new Matrix(g, nparm)).getRowPackedCopy();
 				} catch (RuntimeException re) {
 					// Matrix is singular
-					lambda *= 10.;
+					//lambda *= 10.;
 					continue;
 				}
 				double[] na = (new Matrix(a, nparm)).plus(new Matrix(d, nparm)).getRowPackedCopy();
@@ -108,7 +108,7 @@ public class LevenbergMarquardtSolverLine {
 				else {
 					
 					term++;
-					if (term == 4)
+					if (term == 3)
 						done = true;
 					
 				}
@@ -117,11 +117,12 @@ public class LevenbergMarquardtSolverLine {
 				if (iter >= maxiter) done = true;
 
 
+				//System.out.println(iter+ " " + lambda+ " "+ Math.abs(e1-e0));
 				// in the C++ version, found that changing this to e1 >= e0
 				// was not a good idea.  See comment there.
 				//
 				if (e1 > e0 || Double.isNaN(e1) ) { // new location worse than before
-					lambda *= 10.;
+					lambda *= 10;
 					
 				}
 				else {		// new location better, accept new parameters
@@ -137,15 +138,15 @@ public class LevenbergMarquardtSolverLine {
 				
 				// New truncation criteria to fasten the solver when it is stuck in a local minima @Varun
 				for( int i = 0; i < nparm; i++ ) {
-					if (Math.abs(a[i] - na[i]) < 1.0E-10 )
-						lambda *= 50.;
+					if (Math.abs(a[i] - na[i]) < 1.0E-10   )
+						lambda *= 50;
 				}
 				
 				if (lambda >= 1.0E50)
 					done = true;
 				
 				
-			//	System.out.println(iter+ " " + lambda+ " "+ Math.abs(e1-e0));
+				
 
 			} while(!done);
 
