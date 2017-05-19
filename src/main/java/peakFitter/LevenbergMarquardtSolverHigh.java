@@ -1,7 +1,7 @@
 package peakFitter;
 import Jama.Matrix;
 import LineModels.MTFitFunction;
-public class LevenbergMarquardtSolverLine {
+public class LevenbergMarquardtSolverHigh {
 	
 		/**
 		 * Calculate the current sum-squared-error
@@ -20,6 +20,18 @@ public class LevenbergMarquardtSolverLine {
 				double d = y[i] - f.val(x[i], a, b);
 				sum = sum + (d*d);
 			}
+
+			return sum;
+		} //chiSquared
+		public static final double chiSquaredHigh(
+				final double[][] x, 
+				final double[] a, 
+				final double[] b,
+				final double[] y, 
+				final MTFitFunction f)  {
+			
+			int npts = y.length;
+			double sum = chiSquared(x, a, b, y, f) * (1.0 - chiSquared(x, a, b, y, f));
 
 			return sum;
 		} //chiSquared
@@ -51,7 +63,7 @@ public class LevenbergMarquardtSolverLine {
 			int npts = y.length;
 			int nparm = a.length;
 		
-			double e0 = chiSquared(x, a, b, y, f);
+			double e0 = chiSquaredHigh(x, a, b, y, f);
 			boolean done = false;
 
 			// g = gradient, H = hessian, d = step to minimum
@@ -64,29 +76,32 @@ public class LevenbergMarquardtSolverLine {
 
 			do {
 				++iter;
+				
+
+				
+				// gradient
+				for( int r = 0; r < nparm; r++ ) {
+					g[r] = 0.;
+					for( int i = 0; i < npts; i++ ) {
+						double[] xi = x[i];
+						g[r] += (y[i]-f.val(xi,a, b)) * f.grad(xi, a, b, r) * ( 1.0 -f.val(xi, a, b)) * ( 1.0 - f.val(xi, a, b));
+					}
+				} //npts
 				// hessian approximation
 				for( int r = 0; r < nparm; r++ ) {
 					for( int c = 0; c < nparm; c++ ) {
 						H[r][c] = 0.;
 						for( int i = 0; i < npts; i++ ) {
 							double[] xi = x[i];
-							H[r][c] += f.grad(xi, a, b, r) * f.grad(xi, a, b, c);
+							H[r][c] += f.grad(xi, a, b, r) * f.grad(xi, a, b, c) *  ( 1.0 -f.val(xi, a, b)) * ( 1.0 - f.val(xi, a, b));
+									//-(y[i]-f.val(xi,a, b)) * f.grad(xi, a, b, r) * (y[i]-f.val(xi,a, b)) * f.grad(xi, a, b, r) * (1.0 - f.val(xi, a, b)) * (2.0 - f.val(xi, a, b));
+							
 						}  //npts
 					} //c
 				} //r
-
 				// boost diagonal towards gradient descent
 				for( int r = 0; r < nparm; r++ )
 					H[r][r] *= (1.0 + lambda);
-
-				// gradient
-				for( int r = 0; r < nparm; r++ ) {
-					g[r] = 0.;
-					for( int i = 0; i < npts; i++ ) {
-						double[] xi = x[i];
-						g[r] += (y[i]-f.val(xi,a, b)) * f.grad(xi, a, b, r);
-					}
-				} //npts
 
 				// solve H d = -g, evaluate error at new location
 				//double[] d = DoubleMatrix.solve(H, g);
@@ -99,7 +114,7 @@ public class LevenbergMarquardtSolverLine {
 					continue;
 				}
 				double[] na = (new Matrix(a, nparm)).plus(new Matrix(d, nparm)).getRowPackedCopy();
-				double e1 = chiSquared(x, na, b, y, f);
+				double e1 = chiSquaredHigh(x, na, b, y, f);
 
 				// termination test (slightly different than NR)
 				if (Math.abs(e1-e0) > termepsilon) {
