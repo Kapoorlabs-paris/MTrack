@@ -7,6 +7,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import javax.swing.JProgressBar;
+
 import graphconstructs.Logger;
 import houghandWatershed.HoughTransformandMser;
 import ij.IJ;
@@ -32,6 +34,7 @@ import net.imglib2.type.numeric.integer.UnsignedByteType;
 import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.util.Util;
 import net.imglib2.view.Views;
+import peakFitter.FitterUtils;
 import peakFitter.SortListbyproperty;
 import peakFitter.SubpixelLengthPCLine;
 
@@ -50,10 +53,12 @@ public class LinefinderInteractiveMSERwHough  implements Linefinder{
 	private EllipseRoi ellipseroi;
 	private final double thetaPerPixel;
 	private final double rhoPerPixel;
+	private final JProgressBar jpb;
+	double percent = 0;
 	public LinefinderInteractiveMSERwHough (final RandomAccessibleInterval<FloatType> source, 
 			final RandomAccessibleInterval<FloatType> Preprocessedsource,
 			final MserTree<UnsignedByteType> newtree, final int framenumber, final double thetaPerPixel,
-			final double rhoPerPixel){
+			final double rhoPerPixel, final JProgressBar jpb){
 		
 		this.newtree = newtree;
 		this.source = source;
@@ -61,6 +66,7 @@ public class LinefinderInteractiveMSERwHough  implements Linefinder{
 		this.thetaPerPixel = thetaPerPixel;
 		this.rhoPerPixel = rhoPerPixel;
 		this.framenumber = framenumber;
+		this.jpb = jpb;
 		ndims = source.numDimensions();
 	}
 	
@@ -115,6 +121,7 @@ public class LinefinderInteractiveMSERwHough  implements Linefinder{
 		int count = 0;
 			for (int index = 0; index < ellipselist.size(); ++index) {
 				
+			
 				
 				final ImgFactory<FloatType> factory = Util.getArrayOrCellImgFactory(Preprocessedsource, type);
 				RandomAccessibleInterval<FloatType>  Roiimg = factory.create(Preprocessedsource, type);
@@ -131,6 +138,11 @@ public class LinefinderInteractiveMSERwHough  implements Linefinder{
 	    			
 	    			Roiindex = count;
 	    			count++;
+	    			
+	    			percent = (Math.round(100 * (Roiindex + 1) / (ellipselist.size() - 1)));
+					
+					FitterUtils.SetProgressBarTime(jpb, percent, Roiindex, ellipselist.size() - 2, "Doing Hough Transform");
+	    			
 				ellipseroi.setStrokeColor(Color.green);
 				
 

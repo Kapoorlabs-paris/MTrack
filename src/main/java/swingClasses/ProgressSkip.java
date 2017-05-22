@@ -11,21 +11,24 @@ import updateListeners.FinalPoint;
 public class ProgressSkip extends SwingWorker<Void, Void> {
 
 final Interactive_MTDoubleChannel parent;
+final int starttime;
+final int endtime;
 	
-	
-	public ProgressSkip(final Interactive_MTDoubleChannel parent){
+	public ProgressSkip(final Interactive_MTDoubleChannel parent, final int starttime, final int endtime){
 	
 		this.parent = parent;
+		this.starttime = starttime;
+		this.endtime = endtime;
 	}
 	
 	@Override
 	protected Void doInBackground() throws Exception {
 
-		parent.thirdDimensionSize = parent.thirdDimensionSizeOriginal;
+		
+		
+       
 
-		parent.moveDialogue();
-
-		int next = parent.thirdDimension;
+		int next = starttime;
 
 		if (next < 2)
 			next = 2;
@@ -33,7 +36,7 @@ final Interactive_MTDoubleChannel parent;
 		
 		
 		Track newtrack = new Track(parent);
-		newtrack.Trackobject(next);
+		newtrack.Trackobject(next, endtime);
 		
 
 		return null;

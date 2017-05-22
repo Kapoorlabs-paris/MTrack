@@ -26,7 +26,10 @@ public class ThresholdHoughListener implements AdjustmentListener {
 		this.scrollbarSize = scrollbarSize;
 
 		this.thresholdScrollbar = thresholdScrollbar;
+		thresholdScrollbar.addMouseListener( new StandardMouseListener( parent,ValueChange.SHOWHOUGH ) );
 
+		
+		
 	}
 
 	@Override
@@ -37,12 +40,6 @@ public class ThresholdHoughListener implements AdjustmentListener {
 
 		label.setText("threshold Value = " + parent.thresholdHough);
 
-		// if ( !event.getValueIsAdjusting() )
-		{
-			while (parent.isComputing) {
-				SimpleMultiThreading.threadWait(10);
-			}
-			parent.updatePreview(ValueChange.thresholdHough);
-		}
+		
 	}
 }

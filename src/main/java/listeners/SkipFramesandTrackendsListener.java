@@ -13,11 +13,14 @@ public class SkipFramesandTrackendsListener implements ActionListener {
 	
 	
       final Interactive_MTDoubleChannel parent;
+      final int starttime;
+      final int endtime;
 	
-	
-	public SkipFramesandTrackendsListener(final Interactive_MTDoubleChannel parent){
+	public SkipFramesandTrackendsListener(final Interactive_MTDoubleChannel parent, final int starttime, final int endtime){
 	
 		this.parent = parent;
+		this.starttime = starttime;
+		this.endtime = endtime;
 	}
 	
 	@Override
@@ -47,7 +50,7 @@ public class SkipFramesandTrackendsListener implements ActionListener {
 		parent.frame.setLocationRelativeTo(parent.panelCont);
 		parent.frame.setVisible(true);
 
-		ProgressSkip trackMT = new ProgressSkip(parent);
+		ProgressSkip trackMT = new ProgressSkip(parent, starttime, endtime);
 		trackMT.execute();
 
 	}

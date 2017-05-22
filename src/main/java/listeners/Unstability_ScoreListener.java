@@ -25,7 +25,7 @@ public class Unstability_ScoreListener implements AdjustmentListener {
 		this.parent = parent;
 		this.scrollbarSize = scrollbarSize;
 		this.Unstability_ScoreScrollbar = Unstability_ScoreScrollbar;
-
+		Unstability_ScoreScrollbar.addMouseListener( new StandardMouseListener( parent, ValueChange.SHOWMSER ) );
 	}
 	
 	

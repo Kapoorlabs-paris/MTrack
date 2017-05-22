@@ -49,11 +49,14 @@ import listeners.AcceptResultsListener;
 import listeners.AdvancedSeedListener;
 import listeners.AdvancedTrackerListener;
 import listeners.AnalyzekymoListener;
+import listeners.BeginTrackListener;
 import listeners.CheckResultsListener;
 import listeners.ComputeTreeAgainListener;
 import listeners.ComputeTreeListener;
 import listeners.DeltaListener;
+import listeners.EndTrackListener;
 import listeners.FindLinesListener;
+import listeners.MinSizeListener;
 import listeners.SeedDisplayListener;
 import listeners.SkipFramesandTrackendsListener;
 import listeners.TrackendsListener;
@@ -73,7 +76,8 @@ import updateListeners.MoveToFrameListener;
 public class Interactive_MTDoubleChannelBasic implements PlugIn {
 
 	final Interactive_MTDoubleChannel parent;
-
+	private JLabel inputLabelX, inputLabelY, inputLabelT;
+	private TextField inputFieldX, inputFieldY, inputFieldT;
 	public Interactive_MTDoubleChannelBasic() {
 		this.parent = null;
 	};
@@ -211,10 +215,13 @@ public class Interactive_MTDoubleChannelBasic implements PlugIn {
 
 		final Label deltaText = new Label("Grey Level Seperation between Components = " + parent.delta, Label.CENTER);
 		final Label Unstability_ScoreText = new Label("Unstability Score = " + parent.Unstability_Score, Label.CENTER);
+		final Label minSizeText = new Label("Min # of pixels inside MSER Ellipses = " + parent.minSize, Label.CENTER);
 		final Scrollbar deltaS = new Scrollbar(Scrollbar.HORIZONTAL, parent.deltaInit, 10, 0,
 				10 + parent.scrollbarSize);
 		final Scrollbar Unstability_ScoreS = new Scrollbar(Scrollbar.HORIZONTAL, parent.Unstability_ScoreInit, 10, 0,
 				10 + parent.scrollbarSize);
+		final Scrollbar minSizeS = new Scrollbar(Scrollbar.HORIZONTAL, parent.minSizeInit, 10, 0, 10 + parent.scrollbarSize);
+
 		final Button ComputeTree = new Button("Show MSER Ellipses");
 		final Button FindLinesListener = new Button("Find endpoints");
 
@@ -280,14 +287,18 @@ public class Interactive_MTDoubleChannelBasic implements PlugIn {
 
 		++c.gridy;
 		panelFirst.add(Unstability_ScoreS, c);
+		++c.gridy;
 
+	   panelFirst.add(minSizeText, c);
+
+		++c.gridy;
+		panelFirst.add(minSizeS, c);
+		
 		++c.gridy;
 		c.insets = new Insets(10, 175, 0, 175);
 		panelFirst.add(AdvancedOptions, c);
 
-		++c.gridy;
-		c.insets = new Insets(10, 175, 0, 175);
-		panelFirst.add(ComputeTree, c);
+		
 
 		++c.gridy;
 		c.insets = new Insets(10, 180, 0, 180);
@@ -299,7 +310,9 @@ public class Interactive_MTDoubleChannelBasic implements PlugIn {
 		ChooseDirectory.addActionListener(new ChooseDirectoryListener(inputField));
 		deltaS.addAdjustmentListener(
 				new DeltaListener(parent, deltaText, parent.deltaMin, parent.deltaMax, parent.scrollbarSize, deltaS));
-
+		minSizeS.addAdjustmentListener(
+				new MinSizeListener(parent, minSizeText,parent.minSizemin, parent.minSizemax,
+              parent.scrollbarSize, minSizeS));
 		Unstability_ScoreS.addAdjustmentListener(new Unstability_ScoreListener(parent, Unstability_ScoreText,
 				parent.Unstability_ScoreMin, parent.Unstability_ScoreMax, parent.scrollbarSize, Unstability_ScoreS));
 
@@ -307,7 +320,7 @@ public class Interactive_MTDoubleChannelBasic implements PlugIn {
 		ComputeTree.addActionListener(new ComputeTreeListener(parent));
 		FindLinesListener.addActionListener(new FindLinesListener(parent));
 		JPanel control = new JPanel();
-
+		parent.updatePreview(ValueChange.SHOWMSER);
 		control.add(new JButton(new AbstractAction("\u22b2Prev") {
 
 			/**
@@ -344,13 +357,20 @@ public class Interactive_MTDoubleChannelBasic implements PlugIn {
 
 		ORText.setBackground(new Color(1, 0, 1));
 		ORText.setForeground(new Color(255, 255, 255));
+		inputLabelX = new JLabel("Enter start time point for tracking");
+		inputFieldX = new TextField();
+		inputFieldX.setColumns(5);
 
+		inputLabelY = new JLabel("Enter end time point for tracking");
+		inputFieldY = new TextField();
+		inputFieldY.setColumns(5);
+		inputFieldX.setText(String.valueOf(2));
+		inputFieldY.setText(String.valueOf(parent.thirdDimensionSize));
 		final Label LeftClick = new Label(
 				"Left click deselects an end, Shift + left click selects a deselected end, Shift + Alt + left click marks a user defined seed.");
 
 		LeftClick.setBackground(new Color(1, 0, 1));
 		LeftClick.setForeground(new Color(255, 255, 255));
-		final Button ComputeTreeAgain = new Button("Show MSER Ellipses");
 		final Checkbox Finalize = new Checkbox("Confirm the dynamic seed end(s)");
 
 		final Label MTTextHF = new Label("Select ends for tracking", Label.CENTER);
@@ -383,22 +403,37 @@ public class Interactive_MTDoubleChannelBasic implements PlugIn {
 		c.insets = new Insets(10, 10, 0, 150);
 		panelSecond.add(JumptoFrame, c);
 
+	
+		
+		++c.gridy;
+		c.insets = new Insets(10, 10, 10, 0);
+		panelSecond.add(inputLabelX, c);
+
+		++c.gridy;
+		c.insets = new Insets(10, 10, 10, 0);
+		panelSecond.add(inputFieldX, c);
+
+		++c.gridy;
+		c.insets = new Insets(10, 10, 10, 0);
+		panelSecond.add(inputLabelY, c);
+
+		++c.gridy;
+		c.insets = new Insets(10, 10, 10, 0);
+		panelSecond.add(inputFieldY, c);
+		
+		
 		++c.gridy;
 		c.insets = new Insets(10, 10, 0, 0);
 		panelSecond.add(Finalize, c);
-
 		
-
-		++c.gridy;
-		c.insets = new Insets(10, 175, 0, 175);
-		panelSecond.add(ComputeTreeAgain, c);
 		MoveNext.addActionListener(new MoveNextListener(parent));
 		JumptoFrame.addActionListener(new MoveToFrameListener(parent));
 
 		CardframeSimple.addWindowListener(new FrameListener(CardframeSimple));
 
-		ComputeTreeAgain.addActionListener(new ComputeTreeAgainListener(parent, this));
-		Finalize.addItemListener(new FinalPoint(parent));
+		inputFieldX.addTextListener(new BeginTrackListener(parent));
+		inputFieldY.addTextListener(new EndTrackListener(parent));
+		Finalize.addItemListener(new FinalPoint(parent, this));
 
 	
 
@@ -450,12 +485,11 @@ public class Interactive_MTDoubleChannelBasic implements PlugIn {
 
 		JComboBox<String> cbtrack = new JComboBox<String>(choicestrack);
 
-		final Button TrackEndPoints = new Button("Track EndPoints (From first to a chosen last timepoint)");
-		final Button SkipframeandTrackEndPoints = new Button("TrackEndPoint (User specified first and last timepoint)");
+		final Button SkipframeandTrackEndPoints = new Button("TrackEndPoints from user specified first and last timepoint");
 		final Button CheckResults = new Button("Check Results (then click next)");
 		final Checkbox RoughResults = new Checkbox("Rates and Statistical Analysis");
 		final Checkbox AdvancedOptions = new Checkbox("Advanced Optimizer Options ", parent.AdvancedChoice);
-
+		
 		final Label Checkres = new Label("The tracker now performs an internal check on the results");
 		Checkres.setBackground(new Color(1, 0, 1));
 		Checkres.setForeground(new Color(255, 255, 255));
@@ -469,10 +503,8 @@ public class Interactive_MTDoubleChannelBasic implements PlugIn {
 		c.insets = new Insets(10, 175, 0, 175);
 		panelThird.add(AdvancedOptions, c);
 
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 175);
-		panelThird.add(TrackEndPoints, c);
 
+		
 		++c.gridy;
 		c.insets = new Insets(10, 10, 0, 175);
 		panelThird.add(SkipframeandTrackEndPoints, c);
@@ -507,12 +539,11 @@ public class Interactive_MTDoubleChannelBasic implements PlugIn {
 
 		Exit.addActionListener(new FinishedButtonListener(CardframeSimple, true));
 
-		TrackEndPoints.addActionListener(new TrackendsListener(parent));
-		SkipframeandTrackEndPoints.addActionListener(new SkipFramesandTrackendsListener(parent));
+		SkipframeandTrackEndPoints.addActionListener(new SkipFramesandTrackendsListener(parent, parent.thirdDimension, parent.thirdDimensionSize));
 		CheckResults.addActionListener(new CheckResultsListener(parent));
 		RoughResults.addItemListener(new AcceptResultsListener(parent));
 		AdvancedOptions.addItemListener(new AdvancedTrackerListener(parent));
-		cbtrack.addActionListener(new SeedDisplayListener(cbtrack, Views.hyperSlice(parent.originalimg, 2, 1), parent));
+		cbtrack.addActionListener(new SeedDisplayListener(cbtrack, Views.hyperSlice(parent.originalimg, 2, 0), parent));
 		panelThird.repaint();
 		panelThird.validate();
 		CardframeSimple.pack();

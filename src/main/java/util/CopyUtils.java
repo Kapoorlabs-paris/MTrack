@@ -177,7 +177,25 @@ public class CopyUtils {
 	
 	
 	
+	public static  double[] Transformback(double[] location, double[] size, double[] min,
+			double[] max) {
 
+		int n = location.length;
+
+		double[] delta = new double[n];
+
+		final double[] realpos = new double[n];
+
+		for (int d = 0; d < n; ++d){
+			
+			delta[d] = (max[d] - min[d]) / size[d];
+		    
+			realpos[d] = (location[d] - min[d]) / delta[d];
+		}
+		return realpos;
+
+	}
+	
 	
 	public static RandomAccessibleInterval<FloatType> extractImage(final RandomAccessibleInterval<FloatType> intervalView, final FinalInterval interval) {
 
@@ -186,11 +204,11 @@ public class CopyUtils {
 		RandomAccessibleInterval<FloatType> totalimg = factory.create(intervalView, type);
 		final RandomAccessibleInterval<FloatType> img = Views.interval(intervalView, interval);
 
-		double[] newmin = util.Boundingboxes.Transformback(new double[] { img.min(0), img.min(1) },
+		double[] newmin = Transformback(new double[] { img.min(0), img.min(1) },
 				new double[] { totalimg.dimension(0), totalimg.dimension(1) }, new double[] { img.min(0), img.min(1) },
 				new double[] { img.max(0), img.max(1) });
 
-		double[] newmax = util.Boundingboxes.Transformback(new double[] { img.max(0), img.max(1) },
+		double[] newmax = Transformback(new double[] { img.max(0), img.max(1) },
 				new double[] { totalimg.dimension(0), totalimg.dimension(1) },
 				new double[] { totalimg.min(0), totalimg.min(1) }, new double[] { totalimg.max(0), totalimg.max(1) });
 		long[] newminlong = new long[] { Math.round(newmin[0]), Math.round(newmin[1]) };
@@ -204,7 +222,7 @@ public class CopyUtils {
 
 			cursor.fwd();
 
-			double[] newlocation = util.Boundingboxes.Transformback(
+			double[] newlocation = Transformback(
 					new double[] { cursor.getDoublePosition(0), cursor.getDoublePosition(1) },
 					new double[] { totalimg.dimension(0), totalimg.dimension(1) },
 					new double[] { totalimg.min(0), totalimg.min(1) },
@@ -225,11 +243,11 @@ public class CopyUtils {
 		RandomAccessibleInterval<IntType> totalimg = factory.create(intervalView, type);
 		final RandomAccessibleInterval<IntType> img = Views.interval(intervalView, interval);
 
-		double[] newmin = util.Boundingboxes.Transformback(new double[] { img.min(0), img.min(1) },
+		double[] newmin = Transformback(new double[] { img.min(0), img.min(1) },
 				new double[] { totalimg.dimension(0), totalimg.dimension(1) }, new double[] { img.min(0), img.min(1) },
 				new double[] { img.max(0), img.max(1) });
 
-		double[] newmax = util.Boundingboxes.Transformback(new double[] { img.max(0), img.max(1) },
+		double[] newmax = Transformback(new double[] { img.max(0), img.max(1) },
 				new double[] { totalimg.dimension(0), totalimg.dimension(1) },
 				new double[] { totalimg.min(0), totalimg.min(1) }, new double[] { totalimg.max(0), totalimg.max(1) });
 		long[] newminlong = new long[] { Math.round(newmin[0]), Math.round(newmin[1]) };
@@ -243,7 +261,7 @@ public class CopyUtils {
 
 			cursor.fwd();
 
-			double[] newlocation = util.Boundingboxes.Transformback(
+			double[] newlocation = Transformback(
 					new double[] { cursor.getDoublePosition(0), cursor.getDoublePosition(1) },
 					new double[] { totalimg.dimension(0), totalimg.dimension(1) },
 					new double[] { totalimg.min(0), totalimg.min(1) },

@@ -24,6 +24,7 @@ public class MinSizeListener implements AdjustmentListener {
 		this.scrollbarSize = scrollbarSize;
         this.parent = parent;
 		this.minsizeScrollbar = minsizeScrollbar;
+		minsizeScrollbar.addMouseListener( new StandardMouseListener( parent,ValueChange.SHOWMSER ) );
 
 	}
 
@@ -35,12 +36,6 @@ public class MinSizeListener implements AdjustmentListener {
 
 		label.setText("Min # of pixels inside MSER Ellipses = " + parent.minSize);
 
-		// if ( !event.getValueIsAdjusting() )
-		{
-			while (parent.isComputing) {
-				SimpleMultiThreading.threadWait(10);
-			}
-			parent.updatePreview(ValueChange.MINSIZE);
-		}
+		
 	}
 }

@@ -12,11 +12,14 @@ public class TrackendsListener implements ActionListener {
 
 	
 final Interactive_MTDoubleChannel parent;
+final int starttime;
+final int endtime;
 	
-	
-	public TrackendsListener(final Interactive_MTDoubleChannel parent){
+	public TrackendsListener(final Interactive_MTDoubleChannel parent, final int starttime, final int endtime){
 	
 		this.parent = parent;
+		this.starttime = starttime;
+		this.endtime = endtime;
 	}
 	
 	@Override
@@ -48,7 +51,7 @@ final Interactive_MTDoubleChannel parent;
 		parent.frame.setLocationRelativeTo(parent.panelCont);
 		parent.frame.setVisible(true);
 
-		ProgressTrack trackMT = new ProgressTrack(parent);
+		ProgressTrack trackMT = new ProgressTrack(parent, starttime, endtime);
 		trackMT.execute();
 
 	}

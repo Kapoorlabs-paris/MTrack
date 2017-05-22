@@ -44,7 +44,7 @@ public class ThetaSizeHoughListener implements AdjustmentListener {
 
 		thetaScrollbar.setValue(parent.computeScrollbarPositionFromValue(parent.thetaPerPixel, min, max, scrollbarSize));
 
-		label.setText("thetaPerPixel = " + parent.thetaPerPixel);
+		label.setText(" Pixel size of Hough Space in Theta / Pixel Space = " + parent.thetaPerPixel);
 
 		// if ( !event.getValueIsAdjusting() )
 		{

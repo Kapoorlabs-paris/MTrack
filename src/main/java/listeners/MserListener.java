@@ -145,9 +145,6 @@ import updateListeners.DefaultModelHF;
 				c.insets = new Insets(10, 175, 0, 175);
 				parent.panelSecond.add(AdvancedOptions, c);
 
-				++c.gridy;
-				c.insets = new Insets(10, 175, 0, 175);
-				parent.panelSecond.add(ComputeTree, c);
 
 				++c.gridy;
 				c.insets = new Insets(10, 180, 0, 180);
@@ -177,15 +174,10 @@ import updateListeners.DefaultModelHF;
 				parent.panelSecond.validate();
 				parent.panelSecond.repaint();
 				parent.Cardframe.pack();
-
+				parent.updatePreview(ValueChange.SHOWMSER);
 			}
 
-			if (parent.FindLinesViaMSER != oldState) {
-				while (parent.isComputing)
-					SimpleMultiThreading.threadWait(10);
-
-				parent.updatePreview(ValueChange.FindLinesVia);
-			}
+				
 		}
 	}
 	

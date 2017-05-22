@@ -38,6 +38,7 @@ public class FileChooser extends JPanel {
 	JPanel panelIntro = new JPanel();
 	boolean Simplemode = false;
 	boolean Advancedmode = false;
+	boolean Kymomode = false;
 	
 	public FileChooser() {
 		final JFrame frame = new JFrame("Welcome to MTV Tracker");
@@ -49,15 +50,14 @@ public class FileChooser extends JPanel {
 
 		panelIntro.setLayout(layout);
 		
-		CheckboxGroup Mode = new CheckboxGroup();
 		
 		final Label LoadtrackText = new Label("Load pre-processed tracking image");
 		final Label LoadMeasureText = new Label("Load original image");
 		final Label KymoText = new Label("Kymo mode (only 1 MT, pick Kymograph image) else skip");
 		final Label StartText = new Label("Input Microscope parameters");
-		final Checkbox Simple = new Checkbox("Run in Simple mode ", Mode,  Simplemode);
-		final Checkbox Advanced = new Checkbox("Run in Advanced mode ", Mode,  Advancedmode);
-		
+		final Checkbox Simple = new Checkbox("Run in Simple mode ",  Simplemode);
+		final Checkbox Advanced = new Checkbox("Run in Advanced mode ",  Advancedmode);
+		final Checkbox Kymochoice = new Checkbox("Analyze single MT, compare with Kymograph ",  Kymomode);
 		
 		LoadtrackText.setBackground(new Color(1, 0, 1));
 		LoadtrackText.setForeground(new Color(255, 255, 255));
@@ -71,8 +71,8 @@ public class FileChooser extends JPanel {
 		StartText.setBackground(new Color(1, 0, 1));
 		StartText.setForeground(new Color(255, 255, 255));
 
-		Track = new JButton("Open Tracking image");
-		Measure = new JButton("Open image for performing measurments");
+		Track = new JButton("Open Pre-processed movie");
+		Measure = new JButton("Open UN-preprocessed movie performing measurments");
 		Kymo = new JButton("Open Kymograph for the MT");
 		Done = new JButton("Done");
 		inputLabelX = new JLabel("Enter sigmaX of Microscope PSF (pixel units): ");
@@ -94,6 +94,10 @@ public class FileChooser extends JPanel {
 		c.gridy = 0;
 		c.weightx = 1;
 		c.weighty = 1.5;
+		
+		++c.gridy;
+		c.insets = new Insets(10, 10, 10, 0);
+		panelIntro.add(Kymochoice, c);
 		
 		++c.gridy;
 		c.insets = new Insets(10, 10, 10, 0);
@@ -125,14 +129,7 @@ public class FileChooser extends JPanel {
 		c.insets = new Insets(10, 10, 10, 0);
 		panelIntro.add(Measure, c);
 
-		++c.gridy;
-		c.insets = new Insets(10, 10, 10, 0);
-		panelIntro.add(KymoText, c);
 		
-		++c.gridy;
-		c.insets = new Insets(10, 10, 10, 0);
-		panelIntro.add(Kymo, c);
-
 		++c.gridy;
 		c.insets = new Insets(10, 10, 10, 0);
 		panelIntro.add(StartText, c);
@@ -162,7 +159,7 @@ public class FileChooser extends JPanel {
 		c.insets = new Insets(10, 10, 10, 0);
 		panelIntro.add(inputFieldT, c);
         */
-		
+		Kymochoice.addItemListener(new KymochoiceListener());
 		++c.gridy;
 		++c.gridy;
 		++c.gridy;
@@ -172,7 +169,7 @@ public class FileChooser extends JPanel {
 		panelIntro.setVisible(true);
 		Track.addActionListener(new OpenTrackListener(frame));
 		Measure.addActionListener(new MeasureListener(frame));
-		Kymo.addActionListener(new KymoListener(frame));
+		
 		Done.addActionListener(new DoneButtonListener(frame, true));
 		Simple.addItemListener(new RunSimpleListener());
 		frame.addWindowListener(new FrameListener(frame));
@@ -196,7 +193,168 @@ public class FileChooser extends JPanel {
 		}
 	}
 
-	
+	protected class KymochoiceListener implements ItemListener{
+		
+		@Override
+		public void itemStateChanged(final ItemEvent arg0) {
+
+			
+			if (arg0.getStateChange() == ItemEvent.SELECTED){
+				
+				final JFrame frame = new JFrame("Welcome to MTV Tracker");
+				Kymomode = true;
+				panelIntro.removeAll();
+				/* Instantiation */
+				final GridBagLayout layout = new GridBagLayout();
+				final GridBagConstraints c = new GridBagConstraints();
+
+				panelIntro.setLayout(layout);
+				
+				
+				final Label LoadtrackText = new Label("Load pre-processed tracking image");
+				final Label LoadMeasureText = new Label("Load original image");
+				final Label KymoText = new Label("Kymo mode (only 1 MT, pick Kymograph image) else skip");
+				final Label StartText = new Label("Input Microscope parameters");
+				final Checkbox Simple = new Checkbox("Run in Simple mode ",  Simplemode);
+				final Checkbox Advanced = new Checkbox("Run in Advanced mode ",  Advancedmode);
+				final Checkbox Kymochoice = new Checkbox("Analyze single MT, compare with Kymograph ",  Kymomode);
+				
+				LoadtrackText.setBackground(new Color(1, 0, 1));
+				LoadtrackText.setForeground(new Color(255, 255, 255));
+
+				LoadMeasureText.setBackground(new Color(1, 0, 1));
+				LoadMeasureText.setForeground(new Color(255, 255, 255));
+				
+				KymoText.setBackground(new Color(1, 0, 1));
+				KymoText.setForeground(new Color(255, 255, 255));
+				
+				StartText.setBackground(new Color(1, 0, 1));
+				StartText.setForeground(new Color(255, 255, 255));
+
+				Track = new JButton("Open Pre-processed movie");
+				Measure = new JButton("Open UN-preprocessed movie performing measurments");
+				Kymo = new JButton("Open Kymograph for the MT");
+				Done = new JButton("Done");
+				inputLabelX = new JLabel("Enter sigmaX of Microscope PSF (pixel units): ");
+				inputFieldX = new TextField();
+				inputFieldX.setColumns(10);
+
+				inputLabelY = new JLabel("Enter sigmaY of Microscope PSF (pixel units): ");
+				inputFieldY = new TextField();
+				inputFieldY.setColumns(10);
+
+			//	inputLabelT = new JLabel("Enter time frame to second conversion: ");
+			//	inputFieldT = new TextField();
+			//	inputFieldT.setColumns(2);
+
+				/* Location */
+
+				c.fill = GridBagConstraints.HORIZONTAL;
+				c.gridx = 0;
+				c.gridy = 0;
+				c.weightx = 1;
+				c.weighty = 1.5;
+				
+				++c.gridy;
+				c.insets = new Insets(10, 10, 10, 0);
+				panelIntro.add(Kymochoice, c);
+				
+				++c.gridy;
+				c.insets = new Insets(10, 10, 10, 0);
+				panelIntro.add(Simple, c);
+				
+				
+				++c.gridy;
+				c.insets = new Insets(10, 10, 10, 0);
+				panelIntro.add(Advanced, c);
+				
+				
+				
+				++c.gridy;
+				c.insets = new Insets(10, 10, 10, 0);
+				panelIntro.add(LoadtrackText, c);
+
+				
+
+				++c.gridy;
+				c.insets = new Insets(10, 10, 10, 0);
+				panelIntro.add(Track, c);
+
+				++c.gridy;
+				c.insets = new Insets(10, 10, 10, 0);
+				panelIntro.add(LoadMeasureText, c);
+
+			
+				++c.gridy;
+				c.insets = new Insets(10, 10, 10, 0);
+				panelIntro.add(Measure, c);
+
+				
+				++c.gridy;
+				c.insets = new Insets(10, 10, 10, 0);
+				panelIntro.add(KymoText, c);
+				
+				++c.gridy;
+				c.insets = new Insets(10, 10, 10, 0);
+				panelIntro.add(Kymo, c);
+				
+				++c.gridy;
+				c.insets = new Insets(10, 10, 10, 0);
+				panelIntro.add(StartText, c);
+
+				++c.gridy;
+				c.insets = new Insets(10, 10, 10, 0);
+				panelIntro.add(inputLabelX, c);
+
+				++c.gridy;
+				c.insets = new Insets(10, 10, 10, 0);
+				panelIntro.add(inputFieldX, c);
+
+				++c.gridy;
+				c.insets = new Insets(10, 10, 10, 0);
+				panelIntro.add(inputLabelY, c);
+
+				++c.gridy;
+				c.insets = new Insets(10, 10, 10, 0);
+				panelIntro.add(inputFieldY, c);
+
+				/*
+				++c.gridy;
+				c.insets = new Insets(10, 10, 10, 0);
+				panelIntro.add(inputLabelT, c);
+
+				++c.gridy;
+				c.insets = new Insets(10, 10, 10, 0);
+				panelIntro.add(inputFieldT, c);
+		        */
+				Kymochoice.addItemListener(new KymochoiceListener());
+				++c.gridy;
+				++c.gridy;
+				++c.gridy;
+				++c.gridy;
+				c.insets = new Insets(10, 10, 10, 0);
+				panelIntro.add(Done, c);
+				panelIntro.setVisible(true);
+				Track.addActionListener(new OpenTrackListener(frame));
+				Measure.addActionListener(new MeasureListener(frame));
+				
+				Kymo.addActionListener(new KymoListener(frame));
+				Done.addActionListener(new DoneButtonListener(frame, true));
+				Simple.addItemListener(new RunSimpleListener());
+				frame.addWindowListener(new FrameListener(frame));
+				panelIntro.validate();
+				panelIntro.repaint();
+				
+				frame.add(panelCont, BorderLayout.CENTER);
+				frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+				frame.pack();
+				frame.setVisible(true);
+			}
+			
+		}
+		
+		
+	}
 	protected class RunSimpleListener implements ItemListener{
 		
 		

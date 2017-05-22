@@ -38,25 +38,7 @@ import net.imglib2.view.Views;
 public class Boundingboxes {
 
 	
-	public static  double[] Transformback(double[] location, double[] size, double[] min,
-			double[] max) {
 
-		int n = location.length;
-
-		double[] delta = new double[n];
-
-		final double[] realpos = new double[n];
-
-		for (int d = 0; d < n; ++d){
-			
-			delta[d] = (max[d] - min[d]) / size[d];
-		    
-			realpos[d] = (location[d] - min[d]) / delta[d];
-		}
-		return realpos;
-
-	}
-	
 	
 	public static int GetLabel(final RandomAccessibleInterval<IntType> intimg, final Localizable point){
 		

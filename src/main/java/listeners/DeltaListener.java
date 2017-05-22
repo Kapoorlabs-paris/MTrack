@@ -7,8 +7,6 @@ import java.awt.event.AdjustmentListener;
 
 import interactiveMT.Interactive_MTDoubleChannel;
 import interactiveMT.Interactive_MTDoubleChannel.ValueChange;
-import interactiveMT.Interactive_PSFAnalyze;
-import mpicbg.imglib.multithreading.SimpleMultiThreading;
 
 public class DeltaListener implements AdjustmentListener {
 	final Label label;
@@ -27,6 +25,7 @@ public class DeltaListener implements AdjustmentListener {
 		this.scrollbarSize = scrollbarSize;
 
 		this.deltaScrollbar = deltaScrollbar;
+		deltaScrollbar.addMouseListener( new StandardMouseListener( parent, ValueChange.SHOWMSER ) );
 
 	}
 
@@ -39,12 +38,6 @@ public class DeltaListener implements AdjustmentListener {
 
 		label.setText("Grey Level Seperation between Components = " + parent.delta);
 
-		// if ( !event.getValueIsAdjusting() )
-		{
-			while (parent.isComputing) {
-				SimpleMultiThreading.threadWait(10);
-			}
-			parent.updatePreview(ValueChange.DELTA);
-		}
+		
 	}
 }

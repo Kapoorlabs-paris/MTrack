@@ -86,7 +86,7 @@ final Interactive_MTDoubleChannel parent;
 			
 				// updatePreview(ValueChange.SHOWMSER);
 				LinefinderInteractiveMSERwHough newlineMserwHough = new LinefinderInteractiveMSERwHough(groundframe,
-						groundframepre, parent.newtree, parent.thirdDimension, parent.thetaPerPixel, parent.rhoPerPixel);
+						groundframepre, parent.newtree, parent.thirdDimension, parent.thetaPerPixel, parent.rhoPerPixel, parent.jpb);
 				IJ.log("MSER parameters:" + " " + " thirdDimension: " + " " + parent.thirdDimension);
 				IJ.log("Delta " + " " + parent.delta + " " + "minSize " + " " + parent.minSize + " " + "maxSize " + " " + parent.maxSize
 						+ " " + " Unstability_Score " + " " + parent.Unstability_Score + " " + "minDIversity " + " " + parent.minDiversity);

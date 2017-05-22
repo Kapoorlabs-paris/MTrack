@@ -51,12 +51,12 @@ public  class Track {
 	
 	
 	
-	public  void Trackobject(final int next) {
+	public  void Trackobject(final int next, final int endtime) {
 
-		parent.maxStack();
+		parent.thirdDimensionSize = endtime;
 		int Kalmancount = 0;
 
-		for (int index = next; index <= parent.thirdDimensionSize; ++index) {
+		for (int index = next; index <= endtime; ++index) {
 
 			Kalmancount++;
 

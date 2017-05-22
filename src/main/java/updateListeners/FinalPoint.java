@@ -10,6 +10,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import interactiveMT.Interactive_MTDoubleChannel;
+import interactiveMT.Interactive_MTDoubleChannelBasic;
+import interactiveMT.Interactive_MTDoubleChannel.ValueChange;
 import interactiveMT.Interactive_MTDoubleChannel.Whichend;
 import net.imglib2.util.Pair;
 import net.imglib2.util.ValuePair;
@@ -18,10 +20,17 @@ public class FinalPoint implements ItemListener {
 
 final Interactive_MTDoubleChannel parent;
 	
-	
-	public FinalPoint(final Interactive_MTDoubleChannel parent){
+final Interactive_MTDoubleChannelBasic child;
+
+	public FinalPoint(final Interactive_MTDoubleChannel parent, final Interactive_MTDoubleChannelBasic child ){
 	
 		this.parent = parent;
+		this.child = child;
+	}
+	public FinalPoint(final Interactive_MTDoubleChannel parent ){
+		
+		this.parent = parent;
+		this.child = null;
 	}
 	
 	@Override
@@ -134,7 +143,12 @@ public void FinalizeEnds(){
 	
 	}
 
+	parent.ShowMser = true;
+
+	parent.updatePreview(ValueChange.SHOWMSER);
 	
+	if (child!=null)
+	child.DeterministicSimple();
 	
 	
 }

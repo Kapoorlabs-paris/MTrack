@@ -64,6 +64,7 @@ import listeners.AcceptResultsListener;
 import listeners.AdvancedSeedListener;
 import listeners.AdvancedTrackerListener;
 import listeners.AnalyzekymoListener;
+import listeners.BeginTrackListener;
 import listeners.CheckResultsListener;
 import listeners.ChooseDirectoryListener;
 import listeners.ComputeMserinHoughListener;
@@ -73,6 +74,7 @@ import listeners.DeltaListener;
 import listeners.DoMserSegmentation;
 import listeners.DoSegmentation;
 import listeners.DowatershedListener;
+import listeners.EndTrackListener;
 import listeners.FindLinesListener;
 import listeners.HoughListener;
 import listeners.MaxSizeListener;
@@ -109,6 +111,7 @@ import trackerType.MTTracker;
 import updateListeners.DefaultModel;
 import updateListeners.DefaultModelHF;
 import updateListeners.FinalPoint;
+import updateListeners.FinalizechoicesListener;
 import updateListeners.MoveNextListener;
 import updateListeners.MoveToFrameListener;
 import util.Boundingboxes;
@@ -149,7 +152,12 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public float Unstability_ScoreMax = 1;
 
 	public int radiusseed = 5;
-
+	public JLabel inputLabelX;
+	public JLabel inputLabelY;
+	public JLabel inputLabelT;
+	public TextField inputFieldX;
+	public TextField inputFieldY;
+	public TextField inputFieldT;
 	public float thetaPerPixelMax = 2;
 	public float rhoPerPixelMax = 2;
 	public JProgressBar jpb;
@@ -200,6 +208,8 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public TextField Maxdpixel;
 	private TextField Maxdmicro;
 
+	public int starttimetrack;
+	public int endtimetrack;
 	public int minDiversityInit = 1;
 
 	public int radius = 1;
@@ -1419,12 +1429,12 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		
 		
 		
-		final Button TrackEndPoints = new Button("Track EndPoints (From first to a chosen last timepoint)");
-		final Button SkipframeandTrackEndPoints = new Button("TrackEndPoint (User specified first and last timepoint)");
+		final Button SkipframeandTrackEndPoints = new Button("TrackEndPoint from User specified first and last timepoint");
 		final Button CheckResults = new Button("Check Results (then click next)");
 		final Checkbox RoughResults = new Checkbox("Rates and Statistical Analysis");
 		final Checkbox AdvancedOptions = new Checkbox("Advanced Optimizer Options ", AdvancedChoice);
-
+		
+		
 		final Label Checkres = new Label("The tracker now performs an internal check on the results");
 		Checkres.setBackground(new Color(1, 0, 1));
 		Checkres.setForeground(new Color(255, 255, 255));
@@ -1439,10 +1449,9 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		c.insets = new Insets(10, 175, 0, 175);
 		panelFifth.add(AdvancedOptions, c);
 		
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 175);
-		panelFifth.add(TrackEndPoints, c);
 
+		
+		
 		++c.gridy;
 		c.insets = new Insets(10, 10, 0, 175);
 		panelFifth.add(SkipframeandTrackEndPoints, c);
@@ -1478,13 +1487,11 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		panelFifth.add(Exit, c);
 
 		Exit.addActionListener(new FinishedButtonListener(Cardframe, true));
-		
-		TrackEndPoints.addActionListener(new TrackendsListener(this));
-		SkipframeandTrackEndPoints.addActionListener(new SkipFramesandTrackendsListener(this));
+		SkipframeandTrackEndPoints.addActionListener(new SkipFramesandTrackendsListener(this, this.thirdDimension,  this.thirdDimensionSize));
 		CheckResults.addActionListener(new CheckResultsListener(this));
 		RoughResults.addItemListener(new AcceptResultsListener(this));
 		AdvancedOptions.addItemListener(new AdvancedTrackerListener(this));
-		cbtrack.addActionListener(new SeedDisplayListener(cbtrack, Views.hyperSlice(originalimg, 2, 1),this));
+		cbtrack.addActionListener(new SeedDisplayListener(cbtrack, Views.hyperSlice(originalimg, 2, 0),this));
 		panelFifth.repaint();
 		panelFifth.validate();
 		Cardframe.pack();
@@ -1531,7 +1538,17 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		final Label minSizeText = new Label("Min # of pixels inside MSER Ellipses = " + minSize, Label.CENTER);
 		final Label maxSizeText = new Label("Max # of pixels inside MSER Ellipses = " + maxSize, Label.CENTER);
 		final Checkbox min = new Checkbox("Look for Minima ", darktobright);
-
+		final Checkbox finalizechoices = new Checkbox("Finalize Choices", false);
+		inputLabelX = new JLabel("Enter start time point for tracking");
+		inputFieldX = new TextField();
+		inputFieldX.setColumns(5);
+        
+		
+		inputLabelY = new JLabel("Enter end time point for tracking");
+		inputFieldY = new TextField();
+		inputFieldY.setColumns(10);
+		inputFieldX.setText(String.valueOf(2));
+		inputFieldY.setText(String.valueOf(thirdDimensionSize));
 		final Button ComputeTree = new Button("Compute Tree in each Watershed label and display");
 
 		Update.setBackground(new Color(1, 0, 1));
@@ -1611,16 +1628,26 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		++c.gridy;
 		c.insets = new Insets(10, 10, 0, 0);
 		panelFourth.add(maxSizeS, c);
-/*
 		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 0);
-		c.insets = new Insets(10, 175, 0, 175);
-		panelFourth.add(min, c);
-*/
-		++c.gridy;
+		c.insets = new Insets(10, 10, 10, 0);
+		panelFourth.add(inputLabelX, c);
 
-		c.insets = new Insets(10, 175, 0, 175);
-		panelFourth.add(ComputeTree, c);
+		++c.gridy;
+		c.insets = new Insets(10, 10, 10, 0);
+		panelFourth.add(inputFieldX, c);
+
+		++c.gridy;
+		c.insets = new Insets(10, 10, 10, 0);
+		panelFourth.add(inputLabelY, c);
+
+		++c.gridy;
+		c.insets = new Insets(10, 10, 10, 0);
+		panelFourth.add(inputFieldY, c);
+		
+		++c.gridy;
+		c.insets = new Insets(10, 10, 10, 0);
+		panelFourth.add(finalizechoices, c);
+
 
 		deltaS.addAdjustmentListener(new DeltaListener(this, deltaText, deltaMin, deltaMax, scrollbarSize, deltaS));
 
@@ -1638,22 +1665,14 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 		min.addItemListener(new DarktobrightListener(this));
 		ComputeTree.addActionListener(new ComputeMserinHoughListener(this));
-		
+		inputFieldX.addTextListener(new BeginTrackListener(this));
+		inputFieldY.addTextListener(new EndTrackListener(this));
 		DefaultModelHF loaddefault = new DefaultModelHF(this);
 		loaddefault.LoadDefault();
 		
-		if (analyzekymo && Kymoimg != null) {
-
-			AnalyzekymoListener newkymo = new AnalyzekymoListener(this);
-
-			newkymo.Kymo();
-		}
-
-		else {
-
-
-			Deterministic();
-		}
+		finalizechoices.addItemListener(new FinalizechoicesListener(this));
+		
+		
 
 		threshold.addAdjustmentListener(new ThresholdHoughListener(this, thresholdText, thresholdHoughMin,
 				thresholdHoughMax, scrollbarSize, threshold));
@@ -1692,9 +1711,18 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		final Label minDiversityText = new Label("minDiversity = " + minDiversity, Label.CENTER);
 		final Label minSizeText = new Label("Min # of pixels inside MSER Ellipses = " + minSize, Label.CENTER);
 		final Label maxSizeText = new Label("Max # of pixels inside MSER Ellipses = " + maxSize, Label.CENTER);
-
+		final Checkbox finalizechoices = new Checkbox("Finalize Choices", false);
 		final Checkbox min = new Checkbox("Look for Minima ", darktobright);
-
+		inputLabelX = new JLabel("Enter start time point for tracking");
+		inputFieldX = new TextField();
+		inputFieldX.setColumns(5);
+        
+		
+		inputLabelY = new JLabel("Enter end time point for tracking");
+		inputFieldY = new TextField();
+		inputFieldY.setColumns(10);
+		inputFieldX.setText(String.valueOf(2));
+		inputFieldY.setText(String.valueOf(thirdDimensionSize));
 		final Button ComputeTree = new Button("Compute Tree and display");
 		/* Location */
 
@@ -1744,14 +1772,24 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 		++c.gridy;
 		panelFourth.add(maxSizeS, c);
-/*
 		++c.gridy;
-		c.insets = new Insets(10, 175, 0, 175);
-		panelFourth.add(min, c);
-*/
+		c.insets = new Insets(10, 10, 10, 0);
+		panelFourth.add(inputLabelX, c);
+
 		++c.gridy;
-		c.insets = new Insets(10, 175, 0, 175);
-		panelFourth.add(ComputeTree, c);
+		c.insets = new Insets(10, 10, 10, 0);
+		panelFourth.add(inputFieldX, c);
+
+		++c.gridy;
+		c.insets = new Insets(10, 10, 10, 0);
+		panelFourth.add(inputLabelY, c);
+
+		++c.gridy;
+		c.insets = new Insets(10, 10, 10, 0);
+		panelFourth.add(inputFieldY, c);
+		++c.gridy;
+		c.insets = new Insets(10, 10, 10, 0);
+		panelFourth.add(finalizechoices, c);
 
 		deltaS.addAdjustmentListener(new DeltaListener(this, deltaText, deltaMin, deltaMax, scrollbarSize, deltaS));
 
@@ -1766,23 +1804,13 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 		maxSizeS.addAdjustmentListener(
 				new MaxSizeListener(this, maxSizeText, maxSizemin, maxSizemax, scrollbarSize, maxSizeS));
-
+		inputFieldX.addTextListener(new BeginTrackListener(this));
+		inputFieldY.addTextListener(new EndTrackListener(this));
 		min.addItemListener(new DarktobrightListener(this));
-		ComputeTree.addActionListener(new ComputeTreeListener(this));
 		DefaultModelHF loaddefault = new DefaultModelHF(this);
 		loaddefault.LoadDefault();
-		if (analyzekymo && Kymoimg != null) {
-
-			AnalyzekymoListener newkymo = new AnalyzekymoListener(this);
-
-			newkymo.Kymo();
-		}
-
-		else {
-
-               Deterministic();
-		}
-
+		
+		finalizechoices.addItemListener(new FinalizechoicesListener(this));
 		panelFourth.validate();
 		panelFourth.repaint();
 		Cardframe.pack();
@@ -2181,6 +2209,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 			prestack.addSlice(Localimp.getImageStack().getProcessor(i).convertToRGB());
 			cp = (ColorProcessor) (prestack.getProcessor(i).duplicate());
 
+			if (AllMSERrois.get(i)!=null){
 			ArrayList<EllipseRoi> Rois = AllMSERrois.get(i);
 			for (int index = 0; index < Rois.size(); ++index) {
 
@@ -2262,6 +2291,10 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 			if (displayoverlay && prestack != null)
 				prestack.setPixels(cp.getPixels(), i);
 			Localimp.hide();
+			
+		
+			}
+			
 		}
 
 	}

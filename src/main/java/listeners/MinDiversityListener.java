@@ -27,6 +27,7 @@ public class MinDiversityListener implements AdjustmentListener {
 		this.parent = parent;
 		this.scrollbarSize = scrollbarSize;
 		this.minDiversityScrollbar = minDiversityScrollbar;
+		minDiversityScrollbar .addMouseListener( new StandardMouseListener( parent,ValueChange.SHOWMSER ) );
 
 	}
 	
@@ -43,12 +44,6 @@ public class MinDiversityListener implements AdjustmentListener {
 
 		label.setText("MinDiversity = " + parent.minDiversity);
 
-		// if ( !event.getValueIsAdjusting() )
-		{
-			while (parent.isComputing) {
-				SimpleMultiThreading.threadWait(10);
-			}
-			parent.updatePreview(ValueChange.MINDIVERSITY);
-		}
+		
 	}
 }

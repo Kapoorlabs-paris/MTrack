@@ -34,7 +34,7 @@ public class RhoSizeHoughListener implements AdjustmentListener {
 
 		rhoScrollbar.setValue(parent.computeScrollbarPositionFromValue(parent.rhoPerPixel, min, max, scrollbarSize));
 
-		label.setText("rhoPerPixel = " + parent.rhoPerPixel);
+		label.setText("Pixel size of Hough Space in Rho / Pixel Space =   " + parent.rhoPerPixel);
 
 		// if ( !event.getValueIsAdjusting() )
 		{

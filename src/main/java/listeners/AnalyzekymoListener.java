@@ -81,10 +81,24 @@ public void Kymo() {
 		final Button SkipframeandTrackEndPoints = new Button("TrackEndPoint (User specified first and last frame)");
 		final Button CheckResults = new Button("Check Results (then click next)");
 
+	//	++c.gridy;
+	//	c.insets = new Insets(10, 10, 0, 175);
+	//	parent.panelFifth.add(TrackEndPoints, c);
 		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 175);
-		parent.panelFifth.add(TrackEndPoints, c);
+		c.insets = new Insets(10, 10, 10, 0);
+		parent.panelFifth.add(parent.inputLabelX, c);
 
+		++c.gridy;
+		c.insets = new Insets(10, 10, 10, 0);
+		parent.panelFifth.add(parent.inputFieldX, c);
+
+		++c.gridy;
+		c.insets = new Insets(10, 10, 10, 0);
+		parent.panelFifth.add(parent.inputLabelY, c);
+
+		++c.gridy;
+		c.insets = new Insets(10, 10, 10, 0);
+		parent.panelFifth.add(parent.inputFieldY, c);
 		++c.gridy;
 		c.insets = new Insets(10, 10, 0, 175);
 		parent.panelFifth.add(SkipframeandTrackEndPoints, c);
@@ -100,8 +114,8 @@ public void Kymo() {
 
 		}
 
-		TrackEndPoints.addActionListener(new TrackendsListener(parent));
-		SkipframeandTrackEndPoints.addActionListener(new SkipFramesandTrackendsListener(parent));
+		TrackEndPoints.addActionListener(new TrackendsListener(parent, (int)Float.parseFloat(parent.inputFieldX.getText()), (int)Float.parseFloat(parent.inputFieldY.getText())));
+		SkipframeandTrackEndPoints.addActionListener(new SkipFramesandTrackendsListener(parent, (int)Float.parseFloat(parent.inputFieldX.getText()), (int)Float.parseFloat(parent.inputFieldY.getText())));
 		CheckResults.addActionListener(new CheckResultsListener(parent));
 
 	}

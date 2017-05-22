@@ -131,10 +131,7 @@ public class HoughListener implements ItemListener {
 			++c.gridy;
 			c.insets = new Insets(10, 175, 0, 175);
 			parent.panelSecond.add(displayWatershed, c);
-			++c.gridy;
-			c.insets = new Insets(10, 175, 0, 175);
-			parent.panelSecond.add(Dowatershed, c);
-			
+		
 			
 			
 			++c.gridy;

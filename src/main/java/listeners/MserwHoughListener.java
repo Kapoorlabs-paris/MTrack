@@ -44,10 +44,10 @@ public class MserwHoughListener implements ItemListener {
 			final GridBagLayout layout = new GridBagLayout();
 			final GridBagConstraints c = new GridBagConstraints();
 			parent.panelSecond.removeAll();
-			final Label Step = new Label("Step 1", Label.CENTER);
+			final Label Step = new Label("Step 2", Label.CENTER);
 
 			parent.panelSecond.setLayout(layout);
-			parent.panelSecond.add(Step, c);
+			
 
 			final Checkbox rhoEnable = new Checkbox("Enable Manual Adjustment of rhoPerPixel", parent.enablerhoPerPixel);
 
@@ -107,6 +107,11 @@ public class MserwHoughListener implements ItemListener {
 			c.weightx = 4;
 			c.weighty = 1.5;
 
+			
+			++c.gridy;
+			parent.panelSecond.add(Step, c);
+			
+			++c.gridy;
 			parent.panelSecond.add(deltaText, c);
 
 			++c.gridy;
@@ -142,15 +147,8 @@ public class MserwHoughListener implements ItemListener {
 			++c.gridy;
 			parent.panelSecond.add(maxSizeS, c);
 
-			++c.gridy;
-			c.insets = new Insets(10, 175, 0, 175);
-			parent.panelSecond.add(min, c);
-
-			++c.gridy;
-			c.insets = new Insets(10, 175, 0, 175);
-
-			parent.panelSecond.add(ComputeTree, c);
-			++c.gridy;
+		
+		
 
 			++c.gridy;
 			parent.panelSecond.add(thetaText, c);
@@ -205,14 +203,10 @@ public class MserwHoughListener implements ItemListener {
 			parent.panelSecond.validate();
 			parent.panelSecond.repaint();
 			parent.Cardframe.pack();
+			parent.updatePreview(ValueChange.SHOWMSER);
 		}
 
-		if (parent.FindLinesViaMSERwHOUGH != oldState) {
-			while (parent.isComputing)
-				SimpleMultiThreading.threadWait(10);
-
-			parent.updatePreview(ValueChange.FindLinesVia);
-		}
+	
 	}
 }
 
