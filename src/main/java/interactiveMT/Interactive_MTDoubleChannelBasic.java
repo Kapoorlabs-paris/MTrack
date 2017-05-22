@@ -51,6 +51,7 @@ import listeners.AdvancedTrackerListener;
 import listeners.AnalyzekymoListener;
 import listeners.BeginTrackListener;
 import listeners.CheckResultsListener;
+import listeners.ChooseDirectoryListener;
 import listeners.ComputeTreeAgainListener;
 import listeners.ComputeTreeListener;
 import listeners.DeltaListener;
@@ -208,11 +209,10 @@ public class Interactive_MTDoubleChannelBasic implements PlugIn {
 		final Label Step = new Label("Step 1", Label.CENTER);
 		final Checkbox Analyzekymo = new Checkbox("Analyze Kymograph");
 		final JButton ChooseDirectory = new JButton("Choose Directory");
-
 		final JLabel outputfilename = new JLabel("Enter output filename: ");
 		TextField inputField = new TextField();
 		inputField.setColumns(10);
-
+		inputField.setText(parent.userfile.getName().replaceFirst("[.][^.]+$", ""));
 		final Label deltaText = new Label("Grey Level Seperation between Components = " + parent.delta, Label.CENTER);
 		final Label Unstability_ScoreText = new Label("Unstability Score = " + parent.Unstability_Score, Label.CENTER);
 		final Label minSizeText = new Label("Min # of pixels inside MSER Ellipses = " + parent.minSize, Label.CENTER);
@@ -307,7 +307,7 @@ public class Interactive_MTDoubleChannelBasic implements PlugIn {
 		cl.show(panelCont, "1");
 
 		Analyzekymo.addItemListener(new AnalyzekymoListener(parent));
-		ChooseDirectory.addActionListener(new ChooseDirectoryListener(inputField));
+		ChooseDirectory.addActionListener(new ChooseDirectoryListener(parent, inputField, parent.userfile));
 		deltaS.addAdjustmentListener(
 				new DeltaListener(parent, deltaText, parent.deltaMin, parent.deltaMax, parent.scrollbarSize, deltaS));
 		minSizeS.addAdjustmentListener(
@@ -564,31 +564,6 @@ public class Interactive_MTDoubleChannelBasic implements PlugIn {
 			parent.wasCanceled = cancel;
 			parent.close(parentB, parent.sliceObserver, parent.roiListener);
 		}
-	}
-
-	protected class ChooseDirectoryListener implements ActionListener {
-		final TextField filename;
-
-		public ChooseDirectoryListener(TextField filename) {
-
-			this.filename = filename;
-
-		}
-
-		@Override
-		public void actionPerformed(final ActionEvent arg0) {
-
-			JFileChooser chooserA = new JFileChooser();
-			chooserA.setCurrentDirectory(new java.io.File("."));
-			chooserA.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-			chooserA.showOpenDialog(panelFirst);
-			parent.usefolder = chooserA.getSelectedFile().getAbsolutePath();
-
-			parent.addToName = filename.getText();
-
-			parent.SaveTxt = true;
-		}
-
 	}
 
 	protected class FrameListener extends WindowAdapter {

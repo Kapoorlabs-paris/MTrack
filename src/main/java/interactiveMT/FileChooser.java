@@ -552,18 +552,18 @@ public class FileChooser extends JPanel {
 				
 			   
 			    if(Simplemode)
-			    new Interactive_MTDoubleChannelBasic(new Interactive_MTDoubleChannel(originalimg, originalPreprocessedimg, kymoimg, psf, calibration)).run(null);	
+			    new Interactive_MTDoubleChannelBasic(new Interactive_MTDoubleChannel(originalimg, originalPreprocessedimg, kymoimg, psf, calibration,chooserB.getSelectedFile())).run(null);	
 			    else
-			    new Interactive_MTDoubleChannel(originalimg, originalPreprocessedimg, kymoimg, psf, calibration).run(null);	
+			    new Interactive_MTDoubleChannel(originalimg, originalPreprocessedimg, kymoimg, psf, calibration, chooserB.getSelectedFile()).run(null);	
 			
 			}
 			else{
 
 				
 				if(Simplemode)
-				new Interactive_MTDoubleChannelBasic(new Interactive_MTDoubleChannel(originalimg, originalPreprocessedimg, psf, calibration)).run(null);
+				new Interactive_MTDoubleChannelBasic(new Interactive_MTDoubleChannel(originalimg, originalPreprocessedimg, psf, calibration, chooserB.getSelectedFile())).run(null);
 				else
-				new Interactive_MTDoubleChannel(originalimg, originalPreprocessedimg, psf, calibration).run(null);		
+				new Interactive_MTDoubleChannel(originalimg, originalPreprocessedimg, psf, calibration, chooserB.getSelectedFile()).run(null);		
 			
 			}
 			close(parent);

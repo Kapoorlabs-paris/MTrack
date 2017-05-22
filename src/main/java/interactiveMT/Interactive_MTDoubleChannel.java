@@ -25,6 +25,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -208,6 +209,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public TextField Maxdpixel;
 	private TextField Maxdmicro;
 
+	public final File userfile;
 	public int starttimetrack;
 	public int endtimetrack;
 	public int minDiversityInit = 1;
@@ -563,11 +565,12 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	}
 
 	public Interactive_MTDoubleChannel() {
+		this.userfile = null;
 	};
 
 	public Interactive_MTDoubleChannel(final RandomAccessibleInterval<FloatType> originalimg,
 			final RandomAccessibleInterval<FloatType> originalPreprocessedimg, final double[] psf,
-			final double[] imgCal) {
+			final double[] imgCal, final File userfile) {
 
 		this.originalimg = originalimg;
 		this.originalPreprocessedimg = originalPreprocessedimg;
@@ -578,6 +581,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		imp = ImageJFunctions.show(originalimg);
 		impcopy = imp.duplicate();
 
+		this.userfile = userfile;
 		calibration = imgCal;
 		System.out.println(calibration[0] + " " + calibration[1]);
 
@@ -585,7 +589,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 	public Interactive_MTDoubleChannel(final RandomAccessibleInterval<FloatType> originalimg,
 			final RandomAccessibleInterval<FloatType> originalPreprocessedimg,
-			final RandomAccessibleInterval<FloatType> kymoimg, final double[] psf, final double[] imgCal) {
+			final RandomAccessibleInterval<FloatType> kymoimg, final double[] psf, final double[] imgCal, final File userfile) {
 
 		this.originalimg = originalimg;
 		this.originalPreprocessedimg = originalPreprocessedimg;
@@ -596,6 +600,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		imp = ImageJFunctions.show(originalimg);
 		impcopy = imp.duplicate();
 
+		this.userfile = userfile;
 		calibration = imgCal;
 		System.out.println(calibration[0] + " " + calibration[1]);
 
@@ -1113,6 +1118,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		final JLabel outputfilename = new JLabel("Enter output filename: ");
 		TextField inputField = new TextField();
 		inputField.setColumns(10);
+		inputField.setText(userfile.getName().replaceFirst("[.][^.]+$", ""));
 		final Checkbox mser = new Checkbox("MSER", Finders, FindLinesViaMSER);
 		final Checkbox hough = new Checkbox("HOUGH", Finders, FindLinesViaHOUGH);
 		final Checkbox mserwhough = new Checkbox("MSERwHOUGH", Finders, FindLinesViaMSERwHOUGH);
@@ -1199,7 +1205,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		Analyzekymo.addItemListener(new AnalyzekymoListener(this));
 		hough.addItemListener(new HoughListener(this));
 		mserwhough.addItemListener(new MserwHoughListener(this));
-		ChooseDirectory.addActionListener(new ChooseDirectoryListener(this, inputField));
+		ChooseDirectory.addActionListener(new ChooseDirectoryListener(this, inputField, userfile));
 		JPanel control = new JPanel();
 
 		control.add(new JButton(new AbstractAction("\u22b2Prev") {
