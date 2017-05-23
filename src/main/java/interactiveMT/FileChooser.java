@@ -376,30 +376,7 @@ public class FileChooser extends JPanel {
 		
 	}
 	
-	/*
-	 * 
-	 * Joke:
-	 * 
-	 *  ArrayList<Component> theList = new ArrayList<>();
-			    addAllChildren(panelIntro, theList);
-			    for (Component c : theList)
-			    	
-			    	c.setBackground(Color.MAGENTA);
-			    
-	 * 
-	 * 
-	 * 
-	 */
-	
-	public static void addAllChildren(Component comp, ArrayList<Component> thelist)
-	{
-		thelist.add(comp);
-		if (comp instanceof Container)
-				for (Component child : ((Container) comp).getComponents())
-				{
-					addAllChildren(child, thelist);
-				}
-	}
+
 	
 	protected class RunAdvancedListener implements ItemListener{
 		

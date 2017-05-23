@@ -13,7 +13,6 @@ import net.imglib2.Localizable;
 import net.imglib2.Point;
 import net.imglib2.RandomAccess;
 import net.imglib2.RandomAccessibleInterval;
-import net.imglib2.TwinCursor;
 import net.imglib2.algorithm.labeling.AllConnectedComponents;
 import net.imglib2.algorithm.labeling.Watershed;
 import net.imglib2.algorithm.stats.Normalize;

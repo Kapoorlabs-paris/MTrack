@@ -92,8 +92,7 @@ public class Interactive_MTDoubleChannelBasic implements PlugIn {
 
 	@Override
 	public void run(String arg) {
-		Macro_Runner test_runner = new Macro_Runner();
-		test_runner.run("record");
+		
 		parent.FindLinesViaMSER = true;
 		parent.doMserSegmentation = true;
 
