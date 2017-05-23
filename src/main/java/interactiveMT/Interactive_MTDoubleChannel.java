@@ -56,6 +56,7 @@ import ij.gui.GenericDialog;
 import ij.gui.OvalRoi;
 import ij.gui.Overlay;
 import ij.gui.Roi;
+import ij.plugin.Macro_Runner;
 import ij.plugin.PlugIn;
 import ij.plugin.frame.RoiManager;
 import ij.process.ColorProcessor;
@@ -608,7 +609,9 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 	@Override
 	public void run(String arg) {
-
+		Macro_Runner test_runner = new Macro_Runner();
+		test_runner.run("record");
+		
 		AllSeedrois = new ArrayList<OvalRoi>();
 		jpb = new JProgressBar();
 		newHoughtree = new HashMap<Integer, MserTree<UnsignedByteType>>();
@@ -1084,7 +1087,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		CardLayout cl = new CardLayout();
 
 		panelCont.setLayout(cl);
-
+		
 		panelCont.add(panelFirst, "1");
 		panelCont.add(panelSecond, "2");
 		panelCont.add(panelThird, "3");
@@ -1444,7 +1447,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		final Label Checkres = new Label("The tracker now performs an internal check on the results");
 		Checkres.setBackground(new Color(1, 0, 1));
 		Checkres.setForeground(new Color(255, 255, 255));
-		final Label Done = new Label("Hope that everything was to your satisfaction!");
+		final Label Done = new Label("Hope that everything was to your satisfaction! You can now exit.");
 		final Button Exit = new Button("Close and exit");
 
 		Done.setBackground(new Color(1, 0, 1));
@@ -1488,9 +1491,9 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		c.insets = new Insets(10, 10, 0, 50);
 		panelFifth.add(Done, c);
 
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 50);
-		panelFifth.add(Exit, c);
+	//	++c.gridy;
+	//	c.insets = new Insets(10, 10, 0, 50);
+	//	panelFifth.add(Exit, c);
 
 		Exit.addActionListener(new FinishedButtonListener(Cardframe, true));
 		SkipframeandTrackEndPoints.addActionListener(new SkipFramesandTrackendsListener(this, this.thirdDimension,  this.thirdDimensionSize));

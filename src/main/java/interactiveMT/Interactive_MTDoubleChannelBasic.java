@@ -37,6 +37,7 @@ import ij.ImageStack;
 import ij.gui.OvalRoi;
 import ij.gui.Overlay;
 import ij.gui.Roi;
+import ij.plugin.Macro_Runner;
 import ij.plugin.PlugIn;
 import interactiveMT.Interactive_MTDoubleChannel.FinishedButtonListener;
 import interactiveMT.Interactive_MTDoubleChannel.FrameListener;
@@ -91,6 +92,8 @@ public class Interactive_MTDoubleChannelBasic implements PlugIn {
 
 	@Override
 	public void run(String arg) {
+		Macro_Runner test_runner = new Macro_Runner();
+		test_runner.run("record");
 		parent.FindLinesViaMSER = true;
 		parent.doMserSegmentation = true;
 
@@ -181,7 +184,7 @@ public class Interactive_MTDoubleChannelBasic implements PlugIn {
 	}
 
 	public JFrame CardframeSimple = new JFrame("MicroTubule Tracker (Simple Mode)");
-
+   
 	public JPanel panelCont = new JPanel();
 	public JPanel panelFirst = new JPanel();
 	public JPanel panelSecond = new JPanel();
@@ -193,7 +196,6 @@ public class Interactive_MTDoubleChannelBasic implements PlugIn {
 
 		CardLayout cl = new CardLayout();
 
-		
 		parent.Cardframe.setSize(CardframeSimple.getSize());
 		
 		panelCont.setLayout(cl);
@@ -493,7 +495,7 @@ public class Interactive_MTDoubleChannelBasic implements PlugIn {
 		final Label Checkres = new Label("The tracker now performs an internal check on the results");
 		Checkres.setBackground(new Color(1, 0, 1));
 		Checkres.setForeground(new Color(255, 255, 255));
-		final Label Done = new Label("Hope that everything was to your satisfaction!");
+		final Label Done = new Label("Hope that everything was to your satisfaction! You can now exit.");
 		final Button Exit = new Button("Close and exit");
 
 		Done.setBackground(new Color(1, 0, 1));
@@ -533,9 +535,9 @@ public class Interactive_MTDoubleChannelBasic implements PlugIn {
 		c.insets = new Insets(10, 10, 0, 50);
 		panelThird.add(Done, c);
 
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 50);
-		panelThird.add(Exit, c);
+	//	++c.gridy;
+	//	c.insets = new Insets(10, 10, 0, 50);
+	//	panelThird.add(Exit, c);
 
 		Exit.addActionListener(new FinishedButtonListener(CardframeSimple, true));
 

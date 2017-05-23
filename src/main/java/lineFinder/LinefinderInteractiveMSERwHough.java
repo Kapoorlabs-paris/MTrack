@@ -139,9 +139,9 @@ public class LinefinderInteractiveMSERwHough  implements Linefinder{
 	    			Roiindex = count;
 	    			count++;
 	    			
-	    			percent = (Math.round(100 * (Roiindex + 1) / (ellipselist.size() - 1)));
+	    			percent = (Math.round(100 * (Roiindex + 1) / (ellipselist.size())));
 					
-					FitterUtils.SetProgressBarTime(jpb, percent, Roiindex, ellipselist.size() - 2, "Doing Hough Transform");
+					FitterUtils.SetProgressBarTime(jpb, percent, Roiindex, ellipselist.size() - 1, "Doing Hough Transform");
 	    			
 				ellipseroi.setStrokeColor(Color.green);
 				
