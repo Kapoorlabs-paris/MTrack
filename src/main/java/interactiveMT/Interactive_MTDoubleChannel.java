@@ -137,6 +137,11 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public final int scrollbarSizebig = 1000;
 	public boolean AdvancedChoice = false;
 	public boolean AdvancedChoiceSeeds = false;
+	
+	boolean Simplemode = false;
+	boolean Advancedmode = false;
+	boolean Kymomode = false;
+	
 	// steps per octave
 	public static int standardSensitivity = 4;
 	public int sensitivity = standardSensitivity;

@@ -39,7 +39,7 @@ public class FileChooser extends JPanel {
 	boolean Simplemode = false;
 	boolean Advancedmode = false;
 	boolean Kymomode = false;
-	
+
 	public FileChooser() {
 		final JFrame frame = new JFrame("Welcome to MTV Tracker");
 		
