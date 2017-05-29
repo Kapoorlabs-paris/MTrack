@@ -10,21 +10,14 @@ public class CreateINIfile {
 
 	
 	final Interactive_MTDoubleChannel parent;
-	final Interactive_MTDoubleChannelBasic child;
 	
 	public CreateINIfile(final Interactive_MTDoubleChannel parent) {
 
 		this.parent = parent;
-        this.child = null;
 		
 	}
 	
-	public CreateINIfile(final Interactive_MTDoubleChannel parent, final Interactive_MTDoubleChannelBasic child) {
 
-		this.parent = parent;
-		this.child = child;
-
-	}
 	
 	public void RecordParent(){
 		
@@ -70,6 +63,8 @@ public class CreateINIfile {
 
 
 		Prefs.set("Model.UserChoiceModel", parent.userChoiceModel.toString());
+		
+		
 		Prefs.set("Intensityratio.double", parent.Intensityratio);
 		Prefs.set("Inispacing.double", parent.Inispacing);
 		Prefs.set("Domask.boolean", parent.Domask);

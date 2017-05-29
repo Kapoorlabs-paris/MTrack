@@ -158,10 +158,7 @@ final BatchMode parent;
 		try {
 			parent.jpb.setIndeterminate(false);
 			get();
-			parent.frame.dispose();
-			// JOptionPane.showMessageDialog(jpb.getParent(), "End Points
-			// found and overlayed", "Success",
-			// JOptionPane.INFORMATION_MESSAGE);
+			
 		} catch (ExecutionException | InterruptedException e) {
 			e.printStackTrace();
 		}

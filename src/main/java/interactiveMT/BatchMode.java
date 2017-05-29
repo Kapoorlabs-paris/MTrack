@@ -57,6 +57,7 @@ import ij.gui.GenericDialog;
 import ij.gui.OvalRoi;
 import ij.gui.Overlay;
 import ij.gui.Roi;
+import ij.io.Opener;
 import ij.plugin.Macro_Runner;
 import ij.plugin.PlugIn;
 import ij.plugin.frame.RoiManager;
@@ -220,7 +221,7 @@ public class BatchMode implements PlugIn {
 	
 	
 	
-	public final String userfile;
+	public String userfile;
 	public int starttimetrack;
 	public int endtimetrack;
 
@@ -311,6 +312,10 @@ public class BatchMode implements PlugIn {
 	public int channel = 0;
 	public int thirdDimensionSize;
 	public int thirdDimensionSizeOriginal;
+	
+	
+	public final File[] AllImages;
+	
 	public RandomAccessibleInterval<FloatType> originalimg;
 	public RandomAccessibleInterval<FloatType> originalPreprocessedimg;
 	public RandomAccessibleInterval<FloatType> Kymoimg;
@@ -393,24 +398,38 @@ public class BatchMode implements PlugIn {
 	}
 
 	public BatchMode() {
-		this.userfile = null;
 		this.parent = null;
+		this.AllImages = null;
 	};
 
-	public BatchMode(final RandomAccessibleInterval<FloatType> originalimg, final RandomAccessibleInterval<FloatType> originalPreprocessedimg, final Interactive_MTDoubleChannel parent  ,final File userfile) {
-
-		this.originalimg = originalimg;
-		this.originalPreprocessedimg = originalPreprocessedimg;
-		// Default filename of the txt file with results is same as the image file
+	
+	public BatchMode(final File[] AllImages, final Interactive_MTDoubleChannel parent ){
+		
+		
+		this.AllImages = AllImages;
 		this.parent = parent;
-		this.userfile = userfile.getName().replaceFirst("[.][^.]+$", "");
-
+		
+		
 	}
-
+	
+	
 	
 
 	@Override
 	public void run(String arg) {
+		
+		
+		for (int index = 0; index < AllImages.length; ++index){
+		
+		File currentfile = AllImages[index];
+		
+		ImagePlus impB = new Opener().openImage(currentfile.getPath());
+		
+		originalimg = ImageJFunctions.convertFloat(impB);
+		
+		originalPreprocessedimg =  util.CopyUtils.Preprocess(originalimg);
+		
+		this.userfile = currentfile.getName().replaceFirst("[.][^.]+$", "");
 		
 		parent.usefolder = Prefs.get("Folder.file", IJ.getDirectory("imagej"));
 		
@@ -505,7 +524,7 @@ public class BatchMode implements PlugIn {
 		
 		goTrack();
 		
-		
+		}
 		
 
 	}

@@ -39,6 +39,7 @@ import ij.gui.Overlay;
 import ij.gui.Roi;
 import ij.plugin.Macro_Runner;
 import ij.plugin.PlugIn;
+import initialization.CreateINIfile;
 import interactiveMT.Interactive_MTDoubleChannel.FinishedButtonListener;
 import interactiveMT.Interactive_MTDoubleChannel.FrameListener;
 import interactiveMT.Interactive_MTDoubleChannel.ImagePlusListener;
@@ -80,6 +81,7 @@ public class Interactive_MTDoubleChannelBasic implements PlugIn {
 	final Interactive_MTDoubleChannel parent;
 	private JLabel inputLabelX, inputLabelY, inputLabelT;
 	private TextField inputFieldX, inputFieldY, inputFieldT;
+
 	public Interactive_MTDoubleChannelBasic() {
 		this.parent = null;
 	};
@@ -92,7 +94,7 @@ public class Interactive_MTDoubleChannelBasic implements PlugIn {
 
 	@Override
 	public void run(String arg) {
-		
+
 		parent.FindLinesViaMSER = true;
 		parent.doMserSegmentation = true;
 
@@ -183,27 +185,23 @@ public class Interactive_MTDoubleChannelBasic implements PlugIn {
 	}
 
 	public JFrame CardframeSimple = new JFrame("MicroTubule Velocity Tracker (Simple Mode)");
-   
+
 	public JPanel panelCont = new JPanel();
 	public JPanel panelFirst = new JPanel();
 	public JPanel panelSecond = new JPanel();
 	public JPanel panelThird = new JPanel();
-	public JPanel panelFourth = new JPanel();
-	public JPanel panelFifth = new JPanel();
-	
+
 	public void CardSmall() {
 
 		CardLayout cl = new CardLayout();
 
 		parent.Cardframe.setSize(CardframeSimple.getSize());
-		
+
 		panelCont.setLayout(cl);
 
 		panelCont.add(panelFirst, "1");
 		panelCont.add(panelSecond, "2");
 		panelCont.add(panelThird, "3");
-		panelCont.add(panelFourth, "4");
-		panelCont.add(panelFifth, "5");
 
 		panelFirst.setName("Choose parameters to find Seeds");
 
@@ -221,7 +219,8 @@ public class Interactive_MTDoubleChannelBasic implements PlugIn {
 				10 + parent.scrollbarSize);
 		final Scrollbar Unstability_ScoreS = new Scrollbar(Scrollbar.HORIZONTAL, parent.Unstability_ScoreInit, 10, 0,
 				10 + parent.scrollbarSize);
-		final Scrollbar minSizeS = new Scrollbar(Scrollbar.HORIZONTAL, parent.minSizeInit, 10, 0, 10 + parent.scrollbarSize);
+		final Scrollbar minSizeS = new Scrollbar(Scrollbar.HORIZONTAL, parent.minSizeInit, 10, 0,
+				10 + parent.scrollbarSize);
 
 		final Button ComputeTree = new Button("Show MSER Ellipses");
 		final Button FindLinesListener = new Button("Find endpoints");
@@ -290,16 +289,14 @@ public class Interactive_MTDoubleChannelBasic implements PlugIn {
 		panelFirst.add(Unstability_ScoreS, c);
 		++c.gridy;
 
-	   panelFirst.add(minSizeText, c);
+		panelFirst.add(minSizeText, c);
 
 		++c.gridy;
 		panelFirst.add(minSizeS, c);
-		
+
 		++c.gridy;
 		c.insets = new Insets(10, 175, 0, 175);
 		panelFirst.add(AdvancedOptions, c);
-
-		
 
 		++c.gridy;
 		c.insets = new Insets(10, 180, 0, 180);
@@ -311,9 +308,8 @@ public class Interactive_MTDoubleChannelBasic implements PlugIn {
 		ChooseDirectory.addActionListener(new ChooseDirectoryListener(parent, inputField, parent.userfile));
 		deltaS.addAdjustmentListener(
 				new DeltaListener(parent, deltaText, parent.deltaMin, parent.deltaMax, parent.scrollbarSize, deltaS));
-		minSizeS.addAdjustmentListener(
-				new MinSizeListener(parent, minSizeText,parent.minSizemin, parent.minSizemax,
-              parent.scrollbarSize, minSizeS));
+		minSizeS.addAdjustmentListener(new MinSizeListener(parent, minSizeText, parent.minSizemin, parent.minSizemax,
+				parent.scrollbarSize, minSizeS));
 		Unstability_ScoreS.addAdjustmentListener(new Unstability_ScoreListener(parent, Unstability_ScoreText,
 				parent.Unstability_ScoreMin, parent.Unstability_ScoreMax, parent.scrollbarSize, Unstability_ScoreS));
 
@@ -404,8 +400,6 @@ public class Interactive_MTDoubleChannelBasic implements PlugIn {
 		c.insets = new Insets(10, 10, 0, 150);
 		panelSecond.add(JumptoFrame, c);
 
-	
-		
 		++c.gridy;
 		c.insets = new Insets(10, 10, 10, 0);
 		panelSecond.add(inputLabelX, c);
@@ -421,12 +415,11 @@ public class Interactive_MTDoubleChannelBasic implements PlugIn {
 		++c.gridy;
 		c.insets = new Insets(10, 10, 10, 0);
 		panelSecond.add(inputFieldY, c);
-		
-		
+
 		++c.gridy;
 		c.insets = new Insets(10, 10, 0, 0);
 		panelSecond.add(Finalize, c);
-		
+
 		MoveNext.addActionListener(new MoveNextListener(parent));
 		JumptoFrame.addActionListener(new MoveToFrameListener(parent));
 
@@ -435,8 +428,6 @@ public class Interactive_MTDoubleChannelBasic implements PlugIn {
 		inputFieldX.addTextListener(new BeginTrackListener(parent));
 		inputFieldY.addTextListener(new EndTrackListener(parent));
 		Finalize.addItemListener(new FinalPoint(parent, this));
-
-	
 
 		CardframeSimple.add(panelCont, BorderLayout.CENTER);
 		CardframeSimple.add(control, BorderLayout.SOUTH);
@@ -486,16 +477,18 @@ public class Interactive_MTDoubleChannelBasic implements PlugIn {
 
 		JComboBox<String> cbtrack = new JComboBox<String>(choicestrack);
 
-		final Button SkipframeandTrackEndPoints = new Button("TrackEndPoints from user specified first and last timepoint");
+		final Button SkipframeandTrackEndPoints = new Button(
+				"TrackEndPoints from user specified first and last timepoint");
 		final Button CheckResults = new Button("Check Results (then click next)");
 		final Checkbox RoughResults = new Checkbox("Rates and Statistical Analysis");
 		final Checkbox AdvancedOptions = new Checkbox("Advanced Optimizer Options ", parent.AdvancedChoice);
-		
+
 		final Label Checkres = new Label("The tracker now performs an internal check on the results");
 		Checkres.setBackground(new Color(1, 0, 1));
 		Checkres.setForeground(new Color(255, 255, 255));
 		final Label Done = new Label("Hope that everything was to your satisfaction! You can now exit.");
 		final Button Exit = new Button("Close and exit");
+		final Button Record = new Button("Save program parameters for batch mode");
 
 		Done.setBackground(new Color(1, 0, 1));
 		Done.setForeground(new Color(255, 255, 255));
@@ -504,8 +497,6 @@ public class Interactive_MTDoubleChannelBasic implements PlugIn {
 		c.insets = new Insets(10, 175, 0, 175);
 		panelThird.add(AdvancedOptions, c);
 
-
-		
 		++c.gridy;
 		c.insets = new Insets(10, 10, 0, 175);
 		panelThird.add(SkipframeandTrackEndPoints, c);
@@ -530,17 +521,24 @@ public class Interactive_MTDoubleChannelBasic implements PlugIn {
 		 * ++c.gridy; c.insets = new Insets(10, 10, 0, 175);
 		 * panelFifth.add(RoughResults, c);
 		 */
+
+		++c.gridy;
+		c.insets = new Insets(10, 10, 0, 50);
+		panelThird.add(Record, c);
+
 		++c.gridy;
 		c.insets = new Insets(10, 10, 0, 50);
 		panelThird.add(Done, c);
 
-	//	++c.gridy;
-	//	c.insets = new Insets(10, 10, 0, 50);
-	//	panelThird.add(Exit, c);
+		// ++c.gridy;
+		// c.insets = new Insets(10, 10, 0, 50);
+		// panelThird.add(Exit, c);
 
 		Exit.addActionListener(new FinishedButtonListener(CardframeSimple, true));
 
-		SkipframeandTrackEndPoints.addActionListener(new SkipFramesandTrackendsListener(parent, parent.thirdDimension, parent.thirdDimensionSize));
+		Record.addActionListener(new BatchModeListener());
+		SkipframeandTrackEndPoints.addActionListener(
+				new SkipFramesandTrackendsListener(parent, parent.thirdDimension, parent.thirdDimensionSize));
 		CheckResults.addActionListener(new CheckResultsListener(parent));
 		RoughResults.addItemListener(new AcceptResultsListener(parent));
 		AdvancedOptions.addItemListener(new AdvancedTrackerListener(parent));
@@ -548,6 +546,19 @@ public class Interactive_MTDoubleChannelBasic implements PlugIn {
 		panelThird.repaint();
 		panelThird.validate();
 		CardframeSimple.pack();
+
+	}
+
+	protected class BatchModeListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(final ActionEvent arg0) {
+			
+			CreateINIfile recordparam = new CreateINIfile(parent);
+			recordparam.RecordParent();
+			
+			
+		}
 
 	}
 

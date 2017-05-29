@@ -24,6 +24,7 @@ import peakFitter.FitterUtils;
 import preProcessing.MedianFilter2D;
 
 import java.awt.event.*;
+import java.io.File;
 import java.awt.*;
 import java.util.*;
 
@@ -32,8 +33,10 @@ public class FileChooser extends JPanel {
 	boolean isFinished = false;
 	JButton Track;
 	JButton Measure;
+	JButton Measurebatch;
 	JButton Kymo;
 	JButton Done;
+	File[] AllMovies;
 	JFileChooser chooserA;
 	String choosertitleA;
 	RandomAccessibleInterval<FloatType> ProgramPreprocessedimg;
@@ -52,6 +55,7 @@ public class FileChooser extends JPanel {
 	boolean Advancedmode = false;
 	boolean Kymomode = false;
 	boolean Loadpreimage = false;
+	boolean Batchmoderun = false;
 	
 	public FileChooser() {
 		final JFrame frame = new JFrame("Welcome to MTV Tracker");
@@ -65,7 +69,7 @@ public class FileChooser extends JPanel {
 		
 		panelIntro.setLayout(layout);
 		CheckboxGroup mode = new CheckboxGroup();
-
+		final Checkbox Batchmode = new Checkbox("Run in Batch Mode", Batchmoderun);
 		final Label LoadtrackText = new Label("Load pre-processed tracking image");
 		final Label LoadMeasureText = new Label("Load original image");
 		final Label KymoText = new Label("Kymo mode (only 1 MT, pick Kymograph image) else skip");
@@ -110,7 +114,9 @@ public class FileChooser extends JPanel {
 		c.gridy = 0;
 		c.weightx = 1;
 		c.weighty = 1.5;
-
+		++c.gridy;
+		c.insets = new Insets(10, 10, 10, 0);
+		panelIntro.add(Batchmode, c);
 		++c.gridy;
 		c.insets = new Insets(10, 10, 10, 0);
 		panelIntro.add(Kymochoice, c);
@@ -179,7 +185,7 @@ public class FileChooser extends JPanel {
 		panelIntro.setVisible(true);
 		Track.addActionListener(new OpenTrackListener(frame));
 		Measure.addActionListener(new MeasureListener(frame));
-
+		Batchmode.addItemListener(new RuninBatchListener());
 		Done.addActionListener(new DoneButtonListener(frame, true));
 		Simple.addItemListener(new RunSimpleListener());
 		frame.addWindowListener(new FrameListener(frame));
@@ -190,7 +196,100 @@ public class FileChooser extends JPanel {
 		
 		frame.setVisible(true);
 	}
+	
+	protected class RuninBatchListener implements ItemListener {
 
+		@Override
+		public void itemStateChanged(ItemEvent e) {
+			
+			final JFrame frame = new JFrame("Welcome to MTV Tracker (Batch Mode)");
+			Batchmoderun = true;
+			Kymomode = false;
+			Simplemode = true;
+			Done = new JButton("Done");
+			panelIntro.removeAll();
+			/* Instantiation */
+			final GridBagLayout layout = new GridBagLayout();
+			final GridBagConstraints c = new GridBagConstraints();
+
+			panelIntro.setLayout(layout);
+			
+			
+			final Label LoadDirectoryText = new Label("Choose Directory of MT movies");
+			
+			
+			LoadDirectoryText.setBackground(new Color(1, 0, 1));
+			LoadDirectoryText.setForeground(new Color(255, 255, 255));
+			
+			Measurebatch = new JButton("Batch Process tif files");
+			
+			c.fill = GridBagConstraints.HORIZONTAL;
+			c.gridx = 0;
+			c.gridy = 0;
+			c.weightx = 1;
+			c.weighty = 1.5;
+
+			++c.gridy;
+			c.insets = new Insets(10, 10, 10, 0);
+			panelIntro.add(LoadDirectoryText, c);
+			
+			++c.gridy;
+			c.insets = new Insets(10, 10, 10, 0);
+			panelIntro.add(Measurebatch, c);
+			++c.gridy;
+			c.insets = new Insets(10, 10, 10, 0);
+			panelIntro.add(Done, c);
+			Measurebatch.addActionListener(new MeasurebatchListener(frame));
+			Done.addActionListener(new DoneButtonListener(frame, true));
+			panelIntro.validate();
+			panelIntro.repaint();
+			
+			
+		}
+		
+		
+		
+		
+	}
+	
+	protected class MeasurebatchListener implements ActionListener {
+
+		final Frame parent;
+
+		public MeasurebatchListener(Frame parent) {
+
+			this.parent = parent;
+
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent arg0) {
+
+			int result;
+
+			chooserB = new JFileChooser();
+			if (chooserA!=null)
+			chooserB.setCurrentDirectory(chooserA.getCurrentDirectory());
+			else
+			chooserB.setCurrentDirectory(new java.io.File("."));
+			chooserB.setDialogTitle(choosertitleB);
+			chooserB.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+			//
+			// disable the "All files" option.
+			//
+			chooserB.setAcceptAllFileFilterUsed(false);
+			FileNameExtensionFilter filter = new FileNameExtensionFilter("Image Files", "tif");
+
+			chooserB.setFileFilter(filter);
+			chooserB.showOpenDialog(parent);
+			
+			AllMovies = chooserB.getCurrentDirectory().listFiles();
+			
+			
+
+		}
+
+	}
 	protected class FrameListener extends WindowAdapter {
 		final Frame parent;
 
@@ -307,6 +406,7 @@ public class FileChooser extends JPanel {
 				final Checkbox Simple = new Checkbox("Run in Simple mode ", Simplemode);
 				final Checkbox Advanced = new Checkbox("Run in Advanced mode ", Advancedmode);
 				final Checkbox Kymochoice = new Checkbox("Analyze single MT, compare with Kymograph ", Kymomode);
+				
 
 				LoadtrackText.setBackground(new Color(1, 0, 1));
 				LoadtrackText.setForeground(new Color(255, 255, 255));
@@ -345,10 +445,8 @@ public class FileChooser extends JPanel {
 				c.weightx = 1;
 				c.weighty = 1.5;
 
-				++c.gridy;
-				c.insets = new Insets(10, 10, 10, 0);
-				panelIntro.add(Kymochoice, c);
-
+			
+				
 				++c.gridy;
 				c.insets = new Insets(10, 10, 10, 0);
 				panelIntro.add(Simple, c);
@@ -424,6 +522,9 @@ public class FileChooser extends JPanel {
 				Kymo.addActionListener(new KymoListener(frame));
 				Done.addActionListener(new DoneButtonListener(frame, true));
 				Simple.addItemListener(new RunSimpleListener());
+			
+				
+				
 				frame.addWindowListener(new FrameListener(frame));
 				panelIntro.validate();
 				panelIntro.repaint();
@@ -489,6 +590,9 @@ public class FileChooser extends JPanel {
 			int result;
 
 			chooserA = new JFileChooser();
+			if (chooserB!=null)
+				chooserA.setCurrentDirectory(chooserB.getCurrentDirectory());
+			else
 			chooserA.setCurrentDirectory(new java.io.File("."));
 			chooserA.setDialogTitle(choosertitleA);
 			chooserA.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -568,6 +672,11 @@ public class FileChooser extends JPanel {
 			int result;
 
 			chooserC = new JFileChooser();
+			if (chooserB!=null)
+				chooserC.setCurrentDirectory(chooserB.getCurrentDirectory());
+			else if (chooserA!=null)
+				chooserC.setCurrentDirectory(chooserA.getCurrentDirectory());
+			else
 			chooserC.setCurrentDirectory(new java.io.File("."));
 			chooserC.setDialogTitle(choosertitleC);
 			chooserC.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -602,7 +711,20 @@ public class FileChooser extends JPanel {
 
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
+			
+			
+			
+			
 			wasDone = Done;
+			
+			
+			if(Batchmoderun)
+				new BatchMode(AllMovies, new Interactive_MTDoubleChannel()).run(null);
+			else
+			{
+			
+			
+			
 			ImagePlus impA = null;
 			if (chooserA!=null)
 			impA = new Opener().openImage(chooserA.getSelectedFile().getPath());
@@ -638,6 +760,8 @@ public class FileChooser extends JPanel {
 			psf[1] = Float.parseFloat(inputFieldY.getText());
 			// frametosec = Float.parseFloat(inputFieldT.getText());
 			ImageJFunctions.show(originalPreprocessedimg).setTitle("ProgramPreprocessed");
+			
+				
 			if (kymoimg != null) {
 
 				if (Simplemode)
@@ -656,6 +780,7 @@ public class FileChooser extends JPanel {
 					new Interactive_MTDoubleChannel(originalimg, originalPreprocessedimg, psf, calibration,
 							chooserB.getSelectedFile()).run(null);
 
+			}
 			}
 			close(parent);
 		}
