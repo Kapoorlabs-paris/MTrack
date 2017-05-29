@@ -47,7 +47,6 @@ final Interactive_MTDoubleChannel parent;
 		if (parent.FindLinesViaMSER) {
 
 		
-				// updatePreview(ValueChange.SHOWMSER);
 				LinefinderInteractiveMSER newlineMser = new LinefinderInteractiveMSER(groundframe, groundframepre,
 						parent.newtree, parent.thirdDimension);
 
@@ -67,7 +66,6 @@ final Interactive_MTDoubleChannel parent;
 		if (parent.FindLinesViaHOUGH) {
 
 			
-				// updatePreview(ValueChange.SHOWHOUGH);
 				LinefinderInteractiveHough newlineHough = new LinefinderInteractiveHough(groundframe,
 						groundframepre, parent.intimg, parent.Maxlabel, parent.thetaPerPixel, parent.rhoPerPixel, parent.thirdDimension, parent.jpb);
 
@@ -84,7 +82,6 @@ final Interactive_MTDoubleChannel parent;
 
 		if (parent.FindLinesViaMSERwHOUGH) {
 			
-				// updatePreview(ValueChange.SHOWMSER);
 				LinefinderInteractiveMSERwHough newlineMserwHough = new LinefinderInteractiveMSERwHough(groundframe,
 						groundframepre, parent.newtree, parent.thirdDimension, parent.thetaPerPixel, parent.rhoPerPixel, parent.jpb);
 				IJ.log("MSER parameters:" + " " + " thirdDimension: " + " " + parent.thirdDimension);

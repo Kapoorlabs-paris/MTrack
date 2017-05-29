@@ -217,6 +217,16 @@ public static int getlabelindexSeed(final ArrayList<CommonOutput> imgs, int labe
 		
 	}
 	
+public static void SetProgressBar(JProgressBar jpb){
+		
+		jpb.setIndeterminate(true);
+		jpb.setOpaque(true);
+		jpb.setStringPainted(true);
+		jpb.setString("Pre-processing Image" );
+		
+		
+	}
+	
 public static void SetProgressBarTime(JProgressBar jpb, double percent, int framenumber, int thirdDimsize){
 		
 	jpb.setValue((int) percent);

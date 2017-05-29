@@ -326,8 +326,8 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public RandomAccessibleInterval<FloatType> Kymoimg;
 	public RandomAccessibleInterval<FloatType> CurrentView;
 	public RandomAccessibleInterval<FloatType> CurrentPreprocessedView;
-	int inix = 20;
-	int iniy = 20;
+	public int inix = 1;
+	public int iniy = 1;
 	public double[] calibration;
 	double radiusfactor = 1;
 	public MserTree<UnsignedByteType> newtree;
@@ -2314,7 +2314,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public boolean DialogueModelChoice() {
 
 		GenericDialog gd = new GenericDialog("Model Choice for sub-pixel Localization");
-		String[] LineModel = { "GaussianLines", "SecondOrderPolynomial", "ThridOrderPolynomial" };
+		String[] LineModel = { "Linear Growth Model", "Beam Model", "Higher order Beam Model" };
 
 		int indexmodel = 0;
 
@@ -2351,7 +2351,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public boolean DialogueModelChoiceHF() {
 
 		GenericDialog gd = new GenericDialog("Model Choice for sub-pixel Localization");
-		String[] LineModel = { "GaussianLines", "SecondOrderPolynomial", "ThridOrderPolynomial" };
+		String[] LineModel = { "Linear Growth Model", "Beam Model", "Higher order Beam Model" };
 
 		int indexmodel = 0;
 

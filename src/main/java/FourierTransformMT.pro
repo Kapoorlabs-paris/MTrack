@@ -17,8 +17,11 @@ nooflines = FILE_LINES(filename);
 nignore = 41;
 noofoutputs = nooflines - nignore;
 
-period = 100;
-noofextension = period * (noofoutputs );
+period = 10;
+noofextension = noofoutputs * period;
+if (noofextension MOD 2 NE 0) then begin
+noofextension = noofextension + 1;
+endif
 noofcolumns=long(10)
 tab=dblarr(noofcolumns,noofoutputs );
 
@@ -47,11 +50,7 @@ textend(i) = t(i)
 
 end
 
-for i=0,noofoutputs - 1  do begin
 
-  cwfextend(i) = cwf(i)
-
-end
 
 
 count = 1;
@@ -62,7 +61,7 @@ textend(i) = t(noofoutputs - 1) + count;
 count++;
 end
 
-for i = 1, period - 1 do begin
+for i = 0, period - 1 do begin
 
 
 cwfextend(i*(noofoutputs):(i + 1) * noofoutputs - 1 ) = cwf(0:noofoutputs - 1 )

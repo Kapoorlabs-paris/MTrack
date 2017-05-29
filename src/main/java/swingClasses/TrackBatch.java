@@ -6,17 +6,14 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Iterator;
+
 
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
 
 import MTObjects.ResultsMT;
 import drawandOverlay.DisplayGraph;
-import drawandOverlay.DisplayGraphKalman;
-import graphconstructs.KalmanTrackproperties;
+
 import graphconstructs.Trackproperties;
 import ij.IJ;
 import ij.ImagePlus;
@@ -24,7 +21,7 @@ import ij.gui.Line;
 import ij.gui.Overlay;
 import ij.measure.ResultsTable;
 import ij.plugin.frame.RoiManager;
-import interactiveMT.Interactive_MTDoubleChannel;
+import interactiveMT.BatchMode;
 import interactiveMT.Interactive_MTDoubleChannel.ValueChange;
 import lineFinder.FindlinesVia;
 import lineFinder.LinefinderInteractiveHFHough;
@@ -33,20 +30,19 @@ import lineFinder.LinefinderInteractiveHFMSERwHough;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.img.display.imagej.ImageJFunctions;
 import net.imglib2.type.numeric.real.FloatType;
-import net.imglib2.util.Pair;
-import trackerType.KFsearch;
-import trackerType.TrackModel;
+
 import velocityanalyser.Trackend;
 import velocityanalyser.Trackstart;
 
-public  class Track {
+public  class TrackBatch {
 	
-        final Interactive_MTDoubleChannel parent;
+        final BatchMode parent;
 	
 	
-	public Track(final Interactive_MTDoubleChannel parent){
+	public TrackBatch(final BatchMode parent){
 	
 		this.parent = parent;
+		
 	}
 	
 	
@@ -74,7 +70,7 @@ public  class Track {
 			RandomAccessibleInterval<FloatType> groundframe = parent.currentimg;
 			RandomAccessibleInterval<FloatType> groundframepre = parent.currentPreprocessedimg;
 
-			if (parent.FindLinesViaMSER) {
+			if (parent.parent.FindLinesViaMSER) {
 				if (index == next) {
 
 					IJ.log("MSER parameters:" + " " + " thirdDimension: " + " " + parent.thirdDimension);
@@ -92,10 +88,10 @@ public  class Track {
 
 				LinefinderInteractiveHFMSER newlineMser = new LinefinderInteractiveHFMSER(groundframe, groundframepre,
 						parent.newtree,  parent.thirdDimension);
-				if (parent.showDeterministic) {
+				if (parent.parent.showDeterministic) {
 					parent.returnVector = FindlinesVia.LinefindingMethodHF(groundframe, groundframepre, parent.PrevFrameparam,
 							 parent.thirdDimension, parent.psf, newlineMser, parent.userChoiceModel, parent.Domask, parent.Intensityratio,
-							parent.Inispacing, parent.seedmap, parent.jpb, parent.thirdDimensionSize);
+							parent.Inispacing, parent.parent.seedmap, parent.jpb, parent.thirdDimensionSize);
 					parent.Accountedframes.add(FindlinesVia.getAccountedframes());
 					
 					
@@ -112,7 +108,7 @@ public  class Track {
 
 			}
 
-			if (parent.FindLinesViaHOUGH) {
+			if (parent.parent.FindLinesViaHOUGH) {
 
 				if (index == next) {
 
@@ -127,13 +123,13 @@ public  class Track {
 
 				parent.updatePreview(ValueChange.SHOWHOUGH);
 				parent.updatePreview(ValueChange.SHOWMSERinHough);
-				LinefinderInteractiveHFHough newlineHough = new LinefinderInteractiveHFHough(parent,groundframe,
+				LinefinderInteractiveHFHough newlineHough = new LinefinderInteractiveHFHough(parent.parent,groundframe,
 						groundframepre, parent.Maxlabel, parent.thirdDimension);
 				
-				if (parent.showDeterministic) {
+				if (parent.parent.showDeterministic) {
 					parent.returnVector = FindlinesVia.LinefindingMethodHF(groundframe, groundframepre, parent.PrevFrameparam,
 							 parent.thirdDimension, parent.psf, newlineHough, parent.userChoiceModel,parent.Domask, parent.Intensityratio,
-							parent.Inispacing, parent.seedmap, parent.jpb, parent.thirdDimensionSize);
+							parent.Inispacing, parent.parent.seedmap, parent.jpb, parent.thirdDimensionSize);
 
 					parent.Accountedframes.add(FindlinesVia.getAccountedframes());
 					
@@ -150,7 +146,7 @@ public  class Track {
 
 			}
 
-			if (parent.FindLinesViaMSERwHOUGH) {
+			if (parent.parent.FindLinesViaMSERwHOUGH) {
 				if (index == next) {
 
 					IJ.log("MSER parameters:" + " " + " thirdDimension: " + " " + parent.thirdDimension);
@@ -165,10 +161,10 @@ public  class Track {
 				parent.updatePreview(ValueChange.SHOWMSER);
 				LinefinderInteractiveHFMSERwHough newlineMserwHough = new LinefinderInteractiveHFMSERwHough(groundframe,
 						groundframepre, parent.newtree, parent.thirdDimension, parent.thetaPerPixel, parent.rhoPerPixel);
-				if (parent.showDeterministic) {
+				if (parent.parent.showDeterministic) {
 					parent.returnVector = FindlinesVia.LinefindingMethodHF(groundframe, groundframepre, parent.PrevFrameparam,
 							 parent.thirdDimension, parent.psf, newlineMserwHough, parent.userChoiceModel, parent.Domask, parent.Intensityratio,
-							parent.Inispacing, parent.seedmap, parent.jpb, parent.thirdDimensionSize);
+							parent.Inispacing, parent.parent.seedmap, parent.jpb, parent.thirdDimensionSize);
 
 					parent.Accountedframes.add(FindlinesVia.getAccountedframes());
 					
@@ -185,7 +181,7 @@ public  class Track {
 
 			}
 
-			if (parent.showDeterministic) {
+			if (parent.parent.showDeterministic) {
 				parent.NewFrameparam = parent.returnVector.getB();
 				
 				ArrayList<Trackproperties> startStateVectors = parent.returnVector.getA().getA();
@@ -214,7 +210,7 @@ public  class Track {
 		
 		}
 
-		if (parent.showDeterministic) {
+		if (parent.parent.showDeterministic) {
 
 			if (parent.Allstart.get(0).size() > 0) {
 				ImagePlus impstartsec = ImageJFunctions.show(parent.originalimg);
@@ -254,7 +250,7 @@ public  class Track {
 
 	
 			
-		if (parent.showDeterministic) {
+		if (parent.parent.showDeterministic) {
 
 			ResultsTable rtAll = new ResultsTable();
 			if (parent.Allstart.get(0).size() > 0) {
@@ -333,10 +329,10 @@ public  class Track {
 					}
 				}
 				for (int seedID = MinSeedLabel; seedID <= MaxSeedLabel; ++seedID) {
-					if (parent.SaveTxt) {
+					if (parent.parent.SaveTxt) {
 						try {
 							File fichier = new File(
-									parent.usefolder + "//" + parent.addToName + "SeedLabel" + seedID + "-endA" + ".txt");
+									parent.parent.usefolder + "//" + parent.addToName + "SeedLabel" + seedID + "-endA" + ".txt");
 
 							FileWriter fw = new FileWriter(fichier);
 							BufferedWriter bw = new BufferedWriter(fw);
@@ -484,10 +480,10 @@ public  class Track {
 
 				}
 				for (int seedID = MinSeedLabel; seedID <= MaxSeedLabel; ++seedID) {
-					if (parent.SaveTxt) {
+					if (parent.parent.SaveTxt) {
 						try {
 							File fichier = new File(
-									parent.usefolder + "//" + parent.addToName + "SeedLabel" + seedID + "-endB" + ".txt");
+									parent.parent.usefolder + "//" + parent.addToName + "SeedLabel" + seedID + "-endB" + ".txt");
 
 							FileWriter fw = new FileWriter(fichier);
 							BufferedWriter bw = new BufferedWriter(fw);
@@ -627,10 +623,10 @@ public  class Track {
 					}
 				}
 				for (int seedID = MinSeedLabel; seedID <= MaxSeedLabel; ++seedID) {
-					if (parent.SaveTxt) {
+					if (parent.parent.SaveTxt) {
 						try {
 							File fichier = new File(
-									parent.usefolder + "//" + parent.addToName + "SeedLabel" + seedID + "-Usermarked" + ".txt");
+									parent.parent.usefolder + "//" + parent.addToName + "SeedLabel" + seedID + "-Usermarked" + ".txt");
 
 							FileWriter fw = new FileWriter(fichier);
 							BufferedWriter bw = new BufferedWriter(fw);
@@ -757,7 +753,7 @@ public  class Track {
 
 							if ((int) parent.deltadstart.get(index)[1] == parent.Accountedframes.get(secindex)) {
 
-								parent.netdeltadstart += Math.abs(parent.deltadstart.get(index)[0]);
+								parent.parent.netdeltadstart += Math.abs(parent.deltadstart.get(index)[0]);
 
 							}
 
@@ -829,7 +825,7 @@ public  class Track {
 
 							if ((int) parent.deltadend.get(index)[1] == parent.Accountedframes.get(secindex)) {
 
-								parent.netdeltadend += Math.abs(parent.deltadend.get(index)[0]);
+								parent.parent.netdeltadend += Math.abs(parent.deltadend.get(index)[0]);
 
 							}
 
@@ -841,7 +837,7 @@ public  class Track {
 				}
 
 				FileWriter deltaw;
-				File fichierKydel = new File(parent.usefolder + "//" + parent.addToName + "MTtracker-deltad" + ".txt");
+				File fichierKydel = new File(parent.parent.usefolder + "//" + parent.addToName + "MTtracker-deltad" + ".txt");
 
 				try {
 					deltaw = new FileWriter(fichierKydel);
@@ -888,13 +884,13 @@ public  class Track {
 			}
 		}
 		if (parent.Kymoimg != null) {
-			ImagePlus newimp = parent.Kymoimp.duplicate();
+			ImagePlus newimp = parent.parent.Kymoimp.duplicate();
 			for (int index = 0; index < parent.lengthtime.size() - 1; ++index) {
 
-				Overlay overlay = parent.Kymoimp.getOverlay();
+				Overlay overlay = parent.parent.Kymoimp.getOverlay();
 				if (overlay == null) {
 					overlay = new Overlay();
-					parent.Kymoimp.setOverlay(overlay);
+					parent.parent.Kymoimp.setOverlay(overlay);
 				}
 				Line newline = new Line(parent.lengthtime.get(index)[0], parent.lengthtime.get(index)[1],
 						parent.lengthtime.get(index + 1)[0], parent.lengthtime.get(index + 1)[1]);
@@ -902,14 +898,14 @@ public  class Track {
 
 				overlay.add(newline);
 
-				parent.Kymoimp.setOverlay(overlay);
+				parent.parent.Kymoimp.setOverlay(overlay);
 				RoiManager roimanager = RoiManager.getInstance();
 
 				roimanager.addRoi(newline);
 
 			}
 
-			parent.Kymoimp.show();
+			parent.parent.Kymoimp.show();
 		}
 		parent.displaystack();
 		if (parent.displayoverlay) {

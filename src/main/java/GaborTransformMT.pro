@@ -14,11 +14,14 @@ toenerg=0.1
 filename="/Users/varunkapoor/Documents/MTAnalysisRansac/TestRanSacSeedLabel2-endA.txt";
 
 nooflines = FILE_LINES(filename);
-nignore = 41;
+nignore = 1;
 noofoutputs = nooflines - nignore;
 
-period = 100;
-noofextension = period * (noofoutputs );
+period = 1;
+noofextension = noofoutputs * period;
+if (noofextension MOD 2 NE 0) then begin
+noofextension = noofextension + 1;
+endif
 noofcolumns=long(10)
 tab=dblarr(noofcolumns,noofoutputs );
 
@@ -73,8 +76,8 @@ end
 
 plot, t, cwf, xtitle = 'time (pixel units)', ytitle = 'Length (pixel units)'
 
-nooftimewindows=long(100)
-windowwidth=long(10000)
+nooftimewindows=long(1000)
+windowwidth=long(10)
 starttimeindex= 0;
 finaltimeindex= noofextension-1-windowwidth;
 
@@ -135,7 +138,7 @@ contour, alog10(finalspec),tarray,frequ, levels=levelsforlogfinalspec, c_colors=
 colorbar, ncolors=noofcolors, maxrange=levelsforlogfinalspec(0), minrange=levelsforlogfinalspec(noofcolors-1), position=[0.95,0.15,0.98,0.98], /vertical, format='(D8.2)'
 
 
-plot, frequ, finalspec(nooftimewindows-1,*),   xrange=[fromenerg,toenerg],/ylog, xtitle = "Frequency (1 / framenumber)", ytitle = "Amplitude", title = "Periodic extended L vs T Fourier Transform" 
+plot, frequ, finalspec(nooftimewindows-1,*),   xrange=[fromenerg,toenerg],/ylog, xtitle = "Frequency (1 / framenumber)", ytitle = "Amplitude", title = "Periodic extended L vs T Fourier Transform"
 
 
 
