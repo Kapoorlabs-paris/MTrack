@@ -125,7 +125,49 @@ public class CopyUtils {
 		// return the copy
 		return output;
 	}
+	/**
+	 * Generic, type-agnostic method to create an identical copy of an Img
+	 *
+	 * @param currentPreprocessedimg2
+	 *            - the Img to copy
+	 * @return - the copy of the Img
+	 */
+	public static Img<FloatType> copytoByteFloatImage(final RandomAccessibleInterval<FloatType> input) {
+		// create a new Image with the same properties
+		// note that the input provides the size for the new image as it
+		// implements
+		// the Interval interface
+		final RandomAccessibleInterval<FloatType> inputcopy = copyImage(input);
+		Normalize.normalize(Views.iterable(inputcopy), new FloatType(0), new FloatType(255));
+		final FloatType type = new FloatType();
+		final ImgFactory<FloatType> factory = net.imglib2.util.Util.getArrayOrCellImgFactory(input, type);
+		final Img<FloatType> output = factory.create(input, type);
+		// create a cursor for both images
+		RandomAccess<FloatType> ranac = inputcopy.randomAccess();
+		Cursor<FloatType> cursorOutput = output.cursor();
 
+		// iterate over the input
+		while (cursorOutput.hasNext()) {
+			// move both cursors forward by one pixel
+			cursorOutput.fwd();
+
+			int x = cursorOutput.getIntPosition(0);
+			int y = cursorOutput.getIntPosition(1);
+
+
+				ranac.setPosition(cursorOutput);
+
+				// set the value of this pixel of the output image to the same
+				// as
+				// the input,
+				// every Type supports T.set( T type )
+				cursorOutput.get().set((int) ranac.get().get());
+		}
+
+		// return the copy
+		return output;
+	}
+	
 	/**
 	 * Generic, type-agnostic method to create an identical copy of an Img
 	 *
