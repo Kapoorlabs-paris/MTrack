@@ -38,6 +38,10 @@ public class CreateINIfile {
 		Prefs.set("FindLinesViaMSERwHough.boolean", parent.FindLinesViaMSERwHOUGH);
 		Prefs.set("IniX.int", parent.inix);
 		Prefs.set("IniY.int", parent.iniy);
+		
+		Prefs.set("CalibrationX.double", parent.calibration[0]);
+		Prefs.set("CalibrationX.double", parent.calibration[1]);
+		
 		if (parent.FindLinesViaMSER){
 			
 			Prefs.set("Delta.double", parent.delta);

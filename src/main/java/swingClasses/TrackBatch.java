@@ -54,6 +54,10 @@ public  class TrackBatch {
 
 		for (int index = next; index <= endtime; ++index) {
 
+			
+			if (index == endtime)
+			parent.panel.remove(parent.jpb);
+			
 			Kalmancount++;
 
 			parent.displayBitimg = false;
@@ -71,6 +75,7 @@ public  class TrackBatch {
 			RandomAccessibleInterval<FloatType> groundframepre = parent.currentPreprocessedimg;
 
 			if (parent.parent.FindLinesViaMSER) {
+				/*
 				if (index == next) {
 
 					IJ.log("MSER parameters:" + " " + " thirdDimension: " + " " + parent.thirdDimension);
@@ -81,7 +86,7 @@ public  class TrackBatch {
 							+ parent.Inispacing / Math.min(parent.psf[0], parent.psf[1]));
 
 				}
-
+*/
 				
 
 				parent.updatePreview(ValueChange.SHOWMSER);
@@ -106,6 +111,7 @@ public  class TrackBatch {
 			}
 
 			if (parent.parent.FindLinesViaHOUGH) {
+				/*
 				if (index == next) {
 
 					IJ.log("Hough parameters:" + " " + " thirdDimension: " + " " + parent.thirdDimension);
@@ -115,7 +121,7 @@ public  class TrackBatch {
 
 				}
 
-				
+				*/
 
 				parent.updatePreview(ValueChange.SHOWHOUGH);
 				parent.updatePreview(ValueChange.SHOWMSERinHough);
@@ -141,6 +147,7 @@ public  class TrackBatch {
 			}
 
 			if (parent.parent.FindLinesViaMSERwHOUGH) {
+				/*
 				if (index == next) {
 
 					IJ.log("MSER parameters:" + " " + " thirdDimension: " + " " + parent.thirdDimension);
@@ -152,6 +159,8 @@ public  class TrackBatch {
 							+ parent.Inispacing / Math.min(parent.psf[0], parent.psf[1]));
 
 				} 
+				
+				*/
 				parent.updatePreview(ValueChange.SHOWMSER);
 				LinefinderInteractiveHFMSERwHough newlineMserwHough = new LinefinderInteractiveHFMSERwHough(groundframe,
 						groundframepre, parent.newtree, parent.thirdDimension, parent.thetaPerPixel, parent.rhoPerPixel);
@@ -188,7 +197,8 @@ public  class TrackBatch {
 				}
 		
 				parent.detcount++;
-				util.DrawingUtils.Trackplot(parent.detcount, parent.returnVector, parent.returnVectorUser, parent.AllpreviousRois, parent.colorLineTrack, parent.colorTrack, parent.inactiveColor, parent.overlay, parent.maxghost);
+				util.DrawingUtils.Trackplot(parent.detcount, parent.returnVector, parent.returnVectorUser,
+						parent.AllpreviousRois, parent.colorLineTrack, parent.colorTrack, parent.inactiveColor, parent.overlay, parent.maxghost);
 				
 				
 				parent.PrevFrameparam = parent.NewFrameparam;
@@ -252,7 +262,6 @@ public  class TrackBatch {
 				for (int currentseed = MinSeedLabel; currentseed < MaxSeedLabel + 1; ++currentseed) {
 					double startlengthreal = 0;
 					double startlengthpixel = 0;
-					System.out.println(currentseed);
 					for (int index = 0; index < parent.Allstart.size(); ++index) {
 
 						final ArrayList<Trackproperties> thirdDimension = parent.Allstart.get(index);

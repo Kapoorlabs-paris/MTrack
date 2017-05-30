@@ -193,7 +193,6 @@ public class SubpixelVelocityPCLine extends BenchmarkAlgorithm
 
 			final int oldframenumber = PrevFrameparamstart.get(PrevFrameparamstart.size() - 1).framenumber;
 			final int framediff = framenumber - oldframenumber;
-			System.out.println(Trackstart.get(PrevFrameparamstart.get(index).seedLabel));
 			
 			
 			
@@ -752,6 +751,8 @@ public class SubpixelVelocityPCLine extends BenchmarkAlgorithm
 
 					FitterUtils.SetProgressBarTime(jpb, percent, framenumber, thirdDimsize);
 
+					
+					
 					return PointofInterest;
 
 				}
@@ -1193,12 +1194,22 @@ public class SubpixelVelocityPCLine extends BenchmarkAlgorithm
 
 					FitterUtils.SetProgressBarTime(jpb, percent, framenumber, thirdDimsize);
 
+					
+					
+					
+					
 					return PointofInterest;
 
 				}
+				
+				
+				
 			} else
 				return null;
 
+			
+			
+				
 		}
 	}
 

@@ -187,8 +187,8 @@ public class BatchMode implements PlugIn {
 	public boolean displayoverlay = true;
 	
 	
-	public long minSize = (long) Prefs.getDouble("minSize.double", 1);
-	public long maxSize = (long) Prefs.getDouble("maxSize.double", 10000);
+	public long minSize = (long) Prefs.getDouble(".minSize.double", 1);
+	public long maxSize = (long) Prefs.getDouble(".maxSize.double", 10000);
 	
 	
 	
@@ -200,7 +200,7 @@ public class BatchMode implements PlugIn {
 	public int thirdDimensionsliderInit = 1;
 	public int timeMin = 1;
 
-	double modelnumber = Prefs.get("Model.int", 3);
+	public double modelnumber = Prefs.get(".Model.int", 3);
 
 	
 	public float delta = 1f;
@@ -325,7 +325,7 @@ public class BatchMode implements PlugIn {
 	public int iniy = Prefs.getInt(".IniY.int", 1);
 	
 	public double[] calibration;
-	double radiusfactor = 1;
+	public double radiusfactor = 1;
 	public MserTree<UnsignedByteType> newtree;
 
 	public HashMap<Integer, MserTree<UnsignedByteType>> newHoughtree;
@@ -365,7 +365,7 @@ public class BatchMode implements PlugIn {
 	public long Cannyradius;
 	public HashMap<Integer, ArrayList<Roi>> AllpreviousRois;
 	// first and last slice to process
-	int endStack;
+	public int endStack;
 	public int thirdDimension;
 	
 	
@@ -417,133 +417,12 @@ public class BatchMode implements PlugIn {
 	@Override
 	public void run(String arg) {
 		
-		if (modelnumber == 1)
-			parent.userChoiceModel = UserChoiceModel.Line;
-		if(modelnumber == 2)
-			parent.userChoiceModel = UserChoiceModel.Splineordersec;
-		else
-			parent.userChoiceModel = UserChoiceModel.Splineorderthird;
-		
-		AllSeedrois = new ArrayList<OvalRoi>();
-		jpb = new JProgressBar();
-		newHoughtree = new HashMap<Integer, MserTree<UnsignedByteType>>();
-		Userframe = new ArrayList<Indexedlength>();
-		AllpreviousRois = new HashMap<Integer, ArrayList<Roi>>();
-		
-		count = 0;
-		overlay = new Overlay();
-		nf.setMaximumFractionDigits(3);
 		
 		
-			int index = 1;
+		
 			
-		File currentfile = AllImages[index];
+			
 		
-		ImagePlus impB = new Opener().openImage(currentfile.getPath());
-		
-		
-		originalimg = ImageJFunctions.convertFloat(impB);
-		
-		originalPreprocessedimg =  util.CopyUtils.Preprocess(originalimg);
-		
-		
-		standardRectangle = new Rectangle(inix, iniy, (int) originalimg.dimension(0) - 2 * inix,
-				(int) originalimg.dimension(1) - 2 * iniy);
-		
-		this.userfile = currentfile.getName().replaceFirst("[.][^.]+$", "");
-		
-		parent.usefolder = Prefs.get(".Folder.file", IJ.getDirectory("imagej"));
-		
-		parent.FindLinesViaMSER = Prefs.getBoolean(".FindLinesViaMSER.boolean", false);
-		
-		parent.doSegmentation = false;
-		parent.doMserSegmentation = false;
-		parent.FindLinesViaHOUGH = Prefs.getBoolean(".FindLinesViaHough.boolean", false);
-		parent.FindLinesViaMSERwHOUGH = Prefs.getBoolean(".FindLinesViaMSERwHough.boolean", false);
-		
-		
-		parent.ShowMser = Prefs.getBoolean(".ShowMser.boolean", false);
-		parent.ShowHough = Prefs.getBoolean(".ShowHough.boolean", false);
-		parent.update = Prefs.getBoolean(".update.boolean", false);
-		parent.Canny = Prefs.getBoolean(".Canny.boolean", false);
-		
-		parent.showDeterministic = Prefs.getBoolean(".showDeterministic.boolean", true);
-		parent.RoisViaMSER = Prefs.getBoolean(".RoiViaMSER.boolean", false);
-		parent.RoisViaWatershed = Prefs.getBoolean(".RoiViaWatershed.boolean", false);
-		parent.SaveTxt = Prefs.getBoolean(".SaveTxt.boolean", true);
-		
-		AllSeedrois = new ArrayList<OvalRoi>();
-		jpb = new JProgressBar();
-		newHoughtree = new HashMap<Integer, MserTree<UnsignedByteType>>();
-		Userframe = new ArrayList<Indexedlength>();
-		AllpreviousRois = new HashMap<Integer, ArrayList<Roi>>();
-		Inispacing = 0.5 * Math.min(psf[0], psf[1]);
-		count = 0;
-		overlay = new Overlay();
-		nf.setMaximumFractionDigits(3);
-		
-		
-		Cannyradius = (long) (radiusfactor * Math.ceil(Math.sqrt(psf[0] * psf[0] + psf[1] * psf[1])));
-		if (originalimg.numDimensions() < 3) {
-
-			thirdDimensionSize = 0;
-		}
-
-		if (originalimg.numDimensions() == 3) {
-
-			thirdDimension = 1;
-			startdim = 1;
-			thirdDimensionSize = (int) originalimg.dimension(2);
-
-		}
-
-		if (originalimg.numDimensions() > 3) {
-
-			System.out.println("Image has wrong dimensionality, upload an XYT image");
-			return;
-		}
-
-		
-		prestack = new ImageStack((int) originalimg.dimension(0), (int) originalimg.dimension(1),
-				java.awt.image.ColorModel.getRGBdefault());
-
-		CurrentView = util.CopyUtils.getCurrentView(originalimg, thirdDimension, thirdDimensionSize);
-		CurrentPreprocessedView = util.CopyUtils.getCurrentPreView(originalPreprocessedimg, thirdDimension,
-				thirdDimensionSize);
-
-		output = new ArrayList<CommonOutputHF>();
-		endStack = thirdDimensionSize;
-		thirdDimensionSizeOriginal = thirdDimensionSize;
-		preprocessedimp = ImageJFunctions.show(CurrentView);
-
-		Roi roi = preprocessedimp.getRoi();
-
-		if (roi == null) {
-			// IJ.log( "A rectangular ROI is required to define the area..." );
-			preprocessedimp.setRoi(standardRectangle);
-			roi = preprocessedimp.getRoi();
-		}
-
-		if (roi.getType() != Roi.RECTANGLE) {
-			IJ.log("Only rectangular rois are supported...");
-			return;
-		}
-
-		// copy the ImagePlus into an ArrayImage<FloatType> for faster access
-		// displaySliders();
-		
-		// add listener to the imageplus slice slider
-		sliceObserver = new SliceObserver(preprocessedimp, new ImagePlusListener());
-		// compute first version#
-		
-		isStarted = true;
-
-		// check whenever roi is modified to update accordingly
-		roiListener = new RoiListener();
-		preprocessedimp.getCanvas().addMouseListener(roiListener);
-
-		updatePreview(ValueChange.ALL);
-		IJ.log(" Third Dimension Size " + thirdDimensionSize);
 		
 		goTrack();
 		
@@ -555,15 +434,7 @@ public class BatchMode implements PlugIn {
 
 	public void goTrack(){
 		
-		jpb.setIndeterminate(false);
-
-		jpb.setMaximum(parent.max);
-		panel.add(label);
-		panel.add(jpb);
-		frame.add(panel);
-		frame.pack();
-		frame.setSize(200, 100);
-		frame.setVisible(true);
+		
 
 		ProgressBatch startbatch = new ProgressBatch(this);
 		startbatch.execute();

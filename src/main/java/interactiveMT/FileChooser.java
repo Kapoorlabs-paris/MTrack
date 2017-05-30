@@ -185,40 +185,56 @@ public class FileChooser extends JPanel {
 		panelIntro.setVisible(true);
 		Track.addActionListener(new OpenTrackListener(frame));
 		Measure.addActionListener(new MeasureListener(frame));
-		Batchmode.addItemListener(new RuninBatchListener());
+		Batchmode.addItemListener(new RuninBatchListener(frame));
 		Done.addActionListener(new DoneButtonListener(frame, true));
 		Simple.addItemListener(new RunSimpleListener());
 		frame.addWindowListener(new FrameListener(frame));
 		frame.add(panelCont, BorderLayout.CENTER);
-		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.pack();
 
 		frame.setVisible(true);
 	}
 
 	protected class RuninBatchListener implements ItemListener {
+		
+		
+		final Frame parent;
+		
+		public RuninBatchListener(Frame parent) {
 
+			this.parent = parent;
+
+		}
+		
 		@Override
 		public void itemStateChanged(ItemEvent e) {
-
-			final JFrame frame = new JFrame("Welcome to MTV Tracker (Batch Mode)");
-			Batchmoderun = true;
-			Kymomode = false;
-			Simplemode = true;
-			Done = new JButton("Done");
+			
+			close(parent);
+			
+			
+			
 			panelIntro.removeAll();
+			
 			/* Instantiation */
 			final GridBagLayout layout = new GridBagLayout();
 			final GridBagConstraints c = new GridBagConstraints();
 
 			panelIntro.setLayout(layout);
+			
+			final JFrame frame = new JFrame("Welcome to MTV Tracker (Batch Mode)");
+			Batchmoderun = true;
+			Kymomode = false;
+			Simplemode = true;
+			Done = new JButton("Start batch processing");
+			
+			
 
-			final Label LoadDirectoryText = new Label("Choose Directory of MT movies");
+			final Label LoadDirectoryText = new Label("Using Fiji Prefs we execute the program for all tif files");
 
 			LoadDirectoryText.setBackground(new Color(1, 0, 1));
 			LoadDirectoryText.setForeground(new Color(255, 255, 255));
 
-			Measurebatch = new JButton("Batch Process tif files");
+			Measurebatch = new JButton("Select directory of tif files to process");
 
 			c.fill = GridBagConstraints.HORIZONTAL;
 			c.gridx = 0;
@@ -240,6 +256,12 @@ public class FileChooser extends JPanel {
 			Done.addActionListener(new DoneButtonListener(frame, true));
 			panelIntro.validate();
 			panelIntro.repaint();
+			frame.addWindowListener(new FrameListener(frame));
+			frame.add(panelCont, BorderLayout.CENTER);
+
+			frame.setSize(getPreferredSizeSmall());
+			frame.setVisible(true);
+			
 
 		}
 
@@ -301,10 +323,6 @@ public class FileChooser extends JPanel {
 	public RandomAccessibleInterval<FloatType> Preprocess(RandomAccessibleInterval<FloatType> originalimg) {
 
 	
-
-	
-
-		// Now apply the median filter of radius 1
 
 		final FlatFieldCorrection flatfilter = new FlatFieldCorrection(originalimg, 1);
 		flatfilter.process();
@@ -643,8 +661,16 @@ public class FileChooser extends JPanel {
 
 			wasDone = Done;
 
-			if (Batchmoderun)
+			if (Batchmoderun){
+				
+				
+				
+				
 				new BatchMode(AllMovies, new Interactive_MTDoubleChannel()).run(null);
+				
+				
+				
+			}
 			else {
 
 				ImagePlus impA = null;
@@ -710,8 +736,9 @@ public class FileChooser extends JPanel {
 								chooserB.getSelectedFile()).run(null);
 
 				}
+				close(parent);
 			}
-			close(parent);
+			
 		}
 	}
 
@@ -726,4 +753,8 @@ public class FileChooser extends JPanel {
 		return new Dimension(800, 300);
 	}
 
+	public Dimension getPreferredSizeSmall() {
+		return new Dimension(500, 200);
+	}
+	
 }

@@ -1,29 +1,54 @@
 package swingClasses;
 
+import java.awt.Color;
 import java.awt.Rectangle;
+import java.io.File;
+import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.SwingWorker;
 
 import LineModels.UseLineModel.UserChoiceModel;
+import MTObjects.MTcounter;
+import MTObjects.ResultsMT;
+import fiji.tool.SliceObserver;
+import graphconstructs.Trackproperties;
 import ij.IJ;
+import ij.ImagePlus;
+import ij.ImageStack;
 import ij.Prefs;
+import ij.gui.EllipseRoi;
 import ij.gui.OvalRoi;
 import ij.gui.Overlay;
+import ij.gui.Roi;
+import ij.io.Opener;
 import interactiveMT.BatchMode;
+import interactiveMT.BatchMode.ImagePlusListener;
 import interactiveMT.Interactive_MTDoubleChannel.ValueChange;
 import interactiveMT.Interactive_MTDoubleChannel.Whichend;
+import labeledObjects.CommonOutputHF;
+import labeledObjects.Indexedlength;
 import lineFinder.FindlinesVia;
 import lineFinder.LinefinderInteractiveHough;
 import lineFinder.LinefinderInteractiveMSER;
 import lineFinder.LinefinderInteractiveMSERwHough;
 import mpicbg.imglib.util.Util;
 import net.imglib2.RandomAccessibleInterval;
+import net.imglib2.algorithm.componenttree.mser.MserTree;
+import net.imglib2.img.display.imagej.ImageJFunctions;
+import net.imglib2.type.numeric.integer.UnsignedByteType;
 import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.util.Pair;
 import net.imglib2.util.ValuePair;
+import peakFitter.FitterUtils;
 import updateListeners.FinalPoint;
 
 public class ProgressBatch extends SwingWorker<Void, Void>  {
@@ -42,6 +67,209 @@ final BatchMode parent;
 	@Override
 	protected Void doInBackground() throws Exception {
 		
+		JProgressBar fileprogress = new JProgressBar();
+		
+		fileprogress.setIndeterminate(false);
+
+		fileprogress.setMaximum(parent.AllImages.length);
+		parent.label = new JLabel("Progress..");
+		parent.frame = new JFrame();
+		parent.panel = new JPanel();
+		parent.panel.add(parent.label);
+		parent.panel.add(fileprogress);
+		parent.frame.add(parent.panel);
+		parent.frame.pack();
+		parent.frame.setSize(200, 100);
+		parent.frame.setVisible(true);
+		
+		
+		
+		for (int fileindex = 1; fileindex < parent.AllImages.length; ++fileindex){
+		
+			
+			double percent = Math.round(100 * (fileindex + 1) / (parent.AllImages.length - 1));
+			
+			FitterUtils.SetProgressBarTime(fileprogress, percent, fileindex, (parent.AllImages.length - 1), "Processing File");
+			
+			
+			if (parent.modelnumber == 1)
+				parent.parent.userChoiceModel = UserChoiceModel.Line;
+			if(parent.modelnumber == 2)
+				parent.parent.userChoiceModel = UserChoiceModel.Splineordersec;
+			else
+				parent.parent.userChoiceModel = UserChoiceModel.Splineorderthird;
+			parent.colorDraw = Color.red;
+			parent.colorCurrent = Color.yellow;
+			parent.colorTrack = Color.yellow;
+			parent.colorLineTrack = Color.GRAY;
+			parent.colorUnselect = Color.MAGENTA;
+			parent.colorConfirm = Color.GREEN;
+			parent.colorUser = Color.ORANGE;
+			
+			parent.Progressmin = 0;
+			parent.Progressmax = 100;
+			parent.max = parent.Progressmax;
+			parent.deltadcutoff = 5;
+			parent.deltadstart = new ArrayList<>();
+			parent.deltadend = new ArrayList<>();
+			parent.deltad = new ArrayList<>();
+			parent.lengthtimestart = new ArrayList<double[]>();
+			parent.lengthtimeuser = new ArrayList<double[]>();
+			parent.AllMSERrois = new HashMap<Integer, ArrayList<EllipseRoi>>();
+			parent.AllPoints = new HashMap<Integer, double[]>();
+
+			parent.lengthtimeend = new ArrayList<double[]>();
+			parent.lengthtime = new ArrayList<double[]>();
+			parent.ALLcounts = new ArrayList<MTcounter>();
+			parent.AllSeedrois = new ArrayList<OvalRoi>();
+			parent.jpb = new JProgressBar();
+			parent.newHoughtree = new HashMap<Integer, MserTree<UnsignedByteType>>();
+			parent.Userframe = new ArrayList<Indexedlength>();
+			parent.AllpreviousRois = new HashMap<Integer, ArrayList<Roi>>();
+			parent.maxghost = 1;
+			parent.whichend = new HashMap<Integer, Boolean>();
+			parent.pixellength = new HashMap<Integer, Double>();
+			parent.microlength = new HashMap<Integer, Double>();
+			parent.finalvelocity = new ArrayList<float[]>();
+			parent.finalvelocityKymo = new ArrayList<float[]>();
+			parent.Allstart = new ArrayList<ArrayList<Trackproperties>>();
+			parent.AllUser = new ArrayList<ArrayList<Trackproperties>>();
+			parent.Allend = new ArrayList<ArrayList<Trackproperties>>();
+
+			parent.startlengthlist = new ArrayList<ResultsMT>();
+			parent.userlengthlist = new ArrayList<ResultsMT>();
+			parent.endlengthlist = new ArrayList<ResultsMT>();
+			parent.IDALL = new ArrayList<Pair<Integer, double[]>>();
+			parent.ClickedPoints = new ArrayList<Pair<double[], OvalRoi>>();
+			parent.nf = NumberFormat.getInstance(Locale.ENGLISH);
+			parent.sumlengthpixel = 0;
+			parent.sumlengthmicro = 0;
+			parent.AllmeanCovar = new ArrayList<double[]>();
+			parent.seedmap = new HashMap<Integer, Whichend>();
+			parent.count = 0;
+			parent.detcount = 0;
+			parent.overlay = new Overlay();
+			parent.nf.setMaximumFractionDigits(3);
+		
+		
+			File currentfile = parent.AllImages[fileindex];
+			
+			ImagePlus impB = new Opener().openImage(currentfile.getPath());
+			
+			
+			parent.originalimg = ImageJFunctions.convertFloat(impB);
+			
+			parent.originalPreprocessedimg =  util.CopyUtils.Preprocess(parent.originalimg);
+			
+			
+			parent.standardRectangle = new Rectangle(parent.inix, parent.iniy, (int) parent.originalimg.dimension(0) - 2 * parent.inix,
+					(int) parent.originalimg.dimension(1) - 2 * parent.iniy);
+			
+			parent.userfile = currentfile.getName().replaceFirst("[.][^.]+$", "");
+			
+			parent.parent.usefolder = Prefs.get(".Folder.file", IJ.getDirectory("imagej"));
+			
+			parent.parent.FindLinesViaMSER = Prefs.getBoolean(".FindLinesViaMSER.boolean", false);
+			
+			parent.parent.doSegmentation = false;
+			parent.parent.doMserSegmentation = false;
+			parent.parent.FindLinesViaHOUGH = Prefs.getBoolean(".FindLinesViaHough.boolean", false);
+			parent.parent.FindLinesViaMSERwHOUGH = Prefs.getBoolean(".FindLinesViaMSERwHough.boolean", false);
+			
+			
+			parent.parent.ShowMser = Prefs.getBoolean(".ShowMser.boolean", false);
+			parent.parent.ShowHough = Prefs.getBoolean(".ShowHough.boolean", false);
+			parent.parent.update = Prefs.getBoolean(".update.boolean", false);
+			parent.parent.Canny = Prefs.getBoolean(".Canny.boolean", false);
+			
+			parent.parent.showDeterministic = Prefs.getBoolean(".showDeterministic.boolean", true);
+			parent.parent.RoisViaMSER = Prefs.getBoolean(".RoiViaMSER.boolean", false);
+			parent.parent.RoisViaWatershed = Prefs.getBoolean(".RoiViaWatershed.boolean", false);
+			parent.parent.SaveTxt = Prefs.getBoolean(".SaveTxt.boolean", true);
+			parent.calibration = new double[parent.originalimg.numDimensions() - 1];
+			parent.calibration[0] = Prefs.getDouble(".CalibrationX.double", 1);
+			parent.calibration[1] = Prefs.getDouble(".CalibrationY.double", 1);
+			parent.AllSeedrois = new ArrayList<OvalRoi>();
+			parent.newHoughtree = new HashMap<Integer, MserTree<UnsignedByteType>>();
+			parent.Userframe = new ArrayList<Indexedlength>();
+			parent.AllpreviousRois = new HashMap<Integer, ArrayList<Roi>>();
+			parent.Inispacing = 0.5 * Math.min(parent.psf[0],parent.psf[1]);
+			parent.count = 0;
+			parent.overlay = new Overlay();
+			parent.nf.setMaximumFractionDigits(3);
+			
+			
+			parent.Cannyradius = (long) (parent.radiusfactor * Math.ceil(Math.sqrt(parent.psf[0] * parent.psf[0] + parent.psf[1] * parent.psf[1])));
+			if (parent.originalimg.numDimensions() < 3) {
+
+				parent.thirdDimensionSize = 0;
+			}
+
+			if (parent.originalimg.numDimensions() == 3) {
+
+				parent.thirdDimension = 1;
+				parent.startdim = 1;
+				parent.thirdDimensionSize = (int) parent.originalimg.dimension(2);
+
+			}
+
+			if (parent.originalimg.numDimensions() > 3) {
+
+				System.out.println("Image has wrong dimensionality, upload an XYT image");
+				return null;
+			}
+
+			
+			parent.prestack = new ImageStack((int) parent.originalimg.dimension(0), (int) parent.originalimg.dimension(1),
+					java.awt.image.ColorModel.getRGBdefault());
+
+			parent.CurrentView = util.CopyUtils.getCurrentView(parent.originalimg, parent.thirdDimension, parent.thirdDimensionSize);
+			parent.CurrentPreprocessedView = util.CopyUtils.getCurrentPreView(parent.originalPreprocessedimg, parent.thirdDimension,
+					parent.thirdDimensionSize);
+
+			parent.output = new ArrayList<CommonOutputHF>();
+			parent.endStack = parent.thirdDimensionSize;
+			parent.thirdDimensionSizeOriginal = parent.thirdDimensionSize;
+			parent.preprocessedimp = ImageJFunctions.show(parent.CurrentView);
+
+			Roi roi = parent.preprocessedimp.getRoi();
+
+			if (roi == null) {
+				// IJ.log( "A rectangular ROI is required to define the area..." );
+				parent.preprocessedimp.setRoi(parent.standardRectangle);
+				roi = parent.preprocessedimp.getRoi();
+			}
+
+			if (roi.getType() != Roi.RECTANGLE) {
+				IJ.log("Only rectangular rois are supported...");
+				return null;
+			}
+
+			// copy the ImagePlus into an ArrayImage<FloatType> for faster access
+			// displaySliders();
+		
+			
+			parent.isStarted = true;
+
+			// check whenever roi is modified to update accordingly
+			
+			parent.preprocessedimp.getCanvas().addMouseListener(parent.roiListener);
+
+			parent.updatePreview(ValueChange.ALL);
+			IJ.log(" Third Dimension Size " + parent.thirdDimensionSize);
+		
+			
+		
+			
+			parent.jpb.setIndeterminate(false);
+
+			parent.jpb.setMaximum(parent.max);
+			parent.panel.add(parent.label);
+			parent.panel.add(parent.jpb);
+			parent.frame.add(parent.panel);
+			
+			
+			
 		RandomAccessibleInterval<FloatType> groundframe = parent.currentimg;
 		RandomAccessibleInterval<FloatType> groundframepre = parent.currentPreprocessedimg;
 		
@@ -176,8 +404,9 @@ final BatchMode parent;
 	 newtrack.Trackobject(next, parent.thirdDimensionSize);
 	 
 	
+	 
 		
-		
+		}
 		
 		return null;
 		

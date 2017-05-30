@@ -18,85 +18,18 @@ import net.imglib2.type.numeric.integer.UnsignedByteType;
 import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.util.Util;
 import net.imglib2.view.Views;
+import preProcessing.FlatFieldCorrection;
 import preProcessing.MedianFilter2D;
 
 public class CopyUtils {
 
 	public static RandomAccessibleInterval<FloatType> Preprocess(RandomAccessibleInterval<FloatType> originalimg) {
-		
-		/*
-				// Take the original image and apply Gaussian Blur with radius
-				// 1/10th of the image dimensions
-				JProgressBar jpb = new JProgressBar();
-				jpb.setOpaque(true);
-				jpb.setValue(1);
-			    jpb.setStringPainted(true);
-			   
-				FitterUtils.SetProgressBar(jpb);
-				panelIntro.add(jpb);
-				*/
-				
-				RandomAccessibleInterval<FloatType> gaussimg = util.CopyUtils.copyImage(originalimg);
-				
-				
-				
-				double[] sigma = new double[originalimg.numDimensions() - 1];
-				for (int d = 0; d < originalimg.numDimensions() - 1; ++d){
-					sigma[d] = (int)Math.round((originalimg.realMax(d) - originalimg.realMin(d)) / 20.0);
-				}
-			   
-				
-				 for ( long pos = 0; pos < originalimg.dimension( originalimg.numDimensions() - 1 ); ++pos ){
-				
-					 RandomAccessibleInterval< FloatType > view = Views.hyperSlice(gaussimg, 2, pos);
-					 
-					 try {
-						Gauss3.gauss( sigma, Views.extendMirrorSingle( view ), view );
-					
-					 } catch (IncompatibleTypeException e) {
 
-						e.printStackTrace();
-					}
-				
-				
-				 }
 
-				// Subtract the original image from the Gaussian convolved image
-
-				final FloatType type = originalimg.randomAccess().get().createVariable();
-				final ImgFactory<FloatType> factory = Util.getArrayOrCellImgFactory(originalimg, type);
-				RandomAccessibleInterval<FloatType> Diffimage = factory.create(originalimg, type);
-
-				RandomAccess<FloatType> Diffran = Diffimage.randomAccess();
-				RandomAccess<FloatType> Gaussran = gaussimg.randomAccess();
-				Cursor<FloatType> cursor = Views.iterable(originalimg).localizingCursor();
-
-				while (cursor.hasNext()) {
-
-					cursor.fwd();
-
-					Diffran.setPosition(cursor);
-					Gaussran.setPosition(cursor);
-
-					Float Intensitydiff = cursor.get().get() - Gaussran.get().get();
-
-					Diffran.get().set(Intensitydiff);
-
-				}
-				
-				
-				// Now apply the median filter of radius 2
-				
-				final MedianFilter2D<FloatType> medfilter = new MedianFilter2D<FloatType>(Diffimage,
-						1);
-				medfilter.process();
-				IJ.log(" Median filter sucessfully applied to the whole stack");
-				RandomAccessibleInterval<FloatType>	ProgramPreprocessedimg = medfilter.getResult();
-				
-				
-				
-				
-				return ProgramPreprocessedimg;
+		final FlatFieldCorrection flatfilter = new FlatFieldCorrection(originalimg, 1);
+		flatfilter.process();
+		RandomAccessibleInterval<FloatType> ProgramPreprocessedimg = flatfilter.getResult();
+		return ProgramPreprocessedimg;
 				
 			}
 	public static Img<FloatType> copyImage(final RandomAccessibleInterval<FloatType> input) {
