@@ -92,7 +92,6 @@ public  class Track {
 
 				LinefinderInteractiveHFMSER newlineMser = new LinefinderInteractiveHFMSER(groundframe, groundframepre,
 						parent.newtree,  parent.thirdDimension);
-				if (parent.showDeterministic) {
 					parent.returnVector = FindlinesVia.LinefindingMethodHF(groundframe, groundframepre, parent.PrevFrameparam,
 							 parent.thirdDimension, parent.psf, newlineMser, parent.userChoiceModel, parent.Domask, parent.Intensityratio,
 							parent.Inispacing, parent.seedmap, parent.jpb, parent.thirdDimensionSize);
@@ -106,7 +105,6 @@ public  class Track {
 						
 						
 					}
-				}
 
 				
 
@@ -130,7 +128,6 @@ public  class Track {
 				LinefinderInteractiveHFHough newlineHough = new LinefinderInteractiveHFHough(parent,groundframe,
 						groundframepre, parent.Maxlabel, parent.thirdDimension);
 				
-				if (parent.showDeterministic) {
 					parent.returnVector = FindlinesVia.LinefindingMethodHF(groundframe, groundframepre, parent.PrevFrameparam,
 							 parent.thirdDimension, parent.psf, newlineHough, parent.userChoiceModel,parent.Domask, parent.Intensityratio,
 							parent.Inispacing, parent.seedmap, parent.jpb, parent.thirdDimensionSize);
@@ -144,7 +141,6 @@ public  class Track {
 						
 						
 					}
-				}
 
 			
 
@@ -165,7 +161,6 @@ public  class Track {
 				parent.updatePreview(ValueChange.SHOWMSER);
 				LinefinderInteractiveHFMSERwHough newlineMserwHough = new LinefinderInteractiveHFMSERwHough(groundframe,
 						groundframepre, parent.newtree, parent.thirdDimension, parent.thetaPerPixel, parent.rhoPerPixel);
-				if (parent.showDeterministic) {
 					parent.returnVector = FindlinesVia.LinefindingMethodHF(groundframe, groundframepre, parent.PrevFrameparam,
 							 parent.thirdDimension, parent.psf, newlineMserwHough, parent.userChoiceModel, parent.Domask, parent.Intensityratio,
 							parent.Inispacing, parent.seedmap, parent.jpb, parent.thirdDimensionSize);
@@ -180,12 +175,10 @@ public  class Track {
 						
 					}
 					
-				}
 			
 
 			}
 
-			if (parent.showDeterministic) {
 				parent.NewFrameparam = parent.returnVector.getB();
 				
 				ArrayList<Trackproperties> startStateVectors = parent.returnVector.getA().getA();
@@ -208,13 +201,11 @@ public  class Track {
 				
 				parent.Allstart.add(startStateVectors);
 				parent.Allend.add(endStateVectors);
-			}
 
 		
 		
 		}
 
-		if (parent.showDeterministic) {
 
 			if (parent.Allstart.get(0).size() > 0) {
 				ImagePlus impstartsec = ImageJFunctions.show(parent.originalimg);
@@ -250,11 +241,9 @@ public  class Track {
 			}
 			
 
-		}
 
 	
 			
-		if (parent.showDeterministic) {
 
 			ResultsTable rtAll = new ResultsTable();
 			if (parent.Allstart.get(0).size() > 0) {
@@ -886,7 +875,6 @@ public  class Track {
 					parent.redo = false;
 
 			}
-		}
 		if (parent.Kymoimg != null) {
 			ImagePlus newimp = parent.Kymoimp.duplicate();
 			for (int index = 0; index < parent.lengthtime.size() - 1; ++index) {

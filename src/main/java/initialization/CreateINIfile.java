@@ -1,7 +1,12 @@
 package initialization;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.HashMap;
 
+import LineModels.UseLineModel.UserChoiceModel;
 import ij.Prefs;
 import interactiveMT.Interactive_MTDoubleChannel;
 import interactiveMT.Interactive_MTDoubleChannelBasic;
@@ -19,9 +24,12 @@ public class CreateINIfile {
 	
 
 	
+	
 	public void RecordParent(){
 		
-		File fileini = new File(parent.usefolder + "//" + "ConfirmedParams" + ".ini");
+		
+		
+		System.out.println("Prefs directory : " + Prefs.getPrefsDir());
 		
 		Prefs.set("PSFX.double", parent.psf[0]);
 		Prefs.set("PSFY.double", parent.psf[1]);
@@ -61,9 +69,18 @@ public class CreateINIfile {
 			
 		}
 
-
-		Prefs.set("Model.UserChoiceModel", parent.userChoiceModel.toString());
 		
+		
+		
+		if (parent.userChoiceModel == UserChoiceModel.Line)
+
+		Prefs.set("Model.int", 1);
+		
+		if (parent.userChoiceModel == UserChoiceModel.Splineordersec)
+		Prefs.set("Model.int", 2);
+		
+		if (parent.userChoiceModel == UserChoiceModel.Splineorderthird)
+			Prefs.set("Model.int", 3);
 		
 		Prefs.set("Intensityratio.double", parent.Intensityratio);
 		Prefs.set("Inispacing.double", parent.Inispacing);
@@ -91,6 +108,10 @@ public class CreateINIfile {
 		Prefs.set("RoiViaWatershed.boolean", parent.RoisViaWatershed);
 		
 		Prefs.set("SaveTxt.boolean", parent.SaveTxt);
+		
+		Prefs.savePreferences();
+		
+		System.exit(1);
 		
 	}
 	

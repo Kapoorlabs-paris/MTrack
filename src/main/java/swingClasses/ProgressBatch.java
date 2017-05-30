@@ -1,6 +1,8 @@
 package swingClasses;
 
 import java.awt.Rectangle;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.SwingWorker;
@@ -11,6 +13,8 @@ import ij.Prefs;
 import ij.gui.OvalRoi;
 import ij.gui.Overlay;
 import interactiveMT.BatchMode;
+import interactiveMT.Interactive_MTDoubleChannel.ValueChange;
+import interactiveMT.Interactive_MTDoubleChannel.Whichend;
 import lineFinder.FindlinesVia;
 import lineFinder.LinefinderInteractiveHough;
 import lineFinder.LinefinderInteractiveMSER;
@@ -45,7 +49,7 @@ final BatchMode parent;
 		
 		if (parent.parent.FindLinesViaMSER) {
 
-			
+			parent.updatePreview(ValueChange.SHOWMSER);
 			
 			LinefinderInteractiveMSER newlineMser = new LinefinderInteractiveMSER(groundframe, groundframepre,
 					parent.newtree, parent.thirdDimension);
@@ -61,7 +65,7 @@ final BatchMode parent;
 
 	if (parent.parent.FindLinesViaHOUGH) {
 
-		
+		parent.updatePreview(ValueChange.SHOWHOUGH);
 			LinefinderInteractiveHough newlineHough = new LinefinderInteractiveHough(groundframe,
 					groundframepre, parent.intimg, parent.Maxlabel, parent.thetaPerPixel, parent.rhoPerPixel, parent.thirdDimension, parent.jpb);
 
@@ -74,7 +78,8 @@ final BatchMode parent;
 	}
 
 	if (parent.parent.FindLinesViaMSERwHOUGH) {
-		
+		parent.updatePreview(ValueChange.SHOWHOUGH);
+		parent.updatePreview(ValueChange.SHOWMSER);
 			LinefinderInteractiveMSERwHough newlineMserwHough = new LinefinderInteractiveMSERwHough(groundframe,
 					groundframepre, parent.newtree, parent.thirdDimension, parent.thetaPerPixel, parent.rhoPerPixel, parent.jpb);
 		
@@ -134,9 +139,34 @@ final BatchMode parent;
 
 	// After the seed ends are found, the hash map fo both ends to be tracked is created
 	 
-	FinalPoint Allpoints = new FinalPoint(parent.parent);
+
+	Collections.sort(parent.PrevFrameparam.getA(), parent.Seedcompare);
+	Collections.sort(parent.PrevFrameparam.getB(), parent.Seedcompare);
 	
-	 Allpoints.DefaultEnds();
+	int minSeed = parent.PrevFrameparam.getA().get(0).seedLabel;
+	int maxSeed = parent.PrevFrameparam.getA().get(parent.PrevFrameparam.getA().size() - 1).seedLabel;
+
+	for (int i = 0; i < parent.PrevFrameparam.getA().size(); ++i) {
+
+		Pair<Integer, double[]> seedpair = new ValuePair<Integer, double[]>(parent.PrevFrameparam.getA().get(i).seedLabel, parent.PrevFrameparam.getA().get(i).fixedpos);
+		parent.IDALL.add(seedpair);
+		parent.seedmap.put(parent.PrevFrameparam.getA().get(i).seedLabel, Whichend.start);
+		
+	}
+
+	
+	for (int i = 0; i < parent.PrevFrameparam.getB().size(); ++i) {
+
+		Pair<Integer, double[]> seedpair = new ValuePair<Integer, double[]>(parent.PrevFrameparam.getB().get(i).seedLabel, parent.PrevFrameparam.getB().get(i).fixedpos);
+		parent.IDALL.add(seedpair);
+		if (parent.seedmap.get(parent.PrevFrameparam.getA().get(i).seedLabel) == Whichend.start)
+		parent.seedmap.put(parent.PrevFrameparam.getA().get(i).seedLabel, Whichend.both);
+		
+		
+		
+	}
+	
+	
 	
 	 // Now we track it from the first image in the dynamic channel to the last
 	 

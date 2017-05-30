@@ -5,6 +5,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import ij.IJ;
 import ij.ImagePlus;
+import ij.Prefs;
 import ij.io.Opener;
 import net.imglib2.Cursor;
 import net.imglib2.RandomAccess;
@@ -283,9 +284,9 @@ public class FileChooser extends JPanel {
 			chooserB.setFileFilter(filter);
 			chooserB.showOpenDialog(parent);
 			
-			AllMovies = chooserB.getCurrentDirectory().listFiles();
+			AllMovies = chooserB.getSelectedFile().listFiles();
 			
-			
+			System.out.println(chooserB.getSelectedFile());
 
 		}
 

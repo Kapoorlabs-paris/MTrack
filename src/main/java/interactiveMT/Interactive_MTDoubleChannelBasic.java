@@ -72,6 +72,7 @@ import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.util.Pair;
 import net.imglib2.view.Views;
 import updateListeners.DefaultModel;
+import updateListeners.DefaultModelHF;
 import updateListeners.FinalPoint;
 import updateListeners.MoveNextListener;
 import updateListeners.MoveToFrameListener;
@@ -476,6 +477,8 @@ public class Interactive_MTDoubleChannelBasic implements PlugIn {
 		}
 
 		JComboBox<String> cbtrack = new JComboBox<String>(choicestrack);
+		DefaultModelHF loaddefault = new DefaultModelHF(parent);
+		loaddefault.LoadDefault();
 
 		final Button SkipframeandTrackEndPoints = new Button(
 				"TrackEndPoints from user specified first and last timepoint");

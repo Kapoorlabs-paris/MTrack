@@ -85,31 +85,27 @@ public  class TrackBatch {
 				
 
 				parent.updatePreview(ValueChange.SHOWMSER);
-
 				LinefinderInteractiveHFMSER newlineMser = new LinefinderInteractiveHFMSER(groundframe, groundframepre,
 						parent.newtree,  parent.thirdDimension);
-				if (parent.parent.showDeterministic) {
 					parent.returnVector = FindlinesVia.LinefindingMethodHF(groundframe, groundframepre, parent.PrevFrameparam,
-							 parent.thirdDimension, parent.psf, newlineMser, parent.userChoiceModel, parent.Domask, parent.Intensityratio,
-							parent.Inispacing, parent.parent.seedmap, parent.jpb, parent.thirdDimensionSize);
+							 parent.thirdDimension, parent.psf, newlineMser, parent.parent.userChoiceModel, parent.Domask, parent.Intensityratio,
+							parent.Inispacing, parent.seedmap, parent.jpb, parent.thirdDimensionSize);
 					parent.Accountedframes.add(FindlinesVia.getAccountedframes());
 					
 					
 					if(parent.Userframe.size() > 0){
 						
 						parent.returnVectorUser = FindlinesVia.LinefindingMethodHFUser(groundframe, groundframepre, parent.Userframe, parent.thirdDimension,
-								parent.psf, newlineMser, parent.userChoiceModel, parent.Domask, parent.Intensityratio, parent.Inispacing, parent.jpb, parent.thirdDimensionSize);
+								parent.psf, newlineMser, parent.parent.userChoiceModel, parent.Domask, parent.Intensityratio, parent.Inispacing, parent.jpb, parent.thirdDimensionSize);
 						
 						
 					}
-				}
 
 				
 
 			}
 
 			if (parent.parent.FindLinesViaHOUGH) {
-
 				if (index == next) {
 
 					IJ.log("Hough parameters:" + " " + " thirdDimension: " + " " + parent.thirdDimension);
@@ -126,21 +122,19 @@ public  class TrackBatch {
 				LinefinderInteractiveHFHough newlineHough = new LinefinderInteractiveHFHough(parent.parent,groundframe,
 						groundframepre, parent.Maxlabel, parent.thirdDimension);
 				
-				if (parent.parent.showDeterministic) {
 					parent.returnVector = FindlinesVia.LinefindingMethodHF(groundframe, groundframepre, parent.PrevFrameparam,
-							 parent.thirdDimension, parent.psf, newlineHough, parent.userChoiceModel,parent.Domask, parent.Intensityratio,
-							parent.Inispacing, parent.parent.seedmap, parent.jpb, parent.thirdDimensionSize);
+							 parent.thirdDimension, parent.psf, newlineHough, parent.parent.userChoiceModel,parent.Domask, parent.Intensityratio,
+							parent.Inispacing, parent.seedmap, parent.jpb, parent.thirdDimensionSize);
 
 					parent.Accountedframes.add(FindlinesVia.getAccountedframes());
 					
 	                          if(parent.Userframe.size() > 0){
 						
 						parent.returnVectorUser = FindlinesVia.LinefindingMethodHFUser(groundframe, groundframepre, parent.Userframe, parent.thirdDimension,
-								parent.psf, newlineHough, parent.userChoiceModel, parent.Domask, parent.Intensityratio, parent.Inispacing, parent.jpb, parent.thirdDimensionSize);
+								parent.psf, newlineHough, parent.parent.userChoiceModel, parent.Domask, parent.Intensityratio, parent.Inispacing, parent.jpb, parent.thirdDimensionSize);
 						
 						
 					}
-				}
 
 			
 
@@ -163,15 +157,15 @@ public  class TrackBatch {
 						groundframepre, parent.newtree, parent.thirdDimension, parent.thetaPerPixel, parent.rhoPerPixel);
 				if (parent.parent.showDeterministic) {
 					parent.returnVector = FindlinesVia.LinefindingMethodHF(groundframe, groundframepre, parent.PrevFrameparam,
-							 parent.thirdDimension, parent.psf, newlineMserwHough, parent.userChoiceModel, parent.Domask, parent.Intensityratio,
-							parent.Inispacing, parent.parent.seedmap, parent.jpb, parent.thirdDimensionSize);
+							 parent.thirdDimension, parent.psf, newlineMserwHough, parent.parent.userChoiceModel, parent.Domask, parent.Intensityratio,
+							parent.Inispacing, parent.seedmap, parent.jpb, parent.thirdDimensionSize);
 
 					parent.Accountedframes.add(FindlinesVia.getAccountedframes());
 					
                        if(parent.Userframe.size() > 0){
 						
 						parent.returnVectorUser = FindlinesVia.LinefindingMethodHFUser(groundframe, groundframepre, parent.Userframe, parent.thirdDimension,
-								parent.psf, newlineMserwHough, parent.userChoiceModel, parent.Domask, parent.Intensityratio, parent.Inispacing, parent.jpb, parent.thirdDimensionSize);
+								parent.psf, newlineMserwHough, parent.parent.userChoiceModel, parent.Domask, parent.Intensityratio, parent.Inispacing, parent.jpb, parent.thirdDimensionSize);
 						
 						
 					}
@@ -181,7 +175,6 @@ public  class TrackBatch {
 
 			}
 
-			if (parent.parent.showDeterministic) {
 				parent.NewFrameparam = parent.returnVector.getB();
 				
 				ArrayList<Trackproperties> startStateVectors = parent.returnVector.getA().getA();
@@ -204,13 +197,11 @@ public  class TrackBatch {
 				
 				parent.Allstart.add(startStateVectors);
 				parent.Allend.add(endStateVectors);
-			}
 
 		
 		
 		}
 
-		if (parent.parent.showDeterministic) {
 
 			if (parent.Allstart.get(0).size() > 0) {
 				ImagePlus impstartsec = ImageJFunctions.show(parent.originalimg);
@@ -246,11 +237,9 @@ public  class TrackBatch {
 			}
 			
 
-		}
 
 	
 			
-		if (parent.parent.showDeterministic) {
 
 			ResultsTable rtAll = new ResultsTable();
 			if (parent.Allstart.get(0).size() > 0) {
@@ -882,7 +871,6 @@ public  class TrackBatch {
 					parent.redo = false;
 
 			}
-		}
 		if (parent.Kymoimg != null) {
 			ImagePlus newimp = parent.parent.Kymoimp.duplicate();
 			for (int index = 0; index < parent.lengthtime.size() - 1; ++index) {

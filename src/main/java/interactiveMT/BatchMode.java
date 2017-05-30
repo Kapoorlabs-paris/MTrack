@@ -63,6 +63,7 @@ import ij.plugin.PlugIn;
 import ij.plugin.frame.RoiManager;
 import ij.process.ColorProcessor;
 import interactiveMT.Interactive_MTDoubleChannel.ValueChange;
+import interactiveMT.Interactive_MTDoubleChannel.Whichend;
 import labeledObjects.CommonOutputHF;
 import labeledObjects.Indexedlength;
 import listeners.AcceptResultsListener;
@@ -199,10 +200,9 @@ public class BatchMode implements PlugIn {
 	public int thirdDimensionsliderInit = 1;
 	public int timeMin = 1;
 
+	double modelnumber = Prefs.get("Model.int", 3);
 
-    String model = Prefs.getString("Model.UserChoiceModel");
 	
-	public UserChoiceModel userChoiceModel = UserChoiceModel.valueOf(model);
 	public float delta = 1f;
 
 	
@@ -212,12 +212,12 @@ public class BatchMode implements PlugIn {
 	public TextField Maxdpixel;
 	private TextField Maxdmicro;
 	
-	public double[] psf = new double[]{ Prefs.getDouble("PSFX.double",1),Prefs.getDouble("PSFY.double", 1) };
-	public boolean Domask = Prefs.getBoolean("Domask.boolean", true);
-	public double Intensityratio = Prefs.getDouble("Intensityratio.double",0.5);
-	public double Inispacing = Prefs.getDouble("Inispacing.double", 0.5);
-	public double thetaPerPixel = Prefs.getDouble("thetaPerPixel.double", 1.0);
-	public double rhoPerPixel = Prefs.getDouble("rhoPerPixel.double", 1.0);
+	public double[] psf = new double[]{ Prefs.getDouble(".PSFX.double",1),Prefs.getDouble(".PSFY.double", 1) };
+	public boolean Domask = Prefs.getBoolean(".Domask.boolean", true);
+	public double Intensityratio = Prefs.getDouble(".Intensityratio.double",0.5);
+	public double Inispacing = Prefs.getDouble(".Inispacing.double", 0.5);
+	public double thetaPerPixel = Prefs.getDouble(".thetaPerPixel.double", 1.0);
+	public double rhoPerPixel = Prefs.getDouble(".rhoPerPixel.double", 1.0);
 	
 	
 	
@@ -231,11 +231,11 @@ public class BatchMode implements PlugIn {
 	public boolean enablerhoPerPixel = false;
 	
 	
-	public float Unstability_Score = (float) Prefs.getDouble("Unstability_Score.double", 1);
-	public float minDiversity = (float) Prefs.getDouble("minDiversity.double", 1);
+	public float Unstability_Score = (float) Prefs.getDouble(".Unstability_Score.double", 1);
+	public float minDiversity = (float) Prefs.getDouble(".minDiversity.double", 1);
 	
 	
-	public float thresholdHough = (float) Prefs.getDouble("thresholdHough.double", 1);
+	public float thresholdHough = (float) Prefs.getDouble(".thresholdHough.double", 1);
 	
 	
 	
@@ -321,8 +321,9 @@ public class BatchMode implements PlugIn {
 	public RandomAccessibleInterval<FloatType> Kymoimg;
 	public RandomAccessibleInterval<FloatType> CurrentView;
 	public RandomAccessibleInterval<FloatType> CurrentPreprocessedView;
-	public int inix = 1;
-	public int iniy = 1;
+	public int inix = Prefs.getInt(".IniX.int", 1);
+	public int iniy = Prefs.getInt(".IniY.int", 1);
+	
 	public double[] calibration;
 	double radiusfactor = 1;
 	public MserTree<UnsignedByteType> newtree;
@@ -366,12 +367,10 @@ public class BatchMode implements PlugIn {
 	// first and last slice to process
 	int endStack;
 	public int thirdDimension;
+	
+	
 
-	public static enum Whichend {
-
-		start, end, both, none, user;
-	}
-
+	
 	
 	public boolean isFinished = false;
 	public boolean wasCanceled = false;
@@ -418,37 +417,60 @@ public class BatchMode implements PlugIn {
 	@Override
 	public void run(String arg) {
 		
+		if (modelnumber == 1)
+			parent.userChoiceModel = UserChoiceModel.Line;
+		if(modelnumber == 2)
+			parent.userChoiceModel = UserChoiceModel.Splineordersec;
+		else
+			parent.userChoiceModel = UserChoiceModel.Splineorderthird;
 		
-		for (int index = 0; index < AllImages.length; ++index){
+		AllSeedrois = new ArrayList<OvalRoi>();
+		jpb = new JProgressBar();
+		newHoughtree = new HashMap<Integer, MserTree<UnsignedByteType>>();
+		Userframe = new ArrayList<Indexedlength>();
+		AllpreviousRois = new HashMap<Integer, ArrayList<Roi>>();
 		
+		count = 0;
+		overlay = new Overlay();
+		nf.setMaximumFractionDigits(3);
+		
+		
+			int index = 1;
+			
 		File currentfile = AllImages[index];
 		
 		ImagePlus impB = new Opener().openImage(currentfile.getPath());
+		
 		
 		originalimg = ImageJFunctions.convertFloat(impB);
 		
 		originalPreprocessedimg =  util.CopyUtils.Preprocess(originalimg);
 		
+		
+		standardRectangle = new Rectangle(inix, iniy, (int) originalimg.dimension(0) - 2 * inix,
+				(int) originalimg.dimension(1) - 2 * iniy);
+		
 		this.userfile = currentfile.getName().replaceFirst("[.][^.]+$", "");
 		
-		parent.usefolder = Prefs.get("Folder.file", IJ.getDirectory("imagej"));
+		parent.usefolder = Prefs.get(".Folder.file", IJ.getDirectory("imagej"));
 		
-		parent.FindLinesViaMSER = Prefs.getBoolean("FindLinesViaMSER.boolean", false);
+		parent.FindLinesViaMSER = Prefs.getBoolean(".FindLinesViaMSER.boolean", false);
 		
 		parent.doSegmentation = false;
 		parent.doMserSegmentation = false;
-		parent.FindLinesViaHOUGH = Prefs.getBoolean("FindLinesViaHough.boolean", false);
-		parent.FindLinesViaMSERwHOUGH = Prefs.getBoolean("FindLinesViaMSERwHough.boolean", false);
+		parent.FindLinesViaHOUGH = Prefs.getBoolean(".FindLinesViaHough.boolean", false);
+		parent.FindLinesViaMSERwHOUGH = Prefs.getBoolean(".FindLinesViaMSERwHough.boolean", false);
 		
-		parent.ShowMser = Prefs.getBoolean("ShowMser.boolean", false);
-		parent.ShowHough = Prefs.getBoolean("ShowHough.boolean", false);
-		parent.update = Prefs.getBoolean("update.boolean", false);
-		parent.Canny = Prefs.getBoolean("Canny.boolean", false);
 		
-		parent.showDeterministic = Prefs.getBoolean("showDeterministic.boolean", true);
-		parent.RoisViaMSER = Prefs.getBoolean("RoiViaMSER.boolean", false);
-		parent.RoisViaWatershed = Prefs.getBoolean("RoiViaWatershed.boolean", false);
-		parent.SaveTxt = Prefs.getBoolean("SaveTxt.boolean", true);
+		parent.ShowMser = Prefs.getBoolean(".ShowMser.boolean", false);
+		parent.ShowHough = Prefs.getBoolean(".ShowHough.boolean", false);
+		parent.update = Prefs.getBoolean(".update.boolean", false);
+		parent.Canny = Prefs.getBoolean(".Canny.boolean", false);
+		
+		parent.showDeterministic = Prefs.getBoolean(".showDeterministic.boolean", true);
+		parent.RoisViaMSER = Prefs.getBoolean(".RoiViaMSER.boolean", false);
+		parent.RoisViaWatershed = Prefs.getBoolean(".RoiViaWatershed.boolean", false);
+		parent.SaveTxt = Prefs.getBoolean(".SaveTxt.boolean", true);
 		
 		AllSeedrois = new ArrayList<OvalRoi>();
 		jpb = new JProgressBar();
@@ -513,35 +535,35 @@ public class BatchMode implements PlugIn {
 		// add listener to the imageplus slice slider
 		sliceObserver = new SliceObserver(preprocessedimp, new ImagePlusListener());
 		// compute first version#
-		updatePreview(ValueChange.ALL);
+		
 		isStarted = true;
 
 		// check whenever roi is modified to update accordingly
 		roiListener = new RoiListener();
 		preprocessedimp.getCanvas().addMouseListener(roiListener);
 
+		updatePreview(ValueChange.ALL);
 		IJ.log(" Third Dimension Size " + thirdDimensionSize);
 		
 		goTrack();
 		
-		}
 		
-
+		
 	}
+	
 
 
 	public void goTrack(){
 		
-		parent.jpb.setIndeterminate(false);
+		jpb.setIndeterminate(false);
 
-		parent.jpb.setMaximum(parent.max);
-		parent.panel.add(parent.label);
-		parent.panel.add(parent.jpb);
-		parent.frame.add(parent.panel);
-		parent.frame.pack();
-		parent.frame.setSize(200, 100);
-		parent.frame.setLocationRelativeTo(parent.panelCont);
-		parent.frame.setVisible(true);
+		jpb.setMaximum(parent.max);
+		panel.add(label);
+		panel.add(jpb);
+		frame.add(panel);
+		frame.pack();
+		frame.setSize(200, 100);
+		frame.setVisible(true);
 
 		ProgressBatch startbatch = new ProgressBatch(this);
 		startbatch.execute();
@@ -688,6 +710,7 @@ public class BatchMode implements PlugIn {
 				newimg = util.CopyUtils.copytoByteImage(Kernels.CannyEdgeandMean(currentPreprocessedimg, Cannyradius),
 						standardRectangle);
 
+				
 				roiChanged = true;
 
 			}
@@ -862,7 +885,7 @@ public class BatchMode implements PlugIn {
 		isComputing = false;
 
 	}
-
+	
 	public boolean maxStack() {
 		GenericDialog gd = new GenericDialog("Choose Final Frame");
 		if (thirdDimensionSize > 1) {
@@ -1372,4 +1395,6 @@ public class BatchMode implements PlugIn {
 		frame.getContentPane().add(panel, "Center");
 		frame.setSize(panel.getPreferredSize());
 	}
+	
+	
 }
