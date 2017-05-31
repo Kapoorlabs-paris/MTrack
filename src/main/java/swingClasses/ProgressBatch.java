@@ -12,6 +12,7 @@ import java.util.concurrent.ExecutionException;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.SwingWorker;
@@ -84,12 +85,14 @@ final BatchMode parent;
 		
 		
 		
-		for (int fileindex = 1; fileindex < parent.AllImages.length; ++fileindex){
+		for (int fileindex = 0; fileindex < parent.AllImages.length; ++fileindex){
 		
+			
+			parent.parent.addToName = parent.AllImages[fileindex].getName().replaceFirst("[.][^.]+$", "");
 			
 			double percent = Math.round(100 * (fileindex + 1) / (parent.AllImages.length - 1));
 			
-			FitterUtils.SetProgressBarTime(fileprogress, percent, fileindex, (parent.AllImages.length - 1), "Processing File");
+			FitterUtils.SetProgressBarTime(fileprogress, percent, (fileindex + 1 ), (parent.AllImages.length), "Processing File");
 			
 			
 			if (parent.modelnumber == 1)
@@ -240,10 +243,7 @@ final BatchMode parent;
 				roi = parent.preprocessedimp.getRoi();
 			}
 
-			if (roi.getType() != Roi.RECTANGLE) {
-				IJ.log("Only rectangular rois are supported...");
-				return null;
-			}
+		
 
 			// copy the ImagePlus into an ArrayImage<FloatType> for faster access
 			// displaySliders();
@@ -256,7 +256,6 @@ final BatchMode parent;
 			parent.preprocessedimp.getCanvas().addMouseListener(parent.roiListener);
 
 			parent.updatePreview(ValueChange.ALL);
-			IJ.log(" Third Dimension Size " + parent.thirdDimensionSize);
 		
 			
 		
@@ -417,7 +416,8 @@ final BatchMode parent;
 		try {
 			parent.jpb.setIndeterminate(false);
 			get();
-			
+			parent.frame.dispose();
+			JOptionPane.showMessageDialog(parent.jpb.getParent(), "Success", "Success", JOptionPane.INFORMATION_MESSAGE);
 		} catch (ExecutionException | InterruptedException e) {
 			e.printStackTrace();
 		}

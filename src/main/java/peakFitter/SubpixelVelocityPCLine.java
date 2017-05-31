@@ -198,7 +198,7 @@ public class SubpixelVelocityPCLine extends BenchmarkAlgorithm
 			
 			if (Trackstart.get(PrevFrameparamstart.get(index).seedLabel) == Whichend.start
 					|| Trackstart.get(PrevFrameparamstart.get(index).seedLabel) == Whichend.both) {
-				percent = (Math.round(100 * (index + 1) / (PrevFrameparamstart.size())));
+				percent = (Math.round(100 * (index + 1) / (PrevFrameparamstart.size() - 1)));
 
 				final double originalslope = PrevFrameparamstart.get(index).originalslope;
 
@@ -258,7 +258,7 @@ public class SubpixelVelocityPCLine extends BenchmarkAlgorithm
 			if (Trackstart.get(PrevFrameparamend.get(index).seedLabel) == Whichend.end
 					|| Trackstart.get(PrevFrameparamend.get(index).seedLabel) == Whichend.both) {
 
-				percent = (Math.round(100 * (index + 1) / (PrevFrameparamend.size())));
+				percent = (Math.round(100 * (index + 1) / (PrevFrameparamend.size() - 1)));
 
 				Point secondlinepoint = new Point(ndims);
 				secondlinepoint.setPosition(new long[] { (long) PrevFrameparamend.get(index).currentpos[0],
@@ -1268,198 +1268,7 @@ public class SubpixelVelocityPCLine extends BenchmarkAlgorithm
 
 	}
 
-	private void Testerror(final double[] point, int label, int rate) {
+	
 
-		try {
-			FileWriter writer = new FileWriter("../res/error-moving.txt", true);
-			if (rate == 1) {
-				if (label == 0)
-					writer.write(rate + " " + (point[0] - 383.7869900096266) + " " + (point[1] - 214.6620845470553));
-				writer.write("\r\n");
-
-				if (label == 1)
-					writer.write(rate + " " + (point[0] - 406.5606110921211) + " " + (point[1] - 772.7696058689498));
-				writer.write("\r\n");
-				if (label == 4)
-					writer.write(rate + " " + (point[0] - 726.4888354281538) + " " + (point[1] - 175.931829613848));
-				writer.write("\r\n");
-				if (label == 6)
-					writer.write(rate + " " + (point[0] - 826.0305494697972) + " " + (point[1] - 748.4597998409396));
-				writer.write("\r\n");
-				if (label == 8)
-					writer.write(rate + " " + (point[0] - 889.4867734500586) + " " + (point[1] - 398.56288813577913));
-				writer.write("\r\n");
-				if (label == 2)
-					writer.write(rate + " " + (point[0] - 441.74655759707014) + " " + (point[1] - 242.8911171431671));
-				writer.write("\r\n");
-
-				if (label == 3)
-					writer.write(rate + " " + (point[0] - 472.3859943567383) + " " + (point[1] - 797.0381138658016));
-				writer.write("\r\n");
-				if (label == 5)
-					writer.write(rate + " " + (point[0] - 798.1629795446817) + " " + (point[1] - 185.14679594793904));
-				writer.write("\r\n");
-
-				if (label == 7)
-					writer.write(rate + " " + (point[0] - 900.7642251667279) + " " + (point[1] - 749.8423126238637));
-				writer.write("\r\n");
-				if (label == 9)
-					writer.write(rate + " " + (point[0] - 954.8049347521577) + " " + (point[1] - 379.3048166471907));
-				writer.write("\r\n");
-
-			}
-
-			if (rate == 2) {
-				if (label == 0)
-					writer.write(rate + " " + (point[0] - 380.353507802382) + " " + (point[1] - 213.0539454407681));
-				writer.write("\r\n");
-
-				if (label == 1)
-					writer.write(rate + " " + (point[0] - 403.1271288848765) + " " + (point[1] - 771.5547418672202));
-				writer.write("\r\n");
-				if (label == 4)
-					writer.write(rate + " " + (point[0] - 723.0553532209092) + " " + (point[1] - 175.52440736347455));
-				writer.write("\r\n");
-				if (label == 6)
-					writer.write(rate + " " + (point[0] - 822.5970672625525) + " " + (point[1] - 748.4798964103497));
-				writer.write("\r\n");
-				if (label == 7)
-					writer.write(rate + " " + (point[0] - 886.053291242814) + " " + (point[1] - 399.66197560921444));
-				writer.write("\r\n");
-				if (label == 2)
-					writer.write(rate + " " + (point[0] - 449.89687874290297) + " " + (point[1] - 249.07035580540654));
-				writer.write("\r\n");
-
-				if (label == 3)
-					writer.write(rate + " " + (point[0] - 479.92781431064776) + " " + (point[1] - 801.768490518385));
-				writer.write("\r\n");
-				if (label == 5)
-					writer.write(rate + " " + (point[0] - 802.1351123735927) + " " + (point[1] - 186.44647186352123));
-				writer.write("\r\n");
-
-				if (label == 8)
-					writer.write(rate + " " + (point[0] - 912.7640196182127) + " " + (point[1] - 754.4519161093077));
-				writer.write("\r\n");
-				if (label == 9)
-					writer.write(rate + " " + (point[0] - 967.1860579991517) + " " + (point[1] - 380.05819504153664));
-				writer.write("\r\n");
-
-			}
-			if (rate == 3) {
-				if (label == 0)
-					writer.write(rate + " " + (point[0] - 377.19947344282707) + " " + (point[1] - 211.576691245167));
-				writer.write("\r\n");
-
-				if (label == 1)
-					writer.write(rate + " " + (point[0] - 399.9730945253216) + " " + (point[1] - 770.4387544898699));
-				writer.write("\r\n");
-				if (label == 4)
-					writer.write(rate + " " + (point[0] - 719.9013188613543) + " " + (point[1] - 175.1501448221357));
-				writer.write("\r\n");
-				if (label == 6)
-					writer.write(rate + " " + (point[0] - 819.4430329029976) + " " + (point[1] - 748.4983573391104));
-				writer.write("\r\n");
-				if (label == 7)
-					writer.write(rate + " " + (point[0] - 882.8992568832591) + " " + (point[1] - 400.67160939967266));
-				writer.write("\r\n");
-				if (label == 2)
-					writer.write(rate + " " + (point[0] - 456.23601741188406) + " " + (point[1] - 254.79493727052903));
-				writer.write("\r\n");
-
-				if (label == 3)
-					writer.write(rate + " " + (point[0] - 485.58417927607985) + " " + (point[1] - 806.0628105156728));
-				writer.write("\r\n");
-				if (label == 5)
-					writer.write(rate + " " + (point[0] - 806.1072452025038) + " " + (point[1] - 188.0617045633137));
-				writer.write("\r\n");
-
-				if (label == 8)
-					writer.write(rate + " " + (point[0] - 924.7638140696976) + " " + (point[1] - 761.9414209323095));
-				writer.write("\r\n");
-				if (label == 9)
-					writer.write(rate + " " + (point[0] - 979.5671812461457) + " " + (point[1] - 383.87741769302727));
-				writer.write("\r\n");
-
-			}
-			if (rate == 4) {
-				if (label == 0)
-					writer.write(rate + " " + (point[0] - 374.4506283277463) + " " + (point[1] - 210.28921542328547));
-				writer.write("\r\n");
-
-				if (label == 1)
-					writer.write(rate + " " + (point[0] - 397.2242494102408) + " " + (point[1] - 769.4661346319322));
-				writer.write("\r\n");
-				if (label == 4)
-					writer.write(rate + " " + (point[0] - 717.1524737462735) + " " + (point[1] - 174.82396265630092));
-				writer.write("\r\n");
-				if (label == 6)
-					writer.write(rate + " " + (point[0] - 816.6941877879168) + " " + (point[1] - 748.5144466482486));
-				writer.write("\r\n");
-				if (label == 7)
-					writer.write(rate + " " + (point[0] - 880.1504117681783) + " " + (point[1] - 401.55153859401196));
-				writer.write("\r\n");
-				if (label == 2)
-					writer.write(rate + " " + (point[0] - 460.7639736040134) + " " + (point[1] - 259.375981325999));
-				writer.write("\r\n");
-
-				if (label == 3)
-					writer.write(rate + " " + (point[0] - 489.3550892530346) + " " + (point[1] - 809.2811845652224));
-				writer.write("\r\n");
-				if (label == 5)
-					writer.write(rate + " " + (point[0] - 809.0863448241871) + " " + (point[1] - 189.48021322779607));
-				writer.write("\r\n");
-
-				if (label == 8)
-					writer.write(rate + " " + (point[0] - 934.7636427792683) + " " + (point[1] - 770.3825995843341));
-				writer.write("\r\n");
-				if (label == 9)
-					writer.write(rate + " " + (point[0] - 989.0911222053718) + " " + (point[1] - 388.9015066531777));
-				writer.write("\r\n");
-
-			}
-
-			if (rate == 5) {
-				if (label == 0)
-					writer.write(rate + " " + (point[0] - 372.2165602373956) + " " + (point[1] - 209.24284557327698));
-				writer.write("\r\n");
-
-				if (label == 1)
-					writer.write(rate + " " + (point[0] - 394.9901813198901) + " " + (point[1] - 768.6756575778634));
-				writer.write("\r\n");
-				if (label == 4)
-					writer.write(rate + " " + (point[0] - 714.9184056559228) + " " + (point[1] - 174.55886471959468));
-				writer.write("\r\n");
-				if (label == 6)
-					writer.write(rate + " " + (point[0] - 814.4601196975661) + " " + (point[1] - 748.5275229077819));
-				writer.write("\r\n");
-				if (label == 7)
-					writer.write(rate + " " + (point[0] - 877.9163436778276) + " " + (point[1] - 402.2666831920311));
-				writer.write("\r\n");
-				if (label == 2)
-					writer.write(rate + " " + (point[0] - 464.3863385577169) + " " + (point[1] - 263.336050947176));
-				writer.write("\r\n");
-
-				if (label == 3)
-					writer.write(rate + " " + (point[0] - 493.1259992299893) + " " + (point[1] - 812.7839538558577));
-				writer.write("\r\n");
-				if (label == 5)
-					writer.write(rate + " " + (point[0] - 810.0793780314149) + " " + (point[1] - 189.99249404731648));
-				writer.write("\r\n");
-
-				if (label == 8)
-					writer.write(rate + " " + (point[0] - 942.7635057469248) + " " + (point[1] - 778.5754931747326));
-				writer.write("\r\n");
-				if (label == 9)
-					writer.write(rate + " " + (point[0] - 997.6626690686753) + " " + (point[1] - 394.9742499361645));
-				writer.write("\r\n");
-
-			}
-
-			writer.close();
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-	}
+	
 }

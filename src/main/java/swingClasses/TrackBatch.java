@@ -55,8 +55,13 @@ public  class TrackBatch {
 		for (int index = next; index <= endtime; ++index) {
 
 			
-			if (index == endtime)
+			if (index == endtime){
 			parent.panel.remove(parent.jpb);
+			
+			if (parent.preprocessedimp!=null)
+				parent.preprocessedimp.clone();
+			
+			}
 			
 			Kalmancount++;
 
@@ -214,36 +219,21 @@ public  class TrackBatch {
 
 
 			if (parent.Allstart.get(0).size() > 0) {
-				ImagePlus impstartsec = ImageJFunctions.show(parent.originalimg);
 				final Trackstart trackerstart = new Trackstart(parent.Allstart, parent.thirdDimensionSize - next);
 				trackerstart.process();
-				SimpleWeightedGraph<double[], DefaultWeightedEdge> graphstart = trackerstart.getResult();
-				DisplayGraph displaygraphtrackstart = new DisplayGraph(impstartsec, graphstart);
-				displaygraphtrackstart.getImp();
-				impstartsec.draw();
-				impstartsec.setTitle("Graph Start A MT");
+			
 			}
 			if (parent.Allend.get(0).size() > 0) {
-				ImagePlus impendsec = ImageJFunctions.show(parent.originalimg);
 				final Trackend trackerend = new Trackend(parent.Allend, parent.thirdDimensionSize - next);
 
 				trackerend.process();
-				SimpleWeightedGraph<double[], DefaultWeightedEdge> graphend = trackerend.getResult();
-				DisplayGraph displaygraphtrackend = new DisplayGraph(impendsec, graphend);
-				displaygraphtrackend.getImp();
-				impendsec.draw();
-				impendsec.setTitle("Graph Start B MT");
+				
 			}
 			
 			if (parent.returnVectorUser != null  && parent.AllUser.get(0).size() > 0) {
-				ImagePlus impstartsec = ImageJFunctions.show(parent.originalimg);
 				final Trackstart trackerstart = new Trackstart(parent.AllUser, parent.thirdDimensionSize - next);
 				trackerstart.process();
-				SimpleWeightedGraph<double[], DefaultWeightedEdge> graphstart = trackerstart.getResult();
-				DisplayGraph displaygraphtrackstart = new DisplayGraph(impstartsec, graphstart);
-				displaygraphtrackstart.getImp();
-				impstartsec.draw();
-				impstartsec.setTitle("Graph Start User MT");
+				
 			}
 			
 
@@ -327,10 +317,9 @@ public  class TrackBatch {
 					}
 				}
 				for (int seedID = MinSeedLabel; seedID <= MaxSeedLabel; ++seedID) {
-					if (parent.parent.SaveTxt) {
 						try {
 							File fichier = new File(
-									parent.parent.usefolder + "//" + parent.addToName + "SeedLabel" + seedID + "-endA" + ".txt");
+									parent.batchfolder  + "//" + " Batch_Processed" + parent.parent.addToName + "SeedLabel" + seedID + "-endA" + ".txt");
 
 							FileWriter fw = new FileWriter(fichier);
 							BufferedWriter bw = new BufferedWriter(fw);
@@ -369,7 +358,6 @@ public  class TrackBatch {
 
 						} catch (IOException e) {
 						}
-					}
 				}
 				for (int index = 0; index < parent.startlengthlist.size(); ++index) {
 
@@ -478,10 +466,9 @@ public  class TrackBatch {
 
 				}
 				for (int seedID = MinSeedLabel; seedID <= MaxSeedLabel; ++seedID) {
-					if (parent.parent.SaveTxt) {
 						try {
 							File fichier = new File(
-									parent.parent.usefolder + "//" + parent.addToName + "SeedLabel" + seedID + "-endB" + ".txt");
+									parent.batchfolder + "//" + " Batch_Processed" +  parent.parent.addToName + "SeedLabel" + seedID + "-endB" + ".txt");
 
 							FileWriter fw = new FileWriter(fichier);
 							BufferedWriter bw = new BufferedWriter(fw);
@@ -492,7 +479,6 @@ public  class TrackBatch {
 
 							for (int index = 0; index < parent.endlengthlist.size(); ++index) {
 
-								
 								
 								if (parent.endlengthlist.get(index).seedid == seedID ) {
 									if (index > 0 && parent.endlengthlist.get(index).currentpointpixel[0] != parent.endlengthlist.get(index - 1).currentpointpixel[0]
@@ -520,7 +506,6 @@ public  class TrackBatch {
 
 						} catch (IOException e) {
 						}
-					}
 				}
 				for (int index = 0; index < parent.endlengthlist.size(); ++index) {
 
@@ -621,10 +606,9 @@ public  class TrackBatch {
 					}
 				}
 				for (int seedID = MinSeedLabel; seedID <= MaxSeedLabel; ++seedID) {
-					if (parent.parent.SaveTxt) {
 						try {
 							File fichier = new File(
-									parent.parent.usefolder + "//" + parent.addToName + "SeedLabel" + seedID + "-Usermarked" + ".txt");
+									parent.batchfolder  + "//"+ " Batch_Processed" + parent.parent.addToName + "SeedLabel" + seedID + "-Usermarked" + ".txt");
 
 							FileWriter fw = new FileWriter(fichier);
 							BufferedWriter bw = new BufferedWriter(fw);
@@ -658,7 +642,6 @@ public  class TrackBatch {
 
 						} catch (IOException e) {
 						}
-					}
 				}
 				for (int index = 0; index < parent.userlengthlist.size(); ++index) {
 
@@ -685,7 +668,7 @@ public  class TrackBatch {
 			
 			
 			
-			rtAll.show("Start and End of MT");
+			//rtAll.show("Start and End of MT");
 			if (parent.lengthtimestart != null)
 				parent.lengthtime =parent. lengthtimestart;
 			else
@@ -835,7 +818,7 @@ public  class TrackBatch {
 				}
 
 				FileWriter deltaw;
-				File fichierKydel = new File(parent.parent.usefolder + "//" + parent.addToName + "MTtracker-deltad" + ".txt");
+				File fichierKydel = new File(parent.batchfolder + "//" + " Batch_Processed" + parent.parent.addToName + "MTtracker-deltad" + ".txt");
 
 				try {
 					deltaw = new FileWriter(fichierKydel);
@@ -907,7 +890,7 @@ public  class TrackBatch {
 		parent.displaystack();
 		if (parent.displayoverlay) {
 			parent.prestack.deleteLastSlice();
-			new ImagePlus("Overlays", parent.prestack).show();
+			new ImagePlus(parent.parent.addToName, parent.prestack).show();
 		}
 
 	}

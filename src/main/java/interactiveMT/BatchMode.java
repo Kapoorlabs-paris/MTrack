@@ -60,7 +60,6 @@ import ij.gui.Roi;
 import ij.io.Opener;
 import ij.plugin.Macro_Runner;
 import ij.plugin.PlugIn;
-import ij.plugin.frame.RoiManager;
 import ij.process.ColorProcessor;
 import interactiveMT.Interactive_MTDoubleChannel.ValueChange;
 import interactiveMT.Interactive_MTDoubleChannel.Whichend;
@@ -133,7 +132,6 @@ public class BatchMode implements PlugIn {
 
 	public final Interactive_MTDoubleChannel parent;
 	public ColorProcessor cp = null;
-	public String addToName = "MTTrack";
 	public ArrayList<float[]> deltadstart = new ArrayList<>();
 	public ArrayList<float[]> deltadend = new ArrayList<>();
 	public ArrayList<float[]> deltad = new ArrayList<>();
@@ -142,22 +140,19 @@ public class BatchMode implements PlugIn {
 	public final int scrollbarSizebig = 1000;
 	public boolean AdvancedChoice = false;
 	public boolean AdvancedChoiceSeeds = false;
-	
+
 	boolean Simplemode = false;
 	boolean Advancedmode = false;
 	boolean Kymomode = false;
-	
+
 	// steps per octave
 	public static int standardSensitivity = 4;
 	public int sensitivity = standardSensitivity;
-	
+
 	public MouseListener ml;
 	public MouseListener removeml;
 	public OvalRoi Seedroi;
 	public ArrayList<OvalRoi> AllSeedrois;
-	
-	
-	
 
 	public int radiusseed = 5;
 	public JLabel inputLabelX;
@@ -166,11 +161,9 @@ public class BatchMode implements PlugIn {
 	public TextField inputFieldX;
 	public TextField inputFieldY;
 	public TextField inputFieldT;
-	
+
 	public JProgressBar jpb;
-	
-	
-	
+
 	public JLabel label = new JLabel("Progress..");
 	public JFrame frame = new JFrame();
 	public JPanel panel = new JPanel();
@@ -178,68 +171,55 @@ public class BatchMode implements PlugIn {
 	public int Progressmax = 100;
 	public int max = Progressmax;
 	public float deltadcutoff = 5;
-	
-	
+
 	public boolean analyzekymo = false;
 	public boolean darktobright = false;
 	public boolean displayBitimg = false;
 	public boolean displayWatershedimg = false;
 	public boolean displayoverlay = true;
-	
-	
+
 	public long minSize = (long) Prefs.getDouble(".minSize.double", 1);
 	public long maxSize = (long) Prefs.getDouble(".maxSize.double", 10000);
-	
-	
-	
+
 	public int selectedSeed = 0;
 	public int displayselectedSeed;
 	public double netdeltad = 0;
-	
+
 	public int thirdDimensionslider = 1;
 	public int thirdDimensionsliderInit = 1;
 	public int timeMin = 1;
 
 	public double modelnumber = Prefs.get(".Model.int", 3);
 
-	
 	public float delta = 1f;
-
-	
 
 	public JLabel inputMaxdpixel;
 	public JLabel inputMaxdmicro;
 	public TextField Maxdpixel;
 	private TextField Maxdmicro;
-	
-	public double[] psf = new double[]{ Prefs.getDouble(".PSFX.double",1),Prefs.getDouble(".PSFY.double", 1) };
+
+	public double[] psf = new double[] { Prefs.getDouble(".PSFX.double", 1), Prefs.getDouble(".PSFY.double", 1) };
 	public boolean Domask = Prefs.getBoolean(".Domask.boolean", true);
-	public double Intensityratio = Prefs.getDouble(".Intensityratio.double",0.5);
+	public double Intensityratio = Prefs.getDouble(".Intensityratio.double", 0.5);
 	public double Inispacing = Prefs.getDouble(".Inispacing.double", 0.5);
 	public double thetaPerPixel = Prefs.getDouble(".thetaPerPixel.double", 1.0);
 	public double rhoPerPixel = Prefs.getDouble(".rhoPerPixel.double", 1.0);
-	
-	
-	
+
 	public String userfile;
 	public int starttimetrack;
 	public int endtimetrack;
 
 	public int radius = 1;
 	public long Size = 1;
-	
+
 	public boolean enablerhoPerPixel = false;
-	
-	
+
+	public String batchfolder;
 	public float Unstability_Score = (float) Prefs.getDouble(".Unstability_Score.double", 1);
 	public float minDiversity = (float) Prefs.getDouble(".minDiversity.double", 1);
-	
-	
+
 	public float thresholdHough = (float) Prefs.getDouble(".thresholdHough.double", 1);
-	
-	
-	
-	
+
 	public Color colorDraw = Color.red;
 	public Color colorCurrent = Color.yellow;
 	public Color colorTrack = Color.yellow;
@@ -247,24 +227,19 @@ public class BatchMode implements PlugIn {
 	public Color colorUnselect = Color.MAGENTA;
 	public Color colorConfirm = Color.GREEN;
 	public Color colorUser = Color.ORANGE;
-	
-	
-	
+
 	public FloatType minval = new FloatType(0);
 	public FloatType maxval = new FloatType(1);
 	public SliceObserver sliceObserver;
 	public RoiListener roiListener;
-	
-	
+
 	public boolean numberKymo = false;
 	public boolean numberTracker = true;
 	public boolean isComputing = false;
 	public boolean isStarted = false;
 	public boolean redo = false;
 	public boolean redoAccept = false;
-	
 
-	
 	public boolean displayTree = false;
 	public boolean GaussianLines = true;
 	public boolean Mediancurr = false;
@@ -287,13 +262,10 @@ public class BatchMode implements PlugIn {
 	public MTTracker MTtrackerstart;
 	public MTTracker MTtrackerend;
 
-
 	public int maxghost = 1;
-
 
 	public double sumlengthpixel = 0;
 	public double sumlengthmicro = 0;
-
 
 	public Overlay overlay;
 	public HashMap<Integer, Boolean> whichend = new HashMap<Integer, Boolean>();
@@ -312,10 +284,9 @@ public class BatchMode implements PlugIn {
 	public int channel = 0;
 	public int thirdDimensionSize;
 	public int thirdDimensionSizeOriginal;
-	
-	
+
 	public final File[] AllImages;
-	
+
 	public RandomAccessibleInterval<FloatType> originalimg;
 	public RandomAccessibleInterval<FloatType> originalPreprocessedimg;
 	public RandomAccessibleInterval<FloatType> Kymoimg;
@@ -323,7 +294,7 @@ public class BatchMode implements PlugIn {
 	public RandomAccessibleInterval<FloatType> CurrentPreprocessedView;
 	public int inix = Prefs.getInt(".IniX.int", 1);
 	public int iniy = Prefs.getInt(".IniY.int", 1);
-	
+
 	public double[] calibration;
 	public double radiusfactor = 1;
 	public MserTree<UnsignedByteType> newtree;
@@ -367,11 +338,7 @@ public class BatchMode implements PlugIn {
 	// first and last slice to process
 	public int endStack;
 	public int thirdDimension;
-	
-	
 
-	
-	
 	public boolean isFinished = false;
 	public boolean wasCanceled = false;
 	public int detcount = 0;
@@ -387,63 +354,33 @@ public class BatchMode implements PlugIn {
 		return wasCanceled;
 	}
 
-	
-	
-	
-	
-	public String getFile() {
-
-		return addToName;
-	}
-
 	public BatchMode() {
 		this.parent = null;
 		this.AllImages = null;
 	};
 
-	
-	public BatchMode(final File[] AllImages, final Interactive_MTDoubleChannel parent ){
-		
-		
+	public BatchMode(final File[] AllImages, final Interactive_MTDoubleChannel parent, final File batchdirectory) {
+
 		this.AllImages = AllImages;
 		this.parent = parent;
-		
-		
+		this.batchfolder = batchdirectory.getParent();
+
 	}
-	
-	
-	
 
 	@Override
 	public void run(String arg) {
-		
-		
-		
-		
-			
-			
-		
-		
+
 		goTrack();
-		
-		
-		
+
 	}
-	
 
-
-	public void goTrack(){
-		
-		
+	public void goTrack() {
 
 		ProgressBatch startbatch = new ProgressBatch(this);
 		startbatch.execute();
-		
-		
+
 	}
-	
-	
-	
+
 	/**
 	 * Updates the Preview with the current parameters (sigma, threshold, roi,
 	 * slicenumber)
@@ -483,11 +420,7 @@ public class BatchMode implements PlugIn {
 			preprocessedimp.setTitle("Original image Current View in third dimension: " + " " + thirdDimension);
 		}
 
-		RoiManager roimanager = RoiManager.getInstance();
-
-		if (roimanager == null) {
-			roimanager = new RoiManager();
-		}
+		
 
 		if (change == ValueChange.THIRDDIMTrack) {
 
@@ -565,11 +498,8 @@ public class BatchMode implements PlugIn {
 				roiChanged = true;
 			}
 
-			
-
 			if (roiChanged || currentimg == null || currentPreprocessedimg == null || newimg == null
-					|| change == ValueChange.FRAME  || change == ValueChange.ALL) {
-				
+					|| change == ValueChange.FRAME || change == ValueChange.ALL) {
 
 				long[] min = { (long) standardRectangle.getMinX(), (long) standardRectangle.getMinY() };
 				long[] max = { (long) standardRectangle.getMaxX(), (long) standardRectangle.getMaxY() };
@@ -581,7 +511,6 @@ public class BatchMode implements PlugIn {
 				newimg = util.CopyUtils.copytoByteImage(Kernels.CannyEdgeandMean(currentPreprocessedimg, Cannyradius),
 						standardRectangle);
 
-				
 				roiChanged = true;
 
 			}
@@ -617,8 +546,8 @@ public class BatchMode implements PlugIn {
 				RandomAccessibleInterval<UnsignedByteType> newimg = util.CopyUtils.copytoByteImage(
 						Kernels.CannyEdgeandMean(roiimg, Cannyradius), intimg, standardRectangle, label);
 
-				MserTree<UnsignedByteType> newtree = MserTree.buildMserTree(newimg, delta, minSize, maxSize, Unstability_Score,
-						minDiversity, darktobright);
+				MserTree<UnsignedByteType> newtree = MserTree.buildMserTree(newimg, delta, minSize, maxSize,
+						Unstability_Score, minDiversity, darktobright);
 
 				Rois = util.DrawingUtils.getcurrentRois(newtree, meanCovar);
 				AllmeanCovar.addAll(meanCovar);
@@ -644,7 +573,6 @@ public class BatchMode implements PlugIn {
 
 						overlay.add(or);
 
-						roimanager.addRoi(or);
 
 					}
 				}
@@ -664,8 +592,7 @@ public class BatchMode implements PlugIn {
 			currentimg = util.CopyUtils.extractImage(CurrentView, interval);
 			currentPreprocessedimg = util.CopyUtils.extractImage(CurrentPreprocessedView, interval);
 
-			newimg = util.CopyUtils.copytoByteImage(currentPreprocessedimg,
-					standardRectangle);
+			newimg = util.CopyUtils.copytoByteImage(currentPreprocessedimg, standardRectangle);
 
 			RandomAccessibleInterval<BitType> bitimg = new ArrayImgFactory<BitType>().create(newimg, new BitType());
 			GetLocalmaxmin.ThresholdingBit(newimg, bitimg, thresholdHough);
@@ -706,7 +633,8 @@ public class BatchMode implements PlugIn {
 			newimg = util.CopyUtils.copytoByteImage(Kernels.CannyEdgeandMean(currentPreprocessedimg, Cannyradius),
 					standardRectangle);
 
-			newtree = MserTree.buildMserTree(newimg, delta, minSize, maxSize, Unstability_Score, minDiversity, darktobright);
+			newtree = MserTree.buildMserTree(newimg, delta, minSize, maxSize, Unstability_Score, minDiversity,
+					darktobright);
 			Rois = util.DrawingUtils.getcurrentRois(newtree, AllmeanCovar);
 
 			AllMSERrois.put(thirdDimension, Rois);
@@ -741,7 +669,6 @@ public class BatchMode implements PlugIn {
 
 					overlay.add(or);
 
-					roimanager.addRoi(or);
 
 				}
 
@@ -756,7 +683,7 @@ public class BatchMode implements PlugIn {
 		isComputing = false;
 
 	}
-	
+
 	public boolean maxStack() {
 		GenericDialog gd = new GenericDialog("Choose Final Frame");
 		if (thirdDimensionSize > 1) {
@@ -775,157 +702,10 @@ public class BatchMode implements PlugIn {
 
 	}
 
-	
-
-	protected class ConfirmDirectoryListener implements ActionListener {
-
-		final TextField filename;
-
-		public ConfirmDirectoryListener(TextField filename) {
-
-			this.filename = filename;
-
-		}
-
-		@Override
-		public void actionPerformed(final ActionEvent arg0) {
-
-			addToName = filename.getText();
-
-		}
-
-	}
-
-	
-	public boolean moveDialogue() {
-		GenericDialog gd = new GenericDialog("Choose Frame");
-
-		if (thirdDimensionSize > 1) {
-			gd.addNumericField("Move to frame", thirdDimension, 0);
-
-		}
-
-		gd.showDialog();
-		if (thirdDimensionSize > 1) {
-			thirdDimension = (int) gd.getNextNumber();
-
-		}
-		return !gd.wasCanceled();
-	}
-
-	private boolean Dialogue() {
-		GenericDialog gd = new GenericDialog("Move in time");
-
-		if (thirdDimensionSize > 1) {
-			gd.addNumericField("Move in time", thirdDimension, 0);
-
-		}
-
-		gd.showDialog();
-		if (thirdDimensionSize > 1) {
-			thirdDimension = (int) gd.getNextNumber();
-
-			if (thirdDimension < thirdDimensionSize)
-				thirdDimensionslider = thirdDimension;
-			else
-				thirdDimensionslider = thirdDimensionSize;
-		}
-		return !gd.wasCanceled();
-	}
-
 	protected static int computeIntScrollbarPositionFromValue(final float thirdDimensionslider, final float min,
 			final float max, final int scrollbarSize) {
 		return Util.round(((thirdDimensionslider - min) / (max - min)) * max);
 	}
-
-	protected class moveInThirdDimListener implements ActionListener {
-		final float min, max;
-		Label timeText;
-		final Scrollbar thirdDimensionScroll;
-
-		public moveInThirdDimListener(Scrollbar thirdDimensionScroll, Label timeText, float min, float max) {
-			this.thirdDimensionScroll = thirdDimensionScroll;
-			this.min = min;
-			this.max = max;
-			this.timeText = timeText;
-		}
-
-		@Override
-		public void actionPerformed(final ActionEvent arg0) {
-
-			boolean dialog = Dialogue();
-			if (dialog) {
-
-				thirdDimensionScroll
-						.setValue(computeIntScrollbarPositionFromValue(thirdDimension, min, max, scrollbarSize));
-				timeText.setText("Time index = " + thirdDimensionslider);
-
-				if (thirdDimension > thirdDimensionSize) {
-					IJ.log("Max frame number exceeded, moving to last frame instead");
-					thirdDimension = thirdDimensionSize;
-					CurrentView = util.CopyUtils.getCurrentView(originalimg, thirdDimension, thirdDimensionSize);
-					CurrentPreprocessedView = util.CopyUtils.getCurrentPreView(originalPreprocessedimg, thirdDimension,
-							thirdDimensionSize);
-
-				} else {
-
-					CurrentView = util.CopyUtils.getCurrentView(originalimg, thirdDimension, thirdDimensionSize);
-					CurrentPreprocessedView = util.CopyUtils.getCurrentPreView(originalPreprocessedimg, thirdDimension,
-							thirdDimensionSize);
-
-				}
-
-				// compute first version
-				updatePreview(ValueChange.THIRDDIM);
-
-			}
-		}
-	}
-
-	protected class SaveasTXT implements ItemListener {
-
-		@Override
-		public void itemStateChanged(ItemEvent arg0) {
-			if (arg0.getStateChange() == ItemEvent.DESELECTED)
-				parent.SaveTxt = false;
-
-			else if (arg0.getStateChange() == ItemEvent.SELECTED)
-				parent.SaveTxt = true;
-
-		}
-
-	}
-
-	
-
-	public boolean DialogueAnalysis() {
-
-		GenericDialog gd = new GenericDialog("Analyze");
-
-		gd.addNumericField("Start time of event", parent.starttime, 0);
-		gd.addNumericField("Enfd time of event", parent.endtime, 0);
-
-		gd.addCheckbox("Compute Velocity from Kymograph", numberKymo);
-
-		gd.addCheckbox("Compute Velocity by Tracker", numberTracker);
-
-		gd.showDialog();
-
-		parent.starttime = (int) gd.getNextNumber();
-		parent.endtime = (int) gd.getNextNumber();
-		numberKymo = gd.getNextBoolean();
-		numberTracker = gd.getNextBoolean();
-
-		if (parent.starttime < 0)
-			parent.starttime = 0;
-		if (parent.endtime > thirdDimensionSize)
-			parent.endtime = thirdDimensionSize;
-
-		return !gd.wasCanceled();
-
-	}
-
-
 
 	public Comparator<Indexedlength> Seedcompare = new Comparator<Indexedlength>() {
 
@@ -949,116 +729,6 @@ public class BatchMode implements PlugIn {
 
 	};
 
-	
-
-	public ImagePlus getImp() {
-		return this.imp;
-	}
-
-	protected class FinishedButtonListener implements ActionListener {
-		final Frame parent;
-		final boolean cancel;
-
-		public FinishedButtonListener(Frame parent, final boolean cancel) {
-			this.parent = parent;
-			this.cancel = cancel;
-		}
-
-		@Override
-		public void actionPerformed(final ActionEvent arg0) {
-			wasCanceled = cancel;
-			close(parent, sliceObserver, roiListener);
-		}
-	}
-
-	protected class DoneandmovebackButtonListener implements ActionListener {
-		final Frame parent;
-		final boolean cancel;
-
-		public DoneandmovebackButtonListener(Frame parent, final boolean cancel) {
-			this.parent = parent;
-			this.cancel = cancel;
-		}
-
-		@Override
-		public void actionPerformed(final ActionEvent arg0) {
-			wasCanceled = cancel;
-			close(parent, sliceObserver, roiListener);
-			preprocessedimp.setPosition(channel, 0, 1);
-			imp.setPosition(channel, 0, 1);
-
-		}
-	}
-
-	protected class thirdDimensionsliderListener implements AdjustmentListener {
-		final Label label;
-		final float min, max;
-
-		public thirdDimensionsliderListener(final Label label, final float min, final float max) {
-			this.label = label;
-			this.min = min;
-			this.max = max;
-		}
-
-		@Override
-		public void adjustmentValueChanged(final AdjustmentEvent event) {
-			thirdDimensionslider = (int) computeIntValueFromScrollbarPosition(event.getValue(), min, max,
-					scrollbarSize);
-			label.setText("Time index = " + thirdDimensionslider);
-
-			thirdDimension = thirdDimensionslider;
-
-			if (thirdDimension > thirdDimensionSize) {
-				IJ.log("Max frame number exceeded, moving to last frame instead");
-				thirdDimension = thirdDimensionSize;
-				CurrentView = util.CopyUtils.getCurrentView(originalimg, thirdDimension, thirdDimensionSize);
-				CurrentPreprocessedView = util.CopyUtils.getCurrentPreView(originalPreprocessedimg, thirdDimension,
-						thirdDimensionSize);
-			} else {
-				CurrentView = util.CopyUtils.getCurrentView(originalimg, thirdDimension, thirdDimensionSize);
-				CurrentPreprocessedView = util.CopyUtils.getCurrentPreView(originalPreprocessedimg, thirdDimension,
-						thirdDimensionSize);
-
-			}
-
-			/*
-			 * if ((change == ValueChange.ROI || change == ValueChange.SIGMA ||
-			 * change == ValueChange.MINMAX || change == ValueChange.FOURTHDIM
-			 * || change == ValueChange.THRESHOLD && RoisOrig != null)) {
-			 */
-			if (!event.getValueIsAdjusting()) {
-				// compute first version
-				while (isComputing) {
-					SimpleMultiThreading.threadWait(10);
-				}
-				updatePreview(ValueChange.THIRDDIM);
-
-			}
-
-		}
-	}
-
-	public float computeIntValueFromScrollbarPosition(final int scrollbarPosition, final float min, final float max,
-			final int scrollbarSize) {
-		return min + (scrollbarPosition / (max)) * (max - min);
-	}
-
-	protected class FrameListener extends WindowAdapter {
-		final Frame parent;
-
-		public FrameListener(Frame parent) {
-			super();
-			this.parent = parent;
-		}
-
-		@Override
-		public void windowClosing(WindowEvent e) {
-			close(parent, sliceObserver, preprocessedimp, roiListener);
-		}
-	}
-
-	
-
 	public void displaystack() {
 
 		ImagePlus Localimp = ImageJFunctions.show(originalimg);
@@ -1068,97 +738,94 @@ public class BatchMode implements PlugIn {
 			prestack.addSlice(Localimp.getImageStack().getProcessor(i).convertToRGB());
 			cp = (ColorProcessor) (prestack.getProcessor(i).duplicate());
 
-			if (AllMSERrois.get(i)!=null){
-			ArrayList<EllipseRoi> Rois = AllMSERrois.get(i);
-			for (int index = 0; index < Rois.size(); ++index) {
+			if (AllMSERrois.get(i) != null) {
+				ArrayList<EllipseRoi> Rois = AllMSERrois.get(i);
+				for (int index = 0; index < Rois.size(); ++index) {
 
-				EllipseRoi or = Rois.get(index);
+					EllipseRoi or = Rois.get(index);
 
-				or.setStrokeColor(Color.red);
+					or.setStrokeColor(Color.red);
 
-				if (displayoverlay) {
+					if (displayoverlay) {
 
-					cp.setColor(Color.red);
-					cp.setLineWidth(1);
-					cp.draw(or);
-
-				}
-
-			}
-
-			ArrayList<Roi> AllBigRoi = new ArrayList<Roi>();
-
-			if (endlengthlist != null) {
-				for (int secindex = 0; secindex < endlengthlist.size(); ++secindex) {
-
-					if (endlengthlist.get(secindex).framenumber == i) {
-						double[] newendpoint = new double[ndims];
-
-						newendpoint = endlengthlist.get(secindex).currentpointpixel;
-
-						final OvalRoi Bigroi = new OvalRoi(Util.round(newendpoint[0] - 2.5),
-								Util.round(newendpoint[1] - 2.5), Util.round(5), Util.round(5));
-						AllBigRoi.add(Bigroi);
+						cp.setColor(Color.red);
+						cp.setLineWidth(1);
+						cp.draw(or);
 
 					}
 
 				}
-			}
 
-			if (startlengthlist != null) {
-				for (int secindex = 0; secindex < startlengthlist.size(); ++secindex) {
+				ArrayList<Roi> AllBigRoi = new ArrayList<Roi>();
 
-					if (startlengthlist.get(secindex).framenumber == i) {
-						double[] newstartpoint = new double[ndims];
+				if (endlengthlist != null) {
+					for (int secindex = 0; secindex < endlengthlist.size(); ++secindex) {
 
-						newstartpoint = startlengthlist.get(secindex).currentpointpixel;
+						if (endlengthlist.get(secindex).framenumber == i) {
+							double[] newendpoint = new double[ndims];
 
-						final OvalRoi Bigroi = new OvalRoi(Util.round(newstartpoint[0] - 2.5),
-								Util.round(newstartpoint[1] - 2.5), Util.round(5), Util.round(5));
+							newendpoint = endlengthlist.get(secindex).currentpointpixel;
 
-						AllBigRoi.add(Bigroi);
+							final OvalRoi Bigroi = new OvalRoi(Util.round(newendpoint[0] - 2.5),
+									Util.round(newendpoint[1] - 2.5), Util.round(5), Util.round(5));
+							AllBigRoi.add(Bigroi);
 
-					}
-
-				}
-			}
-
-			if (userlengthlist != null) {
-				for (int secindex = 0; secindex < userlengthlist.size(); ++secindex) {
-
-					if (userlengthlist.get(secindex).framenumber == i) {
-						double[] newstartpoint = new double[ndims];
-
-						newstartpoint = userlengthlist.get(secindex).currentpointpixel;
-
-						final OvalRoi Bigroi = new OvalRoi(Util.round(newstartpoint[0] - 2.5),
-								Util.round(newstartpoint[1] - 2.5), Util.round(5), Util.round(5));
-
-						AllBigRoi.add(Bigroi);
+						}
 
 					}
+				}
+
+				if (startlengthlist != null) {
+					for (int secindex = 0; secindex < startlengthlist.size(); ++secindex) {
+
+						if (startlengthlist.get(secindex).framenumber == i) {
+							double[] newstartpoint = new double[ndims];
+
+							newstartpoint = startlengthlist.get(secindex).currentpointpixel;
+
+							final OvalRoi Bigroi = new OvalRoi(Util.round(newstartpoint[0] - 2.5),
+									Util.round(newstartpoint[1] - 2.5), Util.round(5), Util.round(5));
+
+							AllBigRoi.add(Bigroi);
+
+						}
+
+					}
+				}
+
+				if (userlengthlist != null) {
+					for (int secindex = 0; secindex < userlengthlist.size(); ++secindex) {
+
+						if (userlengthlist.get(secindex).framenumber == i) {
+							double[] newstartpoint = new double[ndims];
+
+							newstartpoint = userlengthlist.get(secindex).currentpointpixel;
+
+							final OvalRoi Bigroi = new OvalRoi(Util.round(newstartpoint[0] - 2.5),
+									Util.round(newstartpoint[1] - 2.5), Util.round(5), Util.round(5));
+
+							AllBigRoi.add(Bigroi);
+
+						}
+
+					}
+				}
+
+				for (int index = 0; index < AllBigRoi.size(); ++index) {
+
+					cp.draw(AllBigRoi.get(index));
 
 				}
+
+				if (displayoverlay && prestack != null)
+					prestack.setPixels(cp.getPixels(), i);
+				Localimp.hide();
+
 			}
 
-			for (int index = 0; index < AllBigRoi.size(); ++index) {
-
-				cp.draw(AllBigRoi.get(index));
-
-			}
-
-			if (displayoverlay && prestack != null)
-				prestack.setPixels(cp.getPixels(), i);
-			Localimp.hide();
-			
-		
-			}
-			
 		}
 
 	}
-
-	
 
 	protected final void close(final Frame parent, final SliceObserver sliceObserver, final ImagePlus imp,
 			RoiListener roiListener) {
@@ -1266,6 +933,5 @@ public class BatchMode implements PlugIn {
 		frame.getContentPane().add(panel, "Center");
 		frame.setSize(panel.getPreferredSize());
 	}
-	
-	
+
 }

@@ -110,6 +110,7 @@ import preProcessing.GetLocalmaxmin;
 import preProcessing.Kernels;
 import preProcessing.MedianFilter2D;
 import trackerType.MTTracker;
+import updateListeners.BatchModeListener;
 import updateListeners.DefaultModel;
 import updateListeners.DefaultModelHF;
 import updateListeners.FinalPoint;
@@ -1452,7 +1453,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		Checkres.setForeground(new Color(255, 255, 255));
 		final Label Done = new Label("Hope that everything was to your satisfaction! You can now exit.");
 		final Button Exit = new Button("Close and exit");
-
+		final Button Record = new Button("Save program parameters for batch mode");
 		Done.setBackground(new Color(1, 0, 1));
 		Done.setForeground(new Color(255, 255, 255));
 	
@@ -1492,6 +1493,9 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 */
 		++c.gridy;
 		c.insets = new Insets(10, 10, 0, 50);
+		panelFifth.add(Record, c);
+		++c.gridy;
+		c.insets = new Insets(10, 10, 0, 50);
 		panelFifth.add(Done, c);
 
 	//	++c.gridy;
@@ -1502,6 +1506,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		SkipframeandTrackEndPoints.addActionListener(new SkipFramesandTrackendsListener(this, this.thirdDimension,  this.thirdDimensionSize));
 		CheckResults.addActionListener(new CheckResultsListener(this));
 		RoughResults.addItemListener(new AcceptResultsListener(this));
+		Record.addActionListener(new BatchModeListener(this));
 		AdvancedOptions.addItemListener(new AdvancedTrackerListener(this));
 		cbtrack.addActionListener(new SeedDisplayListener(cbtrack, Views.hyperSlice(originalimg, 2, 0),this));
 		panelFifth.repaint();

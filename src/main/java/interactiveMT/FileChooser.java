@@ -28,6 +28,8 @@ import preProcessing.MedianFilter2D;
 
 import java.awt.event.*;
 import java.io.File;
+import java.io.FileFilter;
+import java.io.FilenameFilter;
 import java.awt.*;
 import java.util.*;
 
@@ -72,7 +74,7 @@ public class FileChooser extends JPanel {
 
 		panelIntro.setLayout(layout);
 		CheckboxGroup mode = new CheckboxGroup();
-		final Checkbox Batchmode = new Checkbox("Run in Batch Mode", Batchmoderun);
+		final Checkbox Batchmode = new Checkbox("Run in Batch Mode",mode, Batchmoderun);
 		final Label LoadtrackText = new Label("Load pre-processed tracking image");
 		final Label LoadMeasureText = new Label("Load original image");
 		final Label KymoText = new Label("Kymo mode (only 1 MT, pick Kymograph image) else skip");
@@ -120,9 +122,10 @@ public class FileChooser extends JPanel {
 		++c.gridy;
 		c.insets = new Insets(10, 10, 10, 0);
 		panelIntro.add(Batchmode, c);
-		++c.gridy;
-		c.insets = new Insets(10, 10, 10, 0);
-		panelIntro.add(Kymochoice, c);
+		
+		//++c.gridy;
+		//c.insets = new Insets(10, 10, 10, 0);
+		//panelIntro.add(Kymochoice, c);
 
 		++c.gridy;
 		c.insets = new Insets(10, 10, 10, 0);
@@ -298,9 +301,20 @@ public class FileChooser extends JPanel {
 			chooserB.setFileFilter(filter);
 			chooserB.showOpenDialog(parent);
 
-			AllMovies = chooserB.getSelectedFile().listFiles();
+		
+			
+			AllMovies = chooserB.getSelectedFile().listFiles(new FilenameFilter() {
+				
+				@Override
+				public boolean accept(File pathname, String filename) {
+					
+					return filename.endsWith(".tif");
+				}
+			});
 
+			
 			System.out.println(chooserB.getSelectedFile());
+			System.out.println(AllMovies.length);
 
 		}
 
@@ -666,7 +680,7 @@ public class FileChooser extends JPanel {
 				
 				
 				
-				new BatchMode(AllMovies, new Interactive_MTDoubleChannel()).run(null);
+				new BatchMode(AllMovies, new Interactive_MTDoubleChannel(), AllMovies[0]).run(null);
 				
 				
 				

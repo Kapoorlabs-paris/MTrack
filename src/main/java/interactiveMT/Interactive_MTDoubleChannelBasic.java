@@ -71,6 +71,7 @@ import net.imglib2.type.numeric.integer.UnsignedByteType;
 import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.util.Pair;
 import net.imglib2.view.Views;
+import updateListeners.BatchModeListener;
 import updateListeners.DefaultModel;
 import updateListeners.DefaultModelHF;
 import updateListeners.FinalPoint;
@@ -539,7 +540,7 @@ public class Interactive_MTDoubleChannelBasic implements PlugIn {
 
 		Exit.addActionListener(new FinishedButtonListener(CardframeSimple, true));
 
-		Record.addActionListener(new BatchModeListener());
+		Record.addActionListener(new BatchModeListener(parent));
 		SkipframeandTrackEndPoints.addActionListener(
 				new SkipFramesandTrackendsListener(parent, parent.thirdDimension, parent.thirdDimensionSize));
 		CheckResults.addActionListener(new CheckResultsListener(parent));
@@ -552,18 +553,7 @@ public class Interactive_MTDoubleChannelBasic implements PlugIn {
 
 	}
 
-	protected class BatchModeListener implements ActionListener {
-
-		@Override
-		public void actionPerformed(final ActionEvent arg0) {
-			
-			CreateINIfile recordparam = new CreateINIfile(parent);
-			recordparam.RecordParent();
-			
-			
-		}
-
-	}
+	
 
 	protected class FinishedButtonListener implements ActionListener {
 		final Frame parentB;
