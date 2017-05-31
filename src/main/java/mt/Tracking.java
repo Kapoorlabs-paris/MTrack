@@ -112,7 +112,20 @@ public class Tracking
 
 		return series;
 	}
+	public static XYSeries drawFunction( final Polynomial< ?, Point > polynomial, final double from, final double to, final double step, final double minY, final double maxY, final String name )
+	{
+		XYSeries series = new XYSeries( name );
 
+		for ( double x = from; x <= to; x = x + step )
+		{
+			final double v = polynomial.predict( x );
+
+			if ( v >= minY && v <= maxY )
+				series.add( x, v );
+		}
+
+		return series;
+	}
 	public static JFreeChart makeChart( final XYSeriesCollection dataset ) { return makeChart( dataset, "XY Chart", "x-axis", "y-axis" ); }
 	public static JFreeChart makeChart( final XYSeriesCollection dataset, final String title, final String x, final String y )
 	{
@@ -276,6 +289,7 @@ public class Tracking
 
 		final ArrayList< Pair< P, ArrayList< PointFunctionMatch > > > segments = new ArrayList< Pair<P,ArrayList<PointFunctionMatch>> >();
 
+		
 		do
 		{
 			fitted = false;
@@ -342,6 +356,46 @@ public class Tracking
 
 		return new ValuePair< LinearFunction, ArrayList< PointFunctionMatch > >( function, inliers );
 	}
+	public static < P extends AbstractFunction2D< P > > Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>> findFunction(
+			final ArrayList< Point > mts,
+			final P function,
+			final double maxError,
+			final int minNumInliers,
+			final double maxDist )
+	{
+		final ArrayList< PointFunctionMatch > candidates = new ArrayList<PointFunctionMatch>();
+		final ArrayList< PointFunctionMatch > inliers = new ArrayList<PointFunctionMatch>();
+		
+		for ( final Point p : mts )
+			candidates.add( new PointFunctionMatch( p ) );
+
+		try
+		{
+			function.ransac( candidates, inliers, 100, maxError, 0.01, minNumInliers, maxDist );
+
+			if ( inliers.size() >= function.getMinNumPoints() )
+			{
+				function.fit( inliers );
+	
+				//System.out.println( inliers.size() + "/" + candidates.size() );
+				//System.out.println( function );
+			}
+			else
+			{
+				//System.out.println( "0/" + candidates.size() );
+				return null;
+			}
+		}
+		catch ( Exception e )
+		{
+			System.out.println( "Couldn't fit function: " + e );
+			// TODO Auto-generated catch block
+			//e.printStackTrace();
+			return null;
+		}
+
+		return (Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>>) new ValuePair< P, ArrayList< PointFunctionMatch > >( function, inliers );
+	}
 
 	public static Pair< Double, Double > fromTo( final ArrayList< PointFunctionMatch > points )
 	{
@@ -385,4 +439,6 @@ public class Tracking
 
 		display( chart, new Dimension( 1000, 800 ) );
 	}
+
+	
 }

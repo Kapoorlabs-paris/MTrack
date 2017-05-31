@@ -7,10 +7,10 @@ import java.awt.event.AdjustmentListener;
 
 public class LambdaListener implements AdjustmentListener
 {
-	final InteractiveRANSAC_ parent;
+	final InteractiveRANSAC parent;
 	final Label label;
 
-	public LambdaListener( final InteractiveRANSAC_ parent, final Label label, final Scrollbar bar )
+	public LambdaListener( final InteractiveRANSAC parent, final Label label, final Scrollbar bar )
 	{
 		this.parent = parent;
 		this.label = label;
@@ -20,9 +20,9 @@ public class LambdaListener implements AdjustmentListener
 	@Override
 	public void adjustmentValueChanged( final AdjustmentEvent event )
 	{
-		parent.lambda = InteractiveRANSAC_.computeValueFromScrollbarPosition(
+		parent.lambda = InteractiveRANSAC.computeValueFromScrollbarPosition(
 				event.getValue(),
-				InteractiveRANSAC_.MAX_SLIDER,
+				InteractiveRANSAC.MAX_SLIDER,
 				0.0,
 				1.0 );
 

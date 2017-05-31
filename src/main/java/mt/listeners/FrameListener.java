@@ -5,9 +5,9 @@ import java.awt.event.WindowEvent;
 
 public class FrameListener extends WindowAdapter
 {
-	final InteractiveRANSAC_ parent;
+	final InteractiveRANSAC parent;
 	
-	public FrameListener( InteractiveRANSAC_ parent )
+	public FrameListener( InteractiveRANSAC parent )
 	{
 		super();
 		this.parent = parent;

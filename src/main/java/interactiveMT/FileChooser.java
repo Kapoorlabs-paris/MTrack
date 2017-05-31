@@ -313,8 +313,7 @@ public class FileChooser extends JPanel {
 			});
 
 			
-			System.out.println(chooserB.getSelectedFile());
-			System.out.println(AllMovies.length);
+		
 
 		}
 

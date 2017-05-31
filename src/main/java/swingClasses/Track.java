@@ -54,11 +54,9 @@ public  class Track {
 	public  void Trackobject(final int next, final int endtime) {
 
 		parent.thirdDimensionSize = endtime;
-		int Kalmancount = 0;
 
 		for (int index = next; index <= endtime; ++index) {
 
-			Kalmancount++;
 
 			parent.displayBitimg = false;
 			parent.displayWatershedimg = false;
@@ -75,7 +73,7 @@ public  class Track {
 			RandomAccessibleInterval<FloatType> groundframepre = parent.currentPreprocessedimg;
 
 			if (parent.FindLinesViaMSER) {
-				/*
+				
 				if (index == next) {
 
 					IJ.log("MSER parameters:" + " " + " thirdDimension: " + " " + parent.thirdDimension);
@@ -87,7 +85,7 @@ public  class Track {
 
 				}
 
-				*/
+				
 
 				parent.updatePreview(ValueChange.SHOWMSER);
 
@@ -112,7 +110,7 @@ public  class Track {
 			}
 
 			if (parent.FindLinesViaHOUGH) {
-/*
+
 				if (index == next) {
 
 					IJ.log("Hough parameters:" + " " + " thirdDimension: " + " " + parent.thirdDimension);
@@ -121,7 +119,7 @@ public  class Track {
 							+ parent.Inispacing / Math.min(parent.psf[0], parent.psf[1]));
 
 				}
-*/
+
 				
 
 				parent.updatePreview(ValueChange.SHOWHOUGH);
@@ -149,7 +147,7 @@ public  class Track {
 
 			if (parent.FindLinesViaMSERwHOUGH) {
 				
-				/*
+				
 				if (index == next) {
 
 					IJ.log("MSER parameters:" + " " + " thirdDimension: " + " " + parent.thirdDimension);
@@ -161,7 +159,7 @@ public  class Track {
 							+ parent.Inispacing / Math.min(parent.psf[0], parent.psf[1]));
 
 				} 
-				*/
+				
 				parent.updatePreview(ValueChange.SHOWMSER);
 				LinefinderInteractiveHFMSERwHough newlineMserwHough = new LinefinderInteractiveHFMSERwHough(groundframe,
 						groundframepre, parent.newtree, parent.thirdDimension, parent.thetaPerPixel, parent.rhoPerPixel);
@@ -260,7 +258,6 @@ public  class Track {
 				for (int currentseed = MinSeedLabel; currentseed < MaxSeedLabel + 1; ++currentseed) {
 					double startlengthreal = 0;
 					double startlengthpixel = 0;
-					System.out.println(currentseed);
 					for (int index = 0; index < parent.Allstart.size(); ++index) {
 
 						final ArrayList<Trackproperties> thirdDimension = parent.Allstart.get(index);
@@ -334,9 +331,10 @@ public  class Track {
 							FileWriter fw = new FileWriter(fichier);
 							BufferedWriter bw = new BufferedWriter(fw);
 
+
 							bw.write(
-									"\tFramenumber\tTotal Length (pixel)\tTotal Length (real)\tSeed iD\tCurrentPosition X (px units)\tCurrentPosition Y (px units)\tCurrentPosition X (real units)\tCurrentPosition Y (real units)"
-											+ "\tLength per frame (px units)" + "\tLength per frame (real units)\n");
+									"\tFrame\tLength (px)\tLength (real)\tiD\tCurrentPosX (px)\tCurrentPosY (px)\tCurrentPosX (real)\tCurrentPosY (real)"
+											+ "\tdeltaL (px)" + "\tdeltaL (real)\n");
 
 							for (int index = 0; index < parent.startlengthlist.size(); ++index) {
 								
@@ -486,8 +484,8 @@ public  class Track {
 							BufferedWriter bw = new BufferedWriter(fw);
 
 							bw.write(
-									"\tFramenumber\tTotal Length (pixel)\tTotal Length (real)\tSeed iD\tCurrentPosition X (px units)\tCurrentPosition Y (px units)\tCurrentPosition X (real units)\tCurrentPosition Y (real units)"
-											+ "\tLength per frame (px units)" + "\tLength per frame (real units)\n");
+									"\tFrame\tLength (px)\tLength (real)\tiD\tCurrentPosX (px)\tCurrentPosY (px)\tCurrentPosX (real)\tCurrentPosY (real)"
+											+ "\tdeltaL (px)" + "\tdeltaL (real)\n");
 
 							for (int index = 0; index < parent.endlengthlist.size(); ++index) {
 
@@ -554,7 +552,6 @@ public  class Track {
 				for (int currentseed = MinSeedLabel; currentseed < MaxSeedLabel + 1; ++currentseed) {
 					double startlengthreal = 0;
 					double startlengthpixel = 0;
-					System.out.println(currentseed);
 					for (int index = 0; index < parent.AllUser.size(); ++index) {
 
 						final ArrayList<Trackproperties> thirdDimension = parent.AllUser.get(index);
@@ -628,9 +625,10 @@ public  class Track {
 							FileWriter fw = new FileWriter(fichier);
 							BufferedWriter bw = new BufferedWriter(fw);
 
+
 							bw.write(
-									"\tFramenumber\tTotal Length (pixel)\tTotal Length (real)\tSeed iD\tCurrentPosition X (px units)\tCurrentPosition Y (px units)\tCurrentPosition X (real units)\tCurrentPosition Y (real units)"
-											+ "\tLength per frame (px units)" + "\tLength per frame (real units)\n");
+									"\tFrame\tLength (px)\tLength (real)\tiD\tCurrentPosX (px)\tCurrentPosY (px)\tCurrentPosX (real)\tCurrentPosY (real)"
+											+ "\tdeltaL (px)" + "\tdeltaL (real)\n");
 
 							for (int index = 0; index < parent.userlengthlist.size(); ++index) {
 								if (parent.userlengthlist.get(index).seedid == seedID) {

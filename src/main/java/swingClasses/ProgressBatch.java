@@ -88,6 +88,8 @@ final BatchMode parent;
 		for (int fileindex = 0; fileindex < parent.AllImages.length; ++fileindex){
 		
 			
+			
+			
 			parent.parent.addToName = parent.AllImages[fileindex].getName().replaceFirst("[.][^.]+$", "");
 			
 			double percent = Math.round(100 * (fileindex + 1) / (parent.AllImages.length - 1));
@@ -174,8 +176,8 @@ final BatchMode parent;
 			
 			parent.parent.FindLinesViaMSER = Prefs.getBoolean(".FindLinesViaMSER.boolean", false);
 			
-			parent.parent.doSegmentation = false;
-			parent.parent.doMserSegmentation = false;
+			parent.parent.doSegmentation = Prefs.getBoolean(".doSegmentation.boolean", false);
+			parent.parent.doMserSegmentation = Prefs.getBoolean(".doMserSegmentation.boolean", false);
 			parent.parent.FindLinesViaHOUGH = Prefs.getBoolean(".FindLinesViaHough.boolean", false);
 			parent.parent.FindLinesViaMSERwHOUGH = Prefs.getBoolean(".FindLinesViaMSERwHough.boolean", false);
 			

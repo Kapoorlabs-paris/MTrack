@@ -50,20 +50,12 @@ public  class TrackBatch {
 	public  void Trackobject(final int next, final int endtime) {
 
 		parent.thirdDimensionSize = endtime;
-		int Kalmancount = 0;
 
 		for (int index = next; index <= endtime; ++index) {
 
 			
-			if (index == endtime){
-			parent.panel.remove(parent.jpb);
 			
-			if (parent.preprocessedimp!=null)
-				parent.preprocessedimp.clone();
 			
-			}
-			
-			Kalmancount++;
 
 			parent.displayBitimg = false;
 			parent.displayWatershedimg = false;
@@ -80,18 +72,7 @@ public  class TrackBatch {
 			RandomAccessibleInterval<FloatType> groundframepre = parent.currentPreprocessedimg;
 
 			if (parent.parent.FindLinesViaMSER) {
-				/*
-				if (index == next) {
-
-					IJ.log("MSER parameters:" + " " + " thirdDimension: " + " " + parent.thirdDimension);
-					IJ.log("Delta " + " " + parent.delta + " " + "minSize " + " " + parent.minSize + " " + "maxSize " + " " + parent.maxSize
-							+ " " + " Unstability_Score " + " " + parent.Unstability_Score + " " + "minDIversity " + " " + parent.minDiversity);
-
-					IJ.log("Optimization Parameters: " + "R" + parent.Intensityratio + " G"
-							+ parent.Inispacing / Math.min(parent.psf[0], parent.psf[1]));
-
-				}
-*/
+			
 				
 
 				parent.updatePreview(ValueChange.SHOWMSER);
@@ -103,30 +84,14 @@ public  class TrackBatch {
 					parent.Accountedframes.add(FindlinesVia.getAccountedframes());
 					
 					
-					if(parent.Userframe.size() > 0){
-						
-						parent.returnVectorUser = FindlinesVia.LinefindingMethodHFUser(groundframe, groundframepre, parent.Userframe, parent.thirdDimension,
-								parent.psf, newlineMser, parent.parent.userChoiceModel, parent.Domask, parent.Intensityratio, parent.Inispacing, parent.jpb, parent.thirdDimensionSize);
-						
-						
-					}
+				
 
 				
 
 			}
 
 			if (parent.parent.FindLinesViaHOUGH) {
-				/*
-				if (index == next) {
-
-					IJ.log("Hough parameters:" + " " + " thirdDimension: " + " " + parent.thirdDimension);
-					IJ.log("thetaPerPixel " + " " + parent.thetaPerPixel + " " + "rhoPerPixel " + " " + parent.rhoPerPixel);
-					IJ.log("Optimization Parameters: " + "R" + parent.Intensityratio + " G"
-							+ parent.Inispacing / Math.min(parent.psf[0], parent.psf[1]));
-
-				}
-
-				*/
+				
 
 				parent.updatePreview(ValueChange.SHOWHOUGH);
 				parent.updatePreview(ValueChange.SHOWMSERinHough);
@@ -139,33 +104,14 @@ public  class TrackBatch {
 
 					parent.Accountedframes.add(FindlinesVia.getAccountedframes());
 					
-	                          if(parent.Userframe.size() > 0){
-						
-						parent.returnVectorUser = FindlinesVia.LinefindingMethodHFUser(groundframe, groundframepre, parent.Userframe, parent.thirdDimension,
-								parent.psf, newlineHough, parent.parent.userChoiceModel, parent.Domask, parent.Intensityratio, parent.Inispacing, parent.jpb, parent.thirdDimensionSize);
-						
-						
-					}
+	                   
 
 			
 
 			}
 
 			if (parent.parent.FindLinesViaMSERwHOUGH) {
-				/*
-				if (index == next) {
-
-					IJ.log("MSER parameters:" + " " + " thirdDimension: " + " " + parent.thirdDimension);
-					IJ.log("Delta " + " " + parent.delta + " " + "minSize " + " " + parent.minSize + " " + "maxSize " + " " + parent.maxSize
-							+ " " + " Unstability_Score " + " " + parent.Unstability_Score + " " + "minDIversity " + " " + parent.minDiversity);
-					IJ.log("Hough parameters:" + " " + " thirdDimension: " + " " + parent.thirdDimension);
-					IJ.log("thetaPerPixel " + " " + parent.thetaPerPixel + " " + "rhoPerPixel " + " " + parent.rhoPerPixel);
-					IJ.log("Optimization Parameters: " + "R" + parent.Intensityratio + " G"
-							+ parent.Inispacing / Math.min(parent.psf[0], parent.psf[1]));
-
-				} 
 				
-				*/
 				parent.updatePreview(ValueChange.SHOWMSER);
 				LinefinderInteractiveHFMSERwHough newlineMserwHough = new LinefinderInteractiveHFMSERwHough(groundframe,
 						groundframepre, parent.newtree, parent.thirdDimension, parent.thetaPerPixel, parent.rhoPerPixel);
@@ -176,13 +122,7 @@ public  class TrackBatch {
 
 					parent.Accountedframes.add(FindlinesVia.getAccountedframes());
 					
-                       if(parent.Userframe.size() > 0){
-						
-						parent.returnVectorUser = FindlinesVia.LinefindingMethodHFUser(groundframe, groundframepre, parent.Userframe, parent.thirdDimension,
-								parent.psf, newlineMserwHough, parent.parent.userChoiceModel, parent.Domask, parent.Intensityratio, parent.Inispacing, parent.jpb, parent.thirdDimensionSize);
-						
-						
-					}
+                     
 					
 				}
 			
@@ -213,7 +153,10 @@ public  class TrackBatch {
 				parent.Allstart.add(startStateVectors);
 				parent.Allend.add(endStateVectors);
 
-		
+				if (index == endtime){
+					parent.panel.remove(parent.jpb);
+					parent.preprocessedimp.close();
+					}
 		
 		}
 
@@ -319,14 +262,15 @@ public  class TrackBatch {
 				for (int seedID = MinSeedLabel; seedID <= MaxSeedLabel; ++seedID) {
 						try {
 							File fichier = new File(
-									parent.batchfolder  + "//" + " Batch_Processed" + parent.parent.addToName + "SeedLabel" + seedID + "-endA" + ".txt");
+									parent.batchfolder  + "//" + "Batch_Processed" + parent.parent.addToName + "SeedLabel" + seedID + "-endA" + ".txt");
 
 							FileWriter fw = new FileWriter(fichier);
 							BufferedWriter bw = new BufferedWriter(fw);
 
+
 							bw.write(
-									"\tFramenumber\tTotal Length (pixel)\tTotal Length (real)\tSeed iD\tCurrentPosition X (px units)\tCurrentPosition Y (px units)\tCurrentPosition X (real units)\tCurrentPosition Y (real units)"
-											+ "\tLength per frame (px units)" + "\tLength per frame (real units)\n");
+									"\tFrame\tLength (px)\tLength (real)\tiD\tCurrentPosX (px)\tCurrentPosY (px)\tCurrentPosX (real)\tCurrentPosY (real)"
+											+ "\tdeltaL (px)" + "\tdeltaL (real)\n");
 
 							for (int index = 0; index < parent.startlengthlist.size(); ++index) {
 								
@@ -463,19 +407,20 @@ public  class TrackBatch {
 							}
 						}
 					}
-
+					
 				}
 				for (int seedID = MinSeedLabel; seedID <= MaxSeedLabel; ++seedID) {
 						try {
 							File fichier = new File(
-									parent.batchfolder + "//" + " Batch_Processed" +  parent.parent.addToName + "SeedLabel" + seedID + "-endB" + ".txt");
+									parent.batchfolder + "//" + "Batch_Processed" +  parent.parent.addToName + "SeedLabel" + seedID + "-endB" + ".txt");
 
 							FileWriter fw = new FileWriter(fichier);
 							BufferedWriter bw = new BufferedWriter(fw);
 
+
 							bw.write(
-									"\tFramenumber\tTotal Length (pixel)\tTotal Length (real)\tSeed iD\tCurrentPosition X (px units)\tCurrentPosition Y (px units)\tCurrentPosition X (real units)\tCurrentPosition Y (real units)"
-											+ "\tLength per frame (px units)" + "\tLength per frame (real units)\n");
+									"\tFrame\tLength (px)\tLength (real)\tiD\tCurrentPosX (px)\tCurrentPosY (px)\tCurrentPosX (real)\tCurrentPosY (real)"
+											+ "\tdeltaL (px)" + "\tdeltaL (real)\n");
 
 							for (int index = 0; index < parent.endlengthlist.size(); ++index) {
 
@@ -608,14 +553,15 @@ public  class TrackBatch {
 				for (int seedID = MinSeedLabel; seedID <= MaxSeedLabel; ++seedID) {
 						try {
 							File fichier = new File(
-									parent.batchfolder  + "//"+ " Batch_Processed" + parent.parent.addToName + "SeedLabel" + seedID + "-Usermarked" + ".txt");
+									parent.batchfolder  + "//"+ "Batch_Processed" + parent.parent.addToName + "SeedLabel" + seedID + "-Usermarked" + ".txt");
 
 							FileWriter fw = new FileWriter(fichier);
 							BufferedWriter bw = new BufferedWriter(fw);
 
+
 							bw.write(
-									"\tFramenumber\tTotal Length (pixel)\tTotal Length (real)\tSeed iD\tCurrentPosition X (px units)\tCurrentPosition Y (px units)\tCurrentPosition X (real units)\tCurrentPosition Y (real units)"
-											+ "\tLength per frame (px units)" + "\tLength per frame (real units)\n");
+									"\tFrame\tLength (px)\tLength (real)\tiD\tCurrentPosX (px)\tCurrentPosY (px)\tCurrentPosX (real)\tCurrentPosY (real)"
+											+ "\tdeltaL (px)" + "\tdeltaL (real)\n");
 
 							for (int index = 0; index < parent.userlengthlist.size(); ++index) {
 								if (parent.userlengthlist.get(index).seedid == seedID) {
@@ -818,7 +764,7 @@ public  class TrackBatch {
 				}
 
 				FileWriter deltaw;
-				File fichierKydel = new File(parent.batchfolder + "//" + " Batch_Processed" + parent.parent.addToName + "MTtracker-deltad" + ".txt");
+				File fichierKydel = new File(parent.batchfolder + "//" + "Batch_Processed" + parent.parent.addToName + "MTtracker-deltad" + ".txt");
 
 				try {
 					deltaw = new FileWriter(fichierKydel);
@@ -892,6 +838,7 @@ public  class TrackBatch {
 			parent.prestack.deleteLastSlice();
 			new ImagePlus(parent.parent.addToName, parent.prestack).show();
 		}
+		
 
 	}
 

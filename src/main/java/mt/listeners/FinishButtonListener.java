@@ -5,10 +5,10 @@ import java.awt.event.ActionListener;
 
 public class FinishButtonListener implements ActionListener
 {
-	final InteractiveRANSAC_ parent;
+	final InteractiveRANSAC parent;
 	final boolean cancel;
 
-	public FinishButtonListener( final InteractiveRANSAC_ parent, final boolean cancel )
+	public FinishButtonListener( final InteractiveRANSAC parent, final boolean cancel )
 	{
 		this.parent = parent;
 		this.cancel = cancel;

@@ -7,11 +7,11 @@ import java.awt.event.AdjustmentListener;
 
 public class MinSlopeListener implements AdjustmentListener
 {
-	final InteractiveRANSAC_ parent;
+	final InteractiveRANSAC parent;
 	final Label label;
 	final Scrollbar minSlopeSB;
 
-	public MinSlopeListener( final InteractiveRANSAC_ parent, final Scrollbar minSlopeSB, final Label label )
+	public MinSlopeListener( final InteractiveRANSAC parent, final Scrollbar minSlopeSB, final Label label )
 	{
 		this.parent = parent;
 		this.label = label;
@@ -22,15 +22,15 @@ public class MinSlopeListener implements AdjustmentListener
 	@Override
 	public void adjustmentValueChanged( final AdjustmentEvent event )
 	{
-		parent.minSlope = InteractiveRANSAC_.computeValueFromDoubleExpScrollbarPosition(
+		parent.minSlope = InteractiveRANSAC.computeValueFromDoubleExpScrollbarPosition(
 				event.getValue(),
-				InteractiveRANSAC_.MAX_SLIDER,
-				InteractiveRANSAC_.MAX_ABS_SLOPE );
+				InteractiveRANSAC.MAX_SLIDER,
+				InteractiveRANSAC.MAX_ABS_SLOPE );
 
 		if ( parent.minSlope > parent.maxSlope )
 		{
 			parent.minSlope = parent.maxSlope;
-			minSlopeSB.setValue( InteractiveRANSAC_.computeScrollbarPositionValueFromDoubleExp( InteractiveRANSAC_.MAX_SLIDER, parent.minSlope, InteractiveRANSAC_.MAX_ABS_SLOPE ) );
+			minSlopeSB.setValue( InteractiveRANSAC.computeScrollbarPositionValueFromDoubleExp( InteractiveRANSAC.MAX_SLIDER, parent.minSlope, InteractiveRANSAC.MAX_ABS_SLOPE ) );
 		}
 
 		label.setText( "Min. Segment Slope (px/tp) = " + parent.minSlope );

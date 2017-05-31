@@ -1,6 +1,7 @@
 package mt.listeners;
 
 import java.awt.Button;
+import java.awt.Checkbox;
 import java.awt.Choice;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -11,12 +12,17 @@ import java.awt.Insets;
 import java.awt.Label;
 import java.awt.Scrollbar;
 import java.io.File;
+import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Locale;
 
 import javax.swing.JFrame;
 
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.xy.XYSeriesCollection;
+import org.jfree.util.ShapeUtilities;
 
 import fit.AbstractFunction2D;
 import fit.PointFunctionMatch;
@@ -32,7 +38,7 @@ import mt.RansacFileChooser_;
 import mt.Tracking;
 import net.imglib2.util.Pair;
 
-public class InteractiveRANSAC_ implements PlugIn
+public class InteractiveRANSAC implements PlugIn
 {
 	public static int MIN_SLIDER = 0;
 	public static int MAX_SLIDER = 500;
@@ -42,6 +48,12 @@ public class InteractiveRANSAC_ implements PlugIn
 
 	public static double MAX_ABS_SLOPE = 100.0;
 
+	public static double MIN_CAT = 0.0;
+	public static double MAX_CAT = 100.0;
+	public final File inputfile;
+	public final String  inputdirectory;
+	public NumberFormat nf = NumberFormat.getInstance(Locale.ENGLISH);
+	
 	final Frame frame, jFreeChartFrame;
 	int functionChoice; // 0 == Linear, 1 == Quadratic interpolated, 2 == cubic interpolated
 	AbstractFunction2D function;
@@ -56,24 +68,29 @@ public class InteractiveRANSAC_ implements PlugIn
 	final XYSeriesCollection dataset;
 	final JFreeChart chart;
 	int updateCount = 0;
-
+	public ArrayList< Pair< AbstractFunction2D, ArrayList< PointFunctionMatch > > > segments;
+	public
 	// for scrollbars
-	int maxErrorInt, lambdaInt, minSlopeInt, maxSlopeInt;
+	int maxErrorInt, lambdaInt, minSlopeInt, maxSlopeInt,minDistCatInt;
 
 	double maxError = 3.0;
 	double minSlope = 0.1;
 	double maxSlope = 100;
 	int maxDist = 300;
 	int minInliers = 50;
-
+	public boolean detectCatastrophe = false;
+	public double minDistanceCatastrophe = 20;
+	
+	
 	protected boolean wasCanceled = false;
 	
-	public InteractiveRANSAC_( final ArrayList< Pair< Integer, Double > > mts )
+	public InteractiveRANSAC( final ArrayList< Pair< Integer, Double > > mts, File file  )
 	{
-		this( mts, 0, 300, 3.0, 0.1, 10.0, 10, 50, 1, 0.1 );
+		this( mts, 0, 300, 3.0, 0.1, 10.0, 10, 50, 1, 0.1, file );
+		nf.setMaximumFractionDigits(3);
 	}
 
-	public InteractiveRANSAC_(
+	public InteractiveRANSAC(
 			final ArrayList< Pair< Integer, Double > > mts,
 			final int minTP,
 			final int maxTP,
@@ -83,7 +100,8 @@ public class InteractiveRANSAC_ implements PlugIn
 			final int maxDist,
 			final int minInliers,
 			final int functionChoice,
-			final double lambda )
+			final double lambda,
+			final File file )
 	{
 		this.minTP = minTP;
 		this.maxTP = maxTP;
@@ -92,7 +110,8 @@ public class InteractiveRANSAC_ implements PlugIn
 		this.lambda = lambda;
 		this.mts = mts;
 		this.points = Tracking.toPoints( mts );
-
+		this.inputfile = file;
+		this.inputdirectory = file.getParent();
 		this.maxError = maxError;
 		this.minSlope = minSlope;
 		this.maxSlope = maxSlope;
@@ -160,9 +179,12 @@ public class InteractiveRANSAC_ implements PlugIn
 		final Label minSlopeLabel = new Label( "Min. Segment Slope (px/tp) = " + this.minSlope, Label.CENTER );
 		final Label maxSlopeLabel = new Label( "Max. Segment Slope (px/tp) = " + this.maxSlope, Label.CENTER );
 
+		final Checkbox findCatastrophe = new Checkbox( "Detect Catastrophies", this.detectCatastrophe );
+		final Scrollbar minCatDist = new Scrollbar( Scrollbar.HORIZONTAL, this.minDistCatInt, 1, MIN_SLIDER, MAX_SLIDER + 1 );
+		final Label minCatDistLabel = new Label( "Min. Catatastrophy height (tp) = " + this.minDistanceCatastrophe, Label.CENTER );
 		final Button done = new Button( "Done" );
 		final Button cancel = new Button( "Cancel" );
-
+		final Button Write = new Button( "Save Rates to File" );
 		choice.select( functionChoice );
 		setFunction();
 
@@ -223,6 +245,26 @@ public class InteractiveRANSAC_ implements PlugIn
 		++c.gridy;
 		frame.add( maxSlopeLabel, c );
 
+		
+		++c.gridy;
+		c.insets = new Insets( 20, 120, 0, 120 );
+		frame.add( findCatastrophe, c );
+		c.insets = new Insets( 0, 0, 0, 0 );
+
+		++c.gridy;
+		c.insets = new Insets( 10, 0, 0, 0 );
+		frame.add ( minCatDist, c );
+		c.insets = new Insets( 0, 0, 0, 0 );
+
+		++c.gridy;
+		frame.add( minCatDistLabel, c );
+
+		++c.gridy;
+		c.insets = new Insets( 30, 150, 0, 150 );
+		frame.add( Write, c );
+		
+		
+		
 		++c.gridy;
 		c.insets = new Insets( 30, 150, 0, 150 );
 		frame.add( done, c );
@@ -238,12 +280,16 @@ public class InteractiveRANSAC_ implements PlugIn
 		lambdaSB.addAdjustmentListener( new LambdaListener( this, lambdaLabel, lambdaSB ) );
 		minSlopeSB.addAdjustmentListener( new MinSlopeListener( this, minSlopeSB, minSlopeLabel ) );
 		maxSlopeSB.addAdjustmentListener( new MaxSlopeListener( this, maxSlopeSB, maxSlopeLabel ) );
+		findCatastrophe.addItemListener( new CatastrophyCheckBoxListener( this, findCatastrophe, minCatDistLabel, minCatDist ) );
+		minCatDist.addAdjustmentListener( new MinCatastrophyDistanceListener( this, minCatDistLabel, minCatDist ) );
+		Write.addActionListener(new WriteRatesListener(this));
 		done.addActionListener( new FinishButtonListener( this, false ) );
 		cancel.addActionListener( new FinishButtonListener( this, true ) );
 
 		frame.addWindowListener( new FrameListener( this ) );
 		frame.setVisible( true );
 
+		frame.pack();
 		updateRANSAC();
 	}
 
@@ -299,7 +345,7 @@ public class InteractiveRANSAC_ implements PlugIn
 		for ( int i = dataset.getSeriesCount() - 1; i > 0; --i )
 			dataset.removeSeries( i );
 
-		final ArrayList< Pair< AbstractFunction2D, ArrayList< PointFunctionMatch > > > segments =
+	segments =
 				Tracking.findAllFunctions( points, function, maxError, minInliers, maxDist );
 
 		if ( segments == null || segments.size() == 0 )
@@ -356,10 +402,160 @@ public class InteractiveRANSAC_ implements PlugIn
 				System.out.println( "Removed segment because slope is wrong." );
 			}
 		}
+		
+		
+		if ( this.detectCatastrophe )
+		{
+			if ( segments.size() <= 2 )
+			{
+				System.out.println( "We have only " + segments.size() + " segments, need at least two to detect catastrophies." );
+			}
+			else
+			{
+				for ( int catastrophy = 0; catastrophy < segments.size() - 1; ++catastrophy )
+				{
+					final Pair< AbstractFunction2D, ArrayList< PointFunctionMatch > > start = segments.get( catastrophy );
+					final Pair< AbstractFunction2D, ArrayList< PointFunctionMatch > > end = segments.get( catastrophy + 1 );
+
+					final double tStart = start.getB().get( start.getB().size() -1 ).getP1().getL()[ 0 ];
+					final double tEnd = end.getB().get( 0 ).getP1().getL()[ 0 ];
+
+					final double lStart = start.getB().get( start.getB().size() -1 ).getP1().getL()[ 1 ];
+					final double lEnd = end.getB().get( 0 ).getP1().getL()[ 1 ];
+
+					final ArrayList< Point > catastropyPoints = new ArrayList< Point >();
+
+					for ( final Point p : points )
+						if ( p.getL()[ 0 ] >= tStart && p.getL()[ 0 ] <= tEnd )
+							catastropyPoints.add( p );
+
+					/*
+					System.out.println( "\ncatastropy" );
+					for ( final Point p : catastropyPoints)
+						System.out.println( p.getL()[ 0 ] + ", " + p.getL()[ 1 ] );
+					*/
+
+					if ( catastropyPoints.size() > 2 )
+					{
+						if ( Math.abs( lStart - lEnd ) >= this.minDistanceCatastrophe )
+						{
+							// maximally 1.1 timepoints between points on a line
+							final Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>> fit = Tracking.findFunction( catastropyPoints, new LinearFunction(), 0.75, 3, 1.1 );
+	
+						
+							if ( fit != null )
+							{
+								if ( ((LinearFunction) fit.getA()).getM() < 0 )
+								{
+									sort( fit );
+
+									segments.add(fit);
+									System.out.println( fit.getA() );
+
+									double minY = Math.min( fit.getB().get( 0 ).getP1().getL()[ 1 ], fit.getB().get( fit.getB().size() -1 ).getP1().getL()[ 1 ] );
+									double maxY = Math.max( fit.getB().get( 0 ).getP1().getL()[ 1 ], fit.getB().get( fit.getB().size() -1 ).getP1().getL()[ 1 ] );
+
+									final Pair< Double, Double > minMax = Tracking.fromTo( fit.getB() );
+
+									dataset.addSeries( Tracking.drawFunction( (Polynomial)fit.getA(), minMax.getA()-1, minMax.getB()+1, 0.1, minY - 2.5, maxY + 2.5, "C " + catastrophy ) );
+
+									Tracking.setColor( chart, i, new Color( 0, 0, 255 ) );
+									Tracking.setDisplayType( chart, i, true, false );
+									Tracking.setStroke( chart, i, 2f );
+
+									++i;
+
+									dataset.addSeries( Tracking.drawPoints( Tracking.toPairList( fit.getB() ), "C(inl) " + catastrophy ) );
+
+									Tracking.setColor( chart, i, new Color( 0, 0, 255 ) );
+									Tracking.setDisplayType( chart, i, false, true );
+									Tracking.setShape( chart, i, ShapeUtilities.createDownTriangle( 4f ) );
+
+									++i;
+								}
+								else
+								{
+									System.out.println( "Slope not negative: " + fit.getA() );
+								}
+							}
+							else
+							{
+								System.out.println( "No function found." );
+							}
+						}
+						else
+						{
+							System.out.println( "Catastrophy height not sufficient " + Math.abs( lStart - lEnd ) + " < " + this.minDistanceCatastrophe );
+						}
+					}
+					else
+					{
+						System.out.println( "We have only " + catastropyPoints.size() + " points, need at least three to detect this catastrophy." );
+					}
+				}
+			}
+		}
+		
+		
+		
+		
+		
 
 		--updateCount;
 	}
+	protected void sort( final Pair< ? extends AbstractFunction2D, ArrayList< PointFunctionMatch > > segment )
+	{
+		Collections.sort( segment.getB(), new Comparator< PointFunctionMatch >()
+		{
 
+			@Override
+			public int compare( final PointFunctionMatch o1, final PointFunctionMatch o2 )
+			{
+				final double t1 = o1.getP1().getL()[ 0 ];
+				final double t2 = o2.getP1().getL()[ 0 ];
+
+				if ( t1 < t2 )
+					return -1;
+				else if ( t1 == t2 )
+					return 0;
+				else
+					return 1;
+			}
+		} );
+	}
+
+	protected void sort( final ArrayList< Pair< AbstractFunction2D, ArrayList< PointFunctionMatch > > > segments )
+	{
+		for ( final Pair< AbstractFunction2D, ArrayList< PointFunctionMatch > > segment : segments )
+			sort( segment );
+
+		Collections.sort( segments, new Comparator< Pair< AbstractFunction2D, ArrayList< PointFunctionMatch > > >()
+		{
+			@Override
+			public int compare(
+					Pair< AbstractFunction2D, ArrayList< PointFunctionMatch > > o1,
+					Pair< AbstractFunction2D, ArrayList< PointFunctionMatch > > o2 )
+			{
+				final double t1 = o1.getB().get( 0 ).getP1().getL()[ 0 ];
+				final double t2 = o2.getB().get( 0 ).getP1().getL()[ 0 ];
+
+				if ( t1 < t2 )
+					return -1;
+				else if ( t1 == t2 )
+					return 0;
+				else
+					return 1;
+			}
+		} );
+
+
+		for ( final Pair< AbstractFunction2D, ArrayList< PointFunctionMatch > > segment : segments )
+		{
+			System.out.println( "\nSEGMENT" );
+			for ( final PointFunctionMatch pm : segment.getB() )
+				System.out.println( pm.getP1().getL()[ 0 ] + ", " + pm.getP1().getL()[ 1 ] );
+		}
+	}
 	public void close()
 	{
 		frame.setVisible( false );

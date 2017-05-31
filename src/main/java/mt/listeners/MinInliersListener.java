@@ -7,10 +7,10 @@ import java.awt.event.AdjustmentListener;
 
 public class MinInliersListener implements AdjustmentListener
 {
-	final InteractiveRANSAC_ parent;
+	final InteractiveRANSAC parent;
 	final Label label;
 
-	public MinInliersListener( final InteractiveRANSAC_ parent, final Label label, final Scrollbar bar )
+	public MinInliersListener( final InteractiveRANSAC parent, final Label label, final Scrollbar bar )
 	{
 		this.parent = parent;
 		this.label = label;

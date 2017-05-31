@@ -24,7 +24,7 @@ import ij.ImageJ;
 import ij.ImagePlus;
 import ij.io.Opener;
 import mt.Tracking;
-import mt.listeners.InteractiveRANSAC_;
+import mt.listeners.InteractiveRANSAC;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.img.display.imagej.ImageJFunctions;
 import net.imglib2.type.numeric.real.FloatType;
@@ -157,7 +157,7 @@ public class RansacFileChooser_ extends JPanel {
 		wasDone = true;
 
 
-		new InteractiveRANSAC_( Tracking.loadMT( new File( chooserA.getSelectedFile().getPath() ) ) ).run(null);
+		new InteractiveRANSAC( Tracking.loadMT( new File( chooserA.getSelectedFile().getPath() ) ),chooserA.getSelectedFile()  ).run(null);
 	    close(parent);
 		
 		
@@ -176,7 +176,7 @@ public class RansacFileChooser_ extends JPanel {
 			wasDone = Done;
 
 
-			new InteractiveRANSAC_( Tracking.loadMT( new File( chooserA.getSelectedFile().getPath() ) ) ).run(null);
+			new InteractiveRANSAC( Tracking.loadMT( new File( chooserA.getSelectedFile().getPath() ) ),chooserA.getSelectedFile() ).run(null);
 		    close(parent);
 		}
 	}

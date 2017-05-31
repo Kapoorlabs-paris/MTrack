@@ -11,9 +11,9 @@ import java.awt.event.MouseListener;
  */
 public class StandardMouseListener implements MouseListener
 {
-	final InteractiveRANSAC_ parent;
+	final InteractiveRANSAC parent;
 
-	public StandardMouseListener( final InteractiveRANSAC_ parent )
+	public StandardMouseListener( final InteractiveRANSAC parent )
 	{
 		this.parent = parent;
 	}

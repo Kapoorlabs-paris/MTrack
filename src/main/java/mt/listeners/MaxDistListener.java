@@ -7,10 +7,10 @@ import java.awt.event.AdjustmentListener;
 
 public class MaxDistListener implements AdjustmentListener
 {
-	final InteractiveRANSAC_ parent;
+	final InteractiveRANSAC parent;
 	final Label label;
 	
-	public MaxDistListener( final InteractiveRANSAC_ parent, final Label label, final Scrollbar bar )
+	public MaxDistListener( final InteractiveRANSAC parent, final Label label, final Scrollbar bar )
 	{
 		this.parent = parent;
 		this.label = label;
