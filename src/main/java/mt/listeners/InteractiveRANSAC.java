@@ -186,7 +186,7 @@ public class InteractiveRANSAC implements PlugIn
 		final Label minCatDistLabel = new Label( "Min. Catatastrophy height (tp) = " + this.minDistanceCatastrophe, Label.CENTER );
 		final Button done = new Button( "Done" );
 		final Button cancel = new Button( "Cancel" );
-		final Button Write = new Button( "Save Rates to File" );
+		final Button Write = new Button( "Save Rates and Frequencies to File" );
 		choice.select( functionChoice );
 		setFunction();
 
@@ -368,6 +368,11 @@ public class InteractiveRANSAC implements PlugIn
 				
 				final Pair< Double, Double > minMax = Tracking.fromTo( result.getB() );
 		
+				
+				Pair< LinearFunction, ArrayList< PointFunctionMatch > > linearseg = new ValuePair<LinearFunction, ArrayList<PointFunctionMatch>>(linear, result.getB());
+				
+				linearlist.add(linearseg);
+				
 				dataset.addSeries( Tracking.drawFunction( (Polynomial)result.getA(), minMax.getA(), minMax.getB(), 0.5, "Segment " + segment ) );
 
 				if ( functionChoice > 0 )

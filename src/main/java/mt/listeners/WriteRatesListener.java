@@ -30,15 +30,23 @@ public class WriteRatesListener implements ActionListener {
 		String inputfile = parent.inputfile.getName().replaceFirst("[.][^.]+$", "");
 		try {
 			File ratesfile = new File(parent.inputdirectory + "//" + inputfile + "Rates" + ".txt");
-
+			File frequfile = new File(parent.inputdirectory + "//" + inputfile + "Frequency" + ".txt");
+			
 			FileWriter fw = new FileWriter(ratesfile);
 
 			BufferedWriter bw = new BufferedWriter(fw);
-			bw.write("\tStartTime (px)\tEndTime(px)\tLinearRateSlope(px)\tLinearRateRegPolynomial(px)\tLinearityFraction(1 = Fully Linear)\n");
+			
+			
+			FileWriter fwfrequ = new FileWriter(frequfile);
+
+			BufferedWriter bwfrequ = new BufferedWriter(fwfrequ);
+			bwfrequ.write("\tCatastropheFrequency(px)\n");
+			
+			bw.write("\tStartTime (px)\tEndTime(px)\tLinearRateSlope(px)\n");
 			
 			int count = 0;
 			double timediff = 0;
-			
+		
 			for (final Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>> result : parent.segments) {
 
 				final Pair<Double, Double> minMax = Tracking.fromTo(result.getB());
@@ -47,13 +55,12 @@ public class WriteRatesListener implements ActionListener {
 				double endX = minMax.getB();
 				
 				Polynomial<?, Point> polynomial = (Polynomial) result.getA();
-				double startY = polynomial.predict(startX);
-				double endY = polynomial.predict(endX);
-
+				
+                LinearFunction linear = new LinearFunction();
+				LinearFunction.slopeFits( result.getB(), linear, parent.minSlope, parent.maxSlope ) ;
 				
 				
-				
-				double linearrate = (endY - startY) / (endX - startX);
+				double linearrate = linear.getCoefficient(1); 
 				
 				
 				if (linearrate > 0){
@@ -68,39 +75,25 @@ public class WriteRatesListener implements ActionListener {
 
 				bw.write("\t" + parent.nf.format(startX) + "\t" + "\t" + parent.nf.format(endX) + "\t" + "\t"
 						+ parent.nf.format(linearrate) + "\t" + "\t" + "\t" + "\t"
-						
-						+ parent.nf.format(polynomial.getCoefficient(1)) + "\t" + "\t" + "\t" + "\t"
-						
-                        + parent.nf.format(parent.lambda) + "\t" + "\t"
-						
-						+ "\n" + "\n");
+						+ "\n");
 
 			}
 			
 			if (count > 0){
-			bw.write("\tCatastrophe Frequency (px)");
-			bw.write("\t" + (count/timediff)+ "\n" + "\n");
+			bwfrequ.write("\t" + parent.nf.format(count/timediff)+ "\n" + "\n");
 			}
 			
 			
-			bw.write("\tPolynomial\n");
-			for (final Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>> result : parent.segments) {
-
-				Polynomial<?, Point> polynomial = (Polynomial) result.getA();
-				int degree = polynomial.degree();
-				for (int i = degree; i >= 0; --i) {
-
-
-						bw.write("\t" + parent.nf.format(polynomial.getCoefficient(i)) + "X to the power of " + i);
-
-				}
-				bw.write("\n");
-			}
+		
 			
 		
 
 			bw.close();
 			fw.close();
+			
+			bwfrequ.close();
+			fwfrequ.close();
+			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
