@@ -38,7 +38,7 @@ public class QuadraticFunction extends AbstractFunction2D< QuadraticFunction > i
 	public double getC(){ return c; }
 
 	@Override
-	public int degree() { return 1; }
+	public int degree() { return 2; }
 
 	@Override
 	public double getCoefficient( final int j )

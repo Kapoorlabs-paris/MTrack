@@ -35,7 +35,7 @@ import net.imglib2.view.Views;
  */
 public class FlatFieldCorrection extends BenchmarkAlgorithm implements OutputAlgorithm< RandomAccessibleInterval< FloatType >>
 {
-	private static final String BASE_ERROR_MSG = "[MedianFiler2D] ";
+	private static final String BASE_ERROR_MSG = "[FlatFieldAndMedianFilter2D] ";
 
 	private final RandomAccessibleInterval< FloatType > source;
 
@@ -146,7 +146,7 @@ public class FlatFieldCorrection extends BenchmarkAlgorithm implements OutputAlg
 		
 		double[] sigma = new double[in.numDimensions()];
 		for (int d = 0; d < in.numDimensions(); ++d) {
-			sigma[d] = (int) Math.round((in.realMax(d) - in.realMin(d)) / 25.0);
+			sigma[d] = (int) Math.round((in.realMax(d) - in.realMin(d)) / 10.0);
 		}
 		
 		RandomAccessibleInterval<FloatType> gaussimg = util.CopyUtils.copyImage(in);

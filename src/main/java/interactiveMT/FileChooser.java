@@ -191,6 +191,7 @@ public class FileChooser extends JPanel {
 		Batchmode.addItemListener(new RuninBatchListener(frame));
 		Done.addActionListener(new DoneButtonListener(frame, true));
 		Simple.addItemListener(new RunSimpleListener());
+		Advanced.addItemListener(new RunAdvancedListener());
 		frame.addWindowListener(new FrameListener(frame));
 		frame.add(panelCont, BorderLayout.CENTER);
 		frame.pack();

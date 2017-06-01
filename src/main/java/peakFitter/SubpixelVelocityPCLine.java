@@ -198,7 +198,9 @@ public class SubpixelVelocityPCLine extends BenchmarkAlgorithm
 			
 			if (Trackstart.get(PrevFrameparamstart.get(index).seedLabel) == Whichend.start
 					|| Trackstart.get(PrevFrameparamstart.get(index).seedLabel) == Whichend.both) {
-				percent = (Math.round(100 * (index + 1) / (PrevFrameparamstart.size() - 1)));
+				
+				
+				percent = (Math.round(100 * (index + 1) / (PrevFrameparamstart.size())));
 
 				final double originalslope = PrevFrameparamstart.get(index).originalslope;
 
@@ -258,7 +260,7 @@ public class SubpixelVelocityPCLine extends BenchmarkAlgorithm
 			if (Trackstart.get(PrevFrameparamend.get(index).seedLabel) == Whichend.end
 					|| Trackstart.get(PrevFrameparamend.get(index).seedLabel) == Whichend.both) {
 
-				percent = (Math.round(100 * (index + 1) / (PrevFrameparamend.size() - 1)));
+				percent = (Math.round(100 * (index + 1) / (PrevFrameparamend.size())));
 
 				Point secondlinepoint = new Point(ndims);
 				secondlinepoint.setPosition(new long[] { (long) PrevFrameparamend.get(index).currentpos[0],

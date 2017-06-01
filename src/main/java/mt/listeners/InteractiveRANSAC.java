@@ -37,6 +37,7 @@ import mpicbg.models.Point;
 import mt.RansacFileChooser_;
 import mt.Tracking;
 import net.imglib2.util.Pair;
+import net.imglib2.util.ValuePair;
 
 public class InteractiveRANSAC implements PlugIn
 {
@@ -54,6 +55,7 @@ public class InteractiveRANSAC implements PlugIn
 	public final String  inputdirectory;
 	public NumberFormat nf = NumberFormat.getInstance(Locale.ENGLISH);
 	
+	public ArrayList< Pair< LinearFunction, ArrayList< PointFunctionMatch > > > linearlist;
 	final Frame frame, jFreeChartFrame;
 	int functionChoice; // 0 == Linear, 1 == Quadratic interpolated, 2 == cubic interpolated
 	AbstractFunction2D function;
@@ -87,7 +89,7 @@ public class InteractiveRANSAC implements PlugIn
 	public InteractiveRANSAC( final ArrayList< Pair< Integer, Double > > mts, File file  )
 	{
 		this( mts, 0, 300, 3.0, 0.1, 10.0, 10, 50, 1, 0.1, file );
-		nf.setMaximumFractionDigits(3);
+		nf.setMaximumFractionDigits(5);
 	}
 
 	public InteractiveRANSAC(
@@ -139,7 +141,7 @@ public class InteractiveRANSAC implements PlugIn
 	@Override
 	public void run(String arg){
 		/* JFreeChart */
-		
+		linearlist = new ArrayList< Pair< LinearFunction, ArrayList< PointFunctionMatch > > > ();
 		this.dataset.addSeries( Tracking.drawPoints( mts ) );
 		Tracking.setColor( chart, 0, new Color( 64, 64, 64 ) );
 		Tracking.setStroke( chart, 0, 0.75f );
@@ -354,13 +356,16 @@ public class InteractiveRANSAC implements PlugIn
 			return;
 		}
 
-		final LinearFunction linear = new LinearFunction();
+		LinearFunction linear = new LinearFunction();
 		int i = 1, segment = 1;
 
 		for ( final Pair< AbstractFunction2D, ArrayList< PointFunctionMatch > > result : segments )
 		{
+			
 			if ( LinearFunction.slopeFits( result.getB(), linear, minSlope, maxSlope ) )
 			{
+				 
+				
 				final Pair< Double, Double > minMax = Tracking.fromTo( result.getB() );
 		
 				dataset.addSeries( Tracking.drawFunction( (Polynomial)result.getA(), minMax.getA(), minMax.getB(), 0.5, "Segment " + segment ) );
@@ -380,12 +385,19 @@ public class InteractiveRANSAC implements PlugIn
 
 				if ( functionChoice > 0 )
 				{
+					
+					
+					
+					
+					 
 					dataset.addSeries( Tracking.drawFunction( linear, minMax.getA(), minMax.getB(), 0.5, "Linear Segment " + segment ) );
 	
 					Tracking.setColor( chart, i, new Color( 0, 128, 0 ) );
 					Tracking.setStroke( chart, i, 2f );
 	
 					++i;
+					
+				
 				}
 
 				dataset.addSeries( Tracking.drawPoints( Tracking.toPairList( result.getB() ), "Inliers " + segment ) );
@@ -401,6 +413,8 @@ public class InteractiveRANSAC implements PlugIn
 			{
 				System.out.println( "Removed segment because slope is wrong." );
 			}
+			
+			
 		}
 		
 		
@@ -450,7 +464,6 @@ public class InteractiveRANSAC implements PlugIn
 									sort( fit );
 
 									segments.add(fit);
-									System.out.println( fit.getA() );
 
 									double minY = Math.min( fit.getB().get( 0 ).getP1().getL()[ 1 ], fit.getB().get( fit.getB().size() -1 ).getP1().getL()[ 1 ] );
 									double maxY = Math.max( fit.getB().get( 0 ).getP1().getL()[ 1 ], fit.getB().get( fit.getB().size() -1 ).getP1().getL()[ 1 ] );
