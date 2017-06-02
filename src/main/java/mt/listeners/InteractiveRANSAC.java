@@ -46,6 +46,10 @@ public class InteractiveRANSAC implements PlugIn
 
 	public static double MIN_ERROR = 0.0;
 	public static double MAX_ERROR = 30.0;
+	
+
+	public static double MIN_RES = 1.0;
+	public static double MAX_RES = 30.0;
 
 	public static double MAX_ABS_SLOPE = 100.0;
 
@@ -73,11 +77,12 @@ public class InteractiveRANSAC implements PlugIn
 	public ArrayList< Pair< AbstractFunction2D, ArrayList< PointFunctionMatch > > > segments;
 	public
 	// for scrollbars
-	int maxErrorInt, lambdaInt, minSlopeInt, maxSlopeInt,minDistCatInt;
+	int maxErrorInt, lambdaInt, minSlopeInt, maxSlopeInt,minDistCatInt, restoleranceInt;
 
 	double maxError = 3.0;
 	double minSlope = 0.1;
 	double maxSlope = 100;
+	public double restolerance = 10;
 	int maxDist = 300;
 	int minInliers = 50;
 	public boolean detectCatastrophe = false;
@@ -127,7 +132,6 @@ public class InteractiveRANSAC implements PlugIn
 		this.lambdaInt = computeScrollbarPositionFromValue( MAX_SLIDER, this.lambda, 0.0, 1.0 );
 		this.minSlopeInt = computeScrollbarPositionValueFromDoubleExp( MAX_SLIDER, this.minSlope, MAX_ABS_SLOPE );
 		this.maxSlopeInt = computeScrollbarPositionValueFromDoubleExp( MAX_SLIDER, this.maxSlope, MAX_ABS_SLOPE );
-
 		this.maxError = computeValueFromScrollbarPosition( this.maxErrorInt, MAX_SLIDER, MIN_ERROR, MAX_ERROR );
 		this.minSlope = computeValueFromDoubleExpScrollbarPosition( this.minSlopeInt, MAX_SLIDER, MAX_ABS_SLOPE );
 		this.maxSlope = computeValueFromDoubleExpScrollbarPosition( this.maxSlopeInt, MAX_SLIDER, MAX_ABS_SLOPE );
@@ -180,9 +184,11 @@ public class InteractiveRANSAC implements PlugIn
 		this.lambdaLabel = new Label( "Linearity (fraction) = " + this.lambda, Label.CENTER );
 		final Label minSlopeLabel = new Label( "Min. Segment Slope (px/tp) = " + this.minSlope, Label.CENTER );
 		final Label maxSlopeLabel = new Label( "Max. Segment Slope (px/tp) = " + this.maxSlope, Label.CENTER );
+		final Label maxResLabel = new Label( "MT is rescued if the start of event# i + 1 > start of event# i by px =  " + this.restolerance, Label.CENTER );
 
 		final Checkbox findCatastrophe = new Checkbox( "Detect Catastrophies", this.detectCatastrophe );
 		final Scrollbar minCatDist = new Scrollbar( Scrollbar.HORIZONTAL, this.minDistCatInt, 1, MIN_SLIDER, MAX_SLIDER + 1 );
+		final Scrollbar maxRes = new Scrollbar( Scrollbar.HORIZONTAL, this.restoleranceInt, 1, MIN_SLIDER, MAX_SLIDER + 1); 
 		final Label minCatDistLabel = new Label( "Min. Catatastrophy height (tp) = " + this.minDistanceCatastrophe, Label.CENTER );
 		final Button done = new Button( "Done" );
 		final Button cancel = new Button( "Cancel" );
@@ -261,6 +267,8 @@ public class InteractiveRANSAC implements PlugIn
 		++c.gridy;
 		frame.add( minCatDistLabel, c );
 
+		
+		
 		++c.gridy;
 		c.insets = new Insets( 30, 150, 0, 150 );
 		frame.add( Write, c );
@@ -284,6 +292,7 @@ public class InteractiveRANSAC implements PlugIn
 		maxSlopeSB.addAdjustmentListener( new MaxSlopeListener( this, maxSlopeSB, maxSlopeLabel ) );
 		findCatastrophe.addItemListener( new CatastrophyCheckBoxListener( this, findCatastrophe, minCatDistLabel, minCatDist ) );
 		minCatDist.addAdjustmentListener( new MinCatastrophyDistanceListener( this, minCatDistLabel, minCatDist ) );
+		
 		Write.addActionListener(new WriteRatesListener(this));
 		done.addActionListener( new FinishButtonListener( this, false ) );
 		cancel.addActionListener( new FinishButtonListener( this, true ) );
@@ -368,10 +377,6 @@ public class InteractiveRANSAC implements PlugIn
 				
 				final Pair< Double, Double > minMax = Tracking.fromTo( result.getB() );
 		
-				
-				Pair< LinearFunction, ArrayList< PointFunctionMatch > > linearseg = new ValuePair<LinearFunction, ArrayList<PointFunctionMatch>>(linear, result.getB());
-				
-				linearlist.add(linearseg);
 				
 				dataset.addSeries( Tracking.drawFunction( (Polynomial)result.getA(), minMax.getA(), minMax.getB(), 0.5, "Segment " + segment ) );
 
