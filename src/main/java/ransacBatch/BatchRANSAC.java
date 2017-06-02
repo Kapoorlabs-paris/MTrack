@@ -84,14 +84,16 @@ public class BatchRANSAC implements PlugIn {
 	// for scrollbars
 	int maxErrorInt, lambdaInt, minSlopeInt, maxSlopeInt, minDistCatInt, restoleranceInt;
 
-	public static double maxError = Prefs.get(".MaxError.double", 2.0);
-	public static double minSlope = Prefs.get(".Minslope.double", 0.1);
-	public static  double maxSlope = Prefs.get(".Maxslope.double", 100);
-	public static  double restolerance = Prefs.get(".Rescue.double", 5);
-	public static int maxDist = (int)Prefs.get(".MaxGap.double", 300);
-	public static int minInliers = (int)Prefs.get(".MinPoints.double", 10);
-	public static boolean detectCatastrophe = Prefs.getBoolean(".DetectCat.boolean", true);
-	public static double minDistanceCatastrophe = Prefs.get(".MinDist.double", 5);
+	public  double maxError = Prefs.getDouble(".MaxError.double", 2.0);
+	public  double minSlope = Prefs.getDouble(".Minslope.double", 0.1);
+	public   double maxSlope = Prefs.getDouble(".Maxslope.double", 100);
+	public   double restolerance = Prefs.getDouble(".Rescue.double", 5);
+	public  int maxDist = (int)Prefs.getDouble(".MaxGap.double", 300);
+	public  int minInliers = (int)Prefs.getDouble(".MinPoints.double", 10);
+	public  boolean detectCatastrophe = Prefs.getBoolean(".DetectCat.boolean", false);
+	public  double minDistanceCatastrophe = Prefs.getDouble(".MinDist.double", 5);
+	
+	
 
 	protected boolean wasCanceled = false;
 
@@ -99,7 +101,7 @@ public class BatchRANSAC implements PlugIn {
 
 	public BatchRANSAC(final ArrayList<Pair<Integer, Double>> mts, 
 			  final File file) {
-		
+		System.out.println(maxError + " " + Prefs.getDouble(".MaxError.double", 200.0) + " " + minSlope + " " + maxSlope + " " + restolerance + " " + minInliers   );
 		nf.setMaximumFractionDigits(5);
 		
 		this.mts = mts;
