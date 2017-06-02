@@ -34,7 +34,6 @@ import fit.polynomial.QuadraticFunction;
 import ij.ImageJ;
 import ij.plugin.PlugIn;
 import mpicbg.models.Point;
-import mt.RansacFileChooser_;
 import mt.Tracking;
 import net.imglib2.util.Pair;
 import net.imglib2.util.ValuePair;
@@ -569,17 +568,6 @@ public class InteractiveRANSAC implements PlugIn {
 		return (int) Math.round(((value - minValue) / (maxValue - minValue)) * scrollbarMax);
 	}
 
-	public static void main(String[] args) {
-
-		JFrame frame = new JFrame("");
-		RansacFileChooser_ panel = new RansacFileChooser_();
-
-		frame.getContentPane().add(panel, "Center");
-		frame.setSize(panel.getPreferredSize());
-
-		// new InteractiveRANSAC( Tracking.loadMT( new File(
-		// "/Users/varunkapoor/Documents/MTAnalysisRansac/TestRanSacSeedLabel3-endA.txt"
-		// ) ) );
-	}
+	
 
 }

@@ -1,4 +1,4 @@
-package mt.listeners;
+package ransacBatch;
 
 import java.awt.Button;
 import java.awt.Checkbox;
@@ -34,8 +34,8 @@ import fit.polynomial.QuadraticFunction;
 import ij.ImageJ;
 import ij.Prefs;
 import ij.plugin.PlugIn;
+import interactiveMT.Ransac_MT;
 import mpicbg.models.Point;
-import mt.RansacFileChooser_;
 import mt.Tracking;
 import net.imglib2.util.Pair;
 import net.imglib2.util.ValuePair;
@@ -63,7 +63,7 @@ public class BatchRANSAC implements PlugIn {
 
 	public ArrayList<Pair<LinearFunction, ArrayList<PointFunctionMatch>>> linearlist;
 	final Frame frame, jFreeChartFrame;
-	public static int functionChoice =  Prefs.getInt(".Functionchoice.int", 1); 
+	public static int functionChoice =  Prefs.getInt(".Functionchoice.int", 2); 
 	public File inputfile;
 	public String inputdirectory;
 	AbstractFunction2D function;
@@ -84,14 +84,14 @@ public class BatchRANSAC implements PlugIn {
 	// for scrollbars
 	int maxErrorInt, lambdaInt, minSlopeInt, maxSlopeInt, minDistCatInt, restoleranceInt;
 
-	public static double maxError = Prefs.get(".MaxError.double", 3.0);
+	public static double maxError = Prefs.get(".MaxError.double", 2.0);
 	public static double minSlope = Prefs.get(".Minslope.double", 0.1);
 	public static  double maxSlope = Prefs.get(".Maxslope.double", 100);
 	public static  double restolerance = Prefs.get(".Rescue.double", 5);
 	public static int maxDist = (int)Prefs.get(".MaxGap.double", 300);
-	public static int minInliers = (int)Prefs.get(".MinPoints.double", 50);
-	public static boolean detectCatastrophe = Prefs.getBoolean(".DetectCat.boolean", false);
-	public static double minDistanceCatastrophe = Prefs.get(".MinDist.double", 20);
+	public static int minInliers = (int)Prefs.get(".MinPoints.double", 10);
+	public static boolean detectCatastrophe = Prefs.getBoolean(".DetectCat.boolean", true);
+	public static double minDistanceCatastrophe = Prefs.get(".MinDist.double", 5);
 
 	protected boolean wasCanceled = false;
 
@@ -375,15 +375,11 @@ public class BatchRANSAC implements PlugIn {
 
 	public static void main(String[] args) {
 
-		JFrame frame = new JFrame("");
-		RansacFileChooser_ panel = new RansacFileChooser_();
+	
+		Ransac_MT newran = new Ransac_MT();
+		newran.run(null);
 
-		frame.getContentPane().add(panel, "Center");
-		frame.setSize(panel.getPreferredSize());
-
-		// new InteractiveRANSAC( Tracking.loadMT( new File(
-		// "/Users/varunkapoor/Documents/MTAnalysisRansac/TestRanSacSeedLabel3-endA.txt"
-		// ) ) );
+		
 	}
 
 }

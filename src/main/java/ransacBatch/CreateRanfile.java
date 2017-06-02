@@ -1,8 +1,5 @@
-package initialization;
+package ransacBatch;
 
-import java.io.File;
-
-import ij.IJ;
 import ij.Prefs;
 import mt.listeners.InteractiveRANSAC;
 
@@ -19,7 +16,6 @@ public class CreateRanfile {
 
 	public void RecordParent() {
 
-		System.out.println(Prefs.getHomeDir());
 
 		Prefs.set("MaxError.double", parent.maxError);
 		Prefs.set("MinPoints.double", parent.minInliers);
@@ -35,7 +31,7 @@ public class CreateRanfile {
 		Prefs.set("numTp.int", parent.numTimepoints);
 		Prefs.savePreferences();
 
-		// System.exit(1);
+		 System.exit(1);
 
 	}
 

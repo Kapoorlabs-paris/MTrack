@@ -29,19 +29,23 @@ import ij.ImagePlus;
 import ij.io.Opener;
 
 import mt.Tracking;
-import mt.listeners.BatchRANSAC;
 import mt.listeners.InteractiveRANSAC;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.img.display.imagej.ImageJFunctions;
 import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.view.Views;
+import ransacBatch.BatchRANSAC;
 
-public class RansacFileChooser_ extends JPanel {
+public class RansacFileChooser extends JPanel {
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = -5915579156379418824L;
+	/**
+	 * 
+	 */
+	
 	JPanel panelCont = new JPanel();
 	JPanel panelIntro = new JPanel();
 	JFileChooser chooserA;
@@ -52,7 +56,7 @@ public class RansacFileChooser_ extends JPanel {
 	boolean Batchmoderun = false;
 	File[] AllMovies;
 
-	public RansacFileChooser_() {
+	public RansacFileChooser() {
 
 		final JFrame frame = new JFrame("Welcome to the Ransac Part of MTV tracker");
 
@@ -313,13 +317,6 @@ public class RansacFileChooser_ extends JPanel {
 		return new Dimension(800, 300);
 	}
 
-	public static void main(String[] args) {
 
-		JFrame frame = new JFrame("");
-		RansacFileChooser_ panel = new RansacFileChooser_();
-
-		frame.getContentPane().add(panel, "Center");
-		frame.setSize(panel.getPreferredSize());
-	}
 
 }
