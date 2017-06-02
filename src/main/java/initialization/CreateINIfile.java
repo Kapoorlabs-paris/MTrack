@@ -29,7 +29,6 @@ public class CreateINIfile {
 		
 		
 		
-		System.out.println("Prefs directory : " + Prefs.getPrefsDir());
 		
 		Prefs.set("PSFX.double", parent.psf[0]);
 		Prefs.set("PSFY.double", parent.psf[1]);

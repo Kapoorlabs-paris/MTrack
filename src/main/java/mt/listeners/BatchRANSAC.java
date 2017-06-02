@@ -32,6 +32,7 @@ import fit.polynomial.LinearFunction;
 import fit.polynomial.Polynomial;
 import fit.polynomial.QuadraticFunction;
 import ij.ImageJ;
+import ij.Prefs;
 import ij.plugin.PlugIn;
 import mpicbg.models.Point;
 import mt.RansacFileChooser_;
@@ -39,7 +40,11 @@ import mt.Tracking;
 import net.imglib2.util.Pair;
 import net.imglib2.util.ValuePair;
 
-public class InteractiveRANSAC implements PlugIn {
+public class BatchRANSAC implements PlugIn {
+	
+	
+	
+	
 	public static int MIN_SLIDER = 0;
 	public static int MAX_SLIDER = 500;
 
@@ -53,20 +58,21 @@ public class InteractiveRANSAC implements PlugIn {
 
 	public static double MIN_CAT = 0.0;
 	public static double MAX_CAT = 100.0;
-	public File inputfile;
-	public String inputdirectory;
+
 	public NumberFormat nf = NumberFormat.getInstance(Locale.ENGLISH);
 
 	public ArrayList<Pair<LinearFunction, ArrayList<PointFunctionMatch>>> linearlist;
 	final Frame frame, jFreeChartFrame;
-	public int functionChoice = 1; // 0 == Linear, 1 == Quadratic interpolated, 2 ==
-								// cubic interpolated
+	public static int functionChoice =  Prefs.getInt(".Functionchoice.int", 1); 
+	public File inputfile;
+	public String inputdirectory;
 	AbstractFunction2D function;
-	public double lambda;
+	public static double lambda = Prefs.get(".Linearity.double", 0.1);
 	final ArrayList<Pair<Integer, Double>> mts;
 	final ArrayList<Point> points;
-	public final int numTimepoints, minTP, maxTP;
 
+
+	public static int numTimepoints = (int)Prefs.get(".numTp.int", 300);
 	Scrollbar lambdaSB;
 	Label lambdaLabel;
 
@@ -78,50 +84,30 @@ public class InteractiveRANSAC implements PlugIn {
 	// for scrollbars
 	int maxErrorInt, lambdaInt, minSlopeInt, maxSlopeInt, minDistCatInt, restoleranceInt;
 
-	public double maxError = 3.0;
-	public double minSlope = 0.1;
-	public double maxSlope = 100;
-	public double restolerance = 5;
-	public int maxDist = 300;
-	public int minInliers = 50;
-	public boolean detectCatastrophe = false;
-	public double minDistanceCatastrophe = 20;
+	public static double maxError = Prefs.get(".MaxError.double", 3.0);
+	public static double minSlope = Prefs.get(".Minslope.double", 0.1);
+	public static  double maxSlope = Prefs.get(".Maxslope.double", 100);
+	public static  double restolerance = Prefs.get(".Rescue.double", 5);
+	public static int maxDist = (int)Prefs.get(".MaxGap.double", 300);
+	public static int minInliers = (int)Prefs.get(".MinPoints.double", 50);
+	public static boolean detectCatastrophe = Prefs.getBoolean(".DetectCat.boolean", false);
+	public static double minDistanceCatastrophe = Prefs.get(".MinDist.double", 20);
 
 	protected boolean wasCanceled = false;
 
-	public InteractiveRANSAC(final ArrayList<Pair<Integer, Double>> mts, File file) {
-		this(mts, 0, 300, 3.0, 0.1, 10.0, 10, 50, 1, 0.1, file);
-		nf.setMaximumFractionDigits(5);
-	}
+	
 
-	public InteractiveRANSAC(final ArrayList<Pair<Integer, Double>> mts, final int minTP, final int maxTP,
-			final double maxError, final double minSlope, final double maxSlope, final int maxDist,
-			final int minInliers, final int functionChoice, final double lambda, final File file) {
-		this.minTP = minTP;
-		this.maxTP = maxTP;
-		this.numTimepoints = maxTP - minTP + 1;
-		this.functionChoice = functionChoice;
-		this.lambda = lambda;
+	public BatchRANSAC(final ArrayList<Pair<Integer, Double>> mts, 
+			  final File file) {
+		
+		nf.setMaximumFractionDigits(5);
+		
 		this.mts = mts;
 		this.points = Tracking.toPoints(mts);
 		this.inputfile = file;
 		this.inputdirectory = file.getParent();
-		this.maxError = maxError;
-		this.minSlope = minSlope;
-		this.maxSlope = maxSlope;
-		this.maxDist = Math.min(maxDist, numTimepoints);
-		this.minInliers = Math.min(minInliers, numTimepoints);
-
-		if (this.minSlope >= this.maxSlope)
-			this.minSlope = this.maxSlope - 0.1;
-
-		this.maxErrorInt = computeScrollbarPositionFromValue(MAX_SLIDER, this.maxError, MIN_ERROR, MAX_ERROR);
-		this.lambdaInt = computeScrollbarPositionFromValue(MAX_SLIDER, this.lambda, 0.0, 1.0);
-		this.minSlopeInt = computeScrollbarPositionValueFromDoubleExp(MAX_SLIDER, this.minSlope, MAX_ABS_SLOPE);
-		this.maxSlopeInt = computeScrollbarPositionValueFromDoubleExp(MAX_SLIDER, this.maxSlope, MAX_ABS_SLOPE);
-		this.maxError = computeValueFromScrollbarPosition(this.maxErrorInt, MAX_SLIDER, MIN_ERROR, MAX_ERROR);
-		this.minSlope = computeValueFromDoubleExpScrollbarPosition(this.minSlopeInt, MAX_SLIDER, MAX_ABS_SLOPE);
-		this.maxSlope = computeValueFromDoubleExpScrollbarPosition(this.maxSlopeInt, MAX_SLIDER, MAX_ABS_SLOPE);
+	
+	
 		this.dataset = new XYSeriesCollection();
 		this.chart = Tracking.makeChart(dataset, "Microtubule Length Plot", "Timepoint", "MT Length");
 		this.jFreeChartFrame = Tracking.display(chart, new Dimension(1000, 800));
@@ -136,201 +122,16 @@ public class InteractiveRANSAC implements PlugIn {
 		this.dataset.addSeries(Tracking.drawPoints(mts));
 		Tracking.setColor(chart, 0, new Color(64, 64, 64));
 		Tracking.setStroke(chart, 0, 0.75f);
-		Card();
-		updateRANSAC();
-
-	}
-
-	public void Card() {
-
-		/* GUI */
-		this.frame.setSize(400, 450);
-
-		/* Instantiation */
-		final GridBagLayout layout = new GridBagLayout();
-		final GridBagConstraints c = new GridBagConstraints();
-
-		final Scrollbar maxErrorSB = new Scrollbar(Scrollbar.HORIZONTAL, this.maxErrorInt, 1, MIN_SLIDER,
-				MAX_SLIDER + 1);
-		final Scrollbar minInliersSB = new Scrollbar(Scrollbar.HORIZONTAL, this.minInliers, 1, 2, numTimepoints + 1);
-		final Scrollbar maxDistSB = new Scrollbar(Scrollbar.HORIZONTAL, this.maxDist, 1, 0, numTimepoints + 1);
-		final Scrollbar minSlopeSB = new Scrollbar(Scrollbar.HORIZONTAL, this.minSlopeInt, 1, MIN_SLIDER,
-				MAX_SLIDER + 1);
-		final Scrollbar maxSlopeSB = new Scrollbar(Scrollbar.HORIZONTAL, this.maxSlopeInt, 1, MIN_SLIDER,
-				MAX_SLIDER + 1);
-
-		final Choice choice = new Choice();
-		choice.add("Linear Function only");
-		choice.add("Quadratic function regularized with Linear Function");
-		choice.add("Cubic Function regularized with Linear Function");
-
-		this.lambdaSB = new Scrollbar(Scrollbar.HORIZONTAL, this.lambdaInt, 1, MIN_SLIDER, MAX_SLIDER + 1);
-
-		final Label maxErrorLabel = new Label("Max. Error (px) = " + this.maxError, Label.CENTER);
-		final Label minInliersLabel = new Label("Min. #Points (tp) = " + this.minInliers, Label.CENTER);
-		final Label maxDistLabel = new Label("Max. Gap (tp) = " + this.maxDist, Label.CENTER);
-		this.lambdaLabel = new Label("Linearity (fraction) = " + this.lambda, Label.CENTER);
-		final Label minSlopeLabel = new Label("Min. Segment Slope (px/tp) = " + this.minSlope, Label.CENTER);
-		final Label maxSlopeLabel = new Label("Max. Segment Slope (px/tp) = " + this.maxSlope, Label.CENTER);
-		final Label maxResLabel = new Label(
-				"MT is rescued if the start of event# i + 1 > start of event# i by px =  " + this.restolerance,
-				Label.CENTER);
-
-		final Checkbox findCatastrophe = new Checkbox("Detect Catastrophies", this.detectCatastrophe);
-		final Scrollbar minCatDist = new Scrollbar(Scrollbar.HORIZONTAL, this.minDistCatInt, 1, MIN_SLIDER,
-				MAX_SLIDER + 1);
-		final Scrollbar maxRes = new Scrollbar(Scrollbar.HORIZONTAL, this.restoleranceInt, 1, MIN_SLIDER,
-				MAX_SLIDER + 1);
-		final Label minCatDistLabel = new Label("Min. Catatastrophy height (tp) = " + this.minDistanceCatastrophe,
-				Label.CENTER);
-		final Button done = new Button("Done");
-		final Button batch = new Button("Save Parameters for Batch run");
-		final Button cancel = new Button("Cancel");
-		final Button Write = new Button("Save Rates and Frequencies to File");
-		choice.select(functionChoice);
 		setFunction();
-
-		// Location
-		frame.setLayout(layout);
-
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.gridx = 0;
-		c.gridy = 0;
-		c.weightx = 1;
-		frame.add(maxErrorSB, c);
-
-		++c.gridy;
-		frame.add(maxErrorLabel, c);
-
-		++c.gridy;
-		c.insets = new Insets(10, 0, 0, 0);
-		frame.add(minInliersSB, c);
-		c.insets = new Insets(0, 0, 0, 0);
-
-		++c.gridy;
-		frame.add(minInliersLabel, c);
-
-		++c.gridy;
-		c.insets = new Insets(10, 0, 0, 0);
-		frame.add(maxDistSB, c);
-		c.insets = new Insets(0, 0, 0, 0);
-
-		++c.gridy;
-		frame.add(maxDistLabel, c);
-
-		++c.gridy;
-		c.insets = new Insets(30, 0, 0, 0);
-		frame.add(choice, c);
-		c.insets = new Insets(0, 0, 0, 0);
-
-		++c.gridy;
-		c.insets = new Insets(10, 0, 0, 0);
-		frame.add(lambdaSB, c);
-		c.insets = new Insets(0, 0, 0, 0);
-
-		++c.gridy;
-		frame.add(lambdaLabel, c);
-
-		++c.gridy;
-		c.insets = new Insets(30, 0, 0, 0);
-		frame.add(minSlopeSB, c);
-		c.insets = new Insets(0, 0, 0, 0);
-
-		++c.gridy;
-		frame.add(minSlopeLabel, c);
-
-		++c.gridy;
-		c.insets = new Insets(10, 0, 0, 0);
-		frame.add(maxSlopeSB, c);
-		c.insets = new Insets(0, 0, 0, 0);
-
-		++c.gridy;
-		frame.add(maxSlopeLabel, c);
-
-		++c.gridy;
-		c.insets = new Insets(20, 120, 0, 120);
-		frame.add(findCatastrophe, c);
-		c.insets = new Insets(0, 0, 0, 0);
-
-		++c.gridy;
-		c.insets = new Insets(10, 0, 0, 0);
-		frame.add(minCatDist, c);
-		c.insets = new Insets(0, 0, 0, 0);
-
-		++c.gridy;
-		frame.add(minCatDistLabel, c);
-
-		++c.gridy;
-		c.insets = new Insets(30, 150, 0, 150);
-		frame.add(Write, c);
-
-		++c.gridy;
-		c.insets = new Insets(30, 150, 0, 150);
-		frame.add(done, c);
-
-		++c.gridy;
-		c.insets = new Insets(30, 150, 0, 150);
-		frame.add(batch, c);
-
-		++c.gridy;
-		c.insets = new Insets(10, 150, 0, 150);
-		frame.add(cancel, c);
-
-		maxErrorSB.addAdjustmentListener(new MaxErrorListener(this, maxErrorLabel, maxErrorSB));
-		minInliersSB.addAdjustmentListener(new MinInliersListener(this, minInliersLabel, minInliersSB));
-		maxDistSB.addAdjustmentListener(new MaxDistListener(this, maxDistLabel, maxDistSB));
-		choice.addItemListener(new FunctionItemListener(this));
-		lambdaSB.addAdjustmentListener(new LambdaListener(this, lambdaLabel, lambdaSB));
-		minSlopeSB.addAdjustmentListener(new MinSlopeListener(this, minSlopeSB, minSlopeLabel));
-		maxSlopeSB.addAdjustmentListener(new MaxSlopeListener(this, maxSlopeSB, maxSlopeLabel));
-		findCatastrophe
-				.addItemListener(new CatastrophyCheckBoxListener(this, findCatastrophe, minCatDistLabel, minCatDist));
-		minCatDist.addAdjustmentListener(new MinCatastrophyDistanceListener(this, minCatDistLabel, minCatDist));
-
-		Write.addActionListener(new WriteRatesListener(this));
-		done.addActionListener(new FinishButtonListener(this, false));
-		batch.addActionListener(new RansacBatchmodeListener(this));
-		cancel.addActionListener(new FinishButtonListener(this, true));
-
-		frame.addWindowListener(new FrameListener(this));
-		frame.setVisible(true);
-
-		frame.pack();
 		updateRANSAC();
-	}
-
-	public void setFunction() {
-		if (functionChoice == 0) {
-			this.function = new LinearFunction();
-			this.setLambdaEnabled(false);
-		} else if (functionChoice == 1) {
-			this.setLambdaEnabled(true);
-			// this.function = new QuadraticFunction();
-			this.function = new InterpolatedPolynomial<LinearFunction, QuadraticFunction>(new LinearFunction(),
-					new QuadraticFunction(), 1 - this.lambda);
-		} else {
-			this.setLambdaEnabled(true);
-			this.function = new InterpolatedPolynomial<LinearFunction, HigherOrderPolynomialFunction>(
-					new LinearFunction(), new HigherOrderPolynomialFunction(3), 1 - this.lambda);
-		}
 
 	}
 
-	public void setLambdaEnabled(final boolean state) {
-		if (state) {
-			if (!lambdaSB.isEnabled()) {
-				lambdaSB.setEnabled(true);
-				lambdaLabel.setEnabled(true);
-				lambdaLabel.setForeground(Color.BLACK);
-			}
-		} else {
-			if (lambdaSB.isEnabled()) {
-				lambdaSB.setEnabled(false);
-				lambdaLabel.setEnabled(false);
-				lambdaLabel.setForeground(Color.GRAY);
-			}
-		}
-	}
+	
+
+	
+
+	
 
 	public void updateRANSAC() {
 		++updateCount;
@@ -515,18 +316,21 @@ public class InteractiveRANSAC implements PlugIn {
 			}
 		});
 
-		for (final Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>> segment : segments) {
-			System.out.println("\nSEGMENT");
-			for (final PointFunctionMatch pm : segment.getB())
-				System.out.println(pm.getP1().getL()[0] + ", " + pm.getP1().getL()[1]);
-		}
+		
 	}
+	
+	public void setFunction() {
+		if (functionChoice == 0) {
+			this.function = new LinearFunction();
+		} else if (functionChoice == 1) {
+			// this.function = new QuadraticFunction();
+			this.function = new InterpolatedPolynomial<LinearFunction, QuadraticFunction>(new LinearFunction(),
+					new QuadraticFunction(), 1 - lambda);
+		} else {
+			this.function = new InterpolatedPolynomial<LinearFunction, HigherOrderPolynomialFunction>(
+					new LinearFunction(), new HigherOrderPolynomialFunction(3), 1 - lambda);
+		}
 
-	public void close() {
-		frame.setVisible(false);
-		frame.dispose();
-		jFreeChartFrame.setVisible(false);
-		jFreeChartFrame.dispose();
 	}
 
 	protected static double computeValueFromDoubleExpScrollbarPosition(final int scrollbarPosition,
