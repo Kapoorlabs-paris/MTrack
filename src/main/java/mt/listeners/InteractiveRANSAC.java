@@ -1,6 +1,8 @@
 package mt.listeners;
 
+import java.awt.BorderLayout;
 import java.awt.Button;
+import java.awt.CardLayout;
 import java.awt.Checkbox;
 import java.awt.Choice;
 import java.awt.Color;
@@ -11,16 +13,27 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Label;
 import java.awt.Scrollbar;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.FilenameFilter;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Locale;
 
+import javax.swing.AbstractAction;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.jfree.util.ShapeUtilities;
 
@@ -34,9 +47,13 @@ import fit.polynomial.QuadraticFunction;
 import ij.ImageJ;
 import ij.plugin.PlugIn;
 import mpicbg.models.Point;
+import mt.DisplayPoints;
+import mt.LengthCounter;
+import mt.LengthDistribution;
 import mt.Tracking;
 import net.imglib2.util.Pair;
 import net.imglib2.util.ValuePair;
+import ransacBatch.BatchRANSAC;
 
 public class InteractiveRANSAC implements PlugIn {
 	public static int MIN_SLIDER = 0;
@@ -57,7 +74,7 @@ public class InteractiveRANSAC implements PlugIn {
 	public NumberFormat nf = NumberFormat.getInstance(Locale.ENGLISH);
 
 	public ArrayList<Pair<LinearFunction, ArrayList<PointFunctionMatch>>> linearlist;
-	final Frame frame, jFreeChartFrame;
+	final Frame  jFreeChartFrame;
 	public int functionChoice = 1; // 0 == Linear, 1 == Quadratic interpolated, 2 ==
 								// cubic interpolated
 	AbstractFunction2D function;
@@ -86,7 +103,7 @@ public class InteractiveRANSAC implements PlugIn {
 	public int minInliers = 50;
 	public boolean detectCatastrophe = false;
 	public double minDistanceCatastrophe = 20;
-
+	File[] AllMovies;
 	protected boolean wasCanceled = false;
 
 	public InteractiveRANSAC(final ArrayList<Pair<Integer, Double>> mts, File file) {
@@ -125,7 +142,6 @@ public class InteractiveRANSAC implements PlugIn {
 		this.dataset = new XYSeriesCollection();
 		this.chart = Tracking.makeChart(dataset, "Microtubule Length Plot", "Timepoint", "MT Length");
 		this.jFreeChartFrame = Tracking.display(chart, new Dimension(500, 400));
-		this.frame = new Frame("Welcome to Ransac Rate Analyzer ");
 
 	};
 
@@ -141,10 +157,25 @@ public class InteractiveRANSAC implements PlugIn {
 
 	}
 
+	
+	public JFrame Cardframe = new JFrame("Welcome to Ransac Rate and Statistics Analyzer ");
+	public JPanel panelCont = new JPanel();
+	public JPanel panelFirst = new JPanel();
+	public JPanel panelSecond = new JPanel();
+	JFileChooser chooserA;
+	String choosertitleA;
 	public void Card() {
+		
+		CardLayout cl = new CardLayout();
 
-		/* GUI */
-		this.frame.setSize(400, 450);
+		panelCont.setLayout(cl);
+		
+		panelCont.add(panelFirst, "1");
+		panelCont.add(panelSecond, "2");
+		
+		panelFirst.setName("Ransac fits for rates and frequency analysis");
+		
+		panelSecond.setName("Statistical Analysis");
 
 		/* Instantiation */
 		final GridBagLayout layout = new GridBagLayout();
@@ -191,90 +222,92 @@ public class InteractiveRANSAC implements PlugIn {
 		setFunction();
 
 		// Location
-		frame.setLayout(layout);
+		panelFirst.setLayout(layout);
 
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridx = 0;
 		c.gridy = 0;
 		c.weightx = 1;
-		frame.add(maxErrorSB, c);
+		
+		
+		panelFirst.add(maxErrorSB, c);
 
 		++c.gridy;
-		frame.add(maxErrorLabel, c);
-
-		++c.gridy;
-		c.insets = new Insets(10, 0, 0, 0);
-		frame.add(minInliersSB, c);
-		c.insets = new Insets(0, 0, 0, 0);
-
-		++c.gridy;
-		frame.add(minInliersLabel, c);
+		panelFirst.add(maxErrorLabel, c);
 
 		++c.gridy;
 		c.insets = new Insets(10, 0, 0, 0);
-		frame.add(maxDistSB, c);
+		panelFirst.add(minInliersSB, c);
 		c.insets = new Insets(0, 0, 0, 0);
 
 		++c.gridy;
-		frame.add(maxDistLabel, c);
+		panelFirst.add(minInliersLabel, c);
+
+		++c.gridy;
+		c.insets = new Insets(10, 0, 0, 0);
+		panelFirst.add(maxDistSB, c);
+		c.insets = new Insets(0, 0, 0, 0);
+
+		++c.gridy;
+		panelFirst.add(maxDistLabel, c);
 
 		++c.gridy;
 		c.insets = new Insets(30, 0, 0, 0);
-		frame.add(choice, c);
+		panelFirst.add(choice, c);
 		c.insets = new Insets(0, 0, 0, 0);
 
 		++c.gridy;
 		c.insets = new Insets(10, 0, 0, 0);
-		frame.add(lambdaSB, c);
+		panelFirst.add(lambdaSB, c);
 		c.insets = new Insets(0, 0, 0, 0);
 
 		++c.gridy;
-		frame.add(lambdaLabel, c);
+		panelFirst.add(lambdaLabel, c);
 
 		++c.gridy;
 		c.insets = new Insets(30, 0, 0, 0);
-		frame.add(minSlopeSB, c);
+		panelFirst.add(minSlopeSB, c);
 		c.insets = new Insets(0, 0, 0, 0);
 
 		++c.gridy;
-		frame.add(minSlopeLabel, c);
+		panelFirst.add(minSlopeLabel, c);
 
 		++c.gridy;
 		c.insets = new Insets(10, 0, 0, 0);
-		frame.add(maxSlopeSB, c);
+		panelFirst.add(maxSlopeSB, c);
 		c.insets = new Insets(0, 0, 0, 0);
 
 		++c.gridy;
-		frame.add(maxSlopeLabel, c);
+		panelFirst.add(maxSlopeLabel, c);
 
 		++c.gridy;
 		c.insets = new Insets(20, 120, 0, 120);
-		frame.add(findCatastrophe, c);
+		panelFirst.add(findCatastrophe, c);
 		c.insets = new Insets(0, 0, 0, 0);
 
 		++c.gridy;
 		c.insets = new Insets(10, 0, 0, 0);
-		frame.add(minCatDist, c);
+		panelFirst.add(minCatDist, c);
 		c.insets = new Insets(0, 0, 0, 0);
 
 		++c.gridy;
-		frame.add(minCatDistLabel, c);
+		panelFirst.add(minCatDistLabel, c);
 
 		++c.gridy;
 		c.insets = new Insets(30, 150, 0, 150);
-		frame.add(Write, c);
+		panelFirst.add(Write, c);
 
 		++c.gridy;
 		c.insets = new Insets(30, 150, 0, 150);
-		frame.add(done, c);
+		panelFirst.add(done, c);
 
 		++c.gridy;
 		c.insets = new Insets(30, 150, 0, 150);
-		frame.add(batch, c);
+		panelFirst.add(batch, c);
 
 		++c.gridy;
 		c.insets = new Insets(10, 150, 0, 150);
-		frame.add(cancel, c);
+		panelFirst.add(cancel, c);
 
 		maxErrorSB.addAdjustmentListener(new MaxErrorListener(this, maxErrorLabel, maxErrorSB));
 		minInliersSB.addAdjustmentListener(new MinInliersListener(this, minInliersLabel, minInliersSB));
@@ -291,14 +324,134 @@ public class InteractiveRANSAC implements PlugIn {
 		done.addActionListener(new FinishButtonListener(this, false));
 		batch.addActionListener(new RansacBatchmodeListener(this));
 		cancel.addActionListener(new FinishButtonListener(this, true));
+		
+		JPanel control = new JPanel();
 
-		frame.addWindowListener(new FrameListener(this));
-		frame.setVisible(true);
+		control.add(new JButton(new AbstractAction("\u22b2Prev") {
 
-		frame.pack();
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				CardLayout cl = (CardLayout) panelCont.getLayout();
+
+				cl.previous(panelCont);
+			}
+		}));
+		control.add(new JButton(new AbstractAction("Next\u22b3") {
+
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				CardLayout cl = (CardLayout) panelCont.getLayout();
+				cl.next(panelCont);
+			}
+		}));
+		
+		
+		// Statistical Analysis Panel
+		final Label LoadtrackText = new Label("Select directory of txt trajectory files and get length distribution");
+		JButton Lengthdistribution= new JButton("Get Length Distribution");
+		
+		panelSecond.setLayout(layout);
+		
+		++c.gridy;
+		c.insets = new Insets(10, 10, 10, 0);
+		panelSecond.add(Lengthdistribution, c);
+		
+		panelFirst.setVisible(true);
+		cl.show(panelCont, "1");
+		Cardframe.add(panelCont, BorderLayout.CENTER);
+		Cardframe.add(control, BorderLayout.SOUTH);
+		Cardframe.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		Cardframe.pack();
+		Cardframe.setVisible(true);
+		Lengthdistribution.addActionListener(new LengthdistributionListener(Cardframe));
 		updateRANSAC();
 	}
+	
+	
 
+		
+	
+	
+	protected class LengthdistributionListener implements ActionListener {
+
+		final Frame parent;
+
+		public LengthdistributionListener(Frame parent) {
+
+			this.parent = parent;
+
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent arg0) {
+
+			int result;
+
+			chooserA = new JFileChooser();
+
+			chooserA.setCurrentDirectory(new java.io.File("."));
+			chooserA.setDialogTitle(choosertitleA);
+			chooserA.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+			//
+			// disable the "All files" option.
+			//
+			chooserA.setAcceptAllFileFilterUsed(false);
+			FileNameExtensionFilter filter = new FileNameExtensionFilter("Rate Files", "txt");
+
+			chooserA.setFileFilter(filter);
+			chooserA.showOpenDialog(parent);
+
+			AllMovies = chooserA.getSelectedFile().listFiles(new FilenameFilter() {
+
+				@Override
+				public boolean accept(File pathname, String filename) {
+
+					return (filename.endsWith(".txt") && !filename.contains("Rates") && !filename.contains("Average"));
+				}
+			});
+			
+			
+			ArrayList<ArrayList<LengthCounter>> Allcurrentcounter = new ArrayList<ArrayList<LengthCounter>>();
+			
+			for (int i = 0; i < AllMovies.length ; ++i){
+				
+				
+				ArrayList<LengthCounter> currentcounter = 	LengthDistribution.Lengthdistro(AllMovies[i]);
+				
+				Allcurrentcounter.add(currentcounter);
+		
+				
+				
+			}
+			
+			XYSeries counterseries = new XYSeries( "MT length distribution" );
+			
+			for (int index = 0; index < Allcurrentcounter.size(); ++index){
+				
+				for (final LengthCounter lvst : Allcurrentcounter.get(index))
+					counterseries.add(lvst.Framenumber, lvst.totallength);
+				
+			}
+			final XYSeriesCollection dataset = new XYSeriesCollection();
+			dataset.addSeries(counterseries);
+			final JFreeChart chart = ChartFactory.createScatterPlot("MT length distribution", "Time (px)", "Length (px)", dataset);
+			
+			DisplayPoints.display( chart, new Dimension( 800, 500 ) );
+
+		}
+
+	}
+	
 	public void setFunction() {
 		if (functionChoice == 0) {
 			this.function = new LinearFunction();
@@ -541,8 +694,8 @@ public class InteractiveRANSAC implements PlugIn {
 	}
 
 	public void close() {
-		frame.setVisible(false);
-		frame.dispose();
+		panelFirst.setVisible(false);
+		Cardframe.dispose();
 		jFreeChartFrame.setVisible(false);
 		jFreeChartFrame.dispose();
 	}

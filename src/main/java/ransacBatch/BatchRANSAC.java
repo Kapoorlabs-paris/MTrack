@@ -130,9 +130,9 @@ public class BatchRANSAC implements PlugIn {
 		Tracking.setStroke(chart, 0, 0.75f);
 		setFunction();
 		updateRANSAC();
-		
-	
 		writeratestofile();
+		
+		
 
 	}
 	

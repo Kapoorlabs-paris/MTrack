@@ -69,6 +69,8 @@ public class NlengthMaxListener implements ActionListener {
 										MTcount++;
 
 									}
+									if (MTcount == 0)
+										break;
 
 								}
 
@@ -121,6 +123,8 @@ public class NlengthMaxListener implements ActionListener {
 										MTcount++;
 
 									}
+									if (MTcount == 0)
+										break;
 
 								}
 

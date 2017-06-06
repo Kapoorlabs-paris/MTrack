@@ -217,6 +217,7 @@ public class RansacFileChooser extends JPanel {
 				
 				
 			}
+			LengthDistribution.GetLengthDistribution(AllMovies);
 
 		}
 

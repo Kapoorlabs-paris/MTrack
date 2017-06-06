@@ -48,6 +48,65 @@ import net.imglib2.util.ValuePair;
 
 public class Tracking
 {
+	
+	
+	public static ArrayList< FLSobject > loadMTStat( final File file )
+	{
+		final ArrayList< FLSobject > points = new ArrayList< FLSobject >();
+
+		try
+		{
+			BufferedReader in = Util.openFileRead( file );
+
+			while( in.ready() )
+			{
+				String line = in.readLine().trim();
+
+				while ( line.contains( "\t\t" ) )
+					line = line.replaceAll( "\t\t", "\t" );
+
+				if ( line.length() >= 3 && line.matches( "[0-9].*" ) )
+				{
+					final String[] split = line.trim().split( "\t" );
+
+					final int frame = Integer.parseInt( split[ 0 ] );
+					final double length = Double.parseDouble( split[ 1 ] );
+					final int seedID = Integer.parseInt( split[ 3 ] );
+
+					FLSobject statobject = new FLSobject(frame, seedID, length);
+					points.add( statobject);
+				}
+			}
+		}
+		catch ( Exception e )
+		{
+			e.printStackTrace();
+			return null;
+		}
+
+		Collections.sort( points, new Comparator< FLSobject >()
+		{
+			@Override
+			public int compare( final FLSobject o1, final FLSobject o2 )
+			{
+				
+				final int t1 = o1.Framenumber;
+				final int t2 = o2.Framenumber;
+				
+				
+				if (t1 < t2)
+					return -1;
+				else if (t1 == t2)
+					return 0;
+				else
+					return 1;
+			}
+		} );
+
+		return points;
+	}
+	
+	
 	public static ArrayList< Pair< Integer, Double > > loadMT( final File file )
 	{
 		final ArrayList< Pair< Integer, Double > > points = new ArrayList< Pair< Integer, Double > >();
