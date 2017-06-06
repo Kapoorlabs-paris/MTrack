@@ -394,7 +394,7 @@ public class InteractiveRANSAC implements PlugIn {
 		}
 
 		if (this.detectCatastrophe) {
-			if (segments.size() <= 2) {
+			if (segments.size() < 2) {
 				System.out.println(
 						"We have only " + segments.size() + " segments, need at least two to detect catastrophies.");
 			} else {
