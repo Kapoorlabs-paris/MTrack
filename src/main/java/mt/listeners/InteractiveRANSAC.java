@@ -81,6 +81,7 @@ public class InteractiveRANSAC implements PlugIn {
 	public double minSlope = 0.1;
 	public double maxSlope = 100;
 	public double restolerance = 5;
+	public double tptolerance = 5;
 	public int maxDist = 300;
 	public int minInliers = 50;
 	public boolean detectCatastrophe = false;
@@ -123,7 +124,7 @@ public class InteractiveRANSAC implements PlugIn {
 		this.maxSlope = computeValueFromDoubleExpScrollbarPosition(this.maxSlopeInt, MAX_SLIDER, MAX_ABS_SLOPE);
 		this.dataset = new XYSeriesCollection();
 		this.chart = Tracking.makeChart(dataset, "Microtubule Length Plot", "Timepoint", "MT Length");
-		this.jFreeChartFrame = Tracking.display(chart, new Dimension(1000, 800));
+		this.jFreeChartFrame = Tracking.display(chart, new Dimension(500, 400));
 		this.frame = new Frame("Welcome to Ransac Rate Analyzer ");
 
 	};
@@ -483,6 +484,24 @@ public class InteractiveRANSAC implements PlugIn {
 			public int compare(final PointFunctionMatch o1, final PointFunctionMatch o2) {
 				final double t1 = o1.getP1().getL()[0];
 				final double t2 = o2.getP1().getL()[0];
+
+				if (t1 < t2)
+					return -1;
+				else if (t1 == t2)
+					return 0;
+				else
+					return 1;
+			}
+		});
+	}
+	
+	protected void sortPoints(final ArrayList<Point> points) {
+		Collections.sort(points, new Comparator<Point>() {
+
+			@Override
+			public int compare(final Point o1, final Point o2) {
+				final double t1 = o1.getL()[0];
+				final double t2 = o2.getL()[0];
 
 				if (t1 < t2)
 					return -1;

@@ -22,6 +22,7 @@ public class CreateRanfile {
 
 		Prefs.set("MaxGap.double", parent.maxDist);
 		Prefs.set("Rescue.double", parent.restolerance);
+		Prefs.set("Timepoint.double", parent.tptolerance);
 		Prefs.set("Linearity.double", parent.lambda);
 		Prefs.set("Minslope.double", parent.minSlope);
 		Prefs.set("Maxslope.double", parent.maxSlope);
@@ -29,6 +30,7 @@ public class CreateRanfile {
 		Prefs.set("MinDist.double", parent.minDistanceCatastrophe);
 		Prefs.set("Functionchoice.int", parent.functionChoice);
 		Prefs.set("numTp.int", parent.numTimepoints);
+		
 		Prefs.savePreferences();
 
 		 System.exit(1);

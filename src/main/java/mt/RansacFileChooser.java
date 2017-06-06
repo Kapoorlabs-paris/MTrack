@@ -138,7 +138,7 @@ public class RansacFileChooser extends JPanel {
 			LoadDirectoryText.setBackground(new Color(1, 0, 1));
 			LoadDirectoryText.setForeground(new Color(255, 255, 255));
 
-			JButton Measurebatch = new JButton("Select directory of txt trajectory files");
+			JButton Measurebatch = new JButton("Select directory of txt trajectory files and obtain RANSAC fits");
 
 			c.fill = GridBagConstraints.HORIZONTAL;
 			c.gridx = 0;

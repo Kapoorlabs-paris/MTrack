@@ -27,10 +27,43 @@ public class WriteRatesListener implements ActionListener {
 	@Override
 	public void actionPerformed(final ActionEvent arg0) {
 
-		String inputfile = parent.inputfile.getName().replaceFirst("[.][^.]+$", "");
+		
+	writeratestofile();
+
+	}
+	
+	public double leastStart(){
+		
+		
+		double minstartX = Double.MAX_VALUE;
+		
+		for (final Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>> result : parent.segments) {
+
+			final Pair<Double, Double> minMax = Tracking.fromTo(result.getB());
+
+			double startX = minMax.getA();
+			
+			if (minstartX <= startX){
+				
+				minstartX = startX;
+				
+			}
+			
+		}
+		
+		return minstartX;
+		
+	}
+	
+	
+        public  void writeratestofile(){
+		
+		
+
+		String file = parent.inputfile.getName().replaceFirst("[.][^.]+$", "");
 		try {
-			File ratesfile = new File(parent.inputdirectory + "//" + inputfile + "Rates" + ".txt");
-			File frequfile = new File(parent.inputdirectory + "//" + inputfile + "Averages" + ".txt");
+			File ratesfile = new File(parent.inputdirectory + "//" + file + "Rates" + ".txt");
+			File frequfile = new File(parent.inputdirectory + "//" + file + "Averages" + ".txt");
 			
 			FileWriter fw = new FileWriter(ratesfile);
 
@@ -43,7 +76,7 @@ public class WriteRatesListener implements ActionListener {
 			
 			
 			bw.write("\tStartTime (px)\tEndTime(px)\tLinearRateSlope(px)\n");
-			
+			bwfrequ.write("\tAverageGrowthrate(px)\tAverageShrinkrate(px)\tCatastropheFrequency(px)\tRescueFrequency(px)\n");
 			int count = 0;
 			int negcount = 0;
 			int rescount = 0;
@@ -52,7 +85,10 @@ public class WriteRatesListener implements ActionListener {
 			double negtimediff = 0;
 			double averagegrowth = 0;
 			double averageshrink = 0;
-			double startXold = 0;
+			
+			double minstartX = leastStart();
+			double catfrequ = 0;
+			double resfrequ = 0;
 			for (final Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>> result : parent.segments) {
 
 				final Pair<Double, Double> minMax = Tracking.fromTo(result.getB());
@@ -62,19 +98,25 @@ public class WriteRatesListener implements ActionListener {
 				
 				Polynomial<?, Point> polynomial = (Polynomial) result.getA();
 				
+			
+				parent.sortPoints(parent.points);
+				
+				if (parent.points.get(parent.points.size() - 1).getW()[0] - endX >= parent.tptolerance 
+						&& Math.abs(parent.points.get(parent.points.size() - 1).getW()[1] - polynomial.predict(endX)) >= parent.restolerance ){
+				
+					
                 LinearFunction linear = new LinearFunction();
 				LinearFunction.slopeFits( result.getB(), linear, parent.minSlope, parent.maxSlope ) ;
 				
 				
 				double linearrate = linear.getCoefficient(1); 
 				
-				if (startXold!=0){
 					
-					if (startX - startXold > parent.restolerance){
+					if (startX - minstartX > parent.restolerance){
 					rescount++;
 					restimediff += endX - startX;
 					
-					}
+					
 					
 				}
 				
@@ -99,7 +141,6 @@ public class WriteRatesListener implements ActionListener {
 				}
 				
 
-				startXold = startX;
 				
 				
 				bw.write("\t" + parent.nf.format(startX) + "\t" + "\t" + parent.nf.format(endX) + "\t" + "\t"
@@ -113,11 +154,10 @@ public class WriteRatesListener implements ActionListener {
 			if (negcount > 0)
 				averageshrink/=negcount;
 			
-			bwfrequ.write("\tAverageGrowthrate(px)\tAverageShrinkrate(px)\tCatastropheFrequency(px)\tRescueFrequency(px)\n");
 			
 			
-			double catfrequ = 0;
-			double resfrequ = 0;
+			
+			
 			
 			if (count > 0){
 				
@@ -131,24 +171,33 @@ public class WriteRatesListener implements ActionListener {
 			}
 			
 			
+			
+		
+			
+		
+
+			
+			
+		} 
 			bwfrequ.write("\t" + parent.nf.format(averagegrowth) + "\t" + "\t" + "\t" + "\t" + parent.nf.format(averageshrink)  + "\t"+ "\t" + "\t" +  parent.nf.format(catfrequ)
 			 + "\t"+ "\t" + "\t" +  parent.nf.format(resfrequ)
 			
-			+ "\n" + "\n");
-		
+			+ "\n" + "\n");	
 			
-		System.out.println(rescount + " " + count);
-
+			
 			bw.close();
 			fw.close();
 			
 			bwfrequ.close();
 			fwfrequ.close();
-			
-		} catch (IOException e) {
+		
+		}catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
+		
+		
 	}
+
+	
 }
