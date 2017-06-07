@@ -17,12 +17,25 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FilenameFilter;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.filechooser.FileNameExtensionFilter;
+
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.StandardXYBarPainter;
+import org.jfree.chart.renderer.xy.XYBarRenderer;
+import org.jfree.data.xy.IntervalXYDataset;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
 
 import ij.ImageJ;
 import ij.ImagePlus;
@@ -33,6 +46,8 @@ import mt.listeners.InteractiveRANSAC;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.img.display.imagej.ImageJFunctions;
 import net.imglib2.type.numeric.real.FloatType;
+import net.imglib2.util.Pair;
+import net.imglib2.util.ValuePair;
 import net.imglib2.view.Views;
 import ransacBatch.BatchRANSAC;
 
@@ -207,22 +222,31 @@ public class RansacFileChooser extends JPanel {
 					return (filename.endsWith(".txt") && !filename.contains("Rates") && !filename.contains("Average"));
 				}
 			});
-			
-			
-			for (int i = 0; i < AllMovies.length ; ++i){
-				
-				
-				new BatchRANSAC(Tracking.loadMT((AllMovies[i])),
-						AllMovies[i]).run(null);
-				
-				
+
+			ArrayList<Pair<Integer, Double>> Alllife = new ArrayList<Pair<Integer, Double>>();
+			for (int i = 0; i < AllMovies.length; ++i) {
+
+				BatchRANSAC batch = new BatchRANSAC(Tracking.loadMT((AllMovies[i])), AllMovies[i]);
+				batch.run(null);
+				Pair<Integer, Double> life = new ValuePair<Integer, Double>(i, batch.lifetime);
+				Alllife.add(life);
 			}
+			List<Double> Xvalues = new ArrayList<Double>();
+
+			for (final Pair<Integer, Double> key : Alllife)
+				Xvalues.add(key.getB());
+			int numBins = 10;
+			final JFreeChart histXchart = DisplayHistogram.makehistXChart(Xvalues, numBins);
+
+			DisplayPoints.display(histXchart, new Dimension(800, 500));
+
 			LengthDistribution.GetLengthDistribution(AllMovies);
 
 		}
 
 	}
 
+	
 	protected class FrameListener extends WindowAdapter {
 		final Frame parent;
 
@@ -317,7 +341,5 @@ public class RansacFileChooser extends JPanel {
 	public Dimension getPreferredSize() {
 		return new Dimension(800, 300);
 	}
-
-
 
 }

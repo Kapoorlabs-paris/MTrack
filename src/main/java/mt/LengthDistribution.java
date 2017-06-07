@@ -3,6 +3,10 @@ package mt;
 import java.awt.Dimension;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
@@ -11,67 +15,72 @@ import org.jfree.data.xy.XYSeriesCollection;
 
 public class LengthDistribution {
 
-	public static ArrayList<LengthCounter> Lengthdistro(File file) {
+	public static double Lengthdistro(File file) {
 
 		ArrayList<FLSobject> currentobject = Tracking.loadMTStat(file);
+		
 
-		ArrayList<LengthCounter> currentcounter = new ArrayList<LengthCounter>();
-		int starttime = currentobject.get(0).Framenumber;
-		int endtime = currentobject.get(currentobject.size() - 1).Framenumber;
+		double meanlength = 0;
 
-		for (int frameindex = starttime; frameindex <= endtime; ++frameindex) {
-
-			double length = 0;
 
 			for (int index = 0; index < currentobject.size(); ++index) {
 
-				int time = currentobject.get(index).Framenumber;
-
-				if (time == frameindex) {
-
-					length += currentobject.get(index).length;
-
-				
-				}
-
+				meanlength += currentobject.get(index).length;
+	
 			}
-
-			if (length > 0)
-			currentcounter.add(new LengthCounter(frameindex, length));
 			
-		}
+		meanlength/=currentobject.size();
 		
-		return currentcounter;
+		System.out.println(meanlength);
+		
+		return meanlength;
 
 	}
 	
 	public static void GetLengthDistribution(File[] AllMovies){
 		
 		
-		ArrayList<ArrayList<LengthCounter>> Allcurrentcounter = new ArrayList<ArrayList<LengthCounter>>();
+		
+		
+		
+		ArrayList<Double> Allmeans = new ArrayList<Double>();
 		
 		for (int i = 0; i < AllMovies.length ; ++i){
 			
 			
-			ArrayList<LengthCounter> currentcounter = 	LengthDistribution.Lengthdistro(AllMovies[i]);
+           Allmeans.add(LengthDistribution.Lengthdistro(AllMovies[i]));
 			
-			Allcurrentcounter.add(currentcounter);
 	
 			
-			
 		}
+		
+		Collections.sort(Allmeans);
+		
+		int min = (int)Math.round(Allmeans.get(0)) - 1;
+		int max = (int)Math.round(Allmeans.get(Allmeans.size() - 1));
 		
 		XYSeries counterseries = new XYSeries( "MT length distribution" );
-		
-		for (int index = 0; index < Allcurrentcounter.size(); ++index){
+		for (int maxlength = min; maxlength < max; ++maxlength) {
+
+			int MTcount = 0;
 			
-			for (final LengthCounter lvst : Allcurrentcounter.get(index))
-				counterseries.add(lvst.Framenumber, lvst.totallength);
+			
+			for (int index = 0; index < Allmeans.size(); ++index){
+				
+				if (Allmeans.get(index) >= maxlength)
+					MTcount++;
+				
+			}
+			counterseries.add(MTcount, maxlength);
 			
 		}
+		
+		
+		
+		
 		final XYSeriesCollection dataset = new XYSeriesCollection();
 		dataset.addSeries(counterseries);
-		final JFreeChart chart = ChartFactory.createScatterPlot("MT length distribution", "Time (px)", "Length (px)", dataset);
+		final JFreeChart chart = ChartFactory.createScatterPlot("MT length distribution", "Number of MT", "Length (px)", dataset);
 		
 		DisplayPoints.display( chart, new Dimension( 800, 500 ) );
 

@@ -45,10 +45,7 @@ import net.imglib2.util.Pair;
 import net.imglib2.util.ValuePair;
 
 public class BatchRANSAC implements PlugIn {
-	
-	
-	
-	
+
 	public static int MIN_SLIDER = 0;
 	public static int MAX_SLIDER = 500;
 
@@ -67,7 +64,7 @@ public class BatchRANSAC implements PlugIn {
 
 	public ArrayList<Pair<LinearFunction, ArrayList<PointFunctionMatch>>> linearlist;
 	final Frame frame, jFreeChartFrame;
-	public static int functionChoice =  Prefs.getInt(".Functionchoice.int", 2); 
+	public static int functionChoice = Prefs.getInt(".Functionchoice.int", 2);
 	public File inputfile;
 	public String inputdirectory;
 	AbstractFunction2D function;
@@ -75,8 +72,7 @@ public class BatchRANSAC implements PlugIn {
 	final ArrayList<Pair<Integer, Double>> mts;
 	final ArrayList<Point> points;
 
-
-	public static int numTimepoints = (int)Prefs.get(".numTp.int", 300);
+	public static int numTimepoints = (int) Prefs.get(".numTp.int", 300);
 	Scrollbar lambdaSB;
 	Label lambdaLabel;
 
@@ -88,32 +84,26 @@ public class BatchRANSAC implements PlugIn {
 	// for scrollbars
 	int maxErrorInt, lambdaInt, minSlopeInt, maxSlopeInt, minDistCatInt, restoleranceInt;
 
-	public  double maxError = Prefs.getDouble(".MaxError.double", 2.0);
-	public  double minSlope = Prefs.getDouble(".Minslope.double", 0.1);
-	public   double maxSlope = Prefs.getDouble(".Maxslope.double", 100);
-	public   double restolerance = Prefs.getDouble(".Rescue.double", 5);
-	public   double tptolerance = Prefs.getDouble(".Timepoint.double", 5);
-	public  int maxDist = (int)Prefs.getDouble(".MaxGap.double", 300);
-	public  int minInliers = (int)Prefs.getDouble(".MinPoints.double", 10);
-	public  boolean detectCatastrophe = Prefs.getBoolean(".DetectCat.boolean", false);
-	public  double minDistanceCatastrophe = Prefs.getDouble(".MinDist.double", 5);
-	
-	
+	public double maxError = Prefs.getDouble(".MaxError.double", 2.0);
+	public double minSlope = Prefs.getDouble(".Minslope.double", 0.1);
+	public double maxSlope = Prefs.getDouble(".Maxslope.double", 100);
+	public double restolerance = Prefs.getDouble(".Rescue.double", 5);
+	public double tptolerance = Prefs.getDouble(".Timepoint.double", 5);
+	public int maxDist = (int) Prefs.getDouble(".MaxGap.double", 300);
+	public int minInliers = (int) Prefs.getDouble(".MinPoints.double", 10);
+	public boolean detectCatastrophe = Prefs.getBoolean(".DetectCat.boolean", false);
+	public double minDistanceCatastrophe = Prefs.getDouble(".MinDist.double", 5);
 
 	protected boolean wasCanceled = false;
 
-	
-
-	public BatchRANSAC(final ArrayList<Pair<Integer, Double>> mts, 
-			  final File file) {
+	public BatchRANSAC(final ArrayList<Pair<Integer, Double>> mts, final File file) {
 		nf.setMaximumFractionDigits(5);
-		
+
 		this.mts = mts;
 		this.points = Tracking.toPoints(mts);
 		this.inputfile = file;
 		this.inputdirectory = file.getParent();
-	
-	
+
 		this.dataset = new XYSeriesCollection();
 		this.chart = Tracking.makeChart(dataset, "Microtubule Length Plot", "Timepoint", "MT Length");
 		this.jFreeChartFrame = Tracking.display(chart, new Dimension(500, 400));
@@ -121,6 +111,7 @@ public class BatchRANSAC implements PlugIn {
 
 	};
 
+	public double lifetime;
 	@Override
 	public void run(String arg) {
 		/* JFreeChart */
@@ -130,16 +121,9 @@ public class BatchRANSAC implements PlugIn {
 		Tracking.setStroke(chart, 0, 0.75f);
 		setFunction();
 		updateRANSAC();
-		writeratestofile();
-		
-		
+		lifetime = writeratestofile();
 
 	}
-	
-	
-	
-
-	
 
 	public void updateRANSAC() {
 		++updateCount;
@@ -285,6 +269,7 @@ public class BatchRANSAC implements PlugIn {
 
 		--updateCount;
 	}
+
 	protected void sortPoints(final ArrayList<Point> points) {
 		Collections.sort(points, new Comparator<Point>() {
 
@@ -302,52 +287,48 @@ public class BatchRANSAC implements PlugIn {
 			}
 		});
 	}
-	
-	public double leastStart(){
-		
-		
+
+	public double leastStart() {
+
 		double minstartX = Double.MAX_VALUE;
-		
+
 		for (final Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>> result : segments) {
 
 			final Pair<Double, Double> minMax = Tracking.fromTo(result.getB());
 
 			double startX = minMax.getA();
-			
-			if (minstartX <= startX){
-				
-				minstartX = startX;
-				
-			}
-			
-		}
-		
-		return minstartX;
-		
-	}
-	
 
-	public void writeratestofile(){
-		
-		
+			if (minstartX <= startX) {
+
+				minstartX = startX;
+
+			}
+
+		}
+
+		return minstartX;
+
+	}
+
+	public double writeratestofile() {
 
 		String file = inputfile.getName().replaceFirst("[.][^.]+$", "");
+		double lifetime = 0;
 		try {
 			File ratesfile = new File(inputdirectory + "//" + file + "Rates" + ".txt");
 			File frequfile = new File(inputdirectory + "//" + file + "Averages" + ".txt");
-			
+
 			FileWriter fw = new FileWriter(ratesfile);
 
 			BufferedWriter bw = new BufferedWriter(fw);
-			
-			
+
 			FileWriter fwfrequ = new FileWriter(frequfile);
 
 			BufferedWriter bwfrequ = new BufferedWriter(fwfrequ);
-			
-			
+
 			bw.write("\tStartTime (px)\tEndTime(px)\tLinearRateSlope(px)\n");
-			bwfrequ.write("\tAverageGrowthrate(px)\tAverageShrinkrate(px)\tCatastropheFrequency(px)\tRescueFrequency(px)\n");
+			bwfrequ.write(
+					"\tAverageGrowthrate(px)\tAverageShrinkrate(px)\tCatastropheFrequency(px)\tRescueFrequency(px)\n");
 			int count = 0;
 			int negcount = 0;
 			int rescount = 0;
@@ -356,109 +337,92 @@ public class BatchRANSAC implements PlugIn {
 			double negtimediff = 0;
 			double averagegrowth = 0;
 			double averageshrink = 0;
-			
+
 			double minstartX = leastStart();
 			double catfrequ = 0;
 			double resfrequ = 0;
+			
 			for (final Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>> result : segments) {
 
 				final Pair<Double, Double> minMax = Tracking.fromTo(result.getB());
 
 				double startX = minMax.getA();
 				double endX = minMax.getB();
-				
+
 				Polynomial<?, Point> polynomial = (Polynomial) result.getA();
-				
-	           sortPoints(points);
-				
-				if (points.get(points.size() - 1).getW()[0] - endX >= tptolerance && Math.abs(points.get(points.size() - 1).getW()[1] - polynomial.predict(endX)) >= restolerance ){
-				
-                LinearFunction linear = new LinearFunction();
-				LinearFunction.slopeFits( result.getB(), linear, minSlope, maxSlope ) ;
-				
-				
-				double linearrate = linear.getCoefficient(1); 
-				
+
+				sortPoints(points);
+
+				if (points.get(points.size() - 1).getW()[0] - endX >= tptolerance && Math
+						.abs(points.get(points.size() - 1).getW()[1] - polynomial.predict(endX)) >= restolerance) {
+
+					LinearFunction linear = new LinearFunction();
+					LinearFunction.slopeFits(result.getB(), linear, minSlope, maxSlope);
+
+					double linearrate = linear.getCoefficient(1);
+
 					
-					if (startX - minstartX > restolerance){
-					rescount++;
-					restimediff += endX - startX;
-					
-					
-					
+					if (startX - minstartX > restolerance) {
+						rescount++;
+						restimediff += endX - startX;
+
+					}
+
+					if (linearrate > 0) {
+
+						count++;
+						timediff += endX - startX;
+						lifetime = timediff;
+						averagegrowth += linearrate;
+
+					}
+
+					if (linearrate < 0) {
+
+						negcount++;
+						negtimediff += endX - startX;
+
+						averageshrink += linearrate;
+
+					}
+
+					bw.write("\t" + nf.format(startX) + "\t" + "\t" + nf.format(endX) + "\t" + "\t"
+							+ nf.format(linearrate) + "\t" + "\t" + "\t" + "\t" + "\n");
+
 				}
+
+				if (count > 0)
+					averagegrowth /= count;
 				
-				
-				if (linearrate > 0){
-					
-					
-					count++;
-					timediff += endX - startX;
-					
-					averagegrowth+=linearrate;
-					
-				}
-				
-				if (linearrate < 0){
-					
-					negcount++;
-					negtimediff += endX - startX;
-					
-					averageshrink+=linearrate;
-					
-				}
+				if (negcount > 0)
+					averageshrink /= negcount;
+
+				if (count > 0) 
+
+					catfrequ = count / timediff;
+
+
+				if (rescount > 0) 
+
+					resfrequ = rescount / restimediff;
 				
 
-				
-				
-				bw.write("\t" + nf.format(startX) + "\t" + "\t" + nf.format(endX) + "\t" + "\t"
-						+ nf.format(linearrate) + "\t" + "\t" + "\t" + "\t"
-						+ "\n");
+			}
+			bwfrequ.write("\t" + nf.format(averagegrowth) + "\t" + "\t" + "\t" + "\t" + nf.format(averageshrink) + "\t"
+					+ "\t" + "\t" + nf.format(catfrequ) + "\t" + "\t" + "\t" + nf.format(resfrequ)
 
-			}
-			
-			if (count > 0)
-				averagegrowth/=count;
-			if (negcount > 0)
-				averageshrink/=negcount;
-			
-			
-			
-			
-			
-			
-			if (count > 0){
-				
-				catfrequ = count / timediff;
-			
-			}
-			
-			if (rescount > 0){
-				
-				resfrequ = rescount / restimediff;
-			}
-			
-			
-			
-		
-			
-
-			
-		} 
-			bwfrequ.write("\t" + nf.format(averagegrowth) + "\t" + "\t" + "\t" + "\t" + nf.format(averageshrink)  + "\t"+ "\t" + "\t" +  nf.format(catfrequ)
-			 + "\t"+ "\t" + "\t" +  nf.format(resfrequ)
-			
-			+ "\n" + "\n");
+					+ "\n" + "\n");
 			bw.close();
 			fw.close();
-			
+
 			bwfrequ.close();
-			fwfrequ.close();	
-		}catch (IOException e) {
+			fwfrequ.close();
+		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
+		return lifetime;
 		
 	}
 
@@ -500,9 +464,8 @@ public class BatchRANSAC implements PlugIn {
 			}
 		});
 
-		
 	}
-	
+
 	public void setFunction() {
 		if (functionChoice == 0) {
 			this.function = new LinearFunction();
@@ -559,11 +522,9 @@ public class BatchRANSAC implements PlugIn {
 
 	public static void main(String[] args) {
 
-	
 		Ransac_MT newran = new Ransac_MT();
 		newran.run(null);
 
-		
 	}
 
 }

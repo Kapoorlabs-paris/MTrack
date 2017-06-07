@@ -3,9 +3,9 @@ package mt;
 public class FLSobject {
 
 	
-	final int Framenumber;
-	final int seedID;
-	final double length;
+	public final int Framenumber;
+	public final int seedID;
+	public final double length;
 	
 	
 	public FLSobject(final int Framenumber, final int seedID, final double length){

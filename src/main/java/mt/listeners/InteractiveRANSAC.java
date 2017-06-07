@@ -21,7 +21,10 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Locale;
+import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -48,6 +51,7 @@ import ij.ImageJ;
 import ij.plugin.PlugIn;
 import mpicbg.models.Point;
 import mt.DisplayPoints;
+import mt.FLSobject;
 import mt.LengthCounter;
 import mt.LengthDistribution;
 import mt.Tracking;
@@ -421,30 +425,48 @@ public class InteractiveRANSAC implements PlugIn {
 			});
 			
 			
-			ArrayList<ArrayList<LengthCounter>> Allcurrentcounter = new ArrayList<ArrayList<LengthCounter>>();
 			
+			
+			ArrayList<Double> Allmeans = new ArrayList<Double>();
+			
+			if (AllMovies.length > 1){
 			for (int i = 0; i < AllMovies.length ; ++i){
 				
 				
-				ArrayList<LengthCounter> currentcounter = 	LengthDistribution.Lengthdistro(AllMovies[i]);
+	           Allmeans.add(LengthDistribution.Lengthdistro(AllMovies[i]));
 				
-				Allcurrentcounter.add(currentcounter);
 		
-				
+			}
 				
 			}
+			
+			Collections.sort(Allmeans);
+			
+			int min = (int)Math.round(Allmeans.get(0)) - 1;
+			int max = (int)Math.round(Allmeans.get(Allmeans.size() - 1));
 			
 			XYSeries counterseries = new XYSeries( "MT length distribution" );
-			
-			for (int index = 0; index < Allcurrentcounter.size(); ++index){
+			for (int maxlength = min; maxlength < max; ++maxlength) {
+
+				int MTcount = 0;
 				
-				for (final LengthCounter lvst : Allcurrentcounter.get(index))
-					counterseries.add(lvst.Framenumber, lvst.totallength);
+				
+				for (int index = 0; index < Allmeans.size(); ++index){
+					
+					if (Allmeans.get(index) >= maxlength)
+						MTcount++;
+					
+				}
+				counterseries.add(MTcount, maxlength);
 				
 			}
+			
+			
+			
+			
 			final XYSeriesCollection dataset = new XYSeriesCollection();
 			dataset.addSeries(counterseries);
-			final JFreeChart chart = ChartFactory.createScatterPlot("MT length distribution", "Time (px)", "Length (px)", dataset);
+			final JFreeChart chart = ChartFactory.createScatterPlot("MT length distribution", "Number of MT", "Length (px)", dataset);
 			
 			DisplayPoints.display( chart, new Dimension( 800, 500 ) );
 
