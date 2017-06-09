@@ -204,7 +204,7 @@ public class OverlayLines {
 	
 	
 	
-	public static void GetAlllines(
+/*	public static void GetAlllines(
 			RandomAccessibleInterval<FloatType> imgout,
 			
 			RandomAccessibleInterval<IntType> intimg, 
@@ -245,7 +245,7 @@ public class OverlayLines {
 		
 	}
 	
-		
+		*/
 	
 
 }

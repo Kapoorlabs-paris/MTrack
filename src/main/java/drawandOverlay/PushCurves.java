@@ -233,7 +233,7 @@ public class PushCurves {
 		}
 
 	}
-
+/*
 	public static void DrawDetectedGaussians(RandomAccessibleInterval<FloatType> imgout,
 			final ArrayList<double[]> parameters) {
 
@@ -271,7 +271,7 @@ public class PushCurves {
 
 	}
 
-	
+	*/
 
 	
 	
@@ -695,7 +695,7 @@ public class PushCurves {
 	}
 	
 	
-	
+	/*
 	public static void DrawTruncatedline(RandomAccessibleInterval<FloatType> imgout,
 			RandomAccessibleInterval<IntType> intimg, double slope, double intercept,
 			int label) {
@@ -896,7 +896,7 @@ public class PushCurves {
 		}
 
 	}
-
+*/
 	public static double Distance(final double[] cordone, final double[] cordtwo) {
 
 		double distance = 0;

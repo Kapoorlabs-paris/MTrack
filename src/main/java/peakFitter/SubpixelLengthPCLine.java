@@ -455,7 +455,7 @@ public ArrayList<Indexedlength> getEndPoints(){
 						
 						sigmas+= psf[d] * psf[d];
 					}
-					final int numgaussians = (int) Math.max(Math.round(Math.sqrt(sigmas) /  ds), 3);
+					final int numgaussians = (int) Math.max(Math.round(Math.sqrt(sigmas) /  ds), 2);
 				
 				if (DoMask ){
 					System.out.println("Doing Mask Fits: " + numgaussians +  " Gaussian mask used ");
@@ -572,7 +572,7 @@ public ArrayList<Indexedlength> getEndPoints(){
 						
 						sigmas+= psf[d] * psf[d];
 					}
-					final int numgaussians = (int) Math.max(Math.round(Math.sqrt(sigmas) /  ds), 3);
+					final int numgaussians = (int) Math.max(Math.round(Math.sqrt(sigmas) /  ds), 2);
 				
 				if (DoMask ){
 					System.out.println("Doing Mask Fits: " + numgaussians +  " Gaussian mask used ");
@@ -640,6 +640,8 @@ public ArrayList<Indexedlength> getEndPoints(){
 					System.out.println("Fits :" + "StartX:" + startparam[0] + " StartY:" + startparam[1] + " " + "EndX:"
 							+ endparam[0] + "EndY: " + endparam[1] + " " + "ds: " + finalparamstart[4] );
 
+
+					
 					System.out.println("Length: " + Distance(new double[]{startparam[0],  startparam[1]},new double[]{endparam[0],  endparam[1]} ));
 
 					final Indexedlength startPart = new Indexedlength(label, label, framenumber, finalparamstart[4],

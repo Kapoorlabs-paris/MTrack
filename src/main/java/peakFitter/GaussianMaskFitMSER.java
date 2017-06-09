@@ -32,7 +32,9 @@ public class GaussianMaskFitMSER {
 		// make the interval we fit on iterable
 		final IterableInterval<FloatType> signalIterable = Views.iterable(signalInterval);
 
-		final double[] originallocation = location;
+		final double[] newlocation = new double[n];
+		for (int d = 0; d < n; ++d)
+			newlocation[d] = location[d];
 		// create the mask image
 		final Img<FloatType> gaussianMask = new ArrayImgFactory<FloatType>().create(signalInterval,
 				signalIterable.firstElement());
@@ -57,12 +59,12 @@ public class GaussianMaskFitMSER {
 			switch (startorend) {
 
 			case StartfitMSER:
-				beststartfitsumofGaussian(translatedIterableMask,  location, numgaussians, sigma, dxvector, slope, intercept, maxintensityline, noiselevel,
+				beststartfitsumofGaussian(translatedIterableMask,  newlocation, numgaussians, sigma, dxvector, slope, intercept, maxintensityline, noiselevel,
 						halfgaussian);
 				break;
 
 			case EndfitMSER:
-				bestendfitsumofGaussian(translatedIterableMask, location, numgaussians, sigma, dxvector, slope, intercept, maxintensityline, noiselevel,
+				bestendfitsumofGaussian(translatedIterableMask, newlocation, numgaussians, sigma, dxvector, slope, intercept, maxintensityline, noiselevel,
 						halfgaussian);
 				break;
 
@@ -101,21 +103,16 @@ public class GaussianMaskFitMSER {
 
 				}
 			for (int d = 0; d < n; ++d)
-				location[d] = sumLocSN[d] / sumSN;
+				newlocation[d] = sumLocSN[d] / sumSN;
 			Nold = N;	
 			N = sumSN / sumSS;
 
 			++i;
 			if (i >= iterations)
 				break;
-			if (i >= iterations  && Math.abs(N - Nold) > 1.0E-1 ){
-			
-				for (int d = 0; d < n; ++d)
-					location[d] = originallocation[d];
-				
-			}
+		
 
-		} while (Math.abs(N - Nold) > 1.0E-3 );
+		} while (Math.abs(N - Nold) > 1.0E-2 );
 		restoreBackground(signalIterable, bg);
 
 		// ImageJFunctions.show(gaussianMask);
@@ -124,19 +121,19 @@ public class GaussianMaskFitMSER {
 
 		case StartfitMSER:
 			for (int d = 0; d < n; ++d)
-				location[d] -= (numgaussians - 1)*dxvector[d];
+				newlocation[d] -=   (numgaussians - 1)*(dxvector[d]);
 				
 			break;
 
 		case EndfitMSER:
 			for (int d = 0; d < n; ++d)
-			location[d] =  (numgaussians - 1)*dxvector[d];
+			newlocation[d] +=   (numgaussians - 1)*(dxvector[d]);
 			break;
 
 		}
 		
 		
-		return location;
+		return newlocation;
 
 	}
 
@@ -171,12 +168,11 @@ public class GaussianMaskFitMSER {
 		
 		
 		
-		AddGaussian.addGaussian(image, maxintensityline, location, sigma);
 		
 		double[] secondlocation = new double[ndims];
 		
 		
-		for (int n = 1; n < numgaussians; ++n){	
+		for (int n = 0; n < numgaussians; ++n){	
 			
 			
 		for (int d = 0; d < ndims; ++d) {
@@ -184,10 +180,9 @@ public class GaussianMaskFitMSER {
 			
 				
 				
-				secondlocation[d] = location[d] - (n) * dxvector[d];
+				location[d] = location[d] - (n) * dxvector[d];
 			}
-			
-		AddGaussian.addGaussian(image, maxintensityline, secondlocation, sigma);
+		AddGaussian.addGaussian(image, maxintensityline, location, sigma);
 			
 			}
 		
@@ -204,12 +199,11 @@ public class GaussianMaskFitMSER {
 		final int ndims = image.numDimensions();
 		
 
-		AddGaussian.addGaussian(image, maxintensityline, location, sigma);
 		
 		double[] secondlocation = new double[ndims];
 		
 		
-		for (int n = 1; n < numgaussians; ++n){	
+		for (int n = 0; n < numgaussians; ++n){	
 			
 			
 		for (int d = 0; d < ndims; ++d) {
@@ -217,10 +211,10 @@ public class GaussianMaskFitMSER {
 			
 				
 				
-				secondlocation[d] = location[d] + (n) * dxvector[d];
+				location[d] = location[d] + (n) * dxvector[d];
 			}
 			
-		AddGaussian.addGaussian(image, maxintensityline, secondlocation, sigma);
+		AddGaussian.addGaussian(image, maxintensityline, location, sigma);
 			
 			}
 		

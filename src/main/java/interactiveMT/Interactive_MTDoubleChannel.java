@@ -1800,7 +1800,6 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		++c.gridy;
 		c.insets = new Insets(10, 10, 10, 0);
 		panelFourth.add(inputLabelY, c);
-
 		++c.gridy;
 		c.insets = new Insets(10, 10, 10, 0);
 		panelFourth.add(inputFieldY, c);
@@ -2327,7 +2326,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		gd.addCheckbox("Do Gaussian Mask Fits", Domask);
 
 		gd.addNumericField("Initial guess for Min Pixel Intensity (MinPI) belonging to MT (  R =  MinPI / MaxPI), R (enter 0.2 to 0.9) = ", Intensityratio, 2);
-		gd.addNumericField("Initial Spacing between Gaussians along the Polynomial curve = G * Min(Psf), G (enter 0.3 to 1.0) = ",
+		gd.addNumericField("Initial Spacing between Gaussians along the Polynomial curve = G * Min(Psf), G (enter positive number) = ",
 				Inispacing / Math.min(psf[0], psf[1]), 2);
 
 		if (analyzekymo && Kymoimg != null) {
@@ -2365,7 +2364,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		gd.addCheckbox("Do Gaussian Mask Fits", Domask);
 		gd.addCheckbox("DisplayRoi stack (after tracking)", displayoverlay);
 		gd.addNumericField("Initial guess for Min Pixel Intensity (MinPI) belonging to MT (  R =  MinPI / MaxPI), R (enter 0.2 to 0.9) = ", Intensityratio, 2);
-		gd.addNumericField("Initial Spacing between Gaussians along the Polynomial curve = G * Min(Psf), G (enter 0.3 to 1.0) = ",
+		gd.addNumericField("Initial Spacing between Gaussians along the Polynomial curve = G * Min(Psf), G (enter positive number ) = ",
 				Inispacing / Math.min(psf[0], psf[1]), 2);
 		gd.addStringField("Choose a different Directory?:", usefolder);
 		gd.addStringField("Choose a different filename?:", addToName);

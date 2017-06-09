@@ -119,7 +119,7 @@ public class Dummylines {
 		final int n = outimg.numDimensions();
 		
         double growrate = 22* Math.sin(0.2 * frame) ;
-
+        double motion = 5;
 		ArrayList<Dummyprops> newstlist = new ArrayList<Dummyprops>();
 		ArrayList<Dummyprops> newendlist = new ArrayList<Dummyprops>();
 		 for (int index = 0; index < startseeds.size(); ++index){
@@ -137,14 +137,15 @@ public class Dummylines {
 			 }
 			 
 	             oldpos[0] = startseeds.get(index)[0];
-	             oldpos[1] = slope * oldpos[0] + intercept;
+	             oldpos[1] = startseeds.get(index)[1];
 	             
-				 startpos[0] = startseeds.get(index)[0] -  3.5* Math.abs((growrate)) - 15.5 ;
-				 startpos[1] = slope * startpos[0] + intercept;
+	            
+	             
+				 startpos[0] = oldpos[0] + Math.abs(motion* growrate) ;
+				 startpos[1] = oldpos[1] + Math.abs(motion* growrate) ;
 				
 			 
-				 Dummyprops newst = new Dummyprops(frame, oldpos, startpos, slope, intercept);
-				 newstlist.add(newst);
+				
 			
 			 
 					final double stepsize =  1 ;
@@ -165,7 +166,8 @@ public class Dummylines {
 						
 					}
 					
-				
+					 Dummyprops newst = new Dummyprops(frame, oldpos, steppos, slope, intercept);
+					 newstlist.add(newst);
 			 
 		 }
 		 
@@ -184,12 +186,12 @@ public class Dummylines {
 			 }
 			 
 			    oldpos[0] = endseeds.get(index)[0];
-			    oldpos[1] = slope * oldpos[0] + intercept;
+			    oldpos[1] = endseeds.get(index)[1];
 			 
-				endpos[0] = endseeds.get(index)[0] +  5.5* Math.abs((growrate)) ;
-				endpos[1] = slope * endpos[0] + intercept;
+				endpos[0] = oldpos[0] + Math.abs(motion* growrate) ;
+				endpos[1] = oldpos[1] + Math.abs(motion* growrate) ;
 				
-				final double[] en = {endpos[0], endpos[1], slope, intercept};
+				
 				
 				
 				final double stepsize =  1 ;
