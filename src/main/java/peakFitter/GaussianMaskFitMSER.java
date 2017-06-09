@@ -1,10 +1,12 @@
 package peakFitter;
 
+import drawandOverlay.AddGaussian;
 import net.imglib2.Cursor;
 import net.imglib2.IterableInterval;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.img.Img;
 import net.imglib2.img.array.ArrayImgFactory;
+import net.imglib2.img.display.imagej.ImageJFunctions;
 import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.view.Views;
 
@@ -55,12 +57,12 @@ public class GaussianMaskFitMSER {
 			switch (startorend) {
 
 			case StartfitMSER:
-				beststartfitsumofGaussian(translatedIterableMask,  location, numgaussians, sq_sigma, dxvector, slope, intercept, maxintensityline, noiselevel,
+				beststartfitsumofGaussian(translatedIterableMask,  location, numgaussians, sigma, dxvector, slope, intercept, maxintensityline, noiselevel,
 						halfgaussian);
 				break;
 
 			case EndfitMSER:
-				bestendfitsumofGaussian(translatedIterableMask, location, numgaussians, sq_sigma, dxvector, slope, intercept, maxintensityline, noiselevel,
+				bestendfitsumofGaussian(translatedIterableMask, location, numgaussians, sigma, dxvector, slope, intercept, maxintensityline, noiselevel,
 						halfgaussian);
 				break;
 
@@ -84,7 +86,8 @@ public class GaussianMaskFitMSER {
 				
 				final double signal = cImg.get().getRealDouble();
 				final double mask = cMask.get().getRealDouble();
-				final double weight = maxintensityline * R;
+
+				final double weight = 8;
 
 				final double signalmask = signal * mask * weight;
 
@@ -112,12 +115,25 @@ public class GaussianMaskFitMSER {
 				
 			}
 
-		} while (Math.abs(N - Nold) > 1.0E-2 );
+		} while (Math.abs(N - Nold) > 1.0E-3 );
 		restoreBackground(signalIterable, bg);
 
 		// ImageJFunctions.show(gaussianMask);
 		
-		
+		switch (startorend) {
+
+		case StartfitMSER:
+			for (int d = 0; d < n; ++d)
+				location[d] -= (numgaussians - 1)*dxvector[d];
+				
+			break;
+
+		case EndfitMSER:
+			for (int d = 0; d < n; ++d)
+			location[d] =  (numgaussians - 1)*dxvector[d];
+			break;
+
+		}
 		
 		
 		return location;
@@ -147,77 +163,67 @@ public class GaussianMaskFitMSER {
 
 	final public static void beststartfitsumofGaussian(final IterableInterval<FloatType> image, final double[] location,
 			final int numgaussians,
-			final double[] sq_sigma, final double[] dxvector, final double slope, final double intercept, final double maxintensityline,
+			final double[] sigma, final double[] dxvector, final double slope, final double intercept, final double maxintensityline,
 			final double noiselevel,
 			boolean halfgaussian) {
 		final int ndims = image.numDimensions();
-		final Cursor<FloatType> cursor = image.localizingCursor();
-
-		double sumofgaussians = 0;
 		
 		
 		
-		while (cursor.hasNext()) {
-			cursor.fwd();
-
+		
+		AddGaussian.addGaussian(image, maxintensityline, location, sigma);
+		
+		double[] secondlocation = new double[ndims];
+		
+		
+		for (int n = 1; n < numgaussians; ++n){	
 			
-			double value = 1;
-			for (int d = 0; d < ndims; ++d) {
-				sumofgaussians = 0;
-				for (int n = 1; n <= numgaussians; ++n){	
 			
-					
-			final double x = cursor.getDoublePosition(d) - location[d] +  (n-1) * dxvector[d];
-			sumofgaussians+= Math.exp(-(x * x) / sq_sigma[d]) ;
+		for (int d = 0; d < ndims; ++d) {
+			
+			
+				
+				
+				secondlocation[d] = location[d] - (n) * dxvector[d];
+			}
+			
+		AddGaussian.addGaussian(image, maxintensityline, secondlocation, sigma);
 			
 			}
-				value *=  sumofgaussians;
-				
-		}
-			
-			
-			cursor.get().setReal(value);
-
 		
 		
-		}
 		
 		
 	}
 
 	final public static void bestendfitsumofGaussian(final IterableInterval<FloatType> image,  final double[] location,
 			final int numgaussians,
-			final double[] sq_sigma, final double[] dxvector, final double slope, final double intercept, final double maxintensityline,
+			final double[] sigma, final double[] dxvector, final double slope, final double intercept, final double maxintensityline,
 			final double noiselevel,
 			 boolean halfgaussian) {
 		final int ndims = image.numDimensions();
-		final Cursor<FloatType> cursor = image.localizingCursor();
-		double sumofgaussians = 0;
-		while (cursor.hasNext()) {
-			cursor.fwd();
-			
-			double value = 1;
+		
 
+		AddGaussian.addGaussian(image, maxintensityline, location, sigma);
+		
+		double[] secondlocation = new double[ndims];
+		
+		
+		for (int n = 1; n < numgaussians; ++n){	
 			
 			
-				for (int d = 0; d < ndims; ++d) {
-					sumofgaussians = 0;
-					for (int n = 1; n <= numgaussians; ++n){	
+		for (int d = 0; d < ndims; ++d) {
+			
+			
 				
-						
-				final double x = cursor.getDoublePosition(d) - location[d] -  (n-1) * dxvector[d];
-				sumofgaussians+= Math.exp(-(x * x) / sq_sigma[d]) ;
 				
-				}
-					value *=  sumofgaussians;
-				
+				secondlocation[d] = location[d] + (n) * dxvector[d];
 			}
 			
+		AddGaussian.addGaussian(image, maxintensityline, secondlocation, sigma);
 			
-			cursor.get().setReal(value);
-
-		}
-
+			}
+		
 	
 	}
 	

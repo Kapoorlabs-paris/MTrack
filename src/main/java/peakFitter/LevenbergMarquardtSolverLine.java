@@ -138,7 +138,7 @@ public class LevenbergMarquardtSolverLine {
 				
 				// New truncation criteria to fasten the solver when it is stuck in a local minima @Varun
 				for( int i = 0; i < nparm; i++ ) {
-					if (Math.abs(a[i] - na[i]) < 1.0E-10   )
+					if (Math.abs(a[i] - na[i]) < 1.0E-10 && iter > 4  )
 						lambda *= 50;
 				}
 				

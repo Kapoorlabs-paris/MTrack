@@ -110,7 +110,7 @@ public class GaussianLineds implements MTFitFunction {
 		sumofgaussians+= dsumend * Math.exp(-sumend);
 		
 		
-		return   sumofgaussians ;
+		return    sumofgaussians ;
 
 	}
 

@@ -455,10 +455,10 @@ public ArrayList<Indexedlength> getEndPoints(){
 						
 						sigmas+= psf[d] * psf[d];
 					}
-					final int numgaussians = (int) Math.max(Math.round(Math.sqrt(sigmas) /  ds), 2);
+					final int numgaussians = (int) Math.max(Math.round(Math.sqrt(sigmas) /  ds), 3);
 				
-				if (DoMask){
-					System.out.println("Doing Mask Fits: ");
+				if (DoMask ){
+					System.out.println("Doing Mask Fits: " + numgaussians +  " Gaussian mask used ");
 					try {
 								
 							startfit =	peakFitter.GaussianMaskFitMSER.sumofgaussianMaskFit(currentimg, startpos.clone(), psf, numgaussians,
@@ -572,10 +572,10 @@ public ArrayList<Indexedlength> getEndPoints(){
 						
 						sigmas+= psf[d] * psf[d];
 					}
-					final int numgaussians = (int) Math.max(Math.round(Math.sqrt(sigmas) /  ds), 2);
+					final int numgaussians = (int) Math.max(Math.round(Math.sqrt(sigmas) /  ds), 3);
 				
-				if (DoMask){
-					System.out.println("Doing Mask Fits: ");
+				if (DoMask ){
+					System.out.println("Doing Mask Fits: " + numgaussians +  " Gaussian mask used ");
 					try {
 								
 							startfit =	peakFitter.GaussianMaskFitMSER.sumofgaussianMaskFit(currentimg, startpos.clone(), psf, numgaussians,
