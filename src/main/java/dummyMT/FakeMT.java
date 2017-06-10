@@ -120,26 +120,26 @@ public class FakeMT {
 			double steppos[] = {startline[0], startline[1]};
 			double dx = stepsize / Math.sqrt(1 + slope * slope);
 			double dy = slope * dx;
-			
+			AddGaussian.addGaussian(outimg, steppos, sigma);
 			while (true) {
 				
 				
-				
-				AddGaussian.addGaussian(outimg, steppos, sigma);
 				
 				if (steppos[0] > endline[0] || steppos[1] > endline[1] && slope >= 0)
 					break;
 				if (steppos[0] > endline[0] || steppos[1] < endline[1] && slope < 0)
 					break;
+				
+
 				steppos[0] += dx;
 				steppos[1] += dy;
-				
+				AddGaussian.addGaussian(outimg, steppos, sigma);
 			}
 			
 			
-		
+		System.out.println(slope + " " + intercept);
  
-			double[] line = { endline[0], endline[1], slope, intercept, 0};
+			double[] line = { steppos[0], steppos[1], slope, intercept, 0};
 			
 			
 			
@@ -150,21 +150,17 @@ public class FakeMT {
 
 	}
 	
-	public static double[] Growseeds (RandomAccessibleInterval<FloatType> outimg, double[] oldinfo,double[] original, final int frame, double[] sigma) throws IncompatibleTypeException, IOException{
+	public static double[] Growseeds (RandomAccessibleInterval<FloatType> outimg, double[] oldinfo,double[] original, final int frame,
+			double[] sigma, ArrayList<double[]> Allseedgrow) throws IncompatibleTypeException, IOException{
 		
 	
-		
 		final int n = outimg.numDimensions();
 		
-        double growrate = 2* Math.sin(0.2 * frame) ;
-        
+        double growrate =  2* Math.sin(0.2 * frame) ;
+        if (frame == 0)
+        	growrate+=5;
         double motion = 1;
 	
-		 
-		 
-		
-       
-		
                
 				double[] oldpos = {oldinfo[0], oldinfo[1]};
 				double slope = oldinfo[2];
@@ -172,30 +168,31 @@ public class FakeMT {
 				double curvature = oldinfo[4];
 				
 				final double stepsize =  1 ;
-				double steppos[] = {original[0], original[1]};
+				
 				double dx = stepsize / Math.sqrt(1 + (slope + 2 * curvature * oldpos[0]) * (slope + 2 * curvature * oldpos[0]) );
 				double dy = (slope + 2 * curvature * oldpos[0])  * dx ;
-				
+				double steppos[] = {original[0], original[1]};
 				
 				double[] endpos = new double[n];
 				
 				endpos[0] = oldpos[0] + motion* growrate;
-				
+				AddGaussian.addGaussian(outimg, steppos, sigma);
 				while (true) {
 					
-					
-					AddGaussian.addGaussian(outimg, steppos, sigma);
-					
+					 
 					if (steppos[0] > endpos[0] || steppos[1] > endpos[1] && slope >= 0)
 						break;
 					if (steppos[0] > endpos[0] || steppos[1] < endpos[1] && slope < 0)
 						break;
 					
-				   dy += 0.02*dx*dx;
-					steppos[0] += dx ;
-					steppos[1] += dy;
+				 
 					
+					 dy += 0.005*dx;
+						
+						steppos[0] += dx ;
+						steppos[1] += dy;
 					
+					AddGaussian.addGaussian(outimg, steppos, sigma);
 					
 					
 						
@@ -205,8 +202,15 @@ public class FakeMT {
 				
 				double[] returnelement = {steppos[0], steppos[1], slope, intercept, curvature };
 				
+				double length = Distance(new double [] {steppos[0] , steppos[1]}, oldpos);
+				
+				
+				Allseedgrow.add(new double[]{frame, steppos[0], steppos[1], length});
+				
+				
 				
 				return returnelement;
+		
 				
 		 }
 		
@@ -243,7 +247,7 @@ public class FakeMT {
 			for (int d = 0; d < ndims; ++d)
 				Ci[d] = 1.0 / Math.pow(sigma[d],2);
 			
-			final int numframes = 300;
+			final int numframes = 200;
 			final int numlines = 1;
 
 			
@@ -254,10 +258,11 @@ public class FakeMT {
 			
 			
 
-		    double[] lineinfo = GetSeeds(lineimage,  smallrange, numlines, sigma);
-			double[] original = {lineinfo[0], lineinfo[1]};
+		  
+			   
 			
-			
+			  double[]  lineinfo = GetSeeds(lineimage, smallrange, numlines, sigma);
+			  double[] original = {lineinfo[0], lineinfo[1]};
 
 			FloatType minval = new FloatType(0);
 			FloatType maxval = new FloatType(1);
@@ -265,18 +270,17 @@ public class FakeMT {
 			
 			
 			Kernels.addBackground(Views.iterable(lineimage), 0.2);
-			noisylines = Poissonprocess.poissonProcess(lineimage, 50);
+			noisylines = Poissonprocess.poissonProcess(lineimage, 30);
 			ImageJFunctions.show(noisylines);
-		
 			
 	       ArrayList<double[]> Allseedgrow = new ArrayList<double[]>();
 	       
 	       FileWriter fw;
 	       String usefolder = "/Users/varunkapoor/Documents/JoeVisit";
-			File fichierKy = new File(usefolder + "//" +"GrowingendFakeSNR50" + ".txt");
+			File fichierKy = new File(usefolder + "//" +"GrowingendFakeSNR30" + ".txt");
 			fw = new FileWriter(fichierKy);
 			BufferedWriter bw = new BufferedWriter(fw);
-			bw.write("\tFramenumber\tDeltaL\n");
+			bw.write("\tFramenumber\tCurrentX\tCurrentY\tLengthPerframe\n");
 			
 			
 	       
@@ -284,35 +288,35 @@ public class FakeMT {
 				
 				RandomAccessibleInterval<FloatType> noisylinesframe = new ArrayImgFactory<FloatType>().create(range, new FloatType());
 				RandomAccessibleInterval<FloatType> lineimageframe = new ArrayImgFactory<FloatType>().create(range, new FloatType());
+				double[] testreturn = lineinfo;
+
 				
-			
-					double[] testreturn =	Growseeds(lineimageframe,lineinfo, original, frame, sigma);
+				testreturn =	Growseeds(lineimageframe,lineinfo, original, frame, sigma, Allseedgrow);
 			
 
 					
-					double length = Distance(new double [] {testreturn[0] , testreturn[1]}, new double[]{ lineinfo[0], lineinfo[1]});
 				
+					
 					lineinfo = testreturn;
 				
-				Allseedgrow.add(new double[]{frame, length});
+				
 				
 				Normalize.normalize(Views.iterable(lineimageframe), minval, maxval);
 				
 				
 				Kernels.addBackground(Views.iterable(lineimageframe), 0.2);
-				noisylinesframe = Poissonprocess.poissonProcess(lineimageframe, 50);
+				noisylinesframe = Poissonprocess.poissonProcess(lineimageframe, 30);
 				ImageJFunctions.show(noisylinesframe);
-			
 			
 			
 		
 			}
 			
 			
-			for (int index = 0; index < Allseedgrow.size(); ++index)
+			for (int index = 1; index < Allseedgrow.size(); ++index)
 			{
-				
-				bw.write("\t" + (Allseedgrow.get(index)[0]) + "\t" + (Allseedgrow.get(index)[1]) + "\n");
+				bw.write("\t" + (Allseedgrow.get(index)[0] + 2) + "\t" + (Allseedgrow.get(index)[1]) + "\t" + (Allseedgrow.get(index)[2])
+						+ "\t" + (Allseedgrow.get(index)[3])	+ "\n");
 			}
 		
 			bw.close();

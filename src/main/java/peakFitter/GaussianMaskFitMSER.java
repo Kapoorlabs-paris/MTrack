@@ -117,20 +117,7 @@ public class GaussianMaskFitMSER {
 
 		// ImageJFunctions.show(gaussianMask);
 		
-		switch (startorend) {
-
-		case StartfitMSER:
-			for (int d = 0; d < n; ++d)
-				newlocation[d] -=   (numgaussians - 1)*(dxvector[d]);
-				
-			break;
-
-		case EndfitMSER:
-			for (int d = 0; d < n; ++d)
-			newlocation[d] +=   (numgaussians - 1)*(dxvector[d]);
-			break;
-
-		}
+		
 		
 		
 		return newlocation;
@@ -180,9 +167,9 @@ public class GaussianMaskFitMSER {
 			
 				
 				
-				location[d] = location[d] - (n) * dxvector[d];
+				secondlocation[d] = location[d] - (n) * dxvector[d];
 			}
-		AddGaussian.addGaussian(image, maxintensityline, location, sigma);
+		AddGaussian.addGaussian(image, maxintensityline, secondlocation, sigma);
 			
 			}
 		
@@ -211,10 +198,10 @@ public class GaussianMaskFitMSER {
 			
 				
 				
-				location[d] = location[d] + (n) * dxvector[d];
+				secondlocation[d] = location[d] + (n) * dxvector[d];
 			}
 			
-		AddGaussian.addGaussian(image, maxintensityline, location, sigma);
+		AddGaussian.addGaussian(image, maxintensityline, secondlocation, sigma);
 			
 			}
 		
