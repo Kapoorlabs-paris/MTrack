@@ -619,7 +619,7 @@ public static void addBackground(final IterableInterval<FloatType> iterable, fin
 				while(inputcursor.hasNext()){
 					inputcursor.fwd();
 					outputran.setPosition(inputcursor);
-					if (inputcursor.get().get()<=  Lowthreshold)
+					if (inputcursor.get().get()<=  0.5 * Lowthreshold)
 						outputran.get().setZero();
 					else
 						outputran.get().set(inputcursor.get());

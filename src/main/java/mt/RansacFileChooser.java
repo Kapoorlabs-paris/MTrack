@@ -15,10 +15,16 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.FilenameFilter;
+import java.io.IOException;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -60,7 +66,7 @@ public class RansacFileChooser extends JPanel {
 	/**
 	 * 
 	 */
-	
+
 	JPanel panelCont = new JPanel();
 	JPanel panelIntro = new JPanel();
 	JFileChooser chooserA;
@@ -70,7 +76,8 @@ public class RansacFileChooser extends JPanel {
 	String choosertitleA;
 	boolean Batchmoderun = false;
 	File[] AllMovies;
-
+	public NumberFormat nf = NumberFormat.getInstance(Locale.ENGLISH);
+	
 	public RansacFileChooser() {
 
 		final JFrame frame = new JFrame("Welcome to the Ransac Part of MTV tracker");
@@ -226,27 +233,103 @@ public class RansacFileChooser extends JPanel {
 			ArrayList<Pair<Integer, Double>> Alllife = new ArrayList<Pair<Integer, Double>>();
 			for (int i = 0; i < AllMovies.length; ++i) {
 
+				
 				BatchRANSAC batch = new BatchRANSAC(Tracking.loadMT((AllMovies[i])), AllMovies[i]);
+				
 				batch.run(null);
 				Pair<Integer, Double> life = new ValuePair<Integer, Double>(i, batch.lifetime);
 				Alllife.add(life);
+				
+				
 			}
 			List<Double> Xvalues = new ArrayList<Double>();
 
 			for (final Pair<Integer, Double> key : Alllife)
 				Xvalues.add(key.getB());
-			int numBins = 10;
+			int numBins = 50;
 			final JFreeChart histXchart = DisplayHistogram.makehistXChart(Xvalues, numBins);
 
 			DisplayPoints.display(histXchart, new Dimension(800, 500));
 
 			LengthDistribution.GetLengthDistribution(AllMovies);
+			Singlefile();
 
 		}
 
 	}
 
-	
+	public void Singlefile() {
+
+		File[] Averagefiles = chooserA.getSelectedFile().listFiles(new FilenameFilter() {
+
+			@Override
+			public boolean accept(File pathname, String filename) {
+
+				return (filename.endsWith(".txt") && !filename.contains("Rates") && filename.contains("Average")
+						&& !filename.contains("All"));
+			}
+		});
+		File singlefile = new File(
+				chooserA.getSelectedFile() + "//" + "Final_Experimental_results" + "All" + ".txt");
+		
+		try {
+			FileWriter fw = new FileWriter(singlefile);
+
+			BufferedWriter bw = new BufferedWriter(fw);
+			
+			bw.write("\tAverageGrowthrate(px)\tAverageShrinkrate(px)\tCatastropheFrequency(px)\tRescueFrequency(px)\n");
+			for (int i = 0; i < Averagefiles.length; ++i) {
+
+				File file = Averagefiles[i];
+
+				try {
+					BufferedReader in = Util.openFileRead(file);
+
+					while (in.ready()) {
+						String line = in.readLine().trim();
+
+						while (line.contains("\t\t"))
+							line = line.replaceAll("\t\t", "\t");
+
+						if (line.length() >= 3 && line.matches("[0-3].*")) {
+							final String[] split = line.trim().split("\t");
+
+							final double growthrate = Double.parseDouble(split[0]);
+							final double shrinkrate = Double.parseDouble(split[1]);
+							final double catfrequ = Double.parseDouble(split[2]);
+							final double resfrequ = Double.parseDouble(split[3]);
+
+							bw.write("\t" + (growthrate) + "\t" + "\t" + "\t" + "\t" + (shrinkrate)
+									+ "\t" + "\t" + "\t" + (catfrequ) + "\t" + "\t" + "\t"
+									+ (resfrequ)
+
+									+ "\n" + "\n");
+
+						}
+					}
+					
+				}
+				
+				catch (Exception e) {
+					e.printStackTrace();
+
+				}
+				
+
+			}
+			bw.close();
+			fw.close();
+		} 
+		
+		catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			
+		}
+		
+
+	}
+
 	protected class FrameListener extends WindowAdapter {
 		final Frame parent;
 

@@ -23,6 +23,7 @@ public class LengthDistribution {
 		double meanlength = 0;
 
 
+		if (currentobject!=null){
 			for (int index = 0; index < currentobject.size(); ++index) {
 
 				meanlength += currentobject.get(index).length;
@@ -32,7 +33,7 @@ public class LengthDistribution {
 		meanlength/=currentobject.size();
 		
 		System.out.println(meanlength);
-		
+		}		
 		return meanlength;
 
 	}
@@ -47,8 +48,10 @@ public class LengthDistribution {
 		
 		for (int i = 0; i < AllMovies.length ; ++i){
 			
+			double meanlength = LengthDistribution.Lengthdistro(AllMovies[i]);
 			
-           Allmeans.add(LengthDistribution.Lengthdistro(AllMovies[i]));
+			if (meanlength > 0  && meanlength!=Double.NaN)
+           Allmeans.add(meanlength);
 			
 	
 			
@@ -57,7 +60,7 @@ public class LengthDistribution {
 		Collections.sort(Allmeans);
 		
 		int min = (int)Math.round(Allmeans.get(0)) - 1;
-		int max = (int)Math.round(Allmeans.get(Allmeans.size() - 1));
+		int max = (int)Math.round(Allmeans.get(Allmeans.size() - 1)) + 1;
 		
 		XYSeries counterseries = new XYSeries( "MT length distribution" );
 		for (int maxlength = min; maxlength < max; ++maxlength) {
@@ -69,8 +72,8 @@ public class LengthDistribution {
 				
 				if (Allmeans.get(index) >= maxlength)
 					MTcount++;
-				
-			}
+				}
+			
 			counterseries.add(MTcount, maxlength);
 			
 		}

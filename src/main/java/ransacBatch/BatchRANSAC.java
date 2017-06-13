@@ -11,9 +11,11 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Label;
 import java.awt.Scrollbar;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -21,6 +23,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Locale;
 
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 
 import org.jfree.chart.JFreeChart;
@@ -39,7 +42,9 @@ import ij.Prefs;
 import ij.plugin.PlugIn;
 import interactiveMT.Ransac_MT;
 import mpicbg.models.Point;
+import mt.FLSobject;
 import mt.Tracking;
+import mt.Util;
 import mt.listeners.WriteRatesListener;
 import net.imglib2.util.Pair;
 import net.imglib2.util.ValuePair;
@@ -122,9 +127,17 @@ public class BatchRANSAC implements PlugIn {
 		setFunction();
 		updateRANSAC();
 		lifetime = writeratestofile();
+		
+		
+		
 
 	}
 
+	
+	
+	
+	
+	
 	public void updateRANSAC() {
 		++updateCount;
 

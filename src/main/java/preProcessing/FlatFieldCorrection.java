@@ -117,7 +117,7 @@ public class FlatFieldCorrection extends BenchmarkAlgorithm implements OutputAlg
 			
 			Gaussran.setPosition(cursor);
 			
-			value = cursor.get().getRealDouble() - Gaussran.get().getRealDouble();
+			value = Math.round(cursor.get().get() - Gaussran.get().get());
 			cursor.get().setReal(value);
 			
 			
@@ -146,14 +146,14 @@ public class FlatFieldCorrection extends BenchmarkAlgorithm implements OutputAlg
 		
 		double[] sigma = new double[in.numDimensions()];
 		for (int d = 0; d < in.numDimensions(); ++d) {
-			sigma[d] = (int) Math.round((in.realMax(d) - in.realMin(d)) / 20.0);
+			sigma[d] = (int) Math.round((in.realMax(d) - in.realMin(d)) / 25.0);
 		}
 		
-		RandomAccessibleInterval<FloatType> gaussimg = util.CopyUtils.copyImage(in);
-		RandomAccessibleInterval<FloatType> correctedgaussimg = util.CopyUtils.copyImage(in);
+		RandomAccessibleInterval<FloatType> gaussimg = util.CopyUtils.copytoByteFloatImage(in);
+		RandomAccessibleInterval<FloatType> correctedgaussimg = util.CopyUtils.copytoByteFloatImage(in);
 		try {
 			
-			Gauss3.gauss(sigma, Views.extendMirrorSingle(gaussimg), gaussimg);
+			Gauss3.gauss(sigma, Views.extendBorder(gaussimg), gaussimg);
 
 		} catch (IncompatibleTypeException e) {
 
@@ -163,7 +163,8 @@ public class FlatFieldCorrection extends BenchmarkAlgorithm implements OutputAlg
 		// Subtract the darkfield from the image
 		subtract(correctedgaussimg, gaussimg);
 		
-		
+		//correctedgaussimg = Kernels.Meanfilterandsupress(correctedgaussimg, 1);
+		correctedgaussimg = Kernels.SupressLowthresh(correctedgaussimg);
 		final Cursor< FloatType > cursor = out.localizingCursor();
 
 		final RectangleShape shape = new RectangleShape( radius, false );

@@ -156,9 +156,10 @@ public class Tracking
 	{
 		XYSeries series = new XYSeries( name );
 
+		if (mts!=null){
 		for ( final Pair< Integer, Double > mt : mts )
 			series.add( mt.getA(), mt.getB() );
-
+		}
 		return series;
 	}
 
@@ -270,9 +271,10 @@ public class Tracking
 	{
 		final ArrayList< Point > points = new ArrayList< Point >();
 
+		if (mts!=null){
 		for ( final Pair< Integer, Double > mt : mts )
 			points.add( new Point( new double[]{ mt.getA(), mt.getB() } ) );
-
+		}
 		return points;
 	}
 
@@ -471,33 +473,6 @@ public class Tracking
 		return new ValuePair< Double, Double >( min, max );
 	}
 
-	public static void main( String[] args ) throws IOException
-	{
-		final ArrayList< Pair< Integer, Double > > mts = loadMT( new File( "/Users/varunkapoor/Documents/MTAnalysisRansac/TestRanSacSeedLabel3-endA.txt" ) );
-
-		final Pair< LinearFunction, ArrayList< PointFunctionMatch > > result = findFunction( toPoints( mts ), new LinearFunction() );
-		final Pair< Double, Double > minMax = fromTo( result.getB() );
-
-		final XYSeriesCollection dataset = new XYSeriesCollection();
-
-		dataset.addSeries( drawFunction( result.getA(), minMax.getA(), minMax.getB(), 0.5, "Linear 1" ) );
-		dataset.addSeries( drawPoints( mts ) );
-		dataset.addSeries( drawPoints( toPairList( result.getB() ), "Inliers 1" ) );
-
-		final JFreeChart chart = makeChart( dataset );
-
-		setColor( chart, 0, new Color( 64, 64, 64 ) );
-		setStroke( chart, 0, 1f );
-
-		setColor( chart, 1, new Color( 0, 0, 255 ) );
-		setStroke( chart, 1, 0.5f );
-
-		setColor( chart, 2, new Color( 255, 0, 0 ) );
-		setDisplayType( chart, 2, false, true );
-		setSmallUpTriangleShape( chart, 2 );
-
-		display( chart, new Dimension( 1000, 800 ) );
-	}
-
+	
 	
 }

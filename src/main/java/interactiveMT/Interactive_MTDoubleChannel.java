@@ -267,7 +267,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public boolean AutoDelta = false;
 	public boolean Domask = false;
 	public boolean DoRloop = false;
-	public boolean SaveTxt = false;
+	public boolean SaveTxt = true;
 	public boolean SaveXLS = false;
 	public boolean finalpoint = false;
 	public boolean Trackstart;
