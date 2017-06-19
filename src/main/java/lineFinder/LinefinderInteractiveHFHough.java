@@ -121,8 +121,8 @@ public class LinefinderInteractiveHFHough implements LinefinderHF {
 				
 				
 				
-				CommonOutputHF currentOutput = new CommonOutputHF(outputcurr.get(i).framenumber, (int)(label*Math.pow(2, outputcurr.get(i).roilabel)),
-						outputcurr.get(i).Roi, outputcurr.get(i).Actualroi, outputcurr.get(i).intimg,
+				CommonOutputHF currentOutput = new CommonOutputHF(outputcurr.get(i).framenumber, (int)(label*Math.pow(2, label + outputcurr.get(i).roilabel)),
+						outputcurr.get(i).Roi, outputcurr.get(i).Actualroi,
 						outputcurr.get(i).interval,outputcurr.get(i).Allrois);
 				output.add(currentOutput);
 				

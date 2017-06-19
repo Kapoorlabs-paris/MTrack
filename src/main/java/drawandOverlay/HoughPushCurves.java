@@ -35,10 +35,8 @@ public class HoughPushCurves {
 					Phase = Math.toDegrees(Math.atan2(position[0], position[1]));
 
 					// draw the function into the hough space
-
 					PushCurves.DrawSine(imgout, min, max, Amplitude, Phase);
 				
-
 			}
 		}
 		

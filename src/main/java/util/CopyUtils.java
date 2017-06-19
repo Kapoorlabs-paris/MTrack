@@ -138,7 +138,7 @@ public class CopyUtils {
 				// as
 				// the input,
 				// every Type supports T.set( T type )
-				cursorOutput.get().set((int) ranac.get().get());
+				cursorOutput.get().set((int) Math.round(ranac.get().getRealFloat()));
 			}
 		}
 
@@ -254,7 +254,7 @@ public class CopyUtils {
 	
 	
 	public static RandomAccessibleInterval<FloatType> extractImage(final RandomAccessibleInterval<FloatType> intervalView, final FinalInterval interval) {
-
+/*
 		final FloatType type = intervalView.randomAccess().get().createVariable();
 		final ImgFactory<FloatType> factory = net.imglib2.util.Util.getArrayOrCellImgFactory(intervalView, type);
 		RandomAccessibleInterval<FloatType> totalimg = factory.create(intervalView, type);
@@ -288,12 +288,12 @@ public class CopyUtils {
 			ranac.get().set(cursor.get());
 
 		}
-
-		return outimg;
+*/
+		return intervalView;
 	}
 	
 	public static RandomAccessibleInterval<IntType> extractIntImage(final RandomAccessibleInterval<IntType> intervalView, final FinalInterval interval) {
-
+/*
 		final IntType type = intervalView.randomAccess().get().createVariable();
 		final ImgFactory<IntType> factory = net.imglib2.util.Util.getArrayOrCellImgFactory(intervalView, type);
 		RandomAccessibleInterval<IntType> totalimg = factory.create(intervalView, type);
@@ -327,8 +327,8 @@ public class CopyUtils {
 			ranac.get().set(cursor.get());
 
 		}
-
-		return outimg;
+*/
+		return intervalView;
 	}
 	
 	public static  RandomAccessibleInterval<FloatType> getCurrentPreView(RandomAccessibleInterval<FloatType> originalPreprocessedimg,int thirdDimension, int thirdDimensionSize) {

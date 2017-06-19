@@ -54,6 +54,7 @@ import mt.DisplayPoints;
 import mt.FLSobject;
 import mt.LengthCounter;
 import mt.LengthDistribution;
+import mt.RansacFileChooser;
 import mt.Tracking;
 import net.imglib2.util.Pair;
 import net.imglib2.util.ValuePair;
@@ -329,55 +330,14 @@ public class InteractiveRANSAC implements PlugIn {
 		batch.addActionListener(new RansacBatchmodeListener(this));
 		cancel.addActionListener(new FinishButtonListener(this, true));
 		
-		JPanel control = new JPanel();
-
-		control.add(new JButton(new AbstractAction("\u22b2Prev") {
-
-			/**
-			 * 
-			 */
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				CardLayout cl = (CardLayout) panelCont.getLayout();
-
-				cl.previous(panelCont);
-			}
-		}));
-		control.add(new JButton(new AbstractAction("Next\u22b3") {
-
-			/**
-			 * 
-			 */
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				CardLayout cl = (CardLayout) panelCont.getLayout();
-				cl.next(panelCont);
-			}
-		}));
-		
-		
-		// Statistical Analysis Panel
-		final Label LoadtrackText = new Label("Select directory of txt trajectory files and get length distribution");
-		JButton Lengthdistribution= new JButton("Get Length Distribution");
-		
-		panelSecond.setLayout(layout);
-		
-		++c.gridy;
-		c.insets = new Insets(10, 10, 10, 0);
-		panelSecond.add(Lengthdistribution, c);
 		
 		panelFirst.setVisible(true);
 		cl.show(panelCont, "1");
 		Cardframe.add(panelCont, BorderLayout.CENTER);
-		Cardframe.add(control, BorderLayout.SOUTH);
+	
 		Cardframe.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		Cardframe.pack();
 		Cardframe.setVisible(true);
-		Lengthdistribution.addActionListener(new LengthdistributionListener(Cardframe));
 		updateRANSAC();
 	}
 	
@@ -385,94 +345,6 @@ public class InteractiveRANSAC implements PlugIn {
 
 		
 	
-	
-	protected class LengthdistributionListener implements ActionListener {
-
-		final Frame parent;
-
-		public LengthdistributionListener(Frame parent) {
-
-			this.parent = parent;
-
-		}
-
-		@Override
-		public void actionPerformed(final ActionEvent arg0) {
-
-			int result;
-
-			chooserA = new JFileChooser();
-
-			chooserA.setCurrentDirectory(new java.io.File("."));
-			chooserA.setDialogTitle(choosertitleA);
-			chooserA.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-			//
-			// disable the "All files" option.
-			//
-			chooserA.setAcceptAllFileFilterUsed(false);
-			FileNameExtensionFilter filter = new FileNameExtensionFilter("Rate Files", "txt");
-
-			chooserA.setFileFilter(filter);
-			chooserA.showOpenDialog(parent);
-
-			AllMovies = chooserA.getSelectedFile().listFiles(new FilenameFilter() {
-
-				@Override
-				public boolean accept(File pathname, String filename) {
-
-					return (filename.endsWith(".txt") && !filename.contains("Rates") && !filename.contains("Average"));
-				}
-			});
-			
-			
-			
-			
-			ArrayList<Double> Allmeans = new ArrayList<Double>();
-			
-			if (AllMovies.length > 1){
-			for (int i = 0; i < AllMovies.length ; ++i){
-				
-				
-	           Allmeans.add(LengthDistribution.Lengthdistro(AllMovies[i]));
-				
-		
-			}
-				
-			}
-			
-			Collections.sort(Allmeans);
-			
-			int min = (int)Math.round(Allmeans.get(0)) - 1;
-			int max = (int)Math.round(Allmeans.get(Allmeans.size() - 1));
-			
-			XYSeries counterseries = new XYSeries( "MT length distribution" );
-			for (int maxlength = min; maxlength < max; ++maxlength) {
-
-				int MTcount = 0;
-				
-				
-				for (int index = 0; index < Allmeans.size(); ++index){
-					
-					if (Allmeans.get(index) >= maxlength)
-						MTcount++;
-					
-				}
-				counterseries.add(MTcount, maxlength);
-				
-			}
-			
-			
-			
-			
-			final XYSeriesCollection dataset = new XYSeriesCollection();
-			dataset.addSeries(counterseries);
-			final JFreeChart chart = ChartFactory.createScatterPlot("MT length distribution", "Number of MT", "Length (px)", dataset);
-			
-			DisplayPoints.display( chart, new Dimension( 800, 500 ) );
-
-		}
-
-	}
 	
 	public void setFunction() {
 		if (functionChoice == 0) {
@@ -763,5 +635,17 @@ public class InteractiveRANSAC implements PlugIn {
 	}
 
 	
+		    
+	public static void main(String[] args) {
+		
+		new ImageJ();
+		
 
+		    JFrame frame = new JFrame("");
+		    RansacFileChooser panel = new RansacFileChooser();
+		 
+		    frame.getContentPane().add(panel,"Center");
+		    frame.setSize(panel.getPreferredSize());
+
+	}
 }

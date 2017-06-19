@@ -30,7 +30,7 @@ import interactiveMT.Interactive_MTDoubleChannel;
 		public void actionPerformed(final ActionEvent arg0) {
 
 			JFileChooser chooserA = new JFileChooser();
-			chooserA.setCurrentDirectory(userfile.getAbsoluteFile());
+			chooserA.setCurrentDirectory(userfile.getParentFile());
 			chooserA.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 			chooserA.showOpenDialog(parent.panelFirst);
 			parent.usefolder = chooserA.getSelectedFile().getAbsolutePath();

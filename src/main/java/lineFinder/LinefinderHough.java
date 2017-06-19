@@ -17,9 +17,12 @@ import net.imglib2.algorithm.localextrema.RefinedPeak;
 import net.imglib2.img.array.ArrayImgFactory;
 import net.imglib2.img.display.imagej.ImageJFunctions;
 import net.imglib2.type.logic.BitType;
+import net.imglib2.type.numeric.RealType;
 import net.imglib2.type.numeric.integer.IntType;
 import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.util.Pair;
+import net.imglib2.util.RealSum;
+import net.imglib2.view.Views;
 import preProcessing.GetLocalmaxmin;
 import preProcessing.GlobalThresholding;
 import preProcessing.Kernels;
@@ -79,7 +82,9 @@ public class LinefinderHough implements Linefinder {
 		// Create the Bit image for distance transform and seed image for watershedding
 		final Float ThresholdValue = GlobalThresholding.AutomaticThresholding(Preprocessedsource);
 		RandomAccessibleInterval<BitType> bitimg = new ArrayImgFactory<BitType>().create(Preprocessedsource, new BitType());
-		GetLocalmaxmin.ThresholdingBit(Preprocessedsource, bitimg, ThresholdValue);
+		FloatType T = new FloatType(Math.round(ThresholdValue));
+
+		GetLocalmaxmin.ThresholdingBit(Preprocessedsource, bitimg, T);
 		
 		WatershedDistimg<FloatType> WaterafterDisttransform = new WatershedDistimg<FloatType>(Preprocessedsource, bitimg);
 		WaterafterDisttransform.checkInput();
@@ -89,10 +94,10 @@ public class LinefinderHough implements Linefinder {
 		final double[] sizes = new double[ndims];
 
 		// Automatic threshold determination for doing the Hough transform
-		Float val = GlobalThresholding.AutomaticThresholding(Preprocessedsource);
+		
 
 		for (int label = 1; label < Maxlabel - 1; label++) {
-
+			
            
 			Pair<RandomAccessibleInterval<FloatType>, FinalInterval> pair =  Boundingboxes.CurrentLabeloffsetImagepair(intimg, Preprocessedsource, label);
 			RandomAccessibleInterval<FloatType> ActualRoiimg = Boundingboxes.CurrentLabelImage(intimg, source, label);
@@ -100,7 +105,7 @@ public class LinefinderHough implements Linefinder {
 			
 			FinalInterval Realinterval = pair.getB();
 			
-			
+			Float val = GlobalThresholding.AutomaticThresholding(roiimg);
 				System.out.println("Doing Hough Transform in Label Number:" + label);
 			double size = Math
 					.sqrt((roiimg.dimension(0) * roiimg.dimension(0) + roiimg.dimension(1) * roiimg.dimension(1)));
@@ -124,9 +129,16 @@ public class LinefinderHough implements Linefinder {
 
 			// Define Arraylist to get the slope and the intercept of the Hough
 			// detected lines
+			
+			
 			ArrayList<RefinedPeak<Point>> SubpixelMinlist = new ArrayList<RefinedPeak<Point>>(roiimg.numDimensions());
 
+			
 			// Get the list of all the detections
+			
+			final double avg = computeAverage( Views.iterable(houghimage) );
+			System.out.println(avg);
+			if(avg > 0){
 			SubpixelMinlist = GetLocalmaxmin.HoughspaceMaxima(houghimage, interval, sizes, thetaPerPixel, rhoPerPixel);
 
 			// Reduce the number of detections by picking One line per Label,
@@ -168,10 +180,24 @@ public class LinefinderHough implements Linefinder {
 			
 			}
 		
-		
+		}
 		return true;
 	}
-
+	  public < T extends RealType< T > > double computeAverage( final Iterable< T > input )
+	    {
+	        // Count all values using the RealSum class.
+	        // It prevents numerical instabilities when adding up millions of pixels
+	        final RealSum realSum = new RealSum();
+	        long count = 0;
+	 
+	        for ( final T type : input )
+	        {
+	            realSum.add( type.getRealDouble() );
+	            ++count;
+	        }
+	 
+	        return realSum.getSum() / count;
+	    }
 	@Override
 	public ArrayList<CommonOutput> getResult() {
 

@@ -97,7 +97,7 @@ public class FileChooser extends JPanel {
 		StartText.setForeground(new Color(255, 255, 255));
 
 		Track = new JButton("Optionally, Open Pre-processed movie (Done internally if movie not supplied)");
-		Measure = new JButton("Open UN-preprocessed movie performing measurments");
+		Measure = new JButton("Open UN-preprocessed movie for performing measurments");
 		Kymo = new JButton("Open Kymograph for the MT");
 		Done = new JButton("Done");
 		inputLabelX = new JLabel("Enter sigmaX of Microscope PSF (pixel units): ");
@@ -253,9 +253,7 @@ public class FileChooser extends JPanel {
 			++c.gridy;
 			c.insets = new Insets(10, 10, 10, 0);
 			panelIntro.add(Measurebatch, c);
-			++c.gridy;
-			c.insets = new Insets(10, 10, 10, 0);
-			panelIntro.add(Done, c);
+			
 			Measurebatch.addActionListener(new MeasurebatchListener(frame));
 			Done.addActionListener(new DoneButtonListener(frame, true));
 			panelIntro.validate();
@@ -315,7 +313,7 @@ public class FileChooser extends JPanel {
 
 			
 		
-
+			new BatchMode(AllMovies, new Interactive_MTDoubleChannel(), AllMovies[0]).run(null);
 		}
 
 	}
@@ -385,7 +383,7 @@ public class FileChooser extends JPanel {
 				StartText.setForeground(new Color(255, 255, 255));
 
 				Track = new JButton("Optionally, Open Pre-processed movie (done internally if movie not supplied)");
-				Measure = new JButton("Open UN-preprocessed movie performing measurments");
+				Measure = new JButton("Open UN-preprocessed movie for performing measurments");
 				Kymo = new JButton("Open Kymograph for the MT");
 				Done = new JButton("Done");
 				inputLabelX = new JLabel("Enter sigmaX of Microscope PSF (pixel units): ");

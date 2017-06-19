@@ -10,6 +10,7 @@ import net.imglib2.algorithm.BenchmarkAlgorithm;
 import net.imglib2.algorithm.OutputAlgorithm;
 import net.imglib2.algorithm.gauss3.Gauss3;
 import net.imglib2.algorithm.neighborhood.DiamondShape.NeighborhoodsAccessible;
+import net.imglib2.algorithm.stats.Normalize;
 import net.imglib2.exception.IncompatibleTypeException;
 import net.imglib2.algorithm.neighborhood.Neighborhood;
 import net.imglib2.algorithm.neighborhood.RectangleShape;
@@ -117,7 +118,7 @@ public class FlatFieldCorrection extends BenchmarkAlgorithm implements OutputAlg
 			
 			Gaussran.setPosition(cursor);
 			
-			value = Math.round(cursor.get().get() - Gaussran.get().get());
+			value = cursor.get().get() - Gaussran.get().get();
 			cursor.get().setReal(value);
 			
 			
@@ -149,8 +150,10 @@ public class FlatFieldCorrection extends BenchmarkAlgorithm implements OutputAlg
 			sigma[d] = (int) Math.round((in.realMax(d) - in.realMin(d)) / 25.0);
 		}
 		
-		RandomAccessibleInterval<FloatType> gaussimg = util.CopyUtils.copytoByteFloatImage(in);
-		RandomAccessibleInterval<FloatType> correctedgaussimg = util.CopyUtils.copytoByteFloatImage(in);
+		RandomAccessibleInterval<FloatType> gaussimg = util.CopyUtils.copyImage(in);
+		RandomAccessibleInterval<FloatType> correctedgaussimg = util.CopyUtils.copyImage(in);
+		
+	
 		try {
 			
 			Gauss3.gauss(sigma, Views.extendBorder(gaussimg), gaussimg);

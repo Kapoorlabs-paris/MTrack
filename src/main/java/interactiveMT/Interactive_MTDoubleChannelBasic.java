@@ -96,6 +96,8 @@ public class Interactive_MTDoubleChannelBasic implements PlugIn {
 
 	@Override
 	public void run(String arg) {
+	
+		parent.usefolder = parent.userfile.getParentFile().getAbsolutePath();
 
 		parent.FindLinesViaMSER = true;
 		parent.doMserSegmentation = true;

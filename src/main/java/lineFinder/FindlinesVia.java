@@ -54,6 +54,7 @@ public  class FindlinesVia {
 			
 			SubpixelLengthPCLine MTline = new SubpixelLengthPCLine(source, linefinder, psf, model, framenumber, DoMask, jpb);
 			MTline.setIntensityratio(Intensityratio);
+			
 			MTline.setInispacing(Inispacing);
 			MTline.checkInput();
 			MTline.process();
@@ -81,6 +82,7 @@ public  class FindlinesVia {
 					PrevFrameparam.getA(), PrevFrameparam.getB(), psf, framenumber, model, DoMask, Trackstart,jpb, thirdDimsize);
 			growthtracker.setIntensityratio(intensityratio);
 			growthtracker.setInispacing(Inispacing);
+			//growthtracker.setSlopetolerance(slopetolerance);
 			growthtracker.checkInput();
 			growthtracker.process();
 			Accountedframes  = growthtracker.getAccountedframes();

@@ -70,8 +70,9 @@ public class SubpixelVelocityPCLine extends BenchmarkAlgorithm
 	public double termepsilon = 1e-3;
 	// Mask fits iteration param
 	public int iterations = 500;
-	public double cutoffdistance = 15;
+	public double cutoffdistance = 25;
 	public boolean halfgaussian = false;
+	//public double slopetolerance = 10; // in degrees
 	public double Intensityratio;
 	final JProgressBar jpb;
 	final int thirdDimsize;
@@ -91,7 +92,18 @@ public class SubpixelVelocityPCLine extends BenchmarkAlgorithm
 
 		return Inispacing;
 	}
+/*
+	public void setSlopetolerance(double slopetolerance) {
 
+		this.slopetolerance = slopetolerance;
+
+	}
+
+	public double getSlopetolerance() {
+
+		return slopetolerance;
+	}
+	*/
 	public void setCutoffdistance(double cutoffdistance) {
 		this.cutoffdistance = cutoffdistance;
 	}
@@ -581,6 +593,8 @@ public class SubpixelVelocityPCLine extends BenchmarkAlgorithm
 
 			}
 
+			
+		
 			final int seedLabel = iniparam.seedLabel;
 
 			if (model == UserChoiceModel.Line) {
@@ -1210,9 +1224,9 @@ public class SubpixelVelocityPCLine extends BenchmarkAlgorithm
 				return null;
 
 			
+			}
 			
-				
-		}
+		
 	}
 
 

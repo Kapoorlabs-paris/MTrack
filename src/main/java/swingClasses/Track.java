@@ -322,8 +322,26 @@ public  class Track {
 						}
 					}
 				}
+				
 				for (int seedID = MinSeedLabel; seedID <= MaxSeedLabel; ++seedID) {
-					if (parent.SaveTxt) {
+					double count = 0;
+					
+					for (int index = 0; index < parent.startlengthlist.size(); ++index) {
+						
+						
+						if (parent.startlengthlist.get(index).seedid == seedID) {
+							if (index > 0 && parent.startlengthlist.get(index).currentpointpixel[0] != parent.startlengthlist.get(index - 1).currentpointpixel[0]
+									&& parent.startlengthlist.get(index).currentpointpixel[1] != parent.startlengthlist.get(index - 1).currentpointpixel[1])
+								count++;
+							
+						}
+					
+					}
+					
+				
+					if (parent.SaveTxt && count > parent.thirdDimensionSize / 3.0) {
+						
+						
 						try {
 							File fichier = new File(
 									parent.usefolder + "//" + parent.addToName + "SeedLabel" + seedID + "-endA" + ".txt");
@@ -361,6 +379,8 @@ public  class Track {
 								}
 
 							}
+							
+							
 							bw.close();
 							fw.close();
 
@@ -474,8 +494,24 @@ public  class Track {
 					}
 
 				}
+				
+				
 				for (int seedID = MinSeedLabel; seedID <= MaxSeedLabel; ++seedID) {
-					if (parent.SaveTxt) {
+					double count = 0;
+					for (int index = 0; index < parent.endlengthlist.size(); ++index) {
+
+						
+						
+						if (parent.endlengthlist.get(index).seedid == seedID ) {
+							if (index > 0 && parent.endlengthlist.get(index).currentpointpixel[0] != parent.endlengthlist.get(index - 1).currentpointpixel[0]
+									&& parent.endlengthlist.get(index).currentpointpixel[1] != parent.endlengthlist.get(index - 1).currentpointpixel[1])
+								count++;
+							
+						}
+					}
+					
+				
+					if (parent.SaveTxt && count > parent.thirdDimensionSize/3.0) {
 						try {
 							File fichier = new File(
 									parent.usefolder + "//" + parent.addToName + "SeedLabel" + seedID + "-endB" + ".txt");
@@ -616,8 +652,25 @@ public  class Track {
 						}
 					}
 				}
+				
+				
+				
 				for (int seedID = MinSeedLabel; seedID <= MaxSeedLabel; ++seedID) {
-					if (parent.SaveTxt) {
+					double count = 0;
+					for (int index = 0; index < parent.userlengthlist.size(); ++index) {
+						if (parent.userlengthlist.get(index).seedid == seedID) {
+							
+							if (index > 0 && parent.userlengthlist.get(index).currentpointpixel[0] != parent.userlengthlist.get(index - 1).currentpointpixel[0]
+									&& parent.userlengthlist.get(index).currentpointpixel[1] != parent.userlengthlist.get(index - 1).currentpointpixel[1])
+								count++;
+							
+						}
+						
+						}
+					
+			
+					if (parent.SaveTxt && count > parent.thirdDimensionSize / 3.0) {
+						
 						try {
 							File fichier = new File(
 									parent.usefolder + "//" + parent.addToName + "SeedLabel" + seedID + "-Usermarked" + ".txt");

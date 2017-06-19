@@ -80,7 +80,8 @@ public class LinefinderHFHough implements LinefinderHF {
 		// Create the Bit image for distance transform and seed image for watershedding
 		final Float ThresholdValue = GlobalThresholding.AutomaticThresholding(Preprocessedsource);
 		RandomAccessibleInterval<BitType> bitimg = new ArrayImgFactory<BitType>().create(Preprocessedsource, new BitType());
-		GetLocalmaxmin.ThresholdingBit(Preprocessedsource, bitimg, ThresholdValue);
+		FloatType T = new FloatType(Math.round(ThresholdValue));
+		GetLocalmaxmin.ThresholdingBit(Preprocessedsource, bitimg, T);
 		
 		WatershedDistimg<FloatType> WaterafterDisttransform = new WatershedDistimg<FloatType>(Preprocessedsource, bitimg);
 		WaterafterDisttransform.checkInput();

@@ -226,7 +226,8 @@ public class RansacFileChooser extends JPanel {
 				@Override
 				public boolean accept(File pathname, String filename) {
 
-					return (filename.endsWith(".txt") && !filename.contains("Rates") && !filename.contains("Average"));
+					return (filename.endsWith(".txt") && !filename.contains("Rates") && !filename.contains("Average")
+							&& !filename.contains("All"));
 				}
 			});
 
@@ -244,8 +245,11 @@ public class RansacFileChooser extends JPanel {
 			}
 			List<Double> Xvalues = new ArrayList<Double>();
 
-			for (final Pair<Integer, Double> key : Alllife)
+			for (final Pair<Integer, Double> key : Alllife){
+			
+				if (key.getB() > 0)
 				Xvalues.add(key.getB());
+			}
 			int numBins = 50;
 			final JFreeChart histXchart = DisplayHistogram.makehistXChart(Xvalues, numBins);
 
@@ -299,6 +303,7 @@ public class RansacFileChooser extends JPanel {
 							final double catfrequ = Double.parseDouble(split[2]);
 							final double resfrequ = Double.parseDouble(split[3]);
 
+							if(growthrate>0 || shrinkrate < 0 || catfrequ > 0 || resfrequ > 0)
 							bw.write("\t" + (growthrate) + "\t" + "\t" + "\t" + "\t" + (shrinkrate)
 									+ "\t" + "\t" + "\t" + (catfrequ) + "\t" + "\t" + "\t"
 									+ (resfrequ)

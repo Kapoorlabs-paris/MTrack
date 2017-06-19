@@ -1,10 +1,12 @@
 package peakFitter;
 
+import java.awt.Rectangle;
 import java.util.ArrayList;
 
 import javax.swing.JProgressBar;
 
 import LineModels.UseLineModel.UserChoiceModel;
+import ij.gui.EllipseRoi;
 import labeledObjects.CommonOutput;
 import labeledObjects.CommonOutputHF;
 import labeledObjects.Indexedlength;
@@ -14,6 +16,7 @@ import net.imglib2.Point;
 import net.imglib2.PointSampleList;
 import net.imglib2.RandomAccess;
 import net.imglib2.RandomAccessibleInterval;
+import net.imglib2.RealPoint;
 import net.imglib2.type.numeric.integer.IntType;
 import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.util.Pair;
@@ -23,7 +26,8 @@ import preProcessing.GetLocalmaxmin;
 
 public class FitterUtils {
 
-	public static int Getlabel(final ArrayList<CommonOutputHF> imgs,final Point fixedpoint, final double originalslope, final double originalintercept) {
+	public static int Getlabel(final ArrayList<CommonOutputHF> imgs,final Point fixedpoint, 
+			final double originalslope, final double originalintercept) {
 
 
 		int finallabel = Integer.MIN_VALUE;
@@ -51,14 +55,25 @@ public class FitterUtils {
 						&& fixedpoint.getIntPosition(1) >= interval.min(1)
 						&& fixedpoint.getIntPosition(1) <= interval.max(1)) {
 
-					
+					double mindist = Double.MAX_VALUE;
 					for (int i = 0; i < imgs.get(index).Allrois.size(); ++i){
 					
-						if (imgs.get(index).Allrois.get(i).contains(fixedpoint.getIntPosition(0), fixedpoint.getIntPosition(1)))
 						
+						EllipseRoi roi = imgs.get(index).Allrois.get(i);
+						
+						Rectangle rect = roi.getBounds();
+						RealPoint newpoint = new RealPoint(rect.x + rect.width/2.0, rect.y + rect.height/2.0 );
+						double dist = Math.abs(newpoint.getDoublePosition(1) - 
+								originalslope * newpoint.getDoublePosition(0) - originalintercept);
+					//	if (roi.contains(fixedpoint.getIntPosition(0), fixedpoint.getIntPosition(1))){
+						
+							if (dist <= mindist){
 					finallabel = imgs.get(index).roilabel;
+					
+					mindist = dist;
+						//	}
 						
-						
+						}
 					
 					}
 				}
@@ -75,12 +90,14 @@ public class FitterUtils {
 		
 		int labelindex = -1;
 		for (int index = 0; index < imgs.size(); ++index){
-			
+			if(imgs.get(index).intimg != null)
+				labelindex = label;
+			else{
 			if (imgs.get(index).roilabel == label){
 		
 			labelindex = index;
 			
-			
+			}
 			}
 		}
 		
@@ -95,12 +112,14 @@ public static int getlabelindexSeed(final ArrayList<CommonOutput> imgs, int labe
 		
 		int labelindex = -1;
 		for (int index = 0; index < imgs.size(); ++index){
-			
+			if(imgs.get(index).intimg != null)
+				labelindex = label;
+			else{
 			if (imgs.get(index).roilabel == label){
 		
 			labelindex = index;
 			
-			
+			}
 			}
 		}
 		

@@ -69,9 +69,9 @@ public class Tracking
 				{
 					final String[] split = line.trim().split( "\t" );
 
-					final int frame = Integer.parseInt( split[ 0 ] );
+					final int frame = (int)Double.parseDouble( split[ 0 ] );
 					final double length = Double.parseDouble( split[ 1 ] );
-					final int seedID = Integer.parseInt( split[ 3 ] );
+					final int seedID = (int)Double.parseDouble( split[ 3 ] );
 
 					FLSobject statobject = new FLSobject(frame, seedID, length);
 					points.add( statobject);
@@ -126,7 +126,7 @@ public class Tracking
 				{
 					final String[] split = line.trim().split( "\t" );
 
-					final int frame = Integer.parseInt( split[ 0 ] );
+					final int frame = (int)Double.parseDouble( split[ 0 ] );
 					final double length = Double.parseDouble( split[ 1 ] );
 
 					points.add( new ValuePair< Integer, Double >( frame, length ) );
@@ -271,10 +271,10 @@ public class Tracking
 	{
 		final ArrayList< Point > points = new ArrayList< Point >();
 
-		if (mts!=null){
+		
 		for ( final Pair< Integer, Double > mt : mts )
 			points.add( new Point( new double[]{ mt.getA(), mt.getB() } ) );
-		}
+		
 		return points;
 	}
 

@@ -595,7 +595,8 @@ public class BatchMode implements PlugIn {
 			newimg = util.CopyUtils.copytoByteImage(currentPreprocessedimg, standardRectangle);
 
 			RandomAccessibleInterval<BitType> bitimg = new ArrayImgFactory<BitType>().create(newimg, new BitType());
-			GetLocalmaxmin.ThresholdingBit(newimg, bitimg, thresholdHough);
+			FloatType T = new FloatType(Math.round(thresholdHough));
+			GetLocalmaxmin.ThresholdingBit(currentPreprocessedimg, bitimg, T);
 
 			if (displayBitimg)
 				ImageJFunctions.show(bitimg);

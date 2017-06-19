@@ -31,6 +31,7 @@ import net.imglib2.algorithm.neighborhood.Neighborhood;
 import net.imglib2.algorithm.neighborhood.RectangleShape;
 import net.imglib2.algorithm.region.hypersphere.HyperSphere;
 import net.imglib2.algorithm.region.hypersphere.HyperSphereCursor;
+import net.imglib2.algorithm.stats.Normalize;
 import net.imglib2.img.Img;
 import net.imglib2.img.ImgFactory;
 import net.imglib2.img.array.ArrayImgFactory;
@@ -108,38 +109,7 @@ public class GetLocalmaxmin {
 	}
 
 	// Thresholding a FlotType to convert to BitType
-	public static void ThresholdingBit(RandomAccessibleInterval<FloatType> img,
-			RandomAccessibleInterval<BitType> imgout, double ThresholdValue) {
-
-		final double[] backpos = new double[imgout.numDimensions()];
-		final Cursor<FloatType> bound = Views.iterable(img).localizingCursor();
-
-		final RandomAccess<BitType> outbound = imgout.randomAccess();
-
-		while (bound.hasNext()) {
-
-			bound.fwd();
-
-			outbound.setPosition(bound);
-			if (bound.get().get() > 0){
-        if (bound.get().get()>ThresholdValue){
-
-				bound.localize(backpos);
-
-				outbound.get().setReal(1);
-
-			}
-
-			else {
-
-				outbound.get().setZero();
-
-			}
-        
-			}
-
-		}
-	}
+	
 
 	// Finds and displays Local Maxima by constructing a 3*3*3.. local
 	// neighbourhood
@@ -844,42 +814,60 @@ public class GetLocalmaxmin {
 
 		return SubpixelMinlist;
 	}
+	public static < T extends Comparable< T > > void ThresholdingBit( final RandomAccessibleInterval< T > in, final RandomAccessibleInterval< BitType > out, final T threshold )
+	{
+		final Cursor< T > cIn = Views.iterable( in ).localizingCursor();
+		final RandomAccess< BitType > rOut = out.randomAccess();
 
-	public static void ThresholdingBit(RandomAccessibleInterval<UnsignedByteType> img,
-			RandomAccessibleInterval<BitType> imgout, float thresholdHough) {
+		while ( cIn.hasNext() )
+		{
+			cIn.fwd();
+			rOut.setPosition( cIn );
 
+			if ( cIn.get().compareTo( threshold ) > 0 )
+				rOut.get().setOne();
+			else
+				rOut.get().setZero();
+		}
+	}
+	public static void ThresholdingBit(RandomAccessibleInterval<FloatType> img,
+			RandomAccessibleInterval<BitType> imgout, FloatType thresholdHough) {
+		Normalize.normalize(Views.iterable(img), new FloatType(0), new FloatType(255));
+		Normalize.normalize(Views.iterable(img), new FloatType(0), new FloatType(255));
 		final double[] backpos = new double[imgout.numDimensions()];
-		final Cursor<UnsignedByteType> bound = Views.iterable(img).localizingCursor();
-
-		final RandomAccess<BitType> outbound = imgout.randomAccess();
+		
+		final Cursor<FloatType> bound = Views.iterable(img).localizingCursor();
+		
+		final RandomAccess<BitType> outbound =  imgout.randomAccess();
 
 		while (bound.hasNext()) {
 
 			bound.fwd();
 
 			outbound.setPosition(bound);
-			if (bound.get().get() > 0){
+			{
 				
-             if (bound.get().get()> thresholdHough){
+             if (bound.get().compareTo( thresholdHough ) < 0){
 
 				bound.localize(backpos);
+
+				outbound.get().setReal(0);
+
+			}
+
+			else  {
 
 				outbound.get().setReal(255);
 
 			}
-
-			else {
-
-				outbound.get().setZero();
-
-			}
         
-			}
+			
 
 		}
 		
-		
+		}
 	}
+	
 
 	
 }

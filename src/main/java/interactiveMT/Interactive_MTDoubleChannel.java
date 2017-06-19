@@ -191,6 +191,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public int displayselectedSeed;
 	public double netdeltad = 0;
 	public double Intensityratio = 0.5;
+	public double slopetolerance = 5;
 	public double Inispacing = 0.5;
 	public int thirdDimensionslider = 1;
 	public int thirdDimensionsliderInit = 1;
@@ -216,7 +217,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public TextField Maxdpixel;
 	private TextField Maxdmicro;
 
-	public final File userfile;
+	public  File userfile;
 	public int starttimetrack;
 	public int endtimetrack;
 	public int minDiversityInit = 1;
@@ -572,7 +573,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	}
 
 	public Interactive_MTDoubleChannel() {
-		this.userfile = null;
+		
 	};
 
 	public Interactive_MTDoubleChannel(final RandomAccessibleInterval<FloatType> originalimg,
@@ -615,6 +616,10 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 	@Override
 	public void run(String arg) {
+		
+	
+		usefolder  = userfile.getParentFile().getAbsolutePath();
+
 		
 		AllSeedrois = new ArrayList<OvalRoi>();
 		jpb = new JProgressBar();
@@ -790,11 +795,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 			preprocessedimp = ImageJFunctions.show(CurrentPreprocessedView);
 
 			Roi roi = preprocessedimp.getRoi();
-			if (roi == null || roi.getType() != Roi.RECTANGLE) {
-				preprocessedimp.setRoi(new Rectangle(standardRectangle));
-				roi = preprocessedimp.getRoi();
-				roiChanged = true;
-			}
+		
 
 			Rectangle rect = roi.getBounds();
 
@@ -930,7 +931,9 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 					standardRectangle);
 
 			RandomAccessibleInterval<BitType> bitimg = new ArrayImgFactory<BitType>().create(newimg, new BitType());
-			GetLocalmaxmin.ThresholdingBit(newimg, bitimg, thresholdHough);
+			
+			FloatType T = new FloatType(Math.round(thresholdHough));
+			GetLocalmaxmin.ThresholdingBit(currentPreprocessedimg, bitimg, T);
 
 			if (displayBitimg)
 				ImageJFunctions.show(bitimg);
@@ -1503,7 +1506,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	//	panelFifth.add(Exit, c);
 
 		Exit.addActionListener(new FinishedButtonListener(Cardframe, true));
-		SkipframeandTrackEndPoints.addActionListener(new SkipFramesandTrackendsListener(this, this.thirdDimension,  this.thirdDimensionSize));
+		SkipframeandTrackEndPoints.addActionListener(new SkipFramesandTrackendsListener(this, thirdDimension,  thirdDimensionSize));
 		CheckResults.addActionListener(new CheckResultsListener(this));
 		RoughResults.addItemListener(new AcceptResultsListener(this));
 		Record.addActionListener(new BatchModeListener(this));
@@ -2366,6 +2369,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		gd.addNumericField("Initial guess for Min Pixel Intensity (MinPI) belonging to MT (  R =  MinPI / MaxPI), R (enter 0.2 to 0.9) = ", Intensityratio, 2);
 		gd.addNumericField("Initial Spacing between Gaussians along the Polynomial curve = G * Min(Psf), G (enter positive number ) = ",
 				Inispacing / Math.min(psf[0], psf[1]), 2);
+		
 		gd.addStringField("Choose a different Directory?:", usefolder);
 		gd.addStringField("Choose a different filename?:", addToName);
 		gd.showDialog();

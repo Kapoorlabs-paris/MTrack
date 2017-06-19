@@ -18,9 +18,12 @@ import net.imglib2.algorithm.localextrema.RefinedPeak;
 import net.imglib2.img.array.ArrayImgFactory;
 import net.imglib2.img.display.imagej.ImageJFunctions;
 import net.imglib2.type.logic.BitType;
+import net.imglib2.type.numeric.RealType;
 import net.imglib2.type.numeric.integer.IntType;
 import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.util.Pair;
+import net.imglib2.util.RealSum;
+import net.imglib2.view.Views;
 import peakFitter.FitterUtils;
 import preProcessing.GetLocalmaxmin;
 import preProcessing.GlobalThresholding;
@@ -127,6 +130,9 @@ public class LinefinderInteractiveHough implements Linefinder {
 			// detected lines
 			ArrayList<RefinedPeak<Point>> SubpixelMinlist = new ArrayList<RefinedPeak<Point>>(roiimg.numDimensions());
 
+			
+			final double avg = computeAverage( Views.iterable(houghimage) );
+			if(avg > 0){
 			// Get the list of all the detections
 			SubpixelMinlist = GetLocalmaxmin.HoughspaceMaxima(houghimage, interval, sizes, thetaPerPixel, rhoPerPixel);
 
@@ -169,9 +175,25 @@ public class LinefinderInteractiveHough implements Linefinder {
 			
 			}
 		
-		
+	}
 		return true;
 	}
+	
+	 public < T extends RealType< T > > double computeAverage( final Iterable< T > input )
+	    {
+	        // Count all values using the RealSum class.
+	        // It prevents numerical instabilities when adding up millions of pixels
+	        final RealSum realSum = new RealSum();
+	        long count = 0;
+	 
+	        for ( final T type : input )
+	        {
+	            realSum.add( type.getRealDouble() );
+	            ++count;
+	        }
+	 
+	        return realSum.getSum() / count;
+	    }
 
 	@Override
 	public ArrayList<CommonOutput> getResult() {
