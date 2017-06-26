@@ -32,6 +32,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -128,7 +131,7 @@ import util.Boundingboxes;
  * @author Varun Kapoor
  */
 
-public class BatchMode implements PlugIn {
+public class BatchMode implements PlugIn, Runnable {
 
 	public final Interactive_MTDoubleChannel parent;
 	public ColorProcessor cp = null;
@@ -366,9 +369,13 @@ public class BatchMode implements PlugIn {
 		this.batchfolder = batchdirectory.getParent();
 
 	}
-
 	@Override
 	public void run(String arg) {
+		run();
+		
+	}
+	@Override
+	public void run() {
 
 		goTrack();
 
@@ -376,8 +383,12 @@ public class BatchMode implements PlugIn {
 
 	public void goTrack() {
 
+		
+		
+		
 		ProgressBatch startbatch = new ProgressBatch(this);
 		startbatch.execute();
+		
 
 	}
 
@@ -934,5 +945,7 @@ public class BatchMode implements PlugIn {
 		frame.getContentPane().add(panel, "Center");
 		frame.setSize(panel.getPreferredSize());
 	}
+
+	
 
 }

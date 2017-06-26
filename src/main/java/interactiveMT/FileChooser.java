@@ -312,7 +312,6 @@ public class FileChooser extends JPanel {
 			});
 
 			
-		
 			new BatchMode(AllMovies, new Interactive_MTDoubleChannel(), AllMovies[0]).run(null);
 		}
 
