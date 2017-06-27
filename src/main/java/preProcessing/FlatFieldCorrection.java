@@ -133,7 +133,7 @@ public class FlatFieldCorrection extends BenchmarkAlgorithm implements OutputAlg
         * 
         * @param in
         * 
-        * The randomaccessible interval on which we apply a gaussian filter (big radius =  image dim / 25 pixels) and then
+        * The randomaccessible interval on which we apply a gaussian filter (big radius =  image dim / n pixels) and then
         * subtract it from the original image to create a background corrected image
         * 
         * @param out
@@ -147,7 +147,7 @@ public class FlatFieldCorrection extends BenchmarkAlgorithm implements OutputAlg
 		
 		double[] sigma = new double[in.numDimensions()];
 		for (int d = 0; d < in.numDimensions(); ++d) {
-			sigma[d] = (int) Math.round((in.realMax(d) - in.realMin(d)) / 25.0);
+			sigma[d] = (int) Math.round((in.realMax(d) - in.realMin(d)) / 10.0);
 		}
 		
 		RandomAccessibleInterval<FloatType> gaussimg = util.CopyUtils.copyImage(in);
@@ -166,8 +166,10 @@ public class FlatFieldCorrection extends BenchmarkAlgorithm implements OutputAlg
 		// Subtract the darkfield from the image
 		subtract(correctedgaussimg, gaussimg);
 		
-		//correctedgaussimg = Kernels.Meanfilterandsupress(correctedgaussimg, 1);
-		correctedgaussimg = Kernels.SupressLowthresh(correctedgaussimg);
+		
+		
+		correctedgaussimg = Kernels.Meanfilterandsupress(correctedgaussimg, radius);
+	//	correctedgaussimg = Kernels.SupressLowthresh(correctedgaussimg);
 		final Cursor< FloatType > cursor = out.localizingCursor();
 
 		final RectangleShape shape = new RectangleShape( radius, false );

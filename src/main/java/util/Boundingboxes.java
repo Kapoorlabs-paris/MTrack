@@ -24,6 +24,7 @@ import net.imglib2.labeling.DefaultROIStrategyFactory;
 import net.imglib2.labeling.Labeling;
 import net.imglib2.labeling.LabelingROIStrategy;
 import net.imglib2.labeling.NativeImgLabeling;
+import net.imglib2.type.logic.BitType;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.type.numeric.integer.IntType;
 import net.imglib2.type.numeric.integer.UnsignedByteType;
@@ -498,6 +499,51 @@ public static FinalInterval CurrentroiInterval(RandomAccessibleInterval<FloatTyp
 		RandomAccessibleInterval<FloatType> outimgsmall = util.CopyUtils.extractImage(outimg, intervalsmall);
 
 		Pair<RandomAccessibleInterval<FloatType>, FinalInterval> pair = new ValuePair<RandomAccessibleInterval<FloatType>, FinalInterval>(outimgsmall, intervalsmall);
+		return pair;
+
+	}
+	public static Pair<RandomAccessibleInterval<BitType>, FinalInterval> CurrentLabelImagepairBit(RandomAccessibleInterval<IntType> Intimg,
+			RandomAccessibleInterval<BitType> originalimg, int currentLabel) {
+		int n = originalimg.numDimensions();
+		RandomAccess<BitType> inputRA = originalimg.randomAccess();
+		long[] position = new long[n];
+		Cursor<IntType> intCursor = Views.iterable(Intimg).cursor();
+		final BitType type = originalimg.randomAccess().get().createVariable();
+		final ImgFactory<BitType> factory = Util.getArrayOrCellImgFactory(originalimg, type);
+		RandomAccessibleInterval<BitType> outimg = factory.create(originalimg, type);
+		RandomAccess<BitType> imageRA = outimg.randomAccess();
+		long[] minVal = { originalimg.max(0), originalimg.max(1) };
+		long[] maxVal = { originalimg.min(0), originalimg.min(1) };
+		// Go through the whole image and add every pixel, that belongs to
+		// the currently processed label
+
+		while (intCursor.hasNext()) {
+			intCursor.fwd();
+			inputRA.setPosition(intCursor);
+			imageRA.setPosition(inputRA);
+			int i = intCursor.get().get();
+			if (i == currentLabel) {
+				intCursor.localize(position);
+				for (int d = 0; d < n; ++d) {
+					if (position[d] < minVal[d]) {
+						minVal[d] = position[d];
+					}
+					if (position[d] > maxVal[d]) {
+						maxVal[d] = position[d];
+					}
+
+				}
+				imageRA.get().set(inputRA.get());
+
+			}
+
+		}
+		
+		
+		FinalInterval intervalsmall = new FinalInterval(minVal, maxVal) ;
+		RandomAccessibleInterval<BitType> outimgsmall = util.CopyUtils.extractImageBit(outimg, intervalsmall);
+
+		Pair<RandomAccessibleInterval<BitType>, FinalInterval> pair = new ValuePair<RandomAccessibleInterval<BitType>, FinalInterval>(outimgsmall, intervalsmall);
 		return pair;
 
 	}

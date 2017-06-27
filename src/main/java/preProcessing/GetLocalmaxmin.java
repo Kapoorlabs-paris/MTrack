@@ -814,9 +814,9 @@ public class GetLocalmaxmin {
 
 		return SubpixelMinlist;
 	}
-	public static < T extends Comparable< T > > void ThresholdingBit( final RandomAccessibleInterval< T > in, final RandomAccessibleInterval< BitType > out, final T threshold )
+	public static  void ThresholdingBit( final RandomAccessibleInterval< FloatType > in, final RandomAccessibleInterval< BitType > out, final Float threshold )
 	{
-		final Cursor< T > cIn = Views.iterable( in ).localizingCursor();
+		final Cursor< FloatType > cIn = Views.iterable( in ).localizingCursor();
 		final RandomAccess< BitType > rOut = out.randomAccess();
 
 		while ( cIn.hasNext() )
@@ -824,7 +824,7 @@ public class GetLocalmaxmin {
 			cIn.fwd();
 			rOut.setPosition( cIn );
 
-			if ( cIn.get().compareTo( threshold ) > 0 )
+			if ( cIn.get().get() >= ( threshold ) )
 				rOut.get().setOne();
 			else
 				rOut.get().setZero();

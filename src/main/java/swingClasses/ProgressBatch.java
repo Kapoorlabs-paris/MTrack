@@ -60,34 +60,25 @@ import updateListeners.FinalPoint;
 public class ProgressBatch extends SwingWorker<Void, Void> {
 
 	final BatchMode parent;
-	
 
 	public ProgressBatch(final BatchMode parent) {
 
 		this.parent = parent;
-	
+
 	}
 
 	@Override
 	protected Void doInBackground() throws Exception {
-		
+
 		int nThreads = Runtime.getRuntime().availableProcessors();
 		// set up executor service
 		final ExecutorService taskExecutor = Executors.newFixedThreadPool(nThreads);
 
-		
-		
-		
-			ProcessFiles.process(parent.AllImages,taskExecutor);
-			
-			
-		
-		
-				return null;
-		
-	}
-	
+		ProcessFiles.process(parent.AllImages, taskExecutor);
 
+		return null;
+
+	}
 
 	@Override
 	protected void done() {
@@ -102,7 +93,5 @@ public class ProgressBatch extends SwingWorker<Void, Void> {
 		}
 
 	}
-	
-	
 
 }

@@ -72,6 +72,7 @@ import listeners.ChooseDirectoryListener;
 import listeners.ComputeMserinHoughListener;
 import listeners.ComputeTreeListener;
 import listeners.DarktobrightListener;
+import listeners.DeltaHoughListener;
 import listeners.DeltaListener;
 import listeners.DoMserSegmentation;
 import listeners.DoSegmentation;
@@ -79,9 +80,12 @@ import listeners.DowatershedListener;
 import listeners.EndTrackListener;
 import listeners.FindLinesListener;
 import listeners.HoughListener;
+import listeners.MaxSizeHoughListener;
 import listeners.MaxSizeListener;
+import listeners.MinDiversityHoughListener;
 import listeners.Unstability_ScoreListener;
 import listeners.MinDiversityListener;
+import listeners.MinSizeHoughListener;
 import listeners.MinSizeListener;
 import listeners.MserListener;
 import listeners.MserwHoughListener;
@@ -91,7 +95,7 @@ import listeners.ShowwatershedimgListener;
 import listeners.SkipFramesandTrackendsListener;
 import listeners.ThresholdHoughListener;
 import listeners.TrackendsListener;
-
+import listeners.Unstability_ScoreHoughListener;
 import mpicbg.imglib.multithreading.SimpleMultiThreading;
 import mpicbg.imglib.util.Util;
 import net.imglib2.Cursor;
@@ -107,6 +111,7 @@ import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.util.Pair;
 import net.imglib2.view.Views;
 import preProcessing.GetLocalmaxmin;
+import preProcessing.GlobalThresholding;
 import preProcessing.Kernels;
 import preProcessing.MedianFilter2D;
 import trackerType.MTTracker;
@@ -154,7 +159,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public OvalRoi Seedroi;
 	public ArrayList<OvalRoi> AllSeedrois;
 	public float thresholdHoughMin = 0;
-	public float thresholdHoughMax = 250;
+	public float thresholdHoughMax = 1;
 	public float deltaMax = 400f;
 	public float Unstability_ScoreMin = 0;
 	public float Unstability_ScoreMax = 1;
@@ -209,7 +214,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public int minSizeInit = 10;
 	public int maxSizeInit = 5000;
 
-	public float thresholdHoughInit = 100;
+	public float thresholdHoughInit = new Float(0.5);
 	public float rhoPerPixelInit = new Float(1);
 	public float thetaPerPixelInit = new Float(1);
 	public JLabel inputMaxdpixel;
@@ -297,7 +302,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 	public double sumlengthpixel = 0;
 	public double sumlengthmicro = 0;
-
+	
 	public int maxSearchradiusInit = 200;
 	public float maxSearchradiusMin = 10;
 	public float maxSearchradiusMax = 500;
@@ -368,6 +373,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public Rectangle standardRectangle;
 	public FinalInterval interval;
 	public RandomAccessibleInterval<UnsignedByteType> newimg;
+	public RandomAccessibleInterval<BitType> bitimg;
 	public ArrayList<double[]> AllmeanCovar = new ArrayList<double[]>();
 	public long Cannyradius;
 	public HashMap<Integer, ArrayList<Roi>> AllpreviousRois;
@@ -872,15 +878,22 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 				startdim = thirdDimension;
 			for (int label = 1; label < Maxlabel - 1; label++) {
 
-				Pair<RandomAccessibleInterval<FloatType>, FinalInterval> pair = Boundingboxes
-						.CurrentLabelImagepair(intimg, currentPreprocessedimg, label);
+				Pair<RandomAccessibleInterval<BitType>, FinalInterval> pair = Boundingboxes
+						.CurrentLabelImagepairBit(intimg, bitimg, label);
 
-				RandomAccessibleInterval<FloatType> roiimg = pair.getA();
+				RandomAccessibleInterval<BitType> roiimg = pair.getA();
 
-				RandomAccessibleInterval<UnsignedByteType> newimg = util.CopyUtils.copytoByteImage(
-						Kernels.CannyEdgeandMean(roiimg, Cannyradius), intimg, standardRectangle, label);
+				
+						long size = pair.getB().dimension( 0 );
+				for ( int d = 1; d < intimg.numDimensions(); ++d )
+				{
+					size *= pair.getB().dimension( d );
+				}
+						
+				newimg = util.CopyUtils.copytoByteImageBit(
+						Kernels.CannyEdgeandMeanBit(roiimg, Cannyradius), intimg, standardRectangle, label);
 
-				MserTree<UnsignedByteType> newtree = MserTree.buildMserTree(newimg, delta, minSize, maxSize, Unstability_Score,
+				MserTree<UnsignedByteType> newtree = MserTree.buildMserTree(newimg, delta, minSize, Math.min(maxSize, size ), Unstability_Score,
 						minDiversity, darktobright);
 
 				Rois = util.DrawingUtils.getcurrentRois(newtree, meanCovar);
@@ -927,18 +940,21 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 			currentimg = util.CopyUtils.extractImage(CurrentView, interval);
 			currentPreprocessedimg = util.CopyUtils.extractImage(CurrentPreprocessedView, interval);
 
-			newimg = util.CopyUtils.copytoByteImage(currentPreprocessedimg,
+			newimg = util.CopyUtils.copytoByteImage(Kernels.CannyEdgeandMean(currentPreprocessedimg, Cannyradius),
 					standardRectangle);
 
-			RandomAccessibleInterval<BitType> bitimg = new ArrayImgFactory<BitType>().create(newimg, new BitType());
+			bitimg = new ArrayImgFactory<BitType>().create(newimg, new BitType());
 			
-			FloatType T = new FloatType(Math.round(thresholdHough));
-			GetLocalmaxmin.ThresholdingBit(currentPreprocessedimg, bitimg, T);
+			
+			
+			
+			
+			GetLocalmaxmin.ThresholdingBit(currentPreprocessedimg, bitimg, thresholdHough);
 
 			if (displayBitimg)
 				ImageJFunctions.show(bitimg);
 
-			WatershedDistimg<UnsignedByteType> WaterafterDisttransform = new WatershedDistimg<UnsignedByteType>(newimg,
+			WatershedDistimg<FloatType> WaterafterDisttransform = new WatershedDistimg<FloatType>(Kernels.CannyEdgeandMean(currentPreprocessedimg, Cannyradius),
 					bitimg);
 			WaterafterDisttransform.checkInput();
 			WaterafterDisttransform.process();
@@ -1605,9 +1621,9 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		c.insets = new Insets(10, 10, 0, 0);
 		panelFourth.add(displayWatershed, c);
 
-		++c.gridy;
-		c.insets = new Insets(10, 175, 0, 175);
-		panelFourth.add(Dowatershed, c);
+	//	++c.gridy;
+	//	c.insets = new Insets(10, 175, 0, 175);
+	//	panelFourth.add(Dowatershed, c);
 
 		++c.gridy;
 		c.insets = new Insets(10, 10, 0, 0);
@@ -1669,19 +1685,19 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		panelFourth.add(finalizechoices, c);
 
 
-		deltaS.addAdjustmentListener(new DeltaListener(this, deltaText, deltaMin, deltaMax, scrollbarSize, deltaS));
+		deltaS.addAdjustmentListener(new DeltaHoughListener(this, deltaText, deltaMin, deltaMax, scrollbarSize, deltaS));
 
 		Unstability_ScoreS.addAdjustmentListener(
-				new Unstability_ScoreListener(this, Unstability_ScoreText, Unstability_ScoreMin, Unstability_ScoreMax, scrollbarSize, Unstability_ScoreS));
+				new Unstability_ScoreHoughListener(this, Unstability_ScoreText, Unstability_ScoreMin, Unstability_ScoreMax, scrollbarSize, Unstability_ScoreS));
 
-		minDiversityS.addAdjustmentListener(new MinDiversityListener(this, minDiversityText, minDiversityMin,
+		minDiversityS.addAdjustmentListener(new MinDiversityHoughListener(this, minDiversityText, minDiversityMin,
 				minDiversityMax, scrollbarSize, minDiversityS));
 
 		minSizeS.addAdjustmentListener(
-				new MinSizeListener(this, minSizeText, minSizemin, minSizemax, scrollbarSize, minSizeS));
+				new MinSizeHoughListener(this, minSizeText, minSizemin, minSizemax, scrollbarSize, minSizeS));
 
 		maxSizeS.addAdjustmentListener(
-				new MaxSizeListener(this, maxSizeText, maxSizemin, maxSizemax, scrollbarSize, maxSizeS));
+				new MaxSizeHoughListener(this, maxSizeText, maxSizemin, maxSizemax, scrollbarSize, maxSizeS));
 
 		min.addItemListener(new DarktobrightListener(this));
 		ComputeTree.addActionListener(new ComputeMserinHoughListener(this));
@@ -1699,10 +1715,11 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 		displayBit.addItemListener(new ShowBitimgListener(this));
 		displayWatershed.addItemListener(new ShowwatershedimgListener(this));
-		Dowatershed.addActionListener(new DowatershedListener(this));
+		//Dowatershed.addActionListener(new DowatershedListener(this));
 		displayBitimg = false;
 		displayWatershedimg = false;
 
+		
 		panelFourth.repaint();
 		panelFourth.validate();
 		Cardframe.pack();

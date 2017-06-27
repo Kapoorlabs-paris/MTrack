@@ -16,6 +16,7 @@ import net.imglib2.algorithm.region.hypersphere.HyperSphereCursor;
 import net.imglib2.img.Img;
 import net.imglib2.img.array.ArrayImgFactory;
 import net.imglib2.img.array.ArrayImgs;
+import net.imglib2.type.logic.BitType;
 import net.imglib2.type.numeric.complex.ComplexFloatType;
 import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.view.Views;
@@ -187,6 +188,39 @@ public class Kernels {
 		
 	}
 
+	
+	
+	// Do mean filtering on the inputimage
+	public static void MeanFilterBit(RandomAccessibleInterval<BitType> inputimage,
+			RandomAccessibleInterval<BitType> outimage, double sigma) {
+		// Mean filtering for a given sigma
+		Cursor<BitType> cursorInput = Views.iterable(inputimage).cursor();
+		Cursor<BitType> cursorOutput = Views.iterable(outimage).cursor();
+		BitType mean = Views.iterable(inputimage).firstElement().createVariable();
+
+		while (cursorInput.hasNext()) {
+			cursorInput.fwd();
+			cursorOutput.fwd();
+			HyperSphere<BitType> hyperSphere = new HyperSphere<BitType>(Views.extendMirrorSingle(inputimage),
+					cursorInput, (long) sigma);
+			HyperSphereCursor<BitType> cursorsphere = hyperSphere.cursor();
+			cursorsphere.fwd();
+			mean.set(cursorsphere.get());
+			boolean isbright = false;
+			while (cursorsphere.hasNext()) {
+				cursorsphere.fwd();
+				if (cursorsphere.get().get())
+					isbright = true;
+			}
+			
+			if (isbright)
+			
+			cursorOutput.get().set(isbright);
+		}
+		
+		
+	}
+	
 	// Naive Edge detector, first get the gradient of the image, then do local
 	// supression
 
@@ -588,6 +622,115 @@ public static void addBackground(final IterableInterval<FloatType> iterable, fin
 		return meanimg;
 	}
 	
+	public static RandomAccessibleInterval<BitType> CannyEdgeandMeanBit(RandomAccessibleInterval<BitType> inputimg,
+			final double sigma) {
+		int n = inputimg.numDimensions();
+		RandomAccessibleInterval<BitType> cannyimage = new ArrayImgFactory<BitType>().create(inputimg,
+				new BitType());
+		RandomAccessibleInterval<BitType> gradientimage = new ArrayImgFactory<BitType>().create(inputimg,
+				new BitType());
+		RandomAccessibleInterval<BitType> Threshcannyimg = new ArrayImgFactory<BitType>().create(inputimg,
+				new BitType());
+		
+	    // We will create local neighbourhood on this image
+		gradientimage = GradientmagnitudeImageBit(inputimg);
+	    
+		// This is the intended output image so set up a cursor on it
+		Cursor<BitType> cursor = Views.iterable(cannyimage).localizingCursor();
+		
+		// Extend the input image for gradient computation
+		RandomAccessible<BitType> view = Views.extendMirrorSingle(inputimg);
+		RandomAccess<BitType> randomAccess = view.randomAccess();
+
+		RandomAccessible<BitType> gradientview = Views.extendMirrorSingle(gradientimage);
+
+		final double[] direction = new double[n];
+		final double[] left = new double[n];
+		final double[] right = new double[n];
+
+		// iterate over all pixels
+		while (cursor.hasNext()) {
+			// Initialize a point
+			cursor.fwd();
+			// compute gradient and its direction in each dimension and move
+			// along the direction
+			double gradient = 0;
+			
+			for (int d = 0; d < inputimg.numDimensions(); ++d) {
+				randomAccess.setPosition(cursor);
+				// move one pixel back in dimension d
+				randomAccess.bck(d);
+				
+				// get the value
+				double Back = randomAccess.get().getRealDouble();
+
+				// move twice forward in dimension d, i.e.
+				// one pixel above the location of the cursor
+				randomAccess.fwd(d);
+				randomAccess.fwd(d);
+
+				// get the value
+				double Fwd = randomAccess.get().getRealDouble();
+
+				gradient += ((Fwd - Back) * (Fwd - Back)) / 4;
+
+				direction[d] = (Fwd - Back) / 2;
+
+			}
+			// Normalize the gradient direction
+			
+			for (int d = 0; d < inputimg.numDimensions(); ++d) {
+				if (gradient != 0)
+					direction[d] = direction[d] / gradient;
+				else
+					direction[d] = Double.MAX_VALUE;
+			}
+			
+			
+			cursor.get().setReal(Math.sqrt(gradient));
+		
+            // A 5*5*5.. neighbourhood for span = 2, a 3*3*3.. neighbourhood for span = 1.
+			final int span = 1;
+           // Create a hypersphere at the current point in the gradient image
+			final HyperSphere<BitType> localsphere = new HyperSphere<BitType>(gradientview, cursor, span);
+            // To get only the points which are along the gradient direction create left and right in d dimensions
+			Cursor<BitType> localcursor = localsphere.localizingCursor();
+			for (int d = 0; d < n; ++d) {
+				left[d] = cursor.getDoublePosition(d) - direction[d];
+				right[d] = cursor.getDoublePosition(d) + direction[d];
+			}
+			boolean isMaximum = true;
+        	final RandomAccess<BitType> outbound = Threshcannyimg.randomAccess();
+			while (localcursor.hasNext()) {
+				localcursor.fwd();
+			
+					
+				    if (cursor.get().compareTo(localcursor.get()) < 0 ) {
+					isMaximum = false;
+				    	
+					break;
+			}
+				
+			
+			if (isMaximum) {
+				
+				
+				outbound.setPosition(cursor);
+				outbound.get().set(cursor.get());
+				
+			}
+			}
+		}
+		
+
+		RandomAccessibleInterval<BitType> meanimg = new ArrayImgFactory<BitType>().create(inputimg,
+				new BitType());
+		MeanFilterBit(Threshcannyimg, meanimg, sigma);
+		
+		return Threshcannyimg;
+	}
+	
+	
 	public static RandomAccessibleInterval<FloatType> Meanfilterandsupress(RandomAccessibleInterval<FloatType> inputimg, double sigma){
 		// Mean filtering for a given sigma
 		
@@ -668,7 +811,7 @@ public static void addBackground(final IterableInterval<FloatType> iterable, fin
 					inputcursor.fwd();
 					inputcursor.localize(position);
 					outputran.setPosition(inputcursor);
-					if (inputcursor.get().get()<= 0.25 * threshold)
+					if (inputcursor.get().get()<= 0.2 * threshold)
 						outputran.get().setZero();
 					else
 						outputran.get().set(inputcursor.get());
@@ -749,5 +892,49 @@ public static void addBackground(final IterableInterval<FloatType> iterable, fin
 		return gradientimg;
 	}
 
+	public static RandomAccessibleInterval<BitType> GradientmagnitudeImageBit(
+			RandomAccessibleInterval<BitType> inputimg) {
 
+		RandomAccessibleInterval<BitType> gradientimg = new ArrayImgFactory<BitType>().create(inputimg,
+				new BitType());
+		Cursor<BitType> cursor = Views.iterable(gradientimg).localizingCursor();
+		RandomAccessible<BitType> view = Views.extendBorder(inputimg);
+		RandomAccess<BitType> randomAccess = view.randomAccess();
+
+		// iterate over all pixels
+		while (cursor.hasNext()) {
+			// move the cursor to the next pixel
+			cursor.fwd();
+
+			// compute gradient and its direction in each dimension
+			double gradient = 0;
+
+			for (int d = 0; d < inputimg.numDimensions(); ++d) {
+				// set the randomaccess to the location of the cursor
+				randomAccess.setPosition(cursor);
+
+				// move one pixel back in dimension d
+				randomAccess.bck(d);
+
+				// get the value
+				double Back = randomAccess.get().getRealDouble();
+
+				// move twice forward in dimension d, i.e.
+				// one pixel above the location of the cursor
+				randomAccess.fwd(d);
+				randomAccess.fwd(d);
+
+				// get the value
+				double Fwd = randomAccess.get().getRealDouble();
+
+				gradient += ((Fwd - Back) * (Fwd - Back)) / 4;
+
+			}
+
+			cursor.get().setReal(Math.sqrt(gradient));
+
+		}
+
+		return gradientimg;
+	}
 }
