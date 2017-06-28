@@ -1,4 +1,4 @@
-package listeners;
+package singleListeners;
 
 import java.awt.Button;
 import java.awt.Checkbox;
@@ -13,22 +13,31 @@ import java.awt.event.ItemListener;
 
 import javax.swing.JPanel;
 
-import interactiveMT.Interactive_MTDoubleChannel;
-import interactiveMT.Interactive_MTDoubleChannel.ValueChange;
+import listeners.AdvancedSeedListener;
+import listeners.ComputeTreeListener;
+import listeners.DeltaListener;
+import listeners.FindLinesListener;
+import listeners.MaxSizeListener;
+import listeners.MinDiversityListener;
+import listeners.MinSizeListener;
+import listeners.Unstability_ScoreListener;
+import interactiveMT.Interactive_MTSingleChannel;
+import interactiveMT.Interactive_MTSingleChannel.ValueChange;
 import interactiveMT.Interactive_PSFAnalyze;
 import mpicbg.imglib.multithreading.SimpleMultiThreading;
 import updateListeners.DefaultModel;
 import updateListeners.DefaultModelHF;
+import updateListeners.SingleDefaultModel;
 
 
 
 	
-	public class MserListener implements ItemListener {
+	public class SingleMserListener implements ItemListener {
 		
 		
-		Interactive_MTDoubleChannel parent;
+		Interactive_MTSingleChannel parent;
 		
-		public MserListener(final Interactive_MTDoubleChannel parent){
+		public SingleMserListener(final Interactive_MTSingleChannel parent){
 		
 			this.parent = parent;
 		}
@@ -50,7 +59,6 @@ import updateListeners.DefaultModelHF;
 				parent.panelSecond.removeAll();
 				if (parent.inputFieldradi.getText().length() > 0)
 				parent.radiusfactor = Double.parseDouble(parent.inputFieldradi.getText());
-				
 				
 				final GridBagLayout layout = new GridBagLayout();
 				final GridBagConstraints c = new GridBagConstraints();
@@ -92,7 +100,7 @@ import updateListeners.DefaultModelHF;
 				MSparam.setForeground(new Color(255, 255, 255));
 
 				final Checkbox AdvancedOptions = new Checkbox("Advanced Optimizer Options ", parent.AdvancedChoiceSeeds);
-				DefaultModel loaddefault = new DefaultModel(parent);
+				SingleDefaultModel loaddefault = new SingleDefaultModel(parent);
 				loaddefault.LoadDefault();
 				
 				/* Location */
@@ -153,27 +161,27 @@ import updateListeners.DefaultModelHF;
 				c.insets = new Insets(10, 180, 0, 180);
 				parent.panelSecond.add(FindLinesListener, c);
 
-				deltaS.addAdjustmentListener(new DeltaListener(parent, deltaText, parent.deltaMin, parent.deltaMax, 
+				deltaS.addAdjustmentListener(new SingleDeltaListener(parent, deltaText, parent.deltaMin, parent.deltaMax, 
 						parent.scrollbarSize, deltaS));
 
 				Unstability_ScoreS.addAdjustmentListener(
-						new Unstability_ScoreListener(parent, Unstability_ScoreText, parent.Unstability_ScoreMin, parent.Unstability_ScoreMax, 
+						new SingleUnstability_ScoreListener(parent, Unstability_ScoreText, parent.Unstability_ScoreMin, parent.Unstability_ScoreMax, 
 								parent.scrollbarSize, Unstability_ScoreS));
 
-				minDiversityS.addAdjustmentListener(new MinDiversityListener(parent, minDiversityText, parent.minDiversityMin,
+				minDiversityS.addAdjustmentListener(new SingleMinDiversityListener(parent, minDiversityText, parent.minDiversityMin,
 						parent.minDiversityMax, parent.scrollbarSize, minDiversityS));
 
 				minSizeS.addAdjustmentListener(
-						new MinSizeListener(parent, minSizeText,parent.minSizemin, parent.minSizemax,
+						new SingleMinSizeListener(parent, minSizeText,parent.minSizemin, parent.minSizemax,
                       parent.scrollbarSize, minSizeS));
 
 				maxSizeS.addAdjustmentListener(
-						new MaxSizeListener(parent,maxSizeText,parent. maxSizemin, parent.maxSizemax, 
+						new SingleMaxSizeListener(parent,maxSizeText,parent. maxSizemin, parent.maxSizemax, 
 								parent.scrollbarSize, maxSizeS));
 
-				AdvancedOptions.addItemListener(new AdvancedSeedListener(parent));
-				ComputeTree.addActionListener(new ComputeTreeListener(parent));
-				FindLinesListener.addActionListener(new FindLinesListener(parent));
+				AdvancedOptions.addItemListener(new SingleAdvancedSeedListener(parent));
+				ComputeTree.addActionListener(new SingleComputeTreeListener(parent));
+				FindLinesListener.addActionListener(new SingleFindLinesListener(parent));
 				parent.panelSecond.validate();
 				parent.panelSecond.repaint();
 				parent.Cardframe.pack();

@@ -1,4 +1,4 @@
-package listeners;
+package singleListeners;
 
 import java.awt.Button;
 import java.awt.Checkbox;
@@ -11,21 +11,22 @@ import java.awt.Scrollbar;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
-import interactiveMT.Interactive_MTDoubleChannel;
-import interactiveMT.Interactive_MTDoubleChannel.ValueChange;
+import interactiveMT.Interactive_MTSingleChannel;
+import interactiveMT.Interactive_MTSingleChannel.ValueChange;
 import mpicbg.imglib.multithreading.SimpleMultiThreading;
 import updateListeners.DefaultModel;
+import updateListeners.SingleDefaultModel;
 
-public class HoughListener implements ItemListener {
+public class SingleHoughListener implements ItemListener {
 	
 	
 
 		
 		
-		final Interactive_MTDoubleChannel parent;
+		final Interactive_MTSingleChannel parent;
 		
 		
-		public HoughListener(final Interactive_MTDoubleChannel parent){
+		public SingleHoughListener(final Interactive_MTSingleChannel parent){
 		
 			this.parent = parent;
 		}
@@ -86,7 +87,7 @@ public class HoughListener implements ItemListener {
 			Houghparam.setBackground(new Color(1, 0, 1));
 			Houghparam.setForeground(new Color(255, 255, 255));
 			final Checkbox AdvancedOptions = new Checkbox("Advanced Optimizer Options ", parent.AdvancedChoiceSeeds);
-			DefaultModel loaddefault = new DefaultModel(parent);
+			SingleDefaultModel loaddefault = new SingleDefaultModel(parent);
 			loaddefault.LoadDefault();
 			/* Location */
 			parent.panelSecond.setLayout(layout);
@@ -144,20 +145,20 @@ public class HoughListener implements ItemListener {
 			c.insets = new Insets(10, 175, 0, 175);
 			parent.panelSecond.add(FindLinesListener, c);
 
-			threshold.addAdjustmentListener(new ThresholdHoughListener(parent, thresholdText, parent.thresholdHoughMin,
+			threshold.addAdjustmentListener(new SingleThresholdHoughListener(parent, thresholdText, parent.thresholdHoughMin,
 					parent.thresholdHoughMax, parent.scrollbarSize, threshold));
 
-			thetaSize.addAdjustmentListener(new ThetaSizeHoughListener(parent, thetaText, rhoText, parent.thetaPerPixelMin,
+			thetaSize.addAdjustmentListener(new SingleThetaSizeHoughListener(parent, thetaText, rhoText, parent.thetaPerPixelMin,
 					parent.thetaPerPixelMax, parent.scrollbarSize, thetaSize, rhoSize));
 
 			rhoSize.addAdjustmentListener(
-					new RhoSizeHoughListener(parent, rhoText, parent.rhoPerPixelMin, parent.rhoPerPixelMax, parent.scrollbarSize, rhoSize));
+					new SingleRhoSizeHoughListener(parent, rhoText, parent.rhoPerPixelMin, parent.rhoPerPixelMax, parent.scrollbarSize, rhoSize));
 
-			displayBit.addItemListener(new ShowBitimgListener(parent));
-			displayWatershed.addItemListener(new ShowwatershedimgListener(parent));
-			Dowatershed.addActionListener(new DowatershedListener(parent));
-			AdvancedOptions.addItemListener(new AdvancedSeedListener(parent));
-			FindLinesListener.addActionListener(new FindLinesListener(parent));
+			displayBit.addItemListener(new SingleShowBitimgListener(parent));
+			displayWatershed.addItemListener(new SingleShowwatershedimgListener(parent));
+			Dowatershed.addActionListener(new SingleDowatershedListener(parent));
+			AdvancedOptions.addItemListener(new SingleAdvancedSeedListener(parent));
+			FindLinesListener.addActionListener(new SingleFindLinesListener(parent));
 			parent.panelSecond.validate();
 			parent.panelSecond.repaint();
 

@@ -1,4 +1,4 @@
-package listeners;
+package singleListeners;
 
 import java.awt.Button;
 import java.awt.Checkbox;
@@ -11,18 +11,19 @@ import java.awt.Scrollbar;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
-import interactiveMT.Interactive_MTDoubleChannel;
-import interactiveMT.Interactive_MTDoubleChannel.ValueChange;
+import interactiveMT.Interactive_MTSingleChannel;
+import interactiveMT.Interactive_MTSingleChannel.ValueChange;
 import mpicbg.imglib.multithreading.SimpleMultiThreading;
 import updateListeners.DefaultModel;
+import updateListeners.SingleDefaultModel;
 
-public class MserwHoughListener implements ItemListener {
+public class SingleMserwHoughListener implements ItemListener {
 	
 	
-	final Interactive_MTDoubleChannel parent;
+	final Interactive_MTSingleChannel parent;
 	
 	
-	public MserwHoughListener(final Interactive_MTDoubleChannel parent){
+	public SingleMserwHoughListener(final Interactive_MTSingleChannel parent){
 	
 		this.parent = parent;
 	}
@@ -97,7 +98,7 @@ public class MserwHoughListener implements ItemListener {
 			
 			
 			final Checkbox AdvancedOptions = new Checkbox("Advanced Optimizer Options ", parent.AdvancedChoiceSeeds);
-			DefaultModel loaddefault = new DefaultModel(parent);
+			SingleDefaultModel loaddefault = new SingleDefaultModel(parent);
 			loaddefault.LoadDefault();
 			/* Location */
 
@@ -177,31 +178,31 @@ public class MserwHoughListener implements ItemListener {
 			c.insets = new Insets(10, 175, 0, 175);
 			parent.panelSecond.add(FindLinesListener, c);
 
-			deltaS.addAdjustmentListener(new DeltaListener(parent, deltaText, parent.deltaMin, parent.deltaMax, parent.scrollbarSize, deltaS));
+			deltaS.addAdjustmentListener(new SingleDeltaListener(parent, deltaText, parent.deltaMin, parent.deltaMax, parent.scrollbarSize, deltaS));
 
 			Unstability_ScoreS.addAdjustmentListener(
-					new Unstability_ScoreListener(parent, Unstability_ScoreText, parent.Unstability_ScoreMin, parent.Unstability_ScoreMax, parent.scrollbarSize, Unstability_ScoreS));
+					new SingleUnstability_ScoreListener(parent, Unstability_ScoreText, parent.Unstability_ScoreMin, parent.Unstability_ScoreMax, parent.scrollbarSize, Unstability_ScoreS));
 
-			minDiversityS.addAdjustmentListener(new MinDiversityListener(parent, minDiversityText, parent.minDiversityMin,
+			minDiversityS.addAdjustmentListener(new SingleMinDiversityListener(parent, minDiversityText, parent.minDiversityMin,
 					parent.minDiversityMax, parent.scrollbarSize, minDiversityS));
 
 			minSizeS.addAdjustmentListener(
-					new MinSizeListener(parent, minSizeText, parent.minSizemin, parent.minSizemax, parent.scrollbarSize, minSizeS));
+					new SingleMinSizeListener(parent, minSizeText, parent.minSizemin, parent.minSizemax, parent.scrollbarSize, minSizeS));
 
 			maxSizeS.addAdjustmentListener(
-					new MaxSizeListener(parent, maxSizeText, parent.maxSizemin, parent.maxSizemax, parent.scrollbarSize, maxSizeS));
+					new SingleMaxSizeListener(parent, maxSizeText, parent.maxSizemin, parent.maxSizemax, parent.scrollbarSize, maxSizeS));
 
-			min.addItemListener(new DarktobrightListener(parent));
+			min.addItemListener(new SingleDarktobrightListener(parent));
 
-			FindLinesListener.addActionListener(new FindLinesListener(parent));
+			FindLinesListener.addActionListener(new SingleFindLinesListener(parent));
 
-			thetaSize.addAdjustmentListener(new ThetaSizeHoughListener(parent, thetaText, rhoText, parent.thetaPerPixelMin,
+			thetaSize.addAdjustmentListener(new SingleThetaSizeHoughListener(parent, thetaText, rhoText, parent.thetaPerPixelMin,
 					parent.thetaPerPixelMax, parent.scrollbarSize, thetaSize, rhoSize));
 
 			rhoSize.addAdjustmentListener(
-					new RhoSizeHoughListener(parent, rhoText, parent.rhoPerPixelMin, parent.rhoPerPixelMax, parent.scrollbarSize, rhoSize));
-			AdvancedOptions.addItemListener(new AdvancedSeedListener(parent));
-			ComputeTree.addActionListener(new ComputeTreeListener(parent));
+					new SingleRhoSizeHoughListener(parent, rhoText, parent.rhoPerPixelMin, parent.rhoPerPixelMax, parent.scrollbarSize, rhoSize));
+			AdvancedOptions.addItemListener(new SingleAdvancedSeedListener(parent));
+			ComputeTree.addActionListener(new SingleComputeTreeListener(parent));
 			parent.panelSecond.validate();
 			parent.panelSecond.repaint();
 			parent.Cardframe.pack();

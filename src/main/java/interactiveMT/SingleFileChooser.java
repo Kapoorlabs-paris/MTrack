@@ -33,7 +33,7 @@ import java.io.FilenameFilter;
 import java.awt.*;
 import java.util.*;
 
-public class FileChooser extends JPanel {
+public class SingleFileChooser extends JPanel {
 	boolean wasDone = false;
 	boolean isFinished = false;
 	JButton Track;
@@ -64,8 +64,8 @@ public class FileChooser extends JPanel {
 
 	FloatType minval = new FloatType(0);
 	FloatType maxval = new FloatType(1);
-	public FileChooser() {
-		final JFrame frame = new JFrame("Welcome to MTV Tracker (Double Channel)");
+	public SingleFileChooser() {
+		final JFrame frame = new JFrame("Welcome to MTV Tracker (Single Channel)");
 
 		panelCont.add(panelIntro, "1");
 		/* Instantiation */
@@ -730,20 +730,22 @@ public class FileChooser extends JPanel {
 				if (kymoimg != null) {
 
 					if (Simplemode)
-						new Interactive_MTDoubleChannelBasic(new Interactive_MTDoubleChannel(originalimg,
+						
+						new Interactive_MTSingleChannelBasic(new Interactive_MTSingleChannel(originalimg,
 								originalPreprocessedimg, kymoimg, psf, calibration, chooserB.getSelectedFile()))
 										.run(null);
 					else
-						new Interactive_MTDoubleChannel(originalimg, originalPreprocessedimg, kymoimg, psf, calibration,
+						new Interactive_MTSingleChannel(originalimg, originalPreprocessedimg, kymoimg, psf, calibration,
 								chooserB.getSelectedFile()).run(null);
 
 				} else {
 
 					if (Simplemode)
-						new Interactive_MTDoubleChannelBasic(new Interactive_MTDoubleChannel(originalimg,
+						
+						new Interactive_MTSingleChannelBasic(new Interactive_MTSingleChannel(originalimg,
 								originalPreprocessedimg, psf, calibration, chooserB.getSelectedFile())).run(null);
 					else
-						new Interactive_MTDoubleChannel(originalimg, originalPreprocessedimg, psf, calibration,
+						new Interactive_MTSingleChannel(originalimg, originalPreprocessedimg, psf, calibration,
 								chooserB.getSelectedFile()).run(null);
 
 				}

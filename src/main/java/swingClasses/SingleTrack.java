@@ -24,12 +24,14 @@ import ij.gui.Line;
 import ij.gui.Overlay;
 import ij.measure.ResultsTable;
 import ij.plugin.frame.RoiManager;
-import interactiveMT.Interactive_MTDoubleChannel;
-import interactiveMT.Interactive_MTDoubleChannel.ValueChange;
+import interactiveMT.Interactive_MTSingleChannel;
+import interactiveMT.Interactive_MTSingleChannel.ValueChange;
 import lineFinder.FindlinesVia;
 import lineFinder.LinefinderInteractiveHFHough;
 import lineFinder.LinefinderInteractiveHFMSER;
 import lineFinder.LinefinderInteractiveHFMSERwHough;
+import lineFinder.SingleFindlinesVia;
+import lineFinder.SingleLinefinderInteractiveHFHough;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.img.display.imagej.ImageJFunctions;
 import net.imglib2.type.numeric.real.FloatType;
@@ -39,12 +41,12 @@ import trackerType.TrackModel;
 import velocityanalyser.Trackend;
 import velocityanalyser.Trackstart;
 
-public  class Track {
+public  class SingleTrack {
 	
-        final Interactive_MTDoubleChannel parent;
+        final Interactive_MTSingleChannel parent;
 	
 	
-	public Track(final Interactive_MTDoubleChannel parent){
+	public SingleTrack(final Interactive_MTSingleChannel parent){
 	
 		this.parent = parent;
 	}
@@ -91,7 +93,7 @@ public  class Track {
 
 				LinefinderInteractiveHFMSER newlineMser = new LinefinderInteractiveHFMSER(groundframe, groundframepre,
 						parent.newtree,  parent.thirdDimension);
-					parent.returnVector = FindlinesVia.LinefindingMethodHF(groundframe, groundframepre, parent.PrevFrameparam,
+					parent.returnVector = SingleFindlinesVia.LinefindingMethodHF(groundframe, groundframepre, parent.PrevFrameparam,
 							 parent.thirdDimension, parent.psf, newlineMser, parent.userChoiceModel, parent.Domask, parent.Intensityratio,
 							parent.Inispacing, parent.seedmap, parent.jpb, parent.thirdDimensionSize);
 					parent.Accountedframes.add(FindlinesVia.getAccountedframes());
@@ -124,10 +126,10 @@ public  class Track {
 
 				parent.updatePreview(ValueChange.SHOWHOUGH);
 				parent.updatePreview(ValueChange.SHOWMSERinHough);
-				LinefinderInteractiveHFHough newlineHough = new LinefinderInteractiveHFHough(parent,groundframe,
+				SingleLinefinderInteractiveHFHough newlineHough = new SingleLinefinderInteractiveHFHough(parent,groundframe,
 						groundframepre, parent.Maxlabel, parent.thirdDimension);
 				
-					parent.returnVector = FindlinesVia.LinefindingMethodHF(groundframe, groundframepre, parent.PrevFrameparam,
+					parent.returnVector = SingleFindlinesVia.LinefindingMethodHF(groundframe, groundframepre, parent.PrevFrameparam,
 							 parent.thirdDimension, parent.psf, newlineHough, parent.userChoiceModel,parent.Domask, parent.Intensityratio,
 							parent.Inispacing, parent.seedmap, parent.jpb, parent.thirdDimensionSize);
 
@@ -163,7 +165,7 @@ public  class Track {
 				parent.updatePreview(ValueChange.SHOWMSER);
 				LinefinderInteractiveHFMSERwHough newlineMserwHough = new LinefinderInteractiveHFMSERwHough(groundframe,
 						groundframepre, parent.newtree, parent.thirdDimension, parent.thetaPerPixel, parent.rhoPerPixel);
-					parent.returnVector = FindlinesVia.LinefindingMethodHF(groundframe, groundframepre, parent.PrevFrameparam,
+					parent.returnVector = SingleFindlinesVia.LinefindingMethodHF(groundframe, groundframepre, parent.PrevFrameparam,
 							 parent.thirdDimension, parent.psf, newlineMserwHough, parent.userChoiceModel, parent.Domask, parent.Intensityratio,
 							parent.Inispacing, parent.seedmap, parent.jpb, parent.thirdDimensionSize);
 

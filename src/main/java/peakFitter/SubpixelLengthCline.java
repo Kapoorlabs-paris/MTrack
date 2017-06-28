@@ -3,6 +3,8 @@ package peakFitter;
 
 import java.util.ArrayList;
 
+import javax.swing.JProgressBar;
+
 import com.sun.tools.javac.util.Pair;
 
 import LineModels.GaussianLineds;
@@ -34,7 +36,8 @@ implements OutputAlgorithm<ArrayList<Indexedlength>> {
 	private final ArrayList<CommonOutput> imgs;
 	private final int ndims;
 	private ArrayList<Indexedlength> paramlist;
-	
+	private final boolean DoMask;
+
 	private final double[] psf;
 	private final int minlength;
 	private final int framenumber;
@@ -48,6 +51,20 @@ implements OutputAlgorithm<ArrayList<Indexedlength>> {
 	public boolean halfgaussian = false;
     public double Intensityratio = 0.5;
     private final UserChoiceModel model;
+    final JProgressBar jpb;
+    public double Inispacing;
+    
+    double percent = 0;
+	public void setInispacing (double Inispacing){
+		
+		this.Inispacing = Inispacing;
+		
+	}
+	
+	public double getInispacing (){
+		
+		return Inispacing;
+	}
     
     /**
      * 
@@ -155,7 +172,9 @@ implements OutputAlgorithm<ArrayList<Indexedlength>> {
 			             final double[] psf,
 			             final int minlength,
 			             final UserChoiceModel model,
-			             final int framenumber){
+			             final int framenumber,
+			             final boolean DoMask,
+			             final JProgressBar jpb){
 		finder.checkInput();
 		finder.process();
 		this.source = source;
@@ -163,6 +182,8 @@ implements OutputAlgorithm<ArrayList<Indexedlength>> {
 		this.model = model;
 		this.psf = psf;
 		this.minlength = minlength;
+		this.DoMask = DoMask;
+		this.jpb =jpb;
 		this.framenumber = framenumber;
 		this.ndims = source.numDimensions();
 		
@@ -238,19 +259,19 @@ implements OutputAlgorithm<ArrayList<Indexedlength>> {
        			if (inputcursor.get().get()/maxintensityline > Intensityratio){
        			
        				inputcursor.localize(newposition);
-       				long pointonline = (long) (newposition[1] - slope * newposition[0] - intercept);
+       				long pointonline = (int) Math.round(newposition[1] - slope * newposition[0] - intercept);
 
        				// To get the min and max co-rodinates along the line so we have
        				// starting points to
        				// move on the line smoothly
        				
-       				if (pointonline == 0) {
+       				if (Math.abs(pointonline) <= 50) {
 
        					for (int d = 0; d < ndims; ++d) {
-       						if (inputcursor.getDoublePosition(d) <= minVal[d])
+       						if (inputcursor.getDoublePosition(d) <= minVal[d] && inputcursor.get().get() / maxintensityline > Intensityratio)
        							minVal[d] = inputcursor.getDoublePosition(d);
 
-       						if (inputcursor.getDoublePosition(d) >= maxVal[d])
+       						if (inputcursor.getDoublePosition(d) >= maxVal[d] && inputcursor.get().get() / maxintensityline > Intensityratio)
        							maxVal[d] = inputcursor.getDoublePosition(d);
 
        					}

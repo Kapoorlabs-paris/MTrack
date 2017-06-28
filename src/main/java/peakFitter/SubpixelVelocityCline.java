@@ -7,12 +7,20 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import javax.swing.JProgressBar;
+
 import LineModels.GaussianLineds;
+import LineModels.GaussianSplinesecorder;
+import LineModels.GaussianSplinethirdorder;
+import LineModels.MTFitFunction;
 import LineModels.UseLineModel.UserChoiceModel;
 import graphconstructs.Staticproperties;
+import graphconstructs.Trackproperties;
 import ij.gui.EllipseRoi;
 import ij.gui.OvalRoi;
 import ij.gui.Overlay;
+import ij.gui.Roi;
+import interactiveMT.Interactive_MTSingleChannel.Whichend;
 import labeledObjects.CommonOutput;
 import labeledObjects.CommonOutputHF;
 import labeledObjects.Indexedlength;
@@ -27,6 +35,8 @@ import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.algorithm.BenchmarkAlgorithm;
 import net.imglib2.algorithm.OutputAlgorithm;
 import net.imglib2.type.numeric.real.FloatType;
+import net.imglib2.util.Pair;
+import net.imglib2.util.ValuePair;
 import net.imglib2.view.Views;
 import peakFitter.GaussianMaskFitMSER.EndfitMSER;
 import peakFitter.SubpixelVelocityPCLine.StartorEnd;
@@ -34,30 +44,50 @@ import preProcessing.GetLocalmaxmin;
 import util.Boundingboxes;
 
 public class SubpixelVelocityCline extends BenchmarkAlgorithm
-implements OutputAlgorithm<ArrayList<Indexedlength>> {
+implements OutputAlgorithm<Pair<ArrayList<Indexedlength>, ArrayList<Indexedlength>>> {
 
 	private static final String BASE_ERROR_MSG = "[SubpixelVelocity] ";
 	private final RandomAccessibleInterval<FloatType> source;
 	private final ArrayList<CommonOutputHF> imgs;
-	private final ArrayList<Indexedlength> PrevFrameparam;
+	private final ArrayList<Indexedlength> PrevFrameparamstart;
+	private final ArrayList<Indexedlength> PrevFrameparamend;
 	private final int ndims;
 	private final int framenumber;
-	private ArrayList<Indexedlength> final_paramlist;
-	private ArrayList<Staticproperties> startandendinframe;
+	private ArrayList<Indexedlength> final_paramliststart;
+	private ArrayList<Indexedlength> final_paramlistend;
+	private ArrayList<Trackproperties> startinframe;
+	private ArrayList<Trackproperties> endinframe;
 	private final double[] psf;
 	private final UserChoiceModel model;
-	private final Overlay overlay;
 	
+	final JProgressBar jpb;
+	private boolean Maskfail = false;
 	// LM solver iteration params
 	public int maxiter = 500;
 	public double lambda = 1e-3;
 	 public double termepsilon = 1e-1;
 	//Mask fits iteration param
 	 int iterations = 500;
+	 private final boolean DoMask;
 	public double cutoffdistance = 20;
 	public boolean halfgaussian = false;
-	public double Intensityratio = 0.5;
-	
+	public double Intensityratio;
+	private final HashMap<Integer, Whichend> Trackstart;
+	public double Inispacing;
+	final int thirdDimsize;
+	double percent = 0;
+	int maxghost = 5;
+
+	public void setInispacing(double Inispacing) {
+
+		this.Inispacing = Inispacing;
+
+	}
+
+	public double getInispacing() {
+
+		return Inispacing;
+	}
 	public void setCutoffdistance(double cutoffdistance) {
 		this.cutoffdistance = cutoffdistance;
 	}
@@ -102,21 +132,29 @@ implements OutputAlgorithm<ArrayList<Indexedlength>> {
 	
 	public  SubpixelVelocityCline(final RandomAccessibleInterval<FloatType> source, 
 			                      final LinefinderHF finder,
-			                       final ArrayList<Indexedlength> PrevFrameparam,
+			                       final ArrayList<Indexedlength> PrevFrameparamstart,
+			                       final ArrayList<Indexedlength> PrevFrameparamend,
 			                       final double[] psf,
-			                       final UserChoiceModel model,
 			                       final int framenumber,
-			                       final Overlay overlay) {
+			                       final UserChoiceModel model,
+			                       final boolean DoMask,
+			                       final HashMap<Integer, Whichend> Trackstart,
+			                       final JProgressBar jpb,
+			                       final int thirdDimsize) {
 		finder.checkInput();
 		finder.process();
 		imgs = finder.getResult();
 		this.source = source;
 		this.model = model;
-		this.PrevFrameparam = PrevFrameparam;
+		this.DoMask = DoMask;
+		this.jpb = jpb;
+		this.PrevFrameparamstart = PrevFrameparamstart;
+		this.PrevFrameparamend = PrevFrameparamend;
 		this.psf = psf;
 		this.framenumber = framenumber;
-		this.overlay = overlay;
 		this.ndims = source.numDimensions();
+		this.Trackstart = Trackstart;
+		this.thirdDimsize = thirdDimsize;
 		
 	}
 	
@@ -132,186 +170,204 @@ implements OutputAlgorithm<ArrayList<Indexedlength>> {
 
 	@Override
 	public boolean process() {
+		Intensityratio = getIntensityratio();
+		Inispacing = getInispacing();
+		ArrayList<Roi> onlyroi = new ArrayList<Roi>();
+		final_paramliststart = new ArrayList<Indexedlength>();
+		final_paramlistend = new ArrayList<Indexedlength>();
+		startinframe = new ArrayList<Trackproperties>();
+		endinframe = new ArrayList<Trackproperties>();
 		
-		final_paramlist = new ArrayList<Indexedlength>();
-		startandendinframe = new ArrayList<Staticproperties>();
-		
-		for (int index = 0; index < PrevFrameparam.size(); ++index) {
+		for (int index = 0; index < PrevFrameparamstart.size(); ++index) {
 
-			Point linepoint = new Point(ndims);
-			linepoint.setPosition(
-					new long[] { (long) PrevFrameparam.get(index).currentpos[0], (long) PrevFrameparam.get(index).currentpos[1] });
+			final int oldframenumber = PrevFrameparamstart.get(PrevFrameparamstart.size() - 1).framenumber;
+			final int framediff = framenumber - oldframenumber;
 			
 			
 			
-			 ArrayList<Integer> label = Getlabel(linepoint);
-			 Set<Integer> multilabel = new HashSet<Integer>(label);
-			 
-			
-			 Point secondlinepoint = new Point(ndims);
-				secondlinepoint.setPosition(
-						new long[] { (long) PrevFrameparam.get(index).fixedpos[0], (long) PrevFrameparam.get(index).fixedpos[1] });
+			if (Trackstart.get(PrevFrameparamstart.get(index).seedLabel) == Whichend.start
+					|| Trackstart.get(PrevFrameparamstart.get(index).seedLabel) == Whichend.both) {
 				
 				
-				 
-				 ArrayList<Integer> seclabel = Getlabel(secondlinepoint);
-				 Set<Integer> secmultilabel = new HashSet<Integer>(seclabel);
-				 Set<Integer> finallabel = new HashSet<Integer>();
-				 if (multilabel.size() > 0 && secmultilabel.size() > 0){
-				secmultilabel.retainAll(multilabel);
-				finallabel = secmultilabel;
-				 }
-				 else if (multilabel.size() == 0 &&secmultilabel.size() > 0 ){
-					 finallabel = secmultilabel;
-				 }
-				 else if (secmultilabel.size() == 0 && multilabel.size() > 0){
-					 finallabel = multilabel;
-					 
-				 }
-				 
-				 int currentlabel = Integer.MIN_VALUE;
-				Iterator<Integer> iter = finallabel.iterator();
-				if(iter.hasNext()){
-				 currentlabel = iter.next();
-				 
-				}
-				 
-				 
-				 if (currentlabel != Integer.MIN_VALUE){
-					 System.out.println(currentlabel);
-			 Indexedlength paramnextframe =Getfinaltrackparam(PrevFrameparam.get(index),
-							currentlabel, psf, framenumber);
+				percent = (Math.round(100 * (index + 1) / (PrevFrameparamstart.size())));
 
-			 final double[] oldstartpoint = PrevFrameparam.get(index).currentpos;
-			 
-			 final double[] oldendpoint = PrevFrameparam.get(index).fixedpos;
-			
-			 
-			 
-			 
-			 
-			 if (paramnextframe==null)
-				 paramnextframe = PrevFrameparam.get(index);
-			     final_paramlist.add(paramnextframe);
-			 
-                  final double[] newstartpoint = paramnextframe.currentpos;
-			 
-                  
-                  final OvalRoi Bigroi = new OvalRoi(Util.round(newstartpoint[0] - 2.5), Util.round(newstartpoint[1] - 2.5), Util.round(5),
-							Util.round(5));
-							Bigroi.setStrokeColor(Color.GREEN);
-							Bigroi.setStrokeWidth(0.8);
+				final double originalslope = PrevFrameparamstart.get(index).originalslope;
 
-							
-							overlay.add(Bigroi);
-                  
-                  
-			 final double[] newendpoint = paramnextframe.fixedpos;
-			 
-			 final double[] directionstart = {newstartpoint[0] - oldstartpoint[0] , newstartpoint[1] - oldstartpoint[1] };
-			 
-			 final double[] directionend = {newendpoint[0] - oldendpoint[0] , newendpoint[1] - oldendpoint[1] };
-			 
-			System.out.println("Frame:" + framenumber + " " +  "Fits :" + currentlabel + " "+ "StartX:" + paramnextframe.currentpos[0] 
-					+ " StartY:" + paramnextframe.currentpos[1]+ " " + "EndX:"
-					+ paramnextframe.fixedpos[0] + "EndY: " + paramnextframe.fixedpos[1]);
-			 
-		
-			final Staticproperties edge = 
-		   new Staticproperties(currentlabel, oldstartpoint, oldendpoint, newstartpoint, newendpoint, directionstart , directionend );
-			
+				final double originalintercept = PrevFrameparamstart.get(index).originalintercept;
 
-					startandendinframe.add(edge);	
-				 }
+				final Point linepoint = new Point(ndims);
+				linepoint.setPosition(new long[] { (long) PrevFrameparamstart.get(index).currentpos[0],
+						(long) PrevFrameparamstart.get(index).currentpos[1] });
+
+				final OvalRoi Bigroi = new OvalRoi(Util.round(PrevFrameparamstart.get(index).currentpos[0] - 2.5),
+						Util.round(PrevFrameparamstart.get(index).currentpos[1] - 2.5), Util.round(5), Util.round(5));
+				onlyroi.add(Bigroi);
+				
+				
+				
+				
+
+				final Point fixedstartpoint = new Point(ndims);
+				fixedstartpoint.setPosition(new long[] { (long) PrevFrameparamstart.get(index).fixedpos[0],
+						(long) PrevFrameparamstart.get(index).fixedpos[1] });
+
+				int labelstart = FitterUtils.Getlabel(imgs, fixedstartpoint, originalslope, originalintercept);
+				Indexedlength paramnextframe;
+
+				if (labelstart != Integer.MIN_VALUE)
+
+					paramnextframe = Getfinaltrackparam(PrevFrameparamstart.get(index), labelstart, psf,
+							framenumber, StartorEnd.Start);
+				else
+					paramnextframe = PrevFrameparamstart.get(index);
+				if (paramnextframe == null)
+					paramnextframe = PrevFrameparamstart.get(index);
+
+				final_paramliststart.add(paramnextframe);
+
+				final double[] oldstartpoint = PrevFrameparamstart.get(index).currentpos;
+
+				final double[] newstartpoint = paramnextframe.currentpos;
+
+				final double newstartslope = paramnextframe.slope;
+				final double newstartintercept = paramnextframe.intercept;
+
+				final Trackproperties startedge = new Trackproperties(framenumber, labelstart, oldstartpoint,
+						newstartpoint, newstartslope, newstartintercept, originalslope, originalintercept,
+						PrevFrameparamstart.get(index).seedLabel, PrevFrameparamstart.get(index).fixedpos,
+						PrevFrameparamstart.get(index).originalds);
+
+				startinframe.add(startedge);
+			}
+
+		}
 				 
-				 
+		for (int index = 0; index < PrevFrameparamend.size(); ++index) {
+			final int oldframenumber = PrevFrameparamend.get(PrevFrameparamend.size() - 1).framenumber;
+			final int framediff = framenumber - oldframenumber;
+
+			if (Trackstart.get(PrevFrameparamend.get(index).seedLabel) == Whichend.end
+					|| Trackstart.get(PrevFrameparamend.get(index).seedLabel) == Whichend.both) {
+
+				percent = (Math.round(100 * (index + 1) / (PrevFrameparamend.size())));
+
+				Point secondlinepoint = new Point(ndims);
+				secondlinepoint.setPosition(new long[] { (long) PrevFrameparamend.get(index).currentpos[0],
+						(long) PrevFrameparamend.get(index).currentpos[1] });
+				Point fixedendpoint = new Point(ndims);
+				fixedendpoint.setPosition(new long[] { (long) PrevFrameparamend.get(index).fixedpos[0],
+						(long) PrevFrameparamend.get(index).fixedpos[1] });
+
+				final OvalRoi Bigroi = new OvalRoi(Util.round(PrevFrameparamend.get(index).currentpos[0] - 2.5),
+						Util.round(PrevFrameparamend.get(index).currentpos[1] - 2.5), Util.round(5), Util.round(5));
+				onlyroi.add(Bigroi);
+				
+
+				
+
+				final double originalslopeend = PrevFrameparamend.get(index).originalslope;
+
+				final double originalinterceptend = PrevFrameparamend.get(index).originalintercept;
+				int labelend = FitterUtils.Getlabel(imgs, fixedendpoint, originalslopeend, originalinterceptend);
+				Indexedlength paramnextframeend;
+
+				if (labelend != Integer.MIN_VALUE)
+					paramnextframeend = Getfinaltrackparam(PrevFrameparamend.get(index), labelend, psf, framenumber,
+							StartorEnd.End);
+				else
+					paramnextframeend = PrevFrameparamend.get(index);
+				if (paramnextframeend == null)
+					paramnextframeend = PrevFrameparamend.get(index);
+
+				final_paramlistend.add(paramnextframeend);
+
+				final double[] oldendpoint = PrevFrameparamend.get(index).currentpos;
+
+				double[] newendpoint = paramnextframeend.currentpos;
+
+				final double newendslope = paramnextframeend.slope;
+				final double newendintercept = paramnextframeend.intercept;
+
+				final Trackproperties endedge = new Trackproperties(framenumber, labelend, oldendpoint, newendpoint,
+						newendslope, newendintercept, originalslopeend, originalinterceptend,
+						PrevFrameparamend.get(index).seedLabel, PrevFrameparamend.get(index).fixedpos,
+						PrevFrameparamend.get(index).originalds);
+
+				endinframe.add(endedge);
+
+			}
+		}
 		
-		
-}
+
 		return false;
 	}
 
 	@Override
-	public ArrayList<Indexedlength> getResult() {
-		return final_paramlist;
-	} 
-	
-	public ArrayList<Staticproperties> getStateVectors() {
-		return startandendinframe;
-	} 
-	
-	private final double[] MakerepeatedLineguess(Indexedlength iniparam, int label)  {
-		long[] newposition = new long[ndims];
-		double[] minVal = { Double.MAX_VALUE, Double.MAX_VALUE };
-		double[] maxVal = { -Double.MIN_VALUE, -Double.MIN_VALUE };
+	public Pair<ArrayList<Indexedlength>, ArrayList<Indexedlength>> getResult() {
 
-		RandomAccessibleInterval<FloatType> currentimg = imgs.get(label).Actualroi;
+		Pair<ArrayList<Indexedlength>, ArrayList<Indexedlength>> listpair = new ValuePair<ArrayList<Indexedlength>, ArrayList<Indexedlength>>(
+				final_paramliststart, final_paramlistend);
 
-		FinalInterval interval = imgs.get(label).interval;
+		return listpair;
+	}
+	
+	public ArrayList<Trackproperties> getstartStateVectors() {
+		return startinframe;
+	}
+
+	public ArrayList<Trackproperties> getendStateVectors() {
+		return endinframe;
+	}
+	
+	public enum StartorEnd {
+
+		Start, End
+
+	}
+	private final double[] MakerepeatedLineguess(Indexedlength iniparam, int label) {
+
+		double[] minVal = new double[ndims];
+		double[] maxVal = new double[ndims];
 		
+		int labelindex = FitterUtils.getlabelindex(imgs, label);
+		
+		if (labelindex!=-1){
+		
+		RandomAccessibleInterval<FloatType> currentimg  = imgs.get(labelindex).Roi;
+		FinalInterval interval =  imgs.get(labelindex).interval;
+			
+		
+		 
+
+		
+
 		currentimg = Views.interval(currentimg, interval);
-		double slope = iniparam.originalslope;
-		double intercept = iniparam.originalintercept;
-		
-
-
-		final Cursor<FloatType> outcursor = Views.iterable(currentimg).localizingCursor();
 
 		final double maxintensityline = GetLocalmaxmin.computeMaxIntensity(currentimg);
-		while (outcursor.hasNext()) {
+		final double minintensityline = 0;
+		Pair<double[], double[]> minmaxpair = FitterUtils.MakeinitialEndpointguess(imgs, maxintensityline,
+				Intensityratio, ndims, labelindex, iniparam.originalslope, iniparam.originalintercept, iniparam.Curvature,
+				iniparam.Inflection);
+		for (int d = 0; d < ndims; ++d) {
 
-			outcursor.fwd();
-			
-			if (outcursor.get().get()/maxintensityline > Intensityratio){
-				
-				outcursor.localize(newposition);
+			minVal[d] = minmaxpair.getA()[d];
+			maxVal[d] = minmaxpair.getB()[d];
 
-				long pointonline = (long) (outcursor.getLongPosition(1) - slope * outcursor.getLongPosition(0) - intercept);
-				
-				// To get the min and max co-rodinates along the line so we
-				// have starting points to
-				// move on the line smoothly
-
-				if (pointonline == 0) {
-					for (int d = 0; d < ndims; ++d) {
-						if (outcursor.getDoublePosition(d) <= minVal[d])
-							minVal[d] = outcursor.getDoublePosition(d);
-
-						if (outcursor.getDoublePosition(d) >= maxVal[d])
-							maxVal[d] = outcursor.getDoublePosition(d);
-
-					}
-				}
-			}
 		}
-		final double[] MinandMax = new double[2 * ndims + 3];
 
-		if (slope >= 0) {
+		if (model == UserChoiceModel.Line) {
+
+			final double[] MinandMax = new double[2 * ndims + 3];
+
 			for (int d = 0; d < ndims; ++d) {
 
 				MinandMax[d] = minVal[d];
 				MinandMax[d + ndims] = maxVal[d];
 			}
 
-		}
-
-		if (slope < 0) {
-
-			MinandMax[0] = minVal[0];
-			MinandMax[1] = maxVal[1];
-			MinandMax[2] = maxVal[0];
-			MinandMax[3] = minVal[1];
-
-		}
-
-		MinandMax[2 * ndims] = 0.5 * Math.min(psf[0], psf[1]);
-		MinandMax[2 * ndims + 1] = iniparam.lineintensity;
-		MinandMax[2 * ndims + 2] = iniparam.background;
-		
-		System.out.println("Label: " + label + " " + "Initial guess: " + " StartX: " + MinandMax[0] + " StartY: "
-				+ MinandMax[1] + " EndX: " + MinandMax[2] + " EndY: " + MinandMax[3]);
-
-		
+			MinandMax[2 * ndims] = Inispacing;
+			MinandMax[2 * ndims + 1] = maxintensityline;
+			MinandMax[2 * ndims + 2] = minintensityline;
 			for (int d = 0; d < ndims; ++d) {
 
 				if (MinandMax[d] == Double.MAX_VALUE || MinandMax[d + ndims] == -Double.MIN_VALUE)
@@ -322,20 +378,106 @@ implements OutputAlgorithm<ArrayList<Indexedlength>> {
 					return null;
 
 			}
-		
+			return MinandMax;
+		}
 
-		
-		return MinandMax;
+		if (model == UserChoiceModel.Splineordersec) {
 
-	}
-	public Indexedlength Getfinaltrackparam(final Indexedlength iniparam, final int label, final double[] psf, final int rate)  {
+			final double[] MinandMax = new double[2 * ndims + 4];
 
-		if (iniparam == null || label == Integer.MIN_VALUE)
+			for (int d = 0; d < ndims; ++d) {
+
+				MinandMax[d] = minVal[d];
+				MinandMax[d + ndims] = maxVal[d];
+			}
+
+			MinandMax[2 * ndims + 2] = maxintensityline;
+			MinandMax[2 * ndims + 3] = minintensityline;
+			MinandMax[2 * ndims + 1] = iniparam.Curvature;
+			MinandMax[2 * ndims] = Inispacing;
+
+			for (int d = 0; d < ndims; ++d) {
+
+				if (MinandMax[d] == Double.MAX_VALUE || MinandMax[d + ndims] == -Double.MIN_VALUE)
+					return null;
+				if (MinandMax[d] >= source.dimension(d) || MinandMax[d + ndims] >= source.dimension(d))
+					return null;
+				if (MinandMax[d] <= 0 || MinandMax[d + ndims] <= 0)
+					return null;
+
+			}
+			return MinandMax;
+		}
+		if (model == UserChoiceModel.Splineorderthird) {
+
+			final double[] MinandMax = new double[2 * ndims + 5];
+
+			for (int d = 0; d < ndims; ++d) {
+
+				MinandMax[d] = minVal[d];
+				MinandMax[d + ndims] = maxVal[d];
+			}
+
+			MinandMax[2 * ndims + 2] = iniparam.Inflection;
+			MinandMax[2 * ndims + 3] = maxintensityline;
+			MinandMax[2 * ndims + 4] = minintensityline;
+			MinandMax[2 * ndims + 1] = iniparam.Curvature;
+			MinandMax[2 * ndims] = Inispacing;
+
+			for (int d = 0; d < ndims; ++d) {
+
+				if (MinandMax[d] == Double.MAX_VALUE || MinandMax[d + ndims] == -Double.MIN_VALUE)
+					return null;
+				if (MinandMax[d] >= source.dimension(d) || MinandMax[d + ndims] >= source.dimension(d))
+					return null;
+				if (MinandMax[d] <= 0 || MinandMax[d + ndims] <= 0)
+					return null;
+
+			}
+			return MinandMax;
+		}
+
+		else
 			return null;
+		}
+		
+		else 
+			return null;
+	}
+
+	
+	public Indexedlength Getfinaltrackparam(final Indexedlength iniparam, final int label, final double[] psf,
+			final int rate, final StartorEnd startorend) {
+
+		final double[] LMparam = MakerepeatedLineguess(iniparam, label);
+		if (LMparam == null)
+			return iniparam;
 
 		else {
 
-			PointSampleList<FloatType> datalist = gatherfullData(label);
+			final double[] inipos = iniparam.currentpos;
+
+			
+			int labelindex = FitterUtils.getlabelindex(imgs,label);
+			
+			RandomAccessibleInterval<FloatType> currentimg = imgs.get(labelindex).Actualroi;
+
+			FinalInterval interval = imgs.get(labelindex).interval;
+
+			currentimg = Views.interval(currentimg, interval);
+
+			final double[] fixed_param = new double[ndims + 3];
+
+			for (int d = 0; d < ndims; ++d) {
+
+				fixed_param[d] = 1.0 / Math.pow(psf[d], 2);
+
+			}
+			fixed_param[ndims] = iniparam.originalslope;
+			fixed_param[ndims + 1] = iniparam.originalintercept;
+			fixed_param[ndims + 2] = Inispacing;
+
+			PointSampleList<FloatType> datalist = FitterUtils.gatherfullData(imgs, label, ndims);
 			final Cursor<FloatType> listcursor = datalist.localizingCursor();
 			double[][] X = new double[(int) datalist.size()][ndims];
 			double[] I = new double[(int) datalist.size()];
@@ -352,164 +494,689 @@ implements OutputAlgorithm<ArrayList<Indexedlength>> {
 				index++;
 			}
 
-			final double[] finalparamstart = MakerepeatedLineguess(iniparam, label);
-			if (finalparamstart == null)
-				return null;
+	
 
-			else {
-				RandomAccessibleInterval<FloatType> currentimg = imgs.get(label).Actualroi;
+			System.out.println("Label: " + label + " " + "Initial guess: " + " StartX: " + LMparam[0] + " StartY: "
+					+ LMparam[1] + " EndX: " + LMparam[2] + " EndY: " + LMparam[3]);
 
-				FinalInterval interval = imgs.get(label).interval;
-				
-				currentimg = Views.interval(currentimg, interval);
+			final double[] safeparam = LMparam.clone();
+			MTFitFunction UserChoiceFunction = null;
+			if (model == UserChoiceModel.Line) {
+				fixed_param[ndims] = iniparam.slope;
+				fixed_param[ndims + 1] = iniparam.intercept;
+				UserChoiceFunction = new GaussianLineds();
 
-				final double[] fixed_param = new double[ndims];
-
-				for (int d = 0; d < ndims; ++d) {
-
-					fixed_param[d] = 1.0 / Math.pow(psf[d], 2);
-				}
-
-				final double[] inistartpos = { finalparamstart[0], finalparamstart[1] };
-				final double[] iniendpos = { finalparamstart[2], finalparamstart[3] };
-
-				double inicutoffdistance = Distance(inistartpos, iniendpos);
-				final long radius = (long) ( Math.min(psf[0], psf[1]));
-				// LM solver part
-				final double[] safeparam = finalparamstart.clone();
-				
-					try {
-						LevenbergMarquardtSolverLine.solve(X, finalparamstart, fixed_param, I, new GaussianLineds(), lambda,
-								termepsilon, maxiter);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-
-					final double[] startpos = { finalparamstart[0], finalparamstart[1] };
-					final double[] endpos = { finalparamstart[2], finalparamstart[3] };
-					// NaN protection: we prefer returning the crude estimate
-					// than
-					// NaN
-					for (int j = 0; j < finalparamstart.length; j++) {
-						if (Double.isNaN(finalparamstart[j]))
-							finalparamstart[j] = safeparam[j];
-					}
-
-					final double LMdist = sqDistance(startpos, endpos);
-
-					double[] returnparam = new double[2 * ndims + 5];
-
-					final double maxintensityline = GetLocalmaxmin.computeMaxIntensity(currentimg);
-
-					
-
-					double newslope = (endpos[1] - startpos[1]) / (endpos[0] - startpos[0]);
-					double newintercept = (endpos[1] - newslope * endpos[0]);
-					double ds = finalparamstart[2 * ndims];
-					double dx = ds / Math.sqrt(1 + newslope * newslope);
-					double dy = newslope * dx;
-					final double background = finalparamstart[2 * ndims + 2];
-					double[] dxvector = { dx,  dy };
-
-					double[] startfit = new double[ndims];
-					double[] endfit = new double[ndims];
-
-					double sigmas = 0;
-					 
-					for (int d  = 0; d < ndims; ++d){
-						
-						sigmas+=dxvector[d] * dxvector[d];
-					}
-				sigmas = Math.sqrt(sigmas);
-				final int numgaussians = (int) Math.round(ds / sigmas);
-					
-
-					try {
-						startfit = GaussianMaskFitMSER.sumofgaussianMaskFit(currentimg,  startpos.clone(),
-								psf, numgaussians, iterations, dxvector, newslope, newintercept, maxintensityline,  halfgaussian,
-								EndfitMSER.StartfitMSER, label, background, Intensityratio);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-
-					try {
-						endfit = GaussianMaskFitMSER.sumofgaussianMaskFit(currentimg,  endpos.clone(), psf, numgaussians,
-								iterations, dxvector, newslope, newintercept, maxintensityline,  halfgaussian,
-								EndfitMSER.EndfitMSER, label, background, Intensityratio);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-
-					final double Maskdist = sqDistance(startfit, endfit);
-					// If mask fits fail, return LM solver results
-
-
-					for (int d = 0; d < ndims; ++d) {
-						finalparamstart[d]= startfit[d];
-						finalparamstart[ndims + d] = endfit[d];
-					}
-
-					
-					if (Math.abs(Math.sqrt(Maskdist)) - Math.sqrt(LMdist) > cutoffdistance){
-						if (Math.abs(startpos[0] - startfit[0]) >= cutoffdistance / 2 && Math.abs(startpos[1] - startfit[1]) >= cutoffdistance / 2
-								|| Math.abs(endpos[0] - endfit[0]) >= cutoffdistance / 2 && Math.abs(endpos[1] - endfit[1]) >= cutoffdistance / 2 ){
-							System.out.println("Mask fits fail, returning LM solver results!");
-						
-							for (int d = 0; d < ndims; ++d) {
-								finalparamstart[d] = startpos[d];
-								finalparamstart[ndims + d] = endpos[d];
-						}
-						}
-					
-						if (Math.abs(startpos[0] - startfit[0]) >= cutoffdistance || Math.abs(startpos[1] - startfit[1]) >= cutoffdistance 
-								|| Math.abs(endpos[0] - endfit[0]) >= cutoffdistance  || Math.abs(endpos[1] - endfit[1]) >= cutoffdistance  ){
-							System.out.println("Mask fits fail, returning LM solver results!");
-							for (int d = 0; d < ndims; ++d) {
-								finalparamstart[d] = startpos[d];
-								finalparamstart[ndims + d] = endpos[d];
-							}
-							
-						}
-					
-					
-					}
-					
-					
-					
-					for (int d = 0; d < ndims; ++d) {
-						if (Double.isNaN(startfit[d]) || Double.isNaN(endfit[d])) {
-							System.out.println("Mask fits fail, returning LM solver results!");
-							finalparamstart[d] = startpos[d];
-							finalparamstart[ndims + d] = endpos[d];
-
-						}
-
-					}
-
-					final int seedLabel = iniparam.seedLabel;
-
-					final double[] finalstartpoint = { finalparamstart[0], finalparamstart[1] };
-					final double[] finalendpoint = { finalparamstart[2], finalparamstart[3] };
-					
-						final double currentslope = (finalstartpoint[1] - finalendpoint[1]) / (finalstartpoint[0] - finalendpoint[0]);
-						final double currentintercept = finalstartpoint[1] - currentslope * finalstartpoint[0];
-						
-						Indexedlength PointofInterest = new Indexedlength(label, seedLabel, framenumber, 
-								finalparamstart[2 * ndims],finalparamstart[2 * ndims + 1], 
-								finalparamstart[2 * ndims + 2], finalstartpoint, finalendpoint, currentslope, currentintercept,
-								iniparam.originalslope, iniparam.originalintercept, iniparam.originalds);
-					System.out.println("New X: " + finalstartpoint[0] + " New Y: " + finalstartpoint[1]);
-						return PointofInterest;
-
-				
-					
-			
 			}
 
-		}
+			if (model == UserChoiceModel.Splineordersec) {
+				fixed_param[ndims] = iniparam.slope;
+				fixed_param[ndims + 1] = iniparam.intercept;
 
+				UserChoiceFunction = new GaussianSplinesecorder();
+
+			}
+
+			if (model == UserChoiceModel.Splineorderthird) {
+				fixed_param[ndims] = iniparam.slope;
+				fixed_param[ndims + 1] = iniparam.intercept;
+
+				UserChoiceFunction = new GaussianSplinethirdorder();
+
+			}
+			final double[] inistartpos = { LMparam[0], LMparam[1] };
+			final double[] iniendpos = { LMparam[2], LMparam[3] };
+
+			double inicutoffdistanceY = Math.abs(inistartpos[1] - iniendpos[1]);
+			double inicutoffdistanceX = Math.abs(inistartpos[0] - iniendpos[0]);
+			// LM solver part
+			if (inicutoffdistanceY > 0 && inicutoffdistanceX > 0) {
+				// LM solver part
+
+				try {
+					LevenbergMarquardtSolverLine.solve(X, LMparam, fixed_param, I, UserChoiceFunction, lambda,
+							termepsilon, maxiter);
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+			} else {
+				for (int j = 0; j < LMparam.length; j++) {
+
+					LMparam[j] = safeparam[j];
+				}
+
+			}
+
+			for (int j = 0; j < LMparam.length; j++) {
+				if (Double.isNaN(LMparam[j]))
+					LMparam[j] = safeparam[j];
+			}
+
+			double[] startpos = new double[ndims];
+			double[] endpos = new double[ndims];
+
+			for (int d = 0; d < ndims; ++d) {
+				startpos[d] = LMparam[d];
+				endpos[d] = LMparam[d + ndims];
+
+			}
+
+			
+		
+			final int seedLabel = iniparam.seedLabel;
+
+			if (model == UserChoiceModel.Line) {
+				if (startorend == StartorEnd.Start) {
+					double ds = LMparam[2 * ndims];
+					double Intensity = LMparam[2 * ndims + 1];
+					final double background = LMparam[2 * ndims + 2];
+					final double newslope = (startpos[1] - endpos[1]) / (startpos[0] - endpos[0]);
+					final double newintercept = startpos[1] - newslope * startpos[0];
+					double dx = ds / Math.sqrt(1 + (newslope) * (newslope));
+					double dy = (newslope) * dx;
+					double[] dxvector = { dx, dy };
+					double sigmas = 0;
+
+					for (int d = 0; d < ndims; ++d) {
+
+						sigmas += psf[d] * psf[d];
+					}
+					final int numgaussians = (int) Math.max(0.5 * Math.round(Math.sqrt(sigmas) / ds), 2);
+
+					double[] startfit = startpos;
+					double[] endfit = endpos;
+
+					if (DoMask) {
+
+						try {
+							startfit = GaussianMaskFitMSER.sumofgaussianMaskFit(currentimg, startpos.clone(), psf,
+									numgaussians, iterations, dxvector, newslope, newintercept, Intensity, halfgaussian,
+									EndfitMSER.StartfitMSER, label, background, Intensityratio);
+							endfit = GaussianMaskFitMSER.sumofgaussianMaskFit(currentimg, endpos.clone(), psf,
+									numgaussians, iterations, dxvector, newslope, newintercept, Intensity, halfgaussian,
+									EndfitMSER.EndfitMSER, label, background, Intensityratio);
+
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+
+						if (Math.abs(startpos[0] - startfit[0]) >= cutoffdistance
+								|| Math.abs(startpos[1] - startfit[1]) >= cutoffdistance) {
+							Maskfail = true;
+							for (int d = 0; d < ndims; ++d) {
+								startfit[d] = startpos[d];
+							}
+						}
+						for (int d = 0; d < ndims; ++d) {
+							if (Double.isNaN(startfit[d])) {
+								Maskfail = true;
+
+								startfit[d] = startpos[d];
+
+							}
+						}
+
+						if (Math.abs(endpos[0] - endfit[0]) >= cutoffdistance
+								|| Math.abs(endpos[1] - endfit[1]) >= cutoffdistance) {
+							Maskfail = true;
+							for (int d = 0; d < ndims; ++d) {
+								endfit[d] = endpos[d];
+							}
+						}
+						for (int d = 0; d < ndims; ++d) {
+							if (Double.isNaN(endfit[d])) {
+								Maskfail = true;
+								endfit[d] = endpos[d];
+
+							}
+						}
+
+					}
+
+					
+					Indexedlength PointofInterest = new Indexedlength(label, seedLabel, framenumber, LMparam[2 * ndims],
+							LMparam[2 * ndims + 1], LMparam[2 * ndims + 2], startfit, iniparam.fixedpos, newslope,
+							newintercept, iniparam.originalslope, iniparam.originalintercept, iniparam.originalds);
+					if (Maskfail == true)
+						System.out.println("New XLM: " + startfit[0] + " New YLM: " + startfit[1]);
+					else
+						System.out.println("New XMask: " + startfit[0] + " New YMask: " + startfit[1]);
+
+					System.out.println("Number of Gaussians used: " + numgaussians + " ds: " + ds);
+
+					FitterUtils.SetProgressBarTime(jpb, percent, framenumber, thirdDimsize);
+
+					return PointofInterest;
+				} else {
+					double ds = LMparam[2 * ndims];
+					double Intensity = LMparam[2 * ndims + 1];
+					final double background = LMparam[2 * ndims + 2];
+					final double newslope = (endpos[1] - startpos[1]) / (endpos[0] - startpos[0]);
+					final double newintercept = endpos[1] - newslope * endpos[0];
+					double dx = ds / Math.sqrt(1 + (newslope) * (newslope));
+					double dy = (newslope) * dx;
+					double[] dxvector = { dx, dy };
+					double sigmas = 0;
+
+					for (int d = 0; d < ndims; ++d) {
+
+						sigmas += psf[d] * psf[d];
+					}
+					final int numgaussians = (int) Math.max(0.5 * Math.round(Math.sqrt(sigmas) / ds), 2);
+
+					double[] endfit = endpos;
+					double[] startfit = startpos;
+
+					if (DoMask) {
+
+						try {
+							endfit = GaussianMaskFitMSER.sumofgaussianMaskFit(currentimg, endpos.clone(), psf,
+									numgaussians, iterations, dxvector, newslope, newintercept, Intensity, halfgaussian,
+									EndfitMSER.EndfitMSER, label, background, Intensityratio);
+							startfit = GaussianMaskFitMSER.sumofgaussianMaskFit(currentimg, startpos.clone(), psf,
+									numgaussians, iterations, dxvector, newslope, newintercept, Intensity, halfgaussian,
+									EndfitMSER.StartfitMSER, label, background, Intensityratio);
+
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+
+						for (int d = 0; d < ndims; ++d) {
+							if (Double.isNaN(endfit[d])) {
+								Maskfail = true;
+								endfit[d] = endpos[d];
+
+							}
+
+						}
+
+						if (Math.abs(endpos[0] - endfit[0]) >= cutoffdistance
+								|| Math.abs(endpos[1] - endfit[1]) >= cutoffdistance) {
+							Maskfail = true;
+							for (int d = 0; d < ndims; ++d) {
+								endfit[d] = endpos[d];
+							}
+						}
+
+						if (Math.abs(startpos[0] - startfit[0]) >= cutoffdistance
+								|| Math.abs(startpos[1] - startfit[1]) >= cutoffdistance) {
+							Maskfail = true;
+
+							for (int d = 0; d < ndims; ++d) {
+								startfit[d] = startpos[d];
+							}
+						}
+						for (int d = 0; d < ndims; ++d) {
+							if (Double.isNaN(startfit[d])) {
+								Maskfail = true;
+								startfit[d] = startpos[d];
+
+							}
+						}
+
+					}
+				
+
+					Indexedlength PointofInterest = new Indexedlength(label, seedLabel, framenumber, LMparam[2 * ndims],
+							LMparam[2 * ndims + 1], LMparam[2 * ndims + 2], endfit, iniparam.fixedpos, newslope,
+							newintercept, iniparam.originalslope, iniparam.originalintercept, iniparam.originalds);
+
+					if (Maskfail == true)
+						System.out.println("New XLM: " + endfit[0] + " New YLM: " + endfit[1]);
+					else
+						System.out.println("New XMask: " + endfit[0] + " New YMask: " + endfit[1]);
+					System.out.println("Number of Gaussians used: " + numgaussians + "ds: " + ds);
+
+					FitterUtils.SetProgressBarTime(jpb, percent, framenumber, thirdDimsize);
+
+					
+					
+					return PointofInterest;
+
+				}
+			}
+
+			else if (model == UserChoiceModel.Splineordersec) {
+				if (startorend == StartorEnd.Start) {
+					final double Curvature = LMparam[2 * ndims + 1];
+
+					final double currentintercept = iniparam.originalintercept;
+
+					final double ds = (LMparam[2 * ndims]);
+					final double lineIntensity = LMparam[2 * ndims + 2];
+					final double background = LMparam[2 * ndims + 3];
+
+					double[] startfit = startpos;
+					double[] endfit = endpos;
+
+					final double newslope = (startpos[1] - endpos[1]) / (startpos[0] - endpos[0])
+							- Curvature * (startpos[0] + endpos[0]);
+
+					double dxstart = ds / Math.sqrt(
+							1 + (newslope + 2 * Curvature * startpos[0]) * (newslope + 2 * Curvature * startpos[0]));
+					double dystart = (newslope + 2 * Curvature * startpos[0]) * dxstart;
+					double[] dxvectorstart = { dxstart, dystart };
+
+					double dxend = ds / Math
+							.sqrt(1 + (newslope + 2 * Curvature * endpos[0]) * (newslope + 2 * Curvature * endpos[0]));
+					double dyend = (newslope + 2 * Curvature * endpos[0]) * dxend;
+					double[] dxvectorend = { dxend, dyend };
+					double sigmas = 0;
+
+					for (int d = 0; d < ndims; ++d) {
+
+						sigmas += psf[d] * psf[d];
+					}
+
+					final int numgaussians = (int) Math.max(0.5 * Math.round(Math.sqrt(sigmas) / ds), 2);
+
+					if (DoMask) {
+
+						try {
+							startfit = GaussianMaskFitMSER.sumofgaussianMaskFit(currentimg, startpos.clone(), psf,
+									numgaussians, iterations, dxvectorstart, newslope, currentintercept, lineIntensity,
+									halfgaussian, EndfitMSER.StartfitMSER, label, background, Intensityratio);
+							endfit = GaussianMaskFitMSER.sumofgaussianMaskFit(currentimg, endpos.clone(), psf,
+									numgaussians, iterations, dxvectorend, newslope, currentintercept, lineIntensity,
+									halfgaussian, EndfitMSER.EndfitMSER, label, background, Intensityratio);
+
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+
+						for (int d = 0; d < ndims; ++d) {
+							if (Double.isNaN(startfit[d])) {
+								Maskfail = true;
+								// System.out.println("Mask fits fail, returning
+								// LM solver results!");
+								startfit[d] = startpos[d];
+
+							}
+						}
+
+						if (Math.abs(startpos[0] - startfit[0]) >= cutoffdistance
+								|| Math.abs(startpos[1] - startfit[1]) >= cutoffdistance) {
+							// System.out.println("Mask fits fail, returning LM
+							// solver results!");
+							Maskfail = true;
+							for (int d = 0; d < ndims; ++d) {
+								startfit[d] = startpos[d];
+							}
+						}
+
+						for (int d = 0; d < ndims; ++d) {
+							if (Double.isNaN(endfit[d])) {
+								Maskfail = true;
+								// System.out.println("Mask fits fail, returning
+								// LM solver results!");
+								endfit[d] = endpos[d];
+
+							}
+						}
+
+						if (Math.abs(endpos[0] - endfit[0]) >= cutoffdistance
+								|| Math.abs(endpos[1] - endfit[1]) >= cutoffdistance) {
+							// System.out.println("Mask fits fail, returning LM
+							// solver results!");
+							Maskfail = true;
+							for (int d = 0; d < ndims; ++d) {
+								endfit[d] = endpos[d];
+							}
+						}
+
+					}
+
+				
+
+					System.out.println("Curvature: " + Curvature);
+
+					Indexedlength PointofInterest = new Indexedlength(label, seedLabel, framenumber, ds, lineIntensity,
+							background, startfit, iniparam.fixedpos, newslope, currentintercept, iniparam.originalslope,
+							iniparam.originalintercept, Curvature, 0, iniparam.originalds);
+					if (Maskfail == true)
+						System.out.println("New XLM: " + startfit[0] + " New YLM: " + startfit[1]);
+					else
+						System.out.println("New XMask: " + startfit[0] + " New YMask: " + startfit[1]);
+					System.out.println("Number of Gaussians used: " + (numgaussians) + " " + ds);
+
+					FitterUtils.SetProgressBarTime(jpb, percent, framenumber, thirdDimsize);
+
+					return PointofInterest;
+				} else {
+
+					final double Curvature = LMparam[2 * ndims + 1];
+
+					final double currentintercept = iniparam.originalintercept;
+					final double ds = (LMparam[2 * ndims]);
+					final double lineIntensity = LMparam[2 * ndims + 2];
+					final double background = LMparam[2 * ndims + 3];
+					System.out.println("Curvature: " + Curvature);
+					final double newslope = (endpos[1] - startpos[1]) / (endpos[0] - startpos[0])
+							- Curvature * (endpos[0] + startpos[0]);
+
+					double[] endfit = endpos;
+					double[] startfit = startpos;
+
+					double dxend = ds / Math
+							.sqrt(1 + (newslope + 2 * Curvature * endpos[0]) * (newslope + 2 * Curvature * endpos[0]));
+					double dyend = (newslope + 2 * Curvature * endpos[0]) * dxend;
+					double[] dxvectorend = { dxend, dyend };
+
+					double dxstart = ds / Math.sqrt(
+							1 + (newslope + 2 * Curvature * startpos[0]) * (newslope + 2 * Curvature * startpos[0]));
+					double dystart = (newslope + 2 * Curvature * startpos[0]) * dxstart;
+					double[] dxvectorstart = { dxstart, dystart };
+
+					double sigmas = 0;
+
+					for (int d = 0; d < ndims; ++d) {
+
+						sigmas += psf[d] * psf[d];
+					}
+
+					final int numgaussians = (int) Math.max(0.5 * Math.round(Math.sqrt(sigmas) / ds), 2);
+
+					if (DoMask) {
+
+						try {
+
+							startfit = GaussianMaskFitMSER.sumofgaussianMaskFit(currentimg, startpos.clone(), psf,
+									numgaussians, iterations, dxvectorstart, newslope, currentintercept, lineIntensity,
+									halfgaussian, EndfitMSER.StartfitMSER, label, background, Intensityratio);
+							endfit = GaussianMaskFitMSER.sumofgaussianMaskFit(currentimg, endpos.clone(), psf,
+									numgaussians, iterations, dxvectorend, newslope, currentintercept, lineIntensity,
+									halfgaussian, EndfitMSER.EndfitMSER, label, background, Intensityratio);
+
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+
+						for (int d = 0; d < ndims; ++d) {
+							if (Double.isNaN(endfit[d])) {
+								Maskfail = true;
+								endfit[d] = endpos[d];
+
+							}
+
+						}
+
+						if (Math.abs(endpos[0] - endfit[0]) >= cutoffdistance
+								|| Math.abs(endpos[1] - endfit[1]) >= cutoffdistance) {
+							Maskfail = true;
+							for (int d = 0; d < ndims; ++d) {
+								endfit[d] = endpos[d];
+							}
+						}
+
+						for (int d = 0; d < ndims; ++d) {
+							if (Double.isNaN(startfit[d])) {
+								Maskfail = true;
+								// System.out.println("Mask fits fail, returning
+								// LM solver results!");
+								startfit[d] = startpos[d];
+
+							}
+						}
+
+						if (Math.abs(startpos[0] - startfit[0]) >= cutoffdistance
+								|| Math.abs(startpos[1] - startfit[1]) >= cutoffdistance) {
+							// System.out.println("Mask fits fail, returning LM
+							// solver results!");
+							Maskfail = true;
+							for (int d = 0; d < ndims; ++d) {
+								startfit[d] = startpos[d];
+							}
+						}
+
+					}
+
+				
+
+					Indexedlength PointofInterest = new Indexedlength(label, seedLabel, framenumber, ds, lineIntensity,
+							background, endfit, iniparam.fixedpos, newslope, currentintercept, iniparam.originalslope,
+							iniparam.originalintercept, Curvature, 0, iniparam.originalds);
+					if (Maskfail == true)
+						System.out.println("New XLM: " + endfit[0] + " New YLM: " + endfit[1]);
+					else
+						System.out.println("New XMask: " + endfit[0] + " New YMask: " + endfit[1]);
+					System.out.println("Number of Gaussians used: " + (numgaussians) + " " + ds);
+
+					FitterUtils.SetProgressBarTime(jpb, percent, framenumber, thirdDimsize);
+
+					return PointofInterest;
+
+				}
+			} else if (model == UserChoiceModel.Splineorderthird) {
+				if (startorend == StartorEnd.Start) {
+					final double Curvature = LMparam[2 * ndims + 1];
+					final double Inflection = LMparam[2 * ndims + 2];
+
+					final double currentintercept = iniparam.originalintercept;
+
+					final double ds = (LMparam[2 * ndims]);
+					final double lineIntensity = LMparam[2 * ndims + 3];
+					final double background = LMparam[2 * ndims + 4];
+
+					double[] startfit = startpos;
+					double[] endfit = endpos;
+					final double newslope = (startpos[1] - endpos[1]) / (startpos[0] - endpos[0])
+							- Curvature * (startpos[0] + endpos[0]) - Inflection
+									* (startpos[0] * startpos[0] + endpos[0] * endpos[0] + startpos[0] * endpos[0]);
+
+					double dxstart = ds / Math.sqrt(1 + (newslope + 2 * Curvature * startpos[0]
+							+ 3 * Inflection * startpos[0] * startpos[0])
+							* (newslope + 2 * Curvature * startpos[0] + 3 * Inflection * startpos[0] * startpos[0]));
+					double dystart = (newslope + 2 * Curvature * startpos[0]
+							+ 3 * Inflection * startpos[0] * startpos[0]) * dxstart;
+					double[] dxvectorstart = { dxstart, dystart };
+
+					double dxend = ds / Math
+							.sqrt(1 + (newslope + 2 * Curvature * endpos[0] + 3 * Inflection * endpos[0] * endpos[0])
+									* (newslope + 2 * Curvature * endpos[0] + 3 * Inflection * endpos[0] * endpos[0]));
+					double dyend = (newslope + 2 * Curvature * endpos[0] + 3 * Inflection * endpos[0] * endpos[0])
+							* dxend;
+					double[] dxvectorend = { dxend, dyend };
+					double sigmas = 0;
+
+					for (int d = 0; d < ndims; ++d) {
+
+						sigmas += psf[d] * psf[d];
+					}
+
+					final int numgaussians = (int) Math.max(0.5 * Math.round(Math.sqrt(sigmas) / ds), 2);
+
+					if (DoMask) {
+
+						try {
+							startfit = GaussianMaskFitMSER.sumofgaussianMaskFit(currentimg, startpos.clone(), psf,
+									numgaussians, iterations, dxvectorstart, newslope, currentintercept, lineIntensity,
+									halfgaussian, EndfitMSER.StartfitMSER, label, background, Intensityratio);
+							endfit = GaussianMaskFitMSER.sumofgaussianMaskFit(currentimg, endpos.clone(), psf,
+									numgaussians, iterations, dxvectorend, newslope, currentintercept, lineIntensity,
+									halfgaussian, EndfitMSER.EndfitMSER, label, background, Intensityratio);
+
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+
+						for (int d = 0; d < ndims; ++d) {
+							if (Double.isNaN(startfit[d])) {
+								Maskfail = true;
+								startfit[d] = startpos[d];
+
+							}
+						}
+
+						if (Math.abs(startpos[0] - startfit[0]) >= cutoffdistance
+								|| Math.abs(startpos[1] - startfit[1]) >= cutoffdistance) {
+							Maskfail = true;
+							for (int d = 0; d < ndims; ++d) {
+								startfit[d] = startpos[d];
+							}
+						}
+
+						for (int d = 0; d < ndims; ++d) {
+							if (Double.isNaN(endfit[d])) {
+								Maskfail = true;
+								// System.out.println("Mask fits fail, returning
+								// LM solver results!");
+								endfit[d] = endpos[d];
+
+							}
+						}
+
+						if (Math.abs(endpos[0] - endfit[0]) >= cutoffdistance
+								|| Math.abs(endpos[1] - endfit[1]) >= cutoffdistance) {
+							// System.out.println("Mask fits fail, returning LM
+							// solver results!");
+							Maskfail = true;
+							for (int d = 0; d < ndims; ++d) {
+								endfit[d] = endpos[d];
+							}
+						}
+					}
+
+				
+
+					System.out.println("Curvature: " + Curvature);
+					System.out.println("Inflection: " + Inflection);
+					Indexedlength PointofInterest = new Indexedlength(label, seedLabel, framenumber, ds, lineIntensity,
+							background, startfit, iniparam.fixedpos, newslope, currentintercept, iniparam.originalslope,
+							iniparam.originalintercept, Curvature, Inflection, iniparam.originalds);
+					if (Maskfail == true)
+						System.out.println("New XLM: " + startfit[0] + " New YLM: " + startfit[1]);
+					else
+						System.out.println("New XMask: " + startfit[0] + " New YMask: " + startfit[1]);
+					System.out.println("Number of Gaussians used: " + (numgaussians) + " " + ds);
+
+					FitterUtils.SetProgressBarTime(jpb, percent, framenumber, thirdDimsize);
+
+					return PointofInterest;
+				} else {
+
+					final double Curvature = LMparam[2 * ndims + 1];
+					final double Inflection = LMparam[2 * ndims + 2];
+
+					final double currentintercept = iniparam.originalintercept;
+					final double ds = (LMparam[2 * ndims]);
+					final double lineIntensity = LMparam[2 * ndims + 3];
+					final double background = LMparam[2 * ndims + 4];
+					System.out.println("Curvature: " + Curvature);
+					System.out.println("Inflection: " + Inflection);
+					final double newslope = (endpos[1] - startpos[1]) / (endpos[0] - startpos[0])
+							- Curvature * (endpos[0] + startpos[0]) - Inflection
+									* (startpos[0] * startpos[0] + endpos[0] * endpos[0] + startpos[0] * endpos[0]);
+
+					double[] endfit = endpos;
+					double[] startfit = startpos;
+
+					double dxend = ds / Math
+							.sqrt(1 + (newslope + 2 * Curvature * endpos[0] + 3 * Inflection * endpos[0] * endpos[0])
+									* (newslope + 2 * Curvature * endpos[0] + 3 * Inflection * endpos[0] * endpos[0]));
+					double dyend = (newslope + 2 * Curvature * endpos[0] + 3 * Inflection * endpos[0] * endpos[0])
+							* dxend;
+					double[] dxvectorend = { dxend, dyend };
+
+					double dxstart = ds / Math.sqrt(1 + (newslope + 2 * Curvature * startpos[0]
+							+ 3 * Inflection * startpos[0] * startpos[0])
+							* (newslope + 2 * Curvature * startpos[0] + 3 * Inflection * startpos[0] * startpos[0]));
+					double dystart = (newslope + 2 * Curvature * startpos[0]
+							+ 3 * Inflection * startpos[0] * startpos[0]) * dxstart;
+					double[] dxvectorstart = { dxstart, dystart };
+
+					double sigmas = 0;
+
+					for (int d = 0; d < ndims; ++d) {
+
+						sigmas += psf[d] * psf[d];
+					}
+
+					final int numgaussians = (int) Math.max(0.5 * Math.round(Math.sqrt(sigmas) / ds), 2);
+
+					if (DoMask) {
+
+						try {
+							startfit = GaussianMaskFitMSER.sumofgaussianMaskFit(currentimg, startpos.clone(), psf,
+									numgaussians, iterations, dxvectorstart, newslope, currentintercept, lineIntensity,
+									halfgaussian, EndfitMSER.StartfitMSER, label, background, Intensityratio);
+
+							endfit = GaussianMaskFitMSER.sumofgaussianMaskFit(currentimg, endpos.clone(), psf,
+									numgaussians, iterations, dxvectorend, newslope, currentintercept, lineIntensity,
+									halfgaussian, EndfitMSER.EndfitMSER, label, background, Intensityratio);
+
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+
+						for (int d = 0; d < ndims; ++d) {
+							if (Double.isNaN(endfit[d])) {
+								Maskfail = true;
+								endfit[d] = endpos[d];
+
+							}
+
+						}
+
+						if (Math.abs(endpos[0] - endfit[0]) >= cutoffdistance
+								|| Math.abs(endpos[1] - endfit[1]) >= cutoffdistance) {
+							Maskfail = true;
+							for (int d = 0; d < ndims; ++d) {
+								endfit[d] = endpos[d];
+							}
+						}
+
+						for (int d = 0; d < ndims; ++d) {
+							if (Double.isNaN(startfit[d])) {
+								Maskfail = true;
+								// System.out.println("Mask fits fail, returning
+								// LM solver results!");
+								startfit[d] = startpos[d];
+
+							}
+						}
+
+						if (Math.abs(startpos[0] - startfit[0]) >= cutoffdistance
+								|| Math.abs(startpos[1] - startfit[1]) >= cutoffdistance) {
+							// System.out.println("Mask fits fail, returning LM
+							// solver results!");
+							Maskfail = true;
+							for (int d = 0; d < ndims; ++d) {
+								startfit[d] = startpos[d];
+							}
+						}
+
+					}
+
+				
+
+					Indexedlength PointofInterest = new Indexedlength(label, seedLabel, framenumber, ds, lineIntensity,
+							background, endfit, iniparam.fixedpos, newslope, currentintercept, iniparam.originalslope,
+							iniparam.originalintercept, Curvature, Inflection, iniparam.originalds);
+					if (Maskfail == true)
+						System.out.println("New XLM: " + endfit[0] + " New YLM: " + endfit[1]);
+					else
+						System.out.println("New XMask: " + endfit[0] + " New YMask: " + endfit[1]);
+					System.out.println("Number of Gaussians used: " + (numgaussians) + " " + ds);
+
+					FitterUtils.SetProgressBarTime(jpb, percent, framenumber, thirdDimsize);
+
+					
+					
+					
+					
+					return PointofInterest;
+
+				}
+				
+				
+				
+			} else
+				return null;
+
+			
+			}
+			
+		
 	}
-	
 	
 
 	private PointSampleList<FloatType> gatherfullData(final int label) {

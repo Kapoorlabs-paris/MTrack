@@ -60,6 +60,7 @@ import ij.plugin.Macro_Runner;
 import ij.plugin.PlugIn;
 import ij.plugin.frame.RoiManager;
 import ij.process.ColorProcessor;
+import interactiveMT.Interactive_MTDoubleChannel.ValueChange;
 import labeledObjects.CommonOutputHF;
 import labeledObjects.Indexedlength;
 import listeners.AcceptResultsListener;
@@ -149,7 +150,9 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	boolean Simplemode = false;
 	boolean Advancedmode = false;
 	boolean Kymomode = false;
-	
+
+	public JLabel inputradi;
+	public TextField inputFieldradi;
 	// steps per octave
 	public static int standardSensitivity = 4;
 	public int sensitivity = standardSensitivity;
@@ -338,7 +341,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public int inix = 1;
 	public int iniy = 1;
 	public double[] calibration;
-	double radiusfactor = 1;
+	public double radiusfactor = 1;
 	public MserTree<UnsignedByteType> newtree;
 
 	public HashMap<Integer, MserTree<UnsignedByteType>> newHoughtree;
@@ -879,7 +882,13 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 			ArrayList<double[]> meanCovar = new ArrayList<double[]>();
 			if (count == 1)
 				startdim = thirdDimension;
-			
+			for (int i = 0; i < overlay.size(); ++i) {
+				if (overlay.get(i).getStrokeColor() == colorDraw || overlay.get(i).getStrokeColor() == colorCurrent
+						|| overlay.get(i).getStrokeColor() == colorUnselect) {
+					overlay.remove(i);
+					--i;
+				}
+			}
 			for (int label = 1; label < Maxlabel - 1; label++) {
 				Pair<RandomAccessibleInterval<FloatType>, FinalInterval> pair = Boundingboxes
 						.CurrentLabelImagepair(intimg, bitimgFloat, label);
@@ -925,7 +934,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 			AllMSERrois.put(thirdDimension, AllRois);
 			count++;
-
+		
 		}
 
 		if (change == ValueChange.SHOWHOUGH) {
@@ -1123,9 +1132,11 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		
 		// First Panel
 		panelFirst.setName("Preprocess and Determine Seeds");
-
+	inputradi = new JLabel("Radius Factor for Canny Edge with Mean filter(pixel units): ");
+	inputFieldradi = new TextField();
+	inputFieldradi.setColumns(10);
+	inputFieldradi.setText(String.valueOf(radiusfactor));
 		CheckboxGroup Finders = new CheckboxGroup();
-		final Checkbox MedFilterAll = new Checkbox("Apply Median Filter to Stack", MedianAll);
 		final Scrollbar thirdDimensionslider = new Scrollbar(Scrollbar.HORIZONTAL, thirdDimensionsliderInit, 0, 0,
 				thirdDimensionSize);
 		thirdDimensionslider.setBlockIncrement(1);
@@ -1133,7 +1144,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 				thirdDimensionSize, thirdDimensionSize);
 		final Label timeText = new Label("Time index = " + this.thirdDimensionslider, Label.CENTER);
 		final Button JumpinTime = new Button("Jump in time :");
-		final Label MTText = new Label("Preprocess and Determine Seed Ends (Green Channel)", Label.CENTER);
+		final Label MTText = new Label("Determine Seed Ends (Non-dynamic Channel)", Label.CENTER);
 		final Label Step = new Label("Step 1", Label.CENTER);
 		final Checkbox Analyzekymo = new Checkbox("Analyze Kymograph");
 		final JButton ChooseDirectory = new JButton("Choose Directory");
@@ -1155,19 +1166,18 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		c.gridy = 0;
 		c.weightx = 1;
 
-		final Label Pre = new Label("Preprocess");
 		final Label Ends = new Label("Method Choice for Seed Ends Determination");
 		final Label Kymo = new Label("Analyze Kymo");
 		++c.gridy;
 		c.insets = new Insets(10, 10, 0, 0);
 		panelFirst.add(MTText, c);
-
-		++c.gridy;
-		panelFirst.add(Pre, c);
-
 		++c.gridy;
 		c.insets = new Insets(10, 10, 0, 0);
-		panelFirst.add(MedFilterAll, c);
+		panelFirst.add(inputradi, c);
+		++c.gridy;
+		panelFirst.add(inputFieldradi, c);
+
+		
 
 		++c.gridy;
 		panelFirst.add(Ends, c);
@@ -1219,7 +1229,6 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		cl.show(panelCont, "1");
 
 		// MedFiltercur.addItemListener(new MediancurrListener() );
-		MedFilterAll.addItemListener(new MedianAllListener());
 
 		// ChoiceofTracker.addActionListener(new
 		// TrackerButtonListener(Cardframe));
@@ -1346,8 +1355,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		DoMserseg.addItemListener(new DoMserSegmentation(this));
 
 		MTText.setFont(MTText.getFont().deriveFont(Font.BOLD));
-		Pre.setBackground(new Color(1, 0, 1));
-		Pre.setForeground(new Color(255, 255, 255));
+	
 		Ends.setBackground(new Color(1, 0, 1));
 		Ends.setForeground(new Color(255, 255, 255));
 		Kymo.setBackground(new Color(1, 0, 1));
@@ -1715,7 +1723,8 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		displayBitimg = false;
 		displayWatershedimg = false;
 
-		
+		updatePreview(ValueChange.SHOWHOUGH );
+		updatePreview(ValueChange.SHOWMSERinHough );
 		panelFourth.repaint();
 		panelFourth.validate();
 		Cardframe.pack();
