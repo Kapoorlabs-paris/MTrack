@@ -209,8 +209,10 @@ public class Kernels {
 			boolean isbright = false;
 			while (cursorsphere.hasNext()) {
 				cursorsphere.fwd();
-				if (cursorsphere.get().get())
+				if (cursorsphere.get().get()){
 					isbright = true;
+				break;	
+				}
 			}
 			
 			if (isbright)
@@ -622,15 +624,15 @@ public static void addBackground(final IterableInterval<FloatType> iterable, fin
 		return meanimg;
 	}
 	
-	public static RandomAccessibleInterval<BitType> CannyEdgeandMeanBit(RandomAccessibleInterval<BitType> inputimg,
+	public static RandomAccessibleInterval<FloatType> CannyEdgeandMeanBit(RandomAccessibleInterval<BitType> inputimg,
 			final double sigma) {
 		int n = inputimg.numDimensions();
 		RandomAccessibleInterval<BitType> cannyimage = new ArrayImgFactory<BitType>().create(inputimg,
 				new BitType());
 		RandomAccessibleInterval<BitType> gradientimage = new ArrayImgFactory<BitType>().create(inputimg,
 				new BitType());
-		RandomAccessibleInterval<BitType> Threshcannyimg = new ArrayImgFactory<BitType>().create(inputimg,
-				new BitType());
+		RandomAccessibleInterval<FloatType> Threshcannyimg = new ArrayImgFactory<FloatType>().create(inputimg,
+				new FloatType());
 		
 	    // We will create local neighbourhood on this image
 		gradientimage = GradientmagnitudeImageBit(inputimg);
@@ -700,7 +702,7 @@ public static void addBackground(final IterableInterval<FloatType> iterable, fin
 				right[d] = cursor.getDoublePosition(d) + direction[d];
 			}
 			boolean isMaximum = true;
-        	final RandomAccess<BitType> outbound = Threshcannyimg.randomAccess();
+        	final RandomAccess<FloatType> outbound = Threshcannyimg.randomAccess();
 			while (localcursor.hasNext()) {
 				localcursor.fwd();
 			
@@ -716,16 +718,17 @@ public static void addBackground(final IterableInterval<FloatType> iterable, fin
 				
 				
 				outbound.setPosition(cursor);
-				outbound.get().set(cursor.get());
+				FloatType setfloat = new FloatType(cursor.get().getRealFloat());
+				outbound.get().set(setfloat);
 				
 			}
 			}
 		}
 		
 
-		RandomAccessibleInterval<BitType> meanimg = new ArrayImgFactory<BitType>().create(inputimg,
-				new BitType());
-		MeanFilterBit(Threshcannyimg, meanimg, sigma);
+		RandomAccessibleInterval<FloatType> meanimg = new ArrayImgFactory<FloatType>().create(inputimg,
+				new FloatType());
+		MeanFilter(Threshcannyimg, meanimg,  sigma);
 		
 		return Threshcannyimg;
 	}

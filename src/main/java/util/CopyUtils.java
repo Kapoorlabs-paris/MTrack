@@ -328,6 +328,44 @@ public class CopyUtils {
 
 		return intervalView;
 	}
+	public static RandomAccessibleInterval<BitType> oldextractImageBit(final RandomAccessibleInterval<BitType> intervalView, final FinalInterval interval) {
+
+		final BitType type = intervalView.randomAccess().get().createVariable();
+		final ImgFactory<BitType> factory = net.imglib2.util.Util.getArrayOrCellImgFactory(intervalView, type);
+		RandomAccessibleInterval<BitType> totalimg = factory.create(intervalView, type);
+		final RandomAccessibleInterval<BitType> img = Views.interval(intervalView, interval);
+
+		double[] newmin = Transformback(new double[] { img.min(0), img.min(1) },
+				new double[] { totalimg.dimension(0), totalimg.dimension(1) }, new double[] { img.min(0), img.min(1) },
+				new double[] { img.max(0), img.max(1) });
+
+		double[] newmax = Transformback(new double[] { img.max(0), img.max(1) },
+				new double[] { totalimg.dimension(0), totalimg.dimension(1) },
+				new double[] { totalimg.min(0), totalimg.min(1) }, new double[] { totalimg.max(0), totalimg.max(1) });
+		long[] newminlong = new long[] { Math.round(newmin[0]), Math.round(newmin[1]) };
+		long[] newmaxlong = new long[] { Math.round(newmax[0]), Math.round(newmax[1]) };
+
+		RandomAccessibleInterval<BitType> outimg = factory.create(new FinalInterval(newminlong, newmaxlong), type);
+		RandomAccess<BitType> ranac = outimg.randomAccess();
+		final Cursor<BitType> cursor = Views.iterable(img).localizingCursor();
+
+		while (cursor.hasNext()) {
+
+			cursor.fwd();
+
+			double[] newlocation = Transformback(
+					new double[] { cursor.getDoublePosition(0), cursor.getDoublePosition(1) },
+					new double[] { totalimg.dimension(0), totalimg.dimension(1) },
+					new double[] { totalimg.min(0), totalimg.min(1) },
+					new double[] { totalimg.max(0), totalimg.max(1) });
+			long[] newlocationlong = new long[] { Math.round(newlocation[0]), Math.round(newlocation[1]) };
+			ranac.setPosition(newlocationlong);
+			ranac.get().set(cursor.get());
+
+		}
+
+		return intervalView;
+	}
 	
 	
 	public static RandomAccessibleInterval<IntType> extractIntImage(final RandomAccessibleInterval<IntType> intervalView, final FinalInterval interval) {

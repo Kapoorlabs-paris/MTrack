@@ -819,12 +819,15 @@ public class GetLocalmaxmin {
 		final Cursor< FloatType > cIn = Views.iterable( in ).localizingCursor();
 		final RandomAccess< BitType > rOut = out.randomAccess();
 
+		final double[] position = new double[out.numDimensions()];
 		while ( cIn.hasNext() )
 		{
 			cIn.fwd();
 			rOut.setPosition( cIn );
 
+			rOut.localize(position);
 			if ( cIn.get().get() >= ( threshold ) )
+				
 				rOut.get().setOne();
 			else
 				rOut.get().setZero();

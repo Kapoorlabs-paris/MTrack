@@ -37,4 +37,3 @@ public class MaxSizeHoughListener implements AdjustmentListener {
 
 	}
 }
-

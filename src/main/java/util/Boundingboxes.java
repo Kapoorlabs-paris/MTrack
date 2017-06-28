@@ -147,7 +147,7 @@ public class Boundingboxes {
 		return score;
 	}
 
-	public static double GetBoundingbox(RandomAccessibleInterval<IntType> inputimg, int label) {
+	public static FinalInterval GetBoundingbox(RandomAccessibleInterval<IntType> inputimg, int label) {
 
 		Cursor<IntType> intCursor = Views.iterable(inputimg).localizingCursor();
 		int n = inputimg.numDimensions();
@@ -175,9 +175,9 @@ public class Boundingboxes {
 		}
 
 		double boxsize = Distance(minVal, maxVal);
-
+		FinalInterval interval = new FinalInterval(minVal, maxVal);
 		Pair<long[], long[]> boundingBox = new ValuePair<long[], long[]>(minVal, maxVal);
-		return boxsize;
+		return interval;
 	}
 
 	public static int GetMaxlabelsseeded(RandomAccessibleInterval<IntType> intimg) {
@@ -496,7 +496,7 @@ public static FinalInterval CurrentroiInterval(RandomAccessibleInterval<FloatTyp
 		
 		
 		FinalInterval intervalsmall = new FinalInterval(minVal, maxVal) ;
-		RandomAccessibleInterval<FloatType> outimgsmall = util.CopyUtils.extractImage(outimg, intervalsmall);
+		RandomAccessibleInterval<FloatType> outimgsmall = util.CopyUtils.oldextractImage(outimg, intervalsmall);
 
 		Pair<RandomAccessibleInterval<FloatType>, FinalInterval> pair = new ValuePair<RandomAccessibleInterval<FloatType>, FinalInterval>(outimgsmall, intervalsmall);
 		return pair;
@@ -541,7 +541,7 @@ public static FinalInterval CurrentroiInterval(RandomAccessibleInterval<FloatTyp
 		
 		
 		FinalInterval intervalsmall = new FinalInterval(minVal, maxVal) ;
-		RandomAccessibleInterval<BitType> outimgsmall = util.CopyUtils.extractImageBit(outimg, intervalsmall);
+		RandomAccessibleInterval<BitType> outimgsmall = util.CopyUtils.oldextractImageBit(outimg, intervalsmall);
 
 		Pair<RandomAccessibleInterval<BitType>, FinalInterval> pair = new ValuePair<RandomAccessibleInterval<BitType>, FinalInterval>(outimgsmall, intervalsmall);
 		return pair;

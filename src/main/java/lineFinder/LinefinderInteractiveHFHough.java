@@ -103,6 +103,7 @@ public class LinefinderInteractiveHFHough implements LinefinderHF {
 		
 		
 
+		int count = 0;
 		for (int label = 1; label < Maxlabel - 1; ++label){
 		
 			Pair<RandomAccessibleInterval<FloatType>, FinalInterval> pair =  Boundingboxes.CurrentLabelImagepair(parent.intimg, Preprocessedsource, label);
@@ -118,11 +119,11 @@ public class LinefinderInteractiveHFHough implements LinefinderHF {
 			
 			
 			for (int i = 0; i < outputcurr.size(); ++i){
+				count++;
 				
 				
-				
-				CommonOutputHF currentOutput = new CommonOutputHF(outputcurr.get(i).framenumber, (int)(label*Math.pow(2, label + outputcurr.get(i).roilabel)),
-						outputcurr.get(i).Roi, outputcurr.get(i).Actualroi,
+				CommonOutputHF currentOutput = new CommonOutputHF(outputcurr.get(i).framenumber, count,
+						outputcurr.get(i).Roi, outputcurr.get(i).Actualroi, 
 						outputcurr.get(i).interval,outputcurr.get(i).Allrois);
 				output.add(currentOutput);
 				

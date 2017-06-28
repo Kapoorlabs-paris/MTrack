@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import javax.swing.JProgressBar;
 
 import LineModels.UseLineModel.UserChoiceModel;
+import fiji.util.DistanceComparator;
 import ij.gui.EllipseRoi;
 import labeledObjects.CommonOutput;
 import labeledObjects.CommonOutputHF;
@@ -23,27 +24,34 @@ import net.imglib2.util.Pair;
 import net.imglib2.util.ValuePair;
 import net.imglib2.view.Views;
 import preProcessing.GetLocalmaxmin;
+import util.Boundingboxes;
 
 public class FitterUtils {
+	
+	public static double Distance(final double[] minCorner, final double[] maxCorner) {
 
+		double distance = 0;
+
+		for (int d = 0; d < minCorner.length; ++d) {
+
+			distance += Math.pow((minCorner[d] - maxCorner[d]), 2);
+
+		}
+		return Math.sqrt(distance);
+	}
 	public static int Getlabel(final ArrayList<CommonOutputHF> imgs,final Point fixedpoint, 
 			final double originalslope, final double originalintercept) {
 
 
 		int finallabel = Integer.MIN_VALUE;
+		
+		
+		
+		
+		
 		for (int index = 0; index < imgs.size(); ++index) {
 
-			if (imgs.get(index).intimg != null) {
-
-				RandomAccess<IntType> intranac = imgs.get(index).intimg.randomAccess();
-
-				intranac.setPosition(fixedpoint);
-				finallabel = intranac.get().get();
-
-				return finallabel;
-
-			} else {
-
+				
 				
 				
 				
@@ -55,23 +63,18 @@ public class FitterUtils {
 						&& fixedpoint.getIntPosition(1) >= interval.min(1)
 						&& fixedpoint.getIntPosition(1) <= interval.max(1)) {
 
-					double mindist = Double.MAX_VALUE;
 					for (int i = 0; i < imgs.get(index).Allrois.size(); ++i){
 					
 						
 						EllipseRoi roi = imgs.get(index).Allrois.get(i);
 						
-						Rectangle rect = roi.getBounds();
-						RealPoint newpoint = new RealPoint(rect.x + rect.width/2.0, rect.y + rect.height/2.0 );
-						double dist = Math.abs(newpoint.getDoublePosition(1) - 
-								originalslope * newpoint.getDoublePosition(0) - originalintercept);
-					//	if (roi.contains(fixedpoint.getIntPosition(0), fixedpoint.getIntPosition(1))){
 						
-							if (dist <= mindist){
+						if (roi.contains(fixedpoint.getIntPosition(0), fixedpoint.getIntPosition(1))){
+						
+						
 					finallabel = imgs.get(index).roilabel;
 					
-					mindist = dist;
-						//	}
+					
 						
 						}
 					
@@ -79,7 +82,6 @@ public class FitterUtils {
 				}
 
 			}
-		}
 
 		return finallabel;
 	}
@@ -202,9 +204,8 @@ public static int getlabelindexSeed(final ArrayList<CommonOutput> imgs, int labe
 
 			outcursor.localize(newposition);
 			
-			long pointonline = (int)Math.round(newposition[1] - slope * newposition[0] - Curvature * newposition[0]* newposition[0] - 
-					Inflection *  newposition[0]* newposition[0] * newposition[0] - intercept);
-			
+			long pointonline = (int)Math.round(newposition[1] - slope * newposition[0]  - intercept);
+			if (Math.abs(pointonline) <= 50){
 			if (outcursor.getDoublePosition(0) <= minVal[0]
 					&& outcursor.get().get() / maxintensityline > Intensityratio ) {
 				minVal[0] = outcursor.getDoublePosition(0);
@@ -218,6 +219,7 @@ public static int getlabelindexSeed(final ArrayList<CommonOutput> imgs, int labe
 			
 		}
 			
+		}
 		}
 		Pair<double[], double[]> minmaxpair = new ValuePair<double[], double[]>(minVal, maxVal);
 		

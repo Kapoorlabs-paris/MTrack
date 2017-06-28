@@ -376,7 +376,7 @@ public class SubpixelVelocityPCLine extends BenchmarkAlgorithm
 		final double maxintensityline = GetLocalmaxmin.computeMaxIntensity(currentimg);
 		final double minintensityline = 0;
 		Pair<double[], double[]> minmaxpair = FitterUtils.MakeinitialEndpointguess(imgs, maxintensityline,
-				Intensityratio, ndims, labelindex, iniparam.slope, iniparam.intercept, iniparam.Curvature,
+				Intensityratio, ndims, labelindex, iniparam.originalslope, iniparam.originalintercept, iniparam.Curvature,
 				iniparam.Inflection);
 		for (int d = 0; d < ndims; ++d) {
 

@@ -277,9 +277,10 @@ public ArrayList<Indexedlength> getEndPoints(){
        			
        			inputcursor.fwd();
        			
-       			
+       			long pointonline = (long)Math.round(inputcursor.getDoublePosition(1) - slope * inputcursor.getDoublePosition(0) -
+       					intercept );
        				inputcursor.localize(newposition);
- 
+               if (Math.abs(pointonline)<= 50){
        				if (inputcursor.getDoublePosition(0) <= minVal[0]
     						&& inputcursor.get().get() / maxintensityline > Intensityratio) {
     					minVal[0] = inputcursor.getDoublePosition(0);
@@ -294,6 +295,7 @@ public ArrayList<Indexedlength> getEndPoints(){
 
        			
                   }
+        	   }
 		final double[] MinandMax = new double[2 * ndims + 3];
 
 		

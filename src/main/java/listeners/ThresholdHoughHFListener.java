@@ -9,7 +9,7 @@ import interactiveMT.Interactive_MTDoubleChannel;
 import interactiveMT.Interactive_MTDoubleChannel.ValueChange;
 import mpicbg.imglib.multithreading.SimpleMultiThreading;
 
-public class ThresholdHoughListener implements AdjustmentListener {
+public class ThresholdHoughHFListener implements AdjustmentListener {
 	final Label label;
 	final float min, max;
 	final Interactive_MTDoubleChannel parent;
@@ -17,7 +17,7 @@ public class ThresholdHoughListener implements AdjustmentListener {
 
 	final Scrollbar thresholdScrollbar;
 
-	public ThresholdHoughListener(final Interactive_MTDoubleChannel parent , final Label label, final float min, final float max, final int scrollbarSize,
+	public ThresholdHoughHFListener(final Interactive_MTDoubleChannel parent , final Label label, final float min, final float max, final int scrollbarSize,
 			final Scrollbar thresholdScrollbar) {
 		this.label = label;
 		this.min = min;
@@ -27,7 +27,7 @@ public class ThresholdHoughListener implements AdjustmentListener {
 
 		this.thresholdScrollbar = thresholdScrollbar;
 		thresholdScrollbar.addMouseListener( new StandardMouseListener( parent,ValueChange.SHOWHOUGH ) );
-	//	thresholdScrollbar.addMouseListener( new StandardMouseListener( parent,ValueChange.SHOWMSERinHough ) );
+		thresholdScrollbar.addMouseListener( new StandardMouseListener( parent,ValueChange.SHOWMSERinHough ) );
 		
 		
 	}

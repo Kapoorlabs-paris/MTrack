@@ -93,6 +93,7 @@ import listeners.SeedDisplayListener;
 import listeners.ShowBitimgListener;
 import listeners.ShowwatershedimgListener;
 import listeners.SkipFramesandTrackendsListener;
+import listeners.ThresholdHoughHFListener;
 import listeners.ThresholdHoughListener;
 import listeners.TrackendsListener;
 import listeners.Unstability_ScoreHoughListener;
@@ -111,6 +112,7 @@ import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.util.Pair;
 import net.imglib2.view.Views;
 import preProcessing.GetLocalmaxmin;
+import preProcessing.GetLocalmaxmin.IntensityType;
 import preProcessing.GlobalThresholding;
 import preProcessing.Kernels;
 import preProcessing.MedianFilter2D;
@@ -214,7 +216,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public int minSizeInit = 10;
 	public int maxSizeInit = 5000;
 
-	public float thresholdHoughInit = new Float(0.5);
+	public float thresholdHoughInit = new Float(0.25);
 	public float rhoPerPixelInit = new Float(1);
 	public float thetaPerPixelInit = new Float(1);
 	public JLabel inputMaxdpixel;
@@ -374,6 +376,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public FinalInterval interval;
 	public RandomAccessibleInterval<UnsignedByteType> newimg;
 	public RandomAccessibleInterval<BitType> bitimg;
+	public RandomAccessibleInterval<FloatType> bitimgFloat;
 	public ArrayList<double[]> AllmeanCovar = new ArrayList<double[]>();
 	public long Cannyradius;
 	public HashMap<Integer, ArrayList<Roi>> AllpreviousRois;
@@ -876,32 +879,25 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 			ArrayList<double[]> meanCovar = new ArrayList<double[]>();
 			if (count == 1)
 				startdim = thirdDimension;
+			
 			for (int label = 1; label < Maxlabel - 1; label++) {
+				Pair<RandomAccessibleInterval<FloatType>, FinalInterval> pair = Boundingboxes
+						.CurrentLabelImagepair(intimg, bitimgFloat, label);
 
-				Pair<RandomAccessibleInterval<BitType>, FinalInterval> pair = Boundingboxes
-						.CurrentLabelImagepairBit(intimg, bitimg, label);
-
-				RandomAccessibleInterval<BitType> roiimg = pair.getA();
-
-				
-						long size = pair.getB().dimension( 0 );
-				for ( int d = 1; d < intimg.numDimensions(); ++d )
-				{
-					size *= pair.getB().dimension( d );
-				}
+				RandomAccessibleInterval<FloatType> roiimg = pair.getA();
 						
-				newimg = util.CopyUtils.copytoByteImageBit(
-						Kernels.CannyEdgeandMeanBit(roiimg, Cannyradius), intimg, standardRectangle, label);
+				newimg = util.CopyUtils.copytoByteImage(
+						Kernels.CannyEdgeandMean(roiimg, Cannyradius), standardRectangle);
 
-				MserTree<UnsignedByteType> newtree = MserTree.buildMserTree(newimg, delta, minSize, Math.min(maxSize, size ), Unstability_Score,
+				MserTree<UnsignedByteType> newtree = MserTree.buildMserTree(newimg, delta, minSize, maxSize, Unstability_Score,
 						minDiversity, darktobright);
 
 				Rois = util.DrawingUtils.getcurrentRois(newtree, meanCovar);
 				AllmeanCovar.addAll(meanCovar);
 				AllRois.addAll(Rois);
 
+			
 				newHoughtree.put(label, newtree);
-
 				if (preprocessedimp != null) {
 
 					for (int index = 0; index < Rois.size(); ++index) {
@@ -945,15 +941,15 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 			bitimg = new ArrayImgFactory<BitType>().create(newimg, new BitType());
 			
-			
-			
-			
+			bitimgFloat = new ArrayImgFactory<FloatType>().create(newimg, new FloatType());
 			
 			GetLocalmaxmin.ThresholdingBit(currentPreprocessedimg, bitimg, thresholdHough);
+			GetLocalmaxmin.Thresholding(currentPreprocessedimg, bitimgFloat, thresholdHough, IntensityType.Gaussian, new double[]{0.5, 0.5});
 
 			if (displayBitimg)
 				ImageJFunctions.show(bitimg);
 
+			
 			WatershedDistimg<FloatType> WaterafterDisttransform = new WatershedDistimg<FloatType>(Kernels.CannyEdgeandMean(currentPreprocessedimg, Cannyradius),
 					bitimg);
 			WaterafterDisttransform.checkInput();
@@ -1282,10 +1278,10 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 		CheckboxGroup Segmentation = new CheckboxGroup();
 		final Checkbox Doseg = new Checkbox(
-				"Do Waterhshed + MSER based segmentation (slower, recommended for crowded movies)", Segmentation,
+				"DoWatershed +  MSER based segmentation ", Segmentation,
 				doSegmentation);
 		final Checkbox DoMserseg = new Checkbox(
-				"Do MSER based segmentation (faster, recommended for non-crowded movies)", Segmentation,
+				"Do MSER based segmentation", Segmentation,
 				doMserSegmentation);
 		final Label MTTextHF = new Label("Select ends for tracking", Label.CENTER);
 		final Label Step3 = new Label("Step 3", Label.CENTER);
@@ -1710,7 +1706,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		
 		
 
-		threshold.addAdjustmentListener(new ThresholdHoughListener(this, thresholdText, thresholdHoughMin,
+		threshold.addAdjustmentListener(new ThresholdHoughHFListener(this, thresholdText, thresholdHoughMin,
 				thresholdHoughMax, scrollbarSize, threshold));
 
 		displayBit.addItemListener(new ShowBitimgListener(this));
