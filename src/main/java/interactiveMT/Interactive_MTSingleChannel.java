@@ -665,7 +665,7 @@ public class Interactive_MTSingleChannel implements PlugIn {
 	
 		usefolder  = userfile.getParentFile().getAbsolutePath();
 
-		
+		SaveTxt = true;
 		AllSeedrois = new ArrayList<OvalRoi>();
 		jpb = new JProgressBar();
 		newHoughtree = new HashMap<Integer, MserTree<UnsignedByteType>>();
@@ -1940,7 +1940,7 @@ public class Interactive_MTSingleChannel implements PlugIn {
 							thirdDimensionSize);
 
 				} else {
-
+					thirdDimension = thirdDimensionslider;
 					CurrentView = util.CopyUtils.getCurrentView(originalimg, thirdDimension, thirdDimensionSize);
 					CurrentPreprocessedView = util.CopyUtils.getCurrentPreView(originalPreprocessedimg, thirdDimension,
 							thirdDimensionSize);
