@@ -39,12 +39,12 @@ public class FitterUtils {
 		}
 		return Math.sqrt(distance);
 	}
-	public static int Getlabel(final ArrayList<CommonOutputHF> imgs,final Point fixedpoint, 
+	public static ArrayList<Integer> Getlabel(final ArrayList<CommonOutputHF> imgs,final Point fixedpoint, 
 			final double originalslope, final double originalintercept) {
 
 
 		int finallabel = Integer.MIN_VALUE;
-		
+		ArrayList<Integer> alllabels = new ArrayList<Integer>();
 		
 		
 		
@@ -74,7 +74,7 @@ public class FitterUtils {
 						
 					finallabel = imgs.get(index).roilabel;
 					
-					
+					alllabels.add(finallabel);
 						
 						}
 					
@@ -83,7 +83,7 @@ public class FitterUtils {
 
 			}
 
-		return finallabel;
+		return alllabels;
 	}
 	
 	public static int getlabelindex(final ArrayList<CommonOutputHF> imgs, int label){
@@ -227,6 +227,68 @@ public static int getlabelindexSeed(final ArrayList<CommonOutput> imgs, int labe
 		
 	}
 	
+	public static final Pair<double[], double[]> MakeinitialEndpointguessUser(ArrayList<CommonOutputHF> imgs, double maxintensityline, 
+			double Intensityratio, int ndims, int label, double slope, double intercept, double Curvature, double Inflection, int rate){
+		long[] newposition = new long[ndims];
+		double[] minVal = { Double.MAX_VALUE, Double.MAX_VALUE };
+		double[] maxVal = { -Double.MIN_VALUE, -Double.MIN_VALUE };
+		
+		RandomAccessibleInterval<FloatType> currentimg = imgs.get(label).Roi;
+
+		FinalInterval interval = imgs.get(label).interval;
+
+		currentimg = Views.interval(currentimg, interval);
+
+		final Cursor<FloatType> outcursor = Views.iterable(currentimg).localizingCursor();
+		
+		
+		
+		while (outcursor.hasNext()) {
+
+			outcursor.fwd();
+
+			outcursor.localize(newposition);
+			
+			long pointonline = (int)Math.round(newposition[1] - slope * newposition[0]  - intercept);
+			
+			if (rate < imgs.get(label).framenumber){
+				
+				if (outcursor.getDoublePosition(0) <= minVal[0]
+						&& outcursor.get().get() / maxintensityline > Intensityratio ) {
+					minVal[0] = outcursor.getDoublePosition(0);
+					minVal[1] = outcursor.getDoublePosition(1);
+				}
+
+				if (outcursor.getDoublePosition(0) >= maxVal[0]
+						&& outcursor.get().get() / maxintensityline > Intensityratio ) {
+					maxVal[0] = outcursor.getDoublePosition(0);
+					maxVal[1] = outcursor.getDoublePosition(1);
+				
+				}
+				
+			}
+			else{
+			if (Math.abs(pointonline) <= 50 ){
+			if (outcursor.getDoublePosition(0) <= minVal[0]
+					&& outcursor.get().get() / maxintensityline > Intensityratio ) {
+				minVal[0] = outcursor.getDoublePosition(0);
+				minVal[1] = outcursor.getDoublePosition(1);
+			}
+
+			if (outcursor.getDoublePosition(0) >= maxVal[0]
+					&& outcursor.get().get() / maxintensityline > Intensityratio ) {
+				maxVal[0] = outcursor.getDoublePosition(0);
+				maxVal[1] = outcursor.getDoublePosition(1);
+			
+			}
+		}
+			}
+		}
+		Pair<double[], double[]> minmaxpair = new ValuePair<double[], double[]>(minVal, maxVal);
+		
+		return minmaxpair;
+		
+	}
 	
 	public static void SetProgressBar(JProgressBar jpb, double percent){
 		

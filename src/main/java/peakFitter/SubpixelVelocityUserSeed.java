@@ -42,6 +42,7 @@ import net.imglib2.util.Pair;
 import net.imglib2.util.ValuePair;
 import net.imglib2.view.Views;
 import peakFitter.GaussianMaskFitMSER.EndfitMSER;
+import peakFitter.SubpixelVelocityPCLine.StartorEnd;
 import preProcessing.GetLocalmaxmin;
 
 public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm
@@ -176,10 +177,10 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm
 		final_paramlistuser = new ArrayList<Indexedlength>();
 
 		startinuserframe = new ArrayList<Trackproperties>();
-
+		final int oldframenumber = Userframe.get(Userframe.size() - 1).framenumber;
 		for (int index = 0; index < Userframe.size(); ++index) {
 
-			final int oldframenumber = Userframe.get(Userframe.size() - 1).framenumber;
+			
 			final int framediff = framenumber - oldframenumber;
 
 		
@@ -206,15 +207,42 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm
 				fixedstartpoint.setPosition(new long[] { (long) Userframe.get(index).fixedpos[0],
 						(long) Userframe.get(index).fixedpos[1] });
 
-				int labelstart = FitterUtils.Getlabel(imgs, fixedstartpoint, originalslope, originalintercept);
+				ArrayList<Integer> labelstart = FitterUtils.Getlabel(imgs, fixedstartpoint, originalslope, originalintercept);
 				Indexedlength paramnextframestart;
+				
+				int labelindex = Integer.MIN_VALUE;
+				
+				if (labelstart.size() > 0)
+				
+					labelindex = labelstart.get(0);
+				
+				if (labelindex != Integer.MIN_VALUE){
+				paramnextframestart	= Getfinaltrackparam(Userframe.get(index), labelstart.get(0), psf, oldframenumber);
+				
+				double min = Double.MAX_VALUE;
+				double distmin = Double.MAX_VALUE;
+				if (labelstart.size() > 1){
+				for (int j = 0; j < labelstart.size(); ++j){
+					System.out.println("Fitting multiple Labels" + "User defined");
+					Indexedlength test = Getfinaltrackparam(Userframe.get(index), labelstart.get(j), psf, framenumber);
+					double[] currentpos = test.currentpos;
+					double[] fixedpos = test.fixedpos;
+					double pointonline = currentpos[1] - test.originalslope * currentpos[0] - test.originalintercept;
+					double dist = Distance(currentpos, fixedpos) ;
+					if (Math.abs(pointonline) < min && dist < distmin){
+						min = Math.abs(pointonline);
+						distmin = dist;
+						labelindex = j;
+						paramnextframestart = test;
+					}
+				}
+				}
+				}
 
-				if (labelstart != Integer.MIN_VALUE)
 
-					paramnextframestart = Getfinaltrackparam(Userframe.get(index), labelstart, psf,
-							framenumber);
 				else
 					paramnextframestart = Userframe.get(index);
+
 				if (paramnextframestart == null)
 					paramnextframestart = Userframe.get(index);
 
@@ -227,7 +255,7 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm
 				final double newstartslope = paramnextframestart.slope;
 				final double newstartintercept = paramnextframestart.intercept;
 
-				final Trackproperties startedge = new Trackproperties(framenumber, labelstart, oldstartpoint,
+				final Trackproperties startedge = new Trackproperties(framenumber, labelindex, oldstartpoint,
 						newstartpoint, newstartslope, newstartintercept, originalslope, originalintercept,
 						Userframe.get(index).seedLabel, Userframe.get(index).fixedpos,
 						Userframe.get(index).originalds);
@@ -265,12 +293,11 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm
 		return Accountedframes;
 	}
 
-	private final double[] MakerepeatedLineguess(Indexedlength iniparam, int label) {
+	private final double[] MakerepeatedLineguess(Indexedlength iniparam, int label, int rate) {
 
 		double[] minVal = new double[ndims];
 		double[] maxVal = new double[ndims];
         int labelindex = FitterUtils.getlabelindex(imgs, label);
-		
         if (labelindex!=-1){
 		
 		RandomAccessibleInterval<FloatType> currentimg  = imgs.get(labelindex).Roi;
@@ -283,9 +310,11 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm
 
 		final double maxintensityline = GetLocalmaxmin.computeMaxIntensity(currentimg);
 		final double minintensityline = 0;
-		Pair<double[], double[]> minmaxpair = FitterUtils.MakeinitialEndpointguess(imgs, maxintensityline,
+		Pair<double[], double[]> minmaxpair = FitterUtils.MakeinitialEndpointguessUser(imgs, maxintensityline,
 				Intensityratio, ndims, labelindex, iniparam.slope, iniparam.intercept, iniparam.Curvature,
-				iniparam.Inflection);
+				iniparam.Inflection, rate);
+		
+
 		for (int d = 0; d < ndims; ++d) {
 
 			minVal[d] = minmaxpair.getA()[d];
@@ -372,6 +401,7 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm
 					return null;
 
 			}
+			
 			return MinandMax;
 		}
 
@@ -386,12 +416,16 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm
 	public Indexedlength Getfinaltrackparam(final Indexedlength iniparam, final int label, final double[] psf,
 			final int rate) {
 
-		final double[] LMparam = MakerepeatedLineguess(iniparam, label);
+		
+		
+		
+		final double[] LMparam = MakerepeatedLineguess(iniparam, label, rate);
+		
 		if (LMparam == null)
 			return iniparam;
-
+		
 		else {
-
+			
 			final double[] inipos = iniparam.currentpos;
 
 			int labelindex = FitterUtils.getlabelindex(imgs, label);
@@ -437,7 +471,7 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm
 					+ LMparam[1] + " EndX: " + LMparam[2] + " EndY: " + LMparam[3]);
 
 			final double[] safeparam = LMparam.clone();
-			MTFitFunction UserChoiceFunction = null;
+			MTFitFunction UserChoiceFunction = new GaussianSplinethirdorder();
 			if (model == UserChoiceModel.Line) {
 				fixed_param[ndims] = iniparam.slope;
 				fixed_param[ndims + 1] = iniparam.intercept;

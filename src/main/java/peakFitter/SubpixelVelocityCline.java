@@ -211,13 +211,44 @@ implements OutputAlgorithm<Pair<ArrayList<Indexedlength>, ArrayList<Indexedlengt
 				fixedstartpoint.setPosition(new long[] { (long) PrevFrameparamstart.get(index).fixedpos[0],
 						(long) PrevFrameparamstart.get(index).fixedpos[1] });
 
-				int labelstart = FitterUtils.Getlabel(imgs, fixedstartpoint, originalslope, originalintercept);
+				ArrayList<Integer> labelstart = FitterUtils.Getlabel(imgs, fixedstartpoint, originalslope, originalintercept);
 				Indexedlength paramnextframe;
+				
+				int labelindex = Integer.MIN_VALUE;
+				
+				if (labelstart.size() > 0)
+				
+					labelindex = labelstart.get(0);
+				
+				if (labelindex != Integer.MIN_VALUE){
+				paramnextframe	= Getfinaltrackparam(PrevFrameparamstart.get(index), labelstart.get(0), psf, framenumber,
+						StartorEnd.Start);
+				
+				double min = Double.MAX_VALUE;
+				double distmin = Double.MAX_VALUE;
+				if (labelstart.size() > 1){
+				for (int j = 0; j < labelstart.size(); ++j){
+					System.out.println("Fitting multiple Labels");
+					Indexedlength test = Getfinaltrackparam(PrevFrameparamstart.get(index), labelstart.get(j), psf, framenumber,
+							StartorEnd.Start);
+					double[] currentpos = test.currentpos;
+					double[] fixedpos = test.fixedpos;
+					double pointonline = currentpos[1] - test.originalslope * currentpos[0] - test.originalintercept;
+					double dist = Distance(currentpos, fixedpos) ;
+					if (Math.abs(pointonline) < min && dist < distmin){
+						min = Math.abs(pointonline);
+						distmin = dist;
+						labelindex = j;
+						paramnextframe = test;
+					}
+				}
+				}
+				}
+				
+			//	if (labelindex != Integer.MIN_VALUE)
 
-				if (labelstart != Integer.MIN_VALUE)
-
-					paramnextframe = Getfinaltrackparam(PrevFrameparamstart.get(index), labelstart, psf,
-							framenumber, StartorEnd.Start);
+//					paramnextframestart = Getfinaltrackparam(PrevFrameparamstart.get(index), labelindex, psf,
+	//						framenumber, StartorEnd.Start);
 				else
 					paramnextframe = PrevFrameparamstart.get(index);
 				if (paramnextframe == null)
@@ -232,7 +263,7 @@ implements OutputAlgorithm<Pair<ArrayList<Indexedlength>, ArrayList<Indexedlengt
 				final double newstartslope = paramnextframe.slope;
 				final double newstartintercept = paramnextframe.intercept;
 
-				final Trackproperties startedge = new Trackproperties(framenumber, labelstart, oldstartpoint,
+				final Trackproperties startedge = new Trackproperties(framenumber, labelindex, oldstartpoint,
 						newstartpoint, newstartslope, newstartintercept, originalslope, originalintercept,
 						PrevFrameparamstart.get(index).seedLabel, PrevFrameparamstart.get(index).fixedpos,
 						PrevFrameparamstart.get(index).originalds);
@@ -268,12 +299,39 @@ implements OutputAlgorithm<Pair<ArrayList<Indexedlength>, ArrayList<Indexedlengt
 				final double originalslopeend = PrevFrameparamend.get(index).originalslope;
 
 				final double originalinterceptend = PrevFrameparamend.get(index).originalintercept;
-				int labelend = FitterUtils.Getlabel(imgs, fixedendpoint, originalslopeend, originalinterceptend);
+				ArrayList<Integer> labelend = FitterUtils.Getlabel(imgs, fixedendpoint, originalslopeend, originalinterceptend);
 				Indexedlength paramnextframeend;
+                int labelindex = Integer.MIN_VALUE;
+				
+				if (labelend.size() > 0)
+				
+					labelindex = labelend.get(0);
+				if (labelindex != Integer.MIN_VALUE){
+				paramnextframeend	= Getfinaltrackparam(PrevFrameparamend.get(index), labelend.get(0), psf, framenumber,
+						StartorEnd.End);
+				
+				double min = Double.MAX_VALUE;
+				double distmin = Double.MAX_VALUE;
+				if (labelend.size() > 1){
+				for (int j = 0; j < labelend.size(); ++j){
+					System.out.println("Fitting multiple Labels");
 
-				if (labelend != Integer.MIN_VALUE)
-					paramnextframeend = Getfinaltrackparam(PrevFrameparamend.get(index), labelend, psf, framenumber,
+					Indexedlength test = Getfinaltrackparam(PrevFrameparamend.get(index), labelend.get(j), psf, framenumber,
 							StartorEnd.End);
+					double[] currentpos = test.currentpos;
+					double[] fixedpos = test.fixedpos;
+					double pointonline = currentpos[1] - test.originalslope * currentpos[0] - test.originalintercept;
+					double dist = Distance(currentpos, fixedpos);
+					if (Math.abs(pointonline) < min && dist < distmin){
+						min = Math.abs(pointonline);
+						distmin = dist;
+						labelindex = j;
+						paramnextframeend = test;
+					}
+				}
+				}
+				}
+					
 				else
 					paramnextframeend = PrevFrameparamend.get(index);
 				if (paramnextframeend == null)
@@ -288,7 +346,7 @@ implements OutputAlgorithm<Pair<ArrayList<Indexedlength>, ArrayList<Indexedlengt
 				final double newendslope = paramnextframeend.slope;
 				final double newendintercept = paramnextframeend.intercept;
 
-				final Trackproperties endedge = new Trackproperties(framenumber, labelend, oldendpoint, newendpoint,
+				final Trackproperties endedge = new Trackproperties(framenumber, labelindex, oldendpoint, newendpoint,
 						newendslope, newendintercept, originalslopeend, originalinterceptend,
 						PrevFrameparamend.get(index).seedLabel, PrevFrameparamend.get(index).fixedpos,
 						PrevFrameparamend.get(index).originalds);

@@ -24,10 +24,8 @@ import net.imglib2.util.Pair;
 import net.imglib2.util.ValuePair;
 import peakFitter.SubpixelLengthPCKalmanLine;
 import peakFitter.SubpixelLengthPCLine;
-import peakFitter.SubpixelVelocityPCKalmanLine;
 import peakFitter.SubpixelVelocityPCLine;
 import peakFitter.SubpixelVelocityUserSeed;
-import peakFitter.SubpixelVelocityUserSeedKalman;
 import preProcessing.Kernels;
 
 public  class FindlinesVia {
@@ -143,81 +141,6 @@ public  class FindlinesVia {
 	}
 	
 	
-	public static Pair<ArrayList<KalmanTrackproperties>, ArrayList<KalmanIndexedlength>> 
-	LinefindingMethodHFUserKalman(final RandomAccessibleInterval<FloatType> source,
-			final RandomAccessibleInterval<FloatType> Preprocessedsource,ArrayList<KalmanIndexedlength> PrevFrameparam,
-			 final int framenumber, final double[] psf,  final LinefinderHF linefinder, final UserChoiceModel model,
-			final boolean DoMask, final double intensityratio, final double Inispacing, final JProgressBar jpb,
-			final int thirdDimsize) {
-
-		Pair<ArrayList<KalmanTrackproperties>,ArrayList<KalmanIndexedlength>> returnVector = null;
-		
-		
-
-			final SubpixelVelocityUserSeedKalman growthtracker = new SubpixelVelocityUserSeedKalman(source, linefinder,
-					PrevFrameparam, psf, framenumber, model, DoMask,jpb, thirdDimsize);
-			growthtracker.setIntensityratio(intensityratio);
-			growthtracker.setInispacing(Inispacing);
-			growthtracker.checkInput();
-			growthtracker.process();
-			Accountedframes  = growthtracker.getAccountedframes();
-			
-			ArrayList<KalmanIndexedlength> NewFrameparam = growthtracker.getResult();
-			ArrayList<KalmanTrackproperties> startStateVectors = growthtracker.getstartStateVectors();
-			returnVector = 
-					new ValuePair<ArrayList<KalmanTrackproperties>,ArrayList<KalmanIndexedlength>>(startStateVectors, NewFrameparam);
-			
-			
-			
-			
-		
-			
-		
-		
-		
-		return returnVector;
-
-	}
-	
-	
-	public static Pair<Pair<ArrayList<KalmanTrackproperties>, ArrayList<KalmanTrackproperties>>, Pair<ArrayList<KalmanIndexedlength>, ArrayList<KalmanIndexedlength>>> 
-	LinefindingMethodHFKalman(final RandomAccessibleInterval<FloatType> source,
-			final RandomAccessibleInterval<FloatType> Preprocessedsource,Pair<ArrayList<KalmanIndexedlength>,ArrayList<KalmanIndexedlength>> PrevFrameparam,
-			 final int framenumber, final double[] psf,  final LinefinderHF linefinder, final UserChoiceModel model,
-			final boolean DoMask, final int KalmanCount, final double Intensityratio, final double Inispacing, final HashMap<Integer, Whichend> Trackstart, final JProgressBar jpb,
-			final int thirdDimsize) {
-
-		Pair<Pair<ArrayList<KalmanTrackproperties>, ArrayList<KalmanTrackproperties>>,Pair<ArrayList<KalmanIndexedlength>,ArrayList<KalmanIndexedlength>>> returnVector = null;
-		
-		
-
-			final SubpixelVelocityPCKalmanLine growthtracker = new SubpixelVelocityPCKalmanLine(source, linefinder,
-					PrevFrameparam.getA(), PrevFrameparam.getB(), psf, framenumber, model, DoMask, KalmanCount, Trackstart,jpb, thirdDimsize);
-			growthtracker.setIntensityratio(Intensityratio);
-			growthtracker.setInispacing(Inispacing);
-			growthtracker.checkInput();
-			growthtracker.process();
-			Accountedframes  = growthtracker.getAccountedframes();
-			
-			Pair<ArrayList<KalmanIndexedlength>,ArrayList<KalmanIndexedlength>> NewFrameparam = growthtracker.getResult();
-			ArrayList<KalmanTrackproperties> startStateVectors = growthtracker.getcurrstartStateVectors();
-			ArrayList<KalmanTrackproperties> endStateVectors = growthtracker.getcurrendStateVectors();
-			Pair<ArrayList<KalmanTrackproperties>, ArrayList<KalmanTrackproperties>> Statevectors = 
-					new ValuePair<ArrayList<KalmanTrackproperties>, ArrayList<KalmanTrackproperties>>(startStateVectors, endStateVectors); 
-			returnVector = 
-					new ValuePair<Pair<ArrayList<KalmanTrackproperties>, ArrayList<KalmanTrackproperties>>,Pair<ArrayList<KalmanIndexedlength>,ArrayList<KalmanIndexedlength>>>(Statevectors, NewFrameparam);
-			
-			
-			
-			
-		
-			
-		
-		
-		
-		return returnVector;
-
-	}
 	
 	public static int getAccountedframes(){
 		
