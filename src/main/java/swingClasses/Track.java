@@ -93,14 +93,14 @@ public  class Track {
 						parent.newtree,  parent.thirdDimension);
 					parent.returnVector = FindlinesVia.LinefindingMethodHF(groundframe, groundframepre, parent.PrevFrameparam,
 							 parent.thirdDimension, parent.psf, newlineMser, parent.userChoiceModel, parent.Domask, parent.Intensityratio,
-							parent.Inispacing, parent.seedmap, parent.jpb, parent.thirdDimensionSize);
+							parent.Inispacing, parent.seedmap, parent.jpb, parent.thirdDimensionSize, parent.maxdist, next);
 					parent.Accountedframes.add(FindlinesVia.getAccountedframes());
 					
 					
 					if(parent.Userframe.size() > 0){
 						
 						parent.returnVectorUser = FindlinesVia.LinefindingMethodHFUser(groundframe, groundframepre, parent.Userframe, parent.thirdDimension,
-								parent.psf, newlineMser, parent.userChoiceModel, parent.Domask, parent.Intensityratio, parent.Inispacing, parent.jpb, parent.thirdDimensionSize);
+								parent.psf, newlineMser, parent.userChoiceModel, parent.Domask, parent.Intensityratio, parent.Inispacing, parent.jpb, parent.thirdDimensionSize, parent.maxdist, next);
 						
 						
 					}
@@ -129,14 +129,14 @@ public  class Track {
 				
 					parent.returnVector = FindlinesVia.LinefindingMethodHF(groundframe, groundframepre, parent.PrevFrameparam,
 							 parent.thirdDimension, parent.psf, newlineHough, parent.userChoiceModel,parent.Domask, parent.Intensityratio,
-							parent.Inispacing, parent.seedmap, parent.jpb, parent.thirdDimensionSize);
+							parent.Inispacing, parent.seedmap, parent.jpb, parent.thirdDimensionSize, parent.maxdist, next);
 
 					parent.Accountedframes.add(FindlinesVia.getAccountedframes());
 					
 	                          if(parent.Userframe.size() > 0){
 						
 						parent.returnVectorUser = FindlinesVia.LinefindingMethodHFUser(groundframe, groundframepre, parent.Userframe, parent.thirdDimension,
-								parent.psf, newlineHough, parent.userChoiceModel, parent.Domask, parent.Intensityratio, parent.Inispacing, parent.jpb, parent.thirdDimensionSize);
+								parent.psf, newlineHough, parent.userChoiceModel, parent.Domask, parent.Intensityratio, parent.Inispacing, parent.jpb, parent.thirdDimensionSize, parent.maxdist, next);
 						
 						
 					}
@@ -165,14 +165,14 @@ public  class Track {
 						groundframepre, parent.newtree, parent.thirdDimension, parent.thetaPerPixel, parent.rhoPerPixel);
 					parent.returnVector = FindlinesVia.LinefindingMethodHF(groundframe, groundframepre, parent.PrevFrameparam,
 							 parent.thirdDimension, parent.psf, newlineMserwHough, parent.userChoiceModel, parent.Domask, parent.Intensityratio,
-							parent.Inispacing, parent.seedmap, parent.jpb, parent.thirdDimensionSize);
+							parent.Inispacing, parent.seedmap, parent.jpb, parent.thirdDimensionSize, parent.maxdist, next);
 
 					parent.Accountedframes.add(FindlinesVia.getAccountedframes());
 					
                        if(parent.Userframe.size() > 0){
 						
 						parent.returnVectorUser = FindlinesVia.LinefindingMethodHFUser(groundframe, groundframepre, parent.Userframe, parent.thirdDimension,
-								parent.psf, newlineMserwHough, parent.userChoiceModel, parent.Domask, parent.Intensityratio, parent.Inispacing, parent.jpb, parent.thirdDimensionSize);
+								parent.psf, newlineMserwHough, parent.userChoiceModel, parent.Domask, parent.Intensityratio, parent.Inispacing, parent.jpb, parent.thirdDimensionSize, parent.maxdist, next);
 						
 						
 					}

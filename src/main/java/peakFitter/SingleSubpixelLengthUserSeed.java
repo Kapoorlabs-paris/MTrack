@@ -42,7 +42,8 @@ public class SingleSubpixelLengthUserSeed {
 		
 		final double[] originalds = new double[] {ds, ds};
 		
-		Indexedlength NewSeed = new Indexedlength(currentLabel, seedLabel, framenumber, ds, lineintensity, background, currentpos, fixedpos, slope, intercept, originalslope, originalintercept, originalds);
+		Indexedlength NewSeed = new Indexedlength(currentLabel, seedLabel, framenumber, ds, lineintensity,
+				background, currentpos, fixedpos, slope, intercept, originalslope, originalintercept, originalds);
 		
 		
 		return NewSeed;

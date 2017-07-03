@@ -592,7 +592,8 @@ implements OutputAlgorithm<ArrayList<Indexedlength>> {
 
 					final Indexedlength BothPart = new Indexedlength(label, label, framenumber, finalparamstart[4],
 							finalparamstart[5], finalparamstart[6], startparam,
-							endparam , currentslope, currentintercept , currentslope, currentintercept, 0 , 0 , new double[]{dx, dy});
+							endparam , currentslope, currentintercept , currentslope, currentintercept, 0 , 0 , 
+							new double[]{dx, dy});
 
 					System.out.println("Fits :" + "StartX:" + returnparam[0] + " StartY:" + returnparam[1] + " " + "EndX:"
 							+ returnparam[2] + "EndY: " + returnparam[3] + " " + "ds: " + finalparamstart[4] );

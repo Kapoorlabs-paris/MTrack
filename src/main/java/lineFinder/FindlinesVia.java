@@ -54,6 +54,7 @@ public  class FindlinesVia {
 			MTline.setIntensityratio(Intensityratio);
 			
 			MTline.setInispacing(Inispacing);
+			
 			MTline.checkInput();
 			MTline.process();
 			PrevFrameparam = MTline.getResult();
@@ -70,16 +71,17 @@ public  class FindlinesVia {
 			final RandomAccessibleInterval<FloatType> Preprocessedsource,Pair<ArrayList<Indexedlength>,ArrayList<Indexedlength>> PrevFrameparam,
 			 final int framenumber, final double[] psf,  final LinefinderHF linefinder, final UserChoiceModel model,
 			final boolean DoMask, final double intensityratio, final double Inispacing, final HashMap<Integer, Whichend> Trackstart, final JProgressBar jpb,
-			final int thirdDimsize) {
+			final int thirdDimsize, final double maxdist, final int startframe) {
 
 		Pair<Pair<ArrayList<Trackproperties>, ArrayList<Trackproperties>>,Pair<ArrayList<Indexedlength>,ArrayList<Indexedlength>>> returnVector = null;
 		
 		
 
 			final SubpixelVelocityPCLine growthtracker = new SubpixelVelocityPCLine(source, linefinder,
-					PrevFrameparam.getA(), PrevFrameparam.getB(), psf, framenumber, model, DoMask, Trackstart,jpb, thirdDimsize);
+					PrevFrameparam.getA(), PrevFrameparam.getB(), psf, framenumber, model, DoMask, Trackstart,jpb, thirdDimsize, startframe);
 			growthtracker.setIntensityratio(intensityratio);
 			growthtracker.setInispacing(Inispacing);
+			growthtracker.setMaxdist(maxdist);
 			//growthtracker.setSlopetolerance(slopetolerance);
 			growthtracker.checkInput();
 			growthtracker.process();
@@ -109,16 +111,17 @@ public  class FindlinesVia {
 			final RandomAccessibleInterval<FloatType> Preprocessedsource,ArrayList<Indexedlength> PrevFrameparam,
 			 final int framenumber, final double[] psf,  final LinefinderHF linefinder, final UserChoiceModel model,
 			final boolean DoMask, final double intensityratio, final double Inispacing, final JProgressBar jpb,
-			final int thirdDimsize) {
+			final int thirdDimsize, final double maxdist, final int startframe) {
 
 		Pair<ArrayList<Trackproperties>,ArrayList<Indexedlength>> returnVector = null;
 		
 		
 
 			final SubpixelVelocityUserSeed growthtracker = new SubpixelVelocityUserSeed(source, linefinder,
-					PrevFrameparam, psf, framenumber, model, DoMask,jpb, thirdDimsize);
+					PrevFrameparam, psf, framenumber, model, DoMask,jpb, thirdDimsize, startframe);
 			growthtracker.setIntensityratio(intensityratio);
 			growthtracker.setInispacing(Inispacing);
+			growthtracker.setMaxdist(maxdist);
 			growthtracker.checkInput();
 			growthtracker.process();
 			Accountedframes  = growthtracker.getAccountedframes();

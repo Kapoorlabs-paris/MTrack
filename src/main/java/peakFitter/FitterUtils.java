@@ -92,14 +92,12 @@ public class FitterUtils {
 		
 		int labelindex = -1;
 		for (int index = 0; index < imgs.size(); ++index){
-			if(imgs.get(index).intimg != null)
-				labelindex = label;
-			else{
+			
 			if (imgs.get(index).roilabel == label){
 		
 			labelindex = index;
 			
-			}
+			
 			}
 		}
 		
@@ -114,14 +112,12 @@ public static int getlabelindexSeed(final ArrayList<CommonOutput> imgs, int labe
 		
 		int labelindex = -1;
 		for (int index = 0; index < imgs.size(); ++index){
-			if(imgs.get(index).intimg != null)
-				labelindex = label;
-			else{
+			
 			if (imgs.get(index).roilabel == label){
 		
 			labelindex = index;
 			
-			}
+			
 			}
 		}
 		

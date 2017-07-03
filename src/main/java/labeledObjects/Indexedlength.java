@@ -21,10 +21,13 @@ public final class Indexedlength {
 	public final double[] originalds;
 	
 
+
+
 	public Indexedlength(final int currentLabel, final int seedLabel, final int framenumber,
 			final double ds, final double lineintensity, final double background,
 			final double[] currentpos, final double[] fixedpos, 
-			final double slope, final double intercept, final double originalslope, final double originalintercept, final double[] originalds) {
+			final double slope, final double intercept,
+			final double originalslope, final double originalintercept, final double[] originalds) {
 		this.currentLabel = currentLabel;
 		this.seedLabel = seedLabel;
 		this.framenumber = framenumber;
@@ -44,6 +47,7 @@ public final class Indexedlength {
 		
 	}
 
+	
 	public Indexedlength(final int currentLabel, final int seedLabel, final int framenumber,
 			final double ds, final double lineintensity, final double background,
 			final double[] currentpos, final double[] fixedpos, 
@@ -64,9 +68,8 @@ public final class Indexedlength {
 		this.Curvature = Curvature;
 		this.Inflection = Inflection;
 		this.originalds = originalds;
-
+		
 		
 	}
-	
 	
 }

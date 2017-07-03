@@ -44,7 +44,7 @@ import preProcessing.GetLocalmaxmin;
 import util.Boundingboxes;
 
 public class SubpixelVelocityCline extends BenchmarkAlgorithm
-implements OutputAlgorithm<Pair<ArrayList<Indexedlength>, ArrayList<Indexedlength>>> {
+		implements OutputAlgorithm<Pair<ArrayList<Indexedlength>, ArrayList<Indexedlength>>> {
 
 	private static final String BASE_ERROR_MSG = "[SubpixelVelocity] ";
 	private final RandomAccessibleInterval<FloatType> source;
@@ -59,17 +59,17 @@ implements OutputAlgorithm<Pair<ArrayList<Indexedlength>, ArrayList<Indexedlengt
 	private ArrayList<Trackproperties> endinframe;
 	private final double[] psf;
 	private final UserChoiceModel model;
-	
+
 	final JProgressBar jpb;
 	private boolean Maskfail = false;
 	// LM solver iteration params
-	public int maxiter = 500;
+	public int maxiter = 200;
 	public double lambda = 1e-3;
-	 public double termepsilon = 1e-1;
-	//Mask fits iteration param
-	 int iterations = 500;
-	 private final boolean DoMask;
-	public double cutoffdistance = 20;
+	public double termepsilon = 1e-1;
+	// Mask fits iteration param
+	int iterations = 200;
+	private final boolean DoMask;
+	public double cutoffdistance = 15;
 	public boolean halfgaussian = false;
 	public double Intensityratio;
 	private final HashMap<Integer, Whichend> Trackstart;
@@ -88,59 +88,55 @@ implements OutputAlgorithm<Pair<ArrayList<Indexedlength>, ArrayList<Indexedlengt
 
 		return Inispacing;
 	}
+
 	public void setCutoffdistance(double cutoffdistance) {
 		this.cutoffdistance = cutoffdistance;
 	}
+
 	public double getCutoffdistance() {
 		return cutoffdistance;
 	}
-	
+
 	public void setIntensityratio(double intensityratio) {
 		Intensityratio = intensityratio;
 	}
-	
+
 	public double getIntensityratio() {
 		return Intensityratio;
 	}
+
 	public void setMaxiter(int maxiter) {
 		this.maxiter = maxiter;
 	}
-	
+
 	public int getMaxiter() {
 		return maxiter;
 	}
-	
+
 	public void setLambda(double lambda) {
 		this.lambda = lambda;
 	}
-	
+
 	public double getLambda() {
 		return lambda;
 	}
-	
+
 	public void setTermepsilon(double termepsilon) {
 		this.termepsilon = termepsilon;
 	}
-	
+
 	public double getTermepsilon() {
 		return termepsilon;
 	}
-	
+
 	public void setHalfgaussian(boolean halfgaussian) {
 		this.halfgaussian = halfgaussian;
 	}
-	
-	public  SubpixelVelocityCline(final RandomAccessibleInterval<FloatType> source, 
-			                      final LinefinderHF finder,
-			                       final ArrayList<Indexedlength> PrevFrameparamstart,
-			                       final ArrayList<Indexedlength> PrevFrameparamend,
-			                       final double[] psf,
-			                       final int framenumber,
-			                       final UserChoiceModel model,
-			                       final boolean DoMask,
-			                       final HashMap<Integer, Whichend> Trackstart,
-			                       final JProgressBar jpb,
-			                       final int thirdDimsize) {
+
+	public SubpixelVelocityCline(final RandomAccessibleInterval<FloatType> source, final LinefinderHF finder,
+			final ArrayList<Indexedlength> PrevFrameparamstart, final ArrayList<Indexedlength> PrevFrameparamend,
+			final double[] psf, final int framenumber, final UserChoiceModel model, final boolean DoMask,
+			final HashMap<Integer, Whichend> Trackstart, final JProgressBar jpb, final int thirdDimsize) {
 		finder.checkInput();
 		finder.process();
 		imgs = finder.getResult();
@@ -155,9 +151,9 @@ implements OutputAlgorithm<Pair<ArrayList<Indexedlength>, ArrayList<Indexedlengt
 		this.ndims = source.numDimensions();
 		this.Trackstart = Trackstart;
 		this.thirdDimsize = thirdDimsize;
-		
+
 	}
-	
+
 	@Override
 	public boolean checkInput() {
 		if (source.numDimensions() > 2) {
@@ -177,18 +173,15 @@ implements OutputAlgorithm<Pair<ArrayList<Indexedlength>, ArrayList<Indexedlengt
 		final_paramlistend = new ArrayList<Indexedlength>();
 		startinframe = new ArrayList<Trackproperties>();
 		endinframe = new ArrayList<Trackproperties>();
-		
+
 		for (int index = 0; index < PrevFrameparamstart.size(); ++index) {
 
 			final int oldframenumber = PrevFrameparamstart.get(PrevFrameparamstart.size() - 1).framenumber;
 			final int framediff = framenumber - oldframenumber;
-			
-			
-			
+
 			if (Trackstart.get(PrevFrameparamstart.get(index).seedLabel) == Whichend.start
 					|| Trackstart.get(PrevFrameparamstart.get(index).seedLabel) == Whichend.both) {
-				
-				
+
 				percent = (Math.round(100 * (index + 1) / (PrevFrameparamstart.size())));
 
 				final double originalslope = PrevFrameparamstart.get(index).originalslope;
@@ -202,53 +195,55 @@ implements OutputAlgorithm<Pair<ArrayList<Indexedlength>, ArrayList<Indexedlengt
 				final OvalRoi Bigroi = new OvalRoi(Util.round(PrevFrameparamstart.get(index).currentpos[0] - 2.5),
 						Util.round(PrevFrameparamstart.get(index).currentpos[1] - 2.5), Util.round(5), Util.round(5));
 				onlyroi.add(Bigroi);
-				
-				
-				
-				
 
 				final Point fixedstartpoint = new Point(ndims);
 				fixedstartpoint.setPosition(new long[] { (long) PrevFrameparamstart.get(index).fixedpos[0],
 						(long) PrevFrameparamstart.get(index).fixedpos[1] });
 
-				ArrayList<Integer> labelstart = FitterUtils.Getlabel(imgs, fixedstartpoint, originalslope, originalintercept);
+				ArrayList<Integer> labelstart = FitterUtils.Getlabel(imgs, fixedstartpoint, originalslope,
+						originalintercept);
 				Indexedlength paramnextframe;
-				
+
 				int labelindex = Integer.MIN_VALUE;
-				
+
 				if (labelstart.size() > 0)
-				
+
 					labelindex = labelstart.get(0);
-				
-				if (labelindex != Integer.MIN_VALUE){
-				paramnextframe	= Getfinaltrackparam(PrevFrameparamstart.get(index), labelstart.get(0), psf, framenumber,
-						StartorEnd.Start);
-				
-				double min = Double.MAX_VALUE;
-				double distmin = Double.MAX_VALUE;
-				if (labelstart.size() > 1){
-				for (int j = 0; j < labelstart.size(); ++j){
-					System.out.println("Fitting multiple Labels");
-					Indexedlength test = Getfinaltrackparam(PrevFrameparamstart.get(index), labelstart.get(j), psf, framenumber,
-							StartorEnd.Start);
-					double[] currentpos = test.currentpos;
-					double[] fixedpos = test.fixedpos;
-					double pointonline = currentpos[1] - test.originalslope * currentpos[0] - test.originalintercept;
-					double dist = Distance(currentpos, fixedpos) ;
-					if (Math.abs(pointonline) < min && dist < distmin){
-						min = Math.abs(pointonline);
-						distmin = dist;
-						labelindex = j;
-						paramnextframe = test;
+
+				if (labelindex != Integer.MIN_VALUE) {
+					paramnextframe = Getfinaltrackparam(PrevFrameparamstart.get(index), labelstart.get(0), psf,
+							framenumber, StartorEnd.Start);
+
+					double min = Double.MAX_VALUE;
+					double distmin = Double.MAX_VALUE;
+					if (labelstart.size() > 1) {
+						for (int j = 0; j < labelstart.size(); ++j) {
+							System.out.println("Fitting multiple Labels");
+							Indexedlength test = Getfinaltrackparam(PrevFrameparamstart.get(index), labelstart.get(j),
+									psf, framenumber, StartorEnd.Start);
+							double[] currentpos = test.currentpos;
+							double[] fixedpos = test.fixedpos;
+							double pointonline = currentpos[1] - test.originalslope * currentpos[0]
+									- test.originalintercept;
+							double dist = Distance(currentpos, fixedpos);
+							if (Math.abs(pointonline) < min) {
+								min = Math.abs(pointonline);
+								if (dist < distmin) {
+									distmin = dist;
+									labelindex = j;
+									paramnextframe = test;
+								}
+							}
+						}
 					}
 				}
-				}
-				}
-				
-			//	if (labelindex != Integer.MIN_VALUE)
 
-//					paramnextframestart = Getfinaltrackparam(PrevFrameparamstart.get(index), labelindex, psf,
-	//						framenumber, StartorEnd.Start);
+				// if (labelindex != Integer.MIN_VALUE)
+
+				// paramnextframestart =
+				// Getfinaltrackparam(PrevFrameparamstart.get(index),
+				// labelindex, psf,
+				// framenumber, StartorEnd.Start);
 				else
 					paramnextframe = PrevFrameparamstart.get(index);
 				if (paramnextframe == null)
@@ -272,7 +267,7 @@ implements OutputAlgorithm<Pair<ArrayList<Indexedlength>, ArrayList<Indexedlengt
 			}
 
 		}
-				 
+
 		for (int index = 0; index < PrevFrameparamend.size(); ++index) {
 			final int oldframenumber = PrevFrameparamend.get(PrevFrameparamend.size() - 1).framenumber;
 			final int framediff = framenumber - oldframenumber;
@@ -292,46 +287,47 @@ implements OutputAlgorithm<Pair<ArrayList<Indexedlength>, ArrayList<Indexedlengt
 				final OvalRoi Bigroi = new OvalRoi(Util.round(PrevFrameparamend.get(index).currentpos[0] - 2.5),
 						Util.round(PrevFrameparamend.get(index).currentpos[1] - 2.5), Util.round(5), Util.round(5));
 				onlyroi.add(Bigroi);
-				
-
-				
 
 				final double originalslopeend = PrevFrameparamend.get(index).originalslope;
 
 				final double originalinterceptend = PrevFrameparamend.get(index).originalintercept;
-				ArrayList<Integer> labelend = FitterUtils.Getlabel(imgs, fixedendpoint, originalslopeend, originalinterceptend);
+				ArrayList<Integer> labelend = FitterUtils.Getlabel(imgs, fixedendpoint, originalslopeend,
+						originalinterceptend);
 				Indexedlength paramnextframeend;
-                int labelindex = Integer.MIN_VALUE;
-				
-				if (labelend.size() > 0)
-				
-					labelindex = labelend.get(0);
-				if (labelindex != Integer.MIN_VALUE){
-				paramnextframeend	= Getfinaltrackparam(PrevFrameparamend.get(index), labelend.get(0), psf, framenumber,
-						StartorEnd.End);
-				
-				double min = Double.MAX_VALUE;
-				double distmin = Double.MAX_VALUE;
-				if (labelend.size() > 1){
-				for (int j = 0; j < labelend.size(); ++j){
-					System.out.println("Fitting multiple Labels");
+				int labelindex = Integer.MIN_VALUE;
 
-					Indexedlength test = Getfinaltrackparam(PrevFrameparamend.get(index), labelend.get(j), psf, framenumber,
-							StartorEnd.End);
-					double[] currentpos = test.currentpos;
-					double[] fixedpos = test.fixedpos;
-					double pointonline = currentpos[1] - test.originalslope * currentpos[0] - test.originalintercept;
-					double dist = Distance(currentpos, fixedpos);
-					if (Math.abs(pointonline) < min && dist < distmin){
-						min = Math.abs(pointonline);
-						distmin = dist;
-						labelindex = j;
-						paramnextframeend = test;
+				if (labelend.size() > 0)
+
+					labelindex = labelend.get(0);
+				if (labelindex != Integer.MIN_VALUE) {
+					paramnextframeend = Getfinaltrackparam(PrevFrameparamend.get(index), labelend.get(0), psf,
+							framenumber, StartorEnd.End);
+
+					double min = Double.MAX_VALUE;
+					double distmin = Double.MAX_VALUE;
+					if (labelend.size() > 1) {
+						for (int j = 0; j < labelend.size(); ++j) {
+							System.out.println("Fitting multiple Labels");
+
+							Indexedlength test = Getfinaltrackparam(PrevFrameparamend.get(index), labelend.get(j), psf,
+									framenumber, StartorEnd.End);
+							double[] currentpos = test.currentpos;
+							double[] fixedpos = test.fixedpos;
+							double pointonline = currentpos[1] - test.originalslope * currentpos[0]
+									- test.originalintercept;
+							double dist = Distance(currentpos, fixedpos);
+							if (Math.abs(pointonline) < min) {
+								min = Math.abs(pointonline);
+								if (dist < distmin) {
+									distmin = dist;
+									labelindex = j;
+									paramnextframeend = test;
+								}
+							}
+						}
 					}
 				}
-				}
-				}
-					
+
 				else
 					paramnextframeend = PrevFrameparamend.get(index);
 				if (paramnextframeend == null)
@@ -355,7 +351,6 @@ implements OutputAlgorithm<Pair<ArrayList<Indexedlength>, ArrayList<Indexedlengt
 
 			}
 		}
-		
 
 		return false;
 	}
@@ -368,7 +363,7 @@ implements OutputAlgorithm<Pair<ArrayList<Indexedlength>, ArrayList<Indexedlengt
 
 		return listpair;
 	}
-	
+
 	public ArrayList<Trackproperties> getstartStateVectors() {
 		return startinframe;
 	}
@@ -376,134 +371,129 @@ implements OutputAlgorithm<Pair<ArrayList<Indexedlength>, ArrayList<Indexedlengt
 	public ArrayList<Trackproperties> getendStateVectors() {
 		return endinframe;
 	}
-	
+
 	public enum StartorEnd {
 
 		Start, End
 
 	}
+
 	private final double[] MakerepeatedLineguess(Indexedlength iniparam, int label) {
 
 		double[] minVal = new double[ndims];
 		double[] maxVal = new double[ndims];
-		
+
 		int labelindex = FitterUtils.getlabelindex(imgs, label);
-		
-		if (labelindex!=-1){
-		
-		RandomAccessibleInterval<FloatType> currentimg  = imgs.get(labelindex).Roi;
-		FinalInterval interval =  imgs.get(labelindex).interval;
-			
-		
-		 
 
-		
+		if (labelindex != -1) {
 
-		currentimg = Views.interval(currentimg, interval);
+			RandomAccessibleInterval<FloatType> currentimg = imgs.get(labelindex).Roi;
+			FinalInterval interval = imgs.get(labelindex).interval;
 
-		final double maxintensityline = GetLocalmaxmin.computeMaxIntensity(currentimg);
-		final double minintensityline = 0;
-		Pair<double[], double[]> minmaxpair = FitterUtils.MakeinitialEndpointguess(imgs, maxintensityline,
-				Intensityratio, ndims, labelindex, iniparam.originalslope, iniparam.originalintercept, iniparam.Curvature,
-				iniparam.Inflection);
-		for (int d = 0; d < ndims; ++d) {
+			currentimg = Views.interval(currentimg, interval);
 
-			minVal[d] = minmaxpair.getA()[d];
-			maxVal[d] = minmaxpair.getB()[d];
-
-		}
-
-		if (model == UserChoiceModel.Line) {
-
-			final double[] MinandMax = new double[2 * ndims + 3];
-
+			final double maxintensityline = GetLocalmaxmin.computeMaxIntensity(currentimg);
+			final double minintensityline = 0;
+			Pair<double[], double[]> minmaxpair = FitterUtils.MakeinitialEndpointguess(imgs, maxintensityline,
+					Intensityratio, ndims, labelindex, iniparam.originalslope, iniparam.originalintercept,
+					iniparam.Curvature, iniparam.Inflection);
 			for (int d = 0; d < ndims; ++d) {
 
-				MinandMax[d] = minVal[d];
-				MinandMax[d + ndims] = maxVal[d];
-			}
-
-			MinandMax[2 * ndims] = Inispacing;
-			MinandMax[2 * ndims + 1] = maxintensityline;
-			MinandMax[2 * ndims + 2] = minintensityline;
-			for (int d = 0; d < ndims; ++d) {
-
-				if (MinandMax[d] == Double.MAX_VALUE || MinandMax[d + ndims] == -Double.MIN_VALUE)
-					return null;
-				if (MinandMax[d] >= source.dimension(d) || MinandMax[d + ndims] >= source.dimension(d))
-					return null;
-				if (MinandMax[d] <= 0 || MinandMax[d + ndims] <= 0)
-					return null;
+				minVal[d] = minmaxpair.getA()[d];
+				maxVal[d] = minmaxpair.getB()[d];
 
 			}
-			return MinandMax;
-		}
 
-		if (model == UserChoiceModel.Splineordersec) {
+			if (model == UserChoiceModel.Line) {
 
-			final double[] MinandMax = new double[2 * ndims + 4];
+				final double[] MinandMax = new double[2 * ndims + 3];
 
-			for (int d = 0; d < ndims; ++d) {
+				for (int d = 0; d < ndims; ++d) {
 
-				MinandMax[d] = minVal[d];
-				MinandMax[d + ndims] = maxVal[d];
+					MinandMax[d] = minVal[d];
+					MinandMax[d + ndims] = maxVal[d];
+				}
+
+				MinandMax[2 * ndims] = Inispacing;
+				MinandMax[2 * ndims + 1] = maxintensityline;
+				MinandMax[2 * ndims + 2] = minintensityline;
+				for (int d = 0; d < ndims; ++d) {
+
+					if (MinandMax[d] == Double.MAX_VALUE || MinandMax[d + ndims] == -Double.MIN_VALUE)
+						return null;
+					if (MinandMax[d] >= source.dimension(d) || MinandMax[d + ndims] >= source.dimension(d))
+						return null;
+					if (MinandMax[d] <= 0 || MinandMax[d + ndims] <= 0)
+						return null;
+
+				}
+				return MinandMax;
 			}
 
-			MinandMax[2 * ndims + 2] = maxintensityline;
-			MinandMax[2 * ndims + 3] = minintensityline;
-			MinandMax[2 * ndims + 1] = iniparam.Curvature;
-			MinandMax[2 * ndims] = Inispacing;
+			if (model == UserChoiceModel.Splineordersec) {
 
-			for (int d = 0; d < ndims; ++d) {
+				final double[] MinandMax = new double[2 * ndims + 4];
 
-				if (MinandMax[d] == Double.MAX_VALUE || MinandMax[d + ndims] == -Double.MIN_VALUE)
-					return null;
-				if (MinandMax[d] >= source.dimension(d) || MinandMax[d + ndims] >= source.dimension(d))
-					return null;
-				if (MinandMax[d] <= 0 || MinandMax[d + ndims] <= 0)
-					return null;
+				for (int d = 0; d < ndims; ++d) {
 
+					MinandMax[d] = minVal[d];
+					MinandMax[d + ndims] = maxVal[d];
+				}
+
+				MinandMax[2 * ndims + 2] = maxintensityline;
+				MinandMax[2 * ndims + 3] = minintensityline;
+				MinandMax[2 * ndims + 1] = iniparam.Curvature;
+				MinandMax[2 * ndims] = Inispacing;
+
+				for (int d = 0; d < ndims; ++d) {
+
+					if (MinandMax[d] == Double.MAX_VALUE || MinandMax[d + ndims] == -Double.MIN_VALUE)
+						return null;
+					if (MinandMax[d] >= source.dimension(d) || MinandMax[d + ndims] >= source.dimension(d))
+						return null;
+					if (MinandMax[d] <= 0 || MinandMax[d + ndims] <= 0)
+						return null;
+
+				}
+				return MinandMax;
 			}
-			return MinandMax;
-		}
-		if (model == UserChoiceModel.Splineorderthird) {
+			if (model == UserChoiceModel.Splineorderthird) {
 
-			final double[] MinandMax = new double[2 * ndims + 5];
+				final double[] MinandMax = new double[2 * ndims + 5];
 
-			for (int d = 0; d < ndims; ++d) {
+				for (int d = 0; d < ndims; ++d) {
 
-				MinandMax[d] = minVal[d];
-				MinandMax[d + ndims] = maxVal[d];
+					MinandMax[d] = minVal[d];
+					MinandMax[d + ndims] = maxVal[d];
+				}
+
+				MinandMax[2 * ndims + 2] = iniparam.Inflection;
+				MinandMax[2 * ndims + 3] = maxintensityline;
+				MinandMax[2 * ndims + 4] = minintensityline;
+				MinandMax[2 * ndims + 1] = iniparam.Curvature;
+				MinandMax[2 * ndims] = Inispacing;
+
+				for (int d = 0; d < ndims; ++d) {
+
+					if (MinandMax[d] == Double.MAX_VALUE || MinandMax[d + ndims] == -Double.MIN_VALUE)
+						return null;
+					if (MinandMax[d] >= source.dimension(d) || MinandMax[d + ndims] >= source.dimension(d))
+						return null;
+					if (MinandMax[d] <= 0 || MinandMax[d + ndims] <= 0)
+						return null;
+
+				}
+				return MinandMax;
 			}
 
-			MinandMax[2 * ndims + 2] = iniparam.Inflection;
-			MinandMax[2 * ndims + 3] = maxintensityline;
-			MinandMax[2 * ndims + 4] = minintensityline;
-			MinandMax[2 * ndims + 1] = iniparam.Curvature;
-			MinandMax[2 * ndims] = Inispacing;
-
-			for (int d = 0; d < ndims; ++d) {
-
-				if (MinandMax[d] == Double.MAX_VALUE || MinandMax[d + ndims] == -Double.MIN_VALUE)
-					return null;
-				if (MinandMax[d] >= source.dimension(d) || MinandMax[d + ndims] >= source.dimension(d))
-					return null;
-				if (MinandMax[d] <= 0 || MinandMax[d + ndims] <= 0)
-					return null;
-
-			}
-			return MinandMax;
+			else
+				return null;
 		}
 
 		else
 			return null;
-		}
-		
-		else 
-			return null;
 	}
 
-	
 	public Indexedlength Getfinaltrackparam(final Indexedlength iniparam, final int label, final double[] psf,
 			final int rate, final StartorEnd startorend) {
 
@@ -515,9 +505,8 @@ implements OutputAlgorithm<Pair<ArrayList<Indexedlength>, ArrayList<Indexedlengt
 
 			final double[] inipos = iniparam.currentpos;
 
-			
-			int labelindex = FitterUtils.getlabelindex(imgs,label);
-			
+			int labelindex = FitterUtils.getlabelindex(imgs, label);
+
 			RandomAccessibleInterval<FloatType> currentimg = imgs.get(labelindex).Actualroi;
 
 			FinalInterval interval = imgs.get(labelindex).interval;
@@ -551,8 +540,6 @@ implements OutputAlgorithm<Pair<ArrayList<Indexedlength>, ArrayList<Indexedlengt
 
 				index++;
 			}
-
-	
 
 			System.out.println("Label: " + label + " " + "Initial guess: " + " StartX: " + LMparam[0] + " StartY: "
 					+ LMparam[1] + " EndX: " + LMparam[2] + " EndY: " + LMparam[3]);
@@ -618,8 +605,6 @@ implements OutputAlgorithm<Pair<ArrayList<Indexedlength>, ArrayList<Indexedlengt
 
 			}
 
-			
-		
 			final int seedLabel = iniparam.seedLabel;
 
 			if (model == UserChoiceModel.Line) {
@@ -638,7 +623,7 @@ implements OutputAlgorithm<Pair<ArrayList<Indexedlength>, ArrayList<Indexedlengt
 
 						sigmas += psf[d] * psf[d];
 					}
-					final int numgaussians = (int) Math.max(0.5 * Math.round(Math.sqrt(sigmas) / ds), 2);
+					final int numgaussians = (int) Math.min(Math.round(Math.sqrt(sigmas) / ds), 4);
 
 					double[] startfit = startpos;
 					double[] endfit = endpos;
@@ -690,10 +675,10 @@ implements OutputAlgorithm<Pair<ArrayList<Indexedlength>, ArrayList<Indexedlengt
 
 					}
 
-					
 					Indexedlength PointofInterest = new Indexedlength(label, seedLabel, framenumber, LMparam[2 * ndims],
 							LMparam[2 * ndims + 1], LMparam[2 * ndims + 2], startfit, iniparam.fixedpos, newslope,
-							newintercept, iniparam.originalslope, iniparam.originalintercept, iniparam.originalds);
+							newintercept, iniparam.originalslope, iniparam.originalintercept, iniparam.originalds
+							);
 					if (Maskfail == true)
 						System.out.println("New XLM: " + startfit[0] + " New YLM: " + startfit[1]);
 					else
@@ -719,7 +704,7 @@ implements OutputAlgorithm<Pair<ArrayList<Indexedlength>, ArrayList<Indexedlengt
 
 						sigmas += psf[d] * psf[d];
 					}
-					final int numgaussians = (int) Math.max(0.5 * Math.round(Math.sqrt(sigmas) / ds), 2);
+					final int numgaussians = (int) Math.min(Math.round(Math.sqrt(sigmas) / ds), 4);
 
 					double[] endfit = endpos;
 					double[] startfit = startpos;
@@ -772,11 +757,11 @@ implements OutputAlgorithm<Pair<ArrayList<Indexedlength>, ArrayList<Indexedlengt
 						}
 
 					}
-				
 
 					Indexedlength PointofInterest = new Indexedlength(label, seedLabel, framenumber, LMparam[2 * ndims],
 							LMparam[2 * ndims + 1], LMparam[2 * ndims + 2], endfit, iniparam.fixedpos, newslope,
-							newintercept, iniparam.originalslope, iniparam.originalintercept, iniparam.originalds);
+							newintercept, iniparam.originalslope, iniparam.originalintercept, iniparam.originalds
+							);
 
 					if (Maskfail == true)
 						System.out.println("New XLM: " + endfit[0] + " New YLM: " + endfit[1]);
@@ -786,8 +771,6 @@ implements OutputAlgorithm<Pair<ArrayList<Indexedlength>, ArrayList<Indexedlengt
 
 					FitterUtils.SetProgressBarTime(jpb, percent, framenumber, thirdDimsize);
 
-					
-					
 					return PointofInterest;
 
 				}
@@ -825,8 +808,9 @@ implements OutputAlgorithm<Pair<ArrayList<Indexedlength>, ArrayList<Indexedlengt
 						sigmas += psf[d] * psf[d];
 					}
 
-					final int numgaussians = (int) Math.max(0.5 * Math.round(Math.sqrt(sigmas) / ds), 2);
+					final int numgaussians = (int) Math.min(Math.round(Math.sqrt(sigmas) / ds), 4);
 
+					
 					if (DoMask) {
 
 						try {
@@ -882,8 +866,6 @@ implements OutputAlgorithm<Pair<ArrayList<Indexedlength>, ArrayList<Indexedlengt
 						}
 
 					}
-
-				
 
 					System.out.println("Curvature: " + Curvature);
 
@@ -931,8 +913,10 @@ implements OutputAlgorithm<Pair<ArrayList<Indexedlength>, ArrayList<Indexedlengt
 						sigmas += psf[d] * psf[d];
 					}
 
-					final int numgaussians = (int) Math.max(0.5 * Math.round(Math.sqrt(sigmas) / ds), 2);
+					final int numgaussians = (int) Math.min(Math.round(Math.sqrt(sigmas) / ds), 4);
 
+					
+					
 					if (DoMask) {
 
 						try {
@@ -986,8 +970,6 @@ implements OutputAlgorithm<Pair<ArrayList<Indexedlength>, ArrayList<Indexedlengt
 						}
 
 					}
-
-				
 
 					Indexedlength PointofInterest = new Indexedlength(label, seedLabel, framenumber, ds, lineIntensity,
 							background, endfit, iniparam.fixedpos, newslope, currentintercept, iniparam.originalslope,
@@ -1040,8 +1022,9 @@ implements OutputAlgorithm<Pair<ArrayList<Indexedlength>, ArrayList<Indexedlengt
 						sigmas += psf[d] * psf[d];
 					}
 
-					final int numgaussians = (int) Math.max(0.5 * Math.round(Math.sqrt(sigmas) / ds), 2);
+					final int numgaussians = (int) Math.min(Math.round(Math.sqrt(sigmas) / ds), 4);
 
+					
 					if (DoMask) {
 
 						try {
@@ -1092,8 +1075,6 @@ implements OutputAlgorithm<Pair<ArrayList<Indexedlength>, ArrayList<Indexedlengt
 							}
 						}
 					}
-
-				
 
 					System.out.println("Curvature: " + Curvature);
 					System.out.println("Inflection: " + Inflection);
@@ -1148,8 +1129,9 @@ implements OutputAlgorithm<Pair<ArrayList<Indexedlength>, ArrayList<Indexedlengt
 						sigmas += psf[d] * psf[d];
 					}
 
-					final int numgaussians = (int) Math.max(0.5 * Math.round(Math.sqrt(sigmas) / ds), 2);
+					final int numgaussians = (int) Math.min(Math.round(Math.sqrt(sigmas) / ds), 4);
 
+					
 					if (DoMask) {
 
 						try {
@@ -1204,8 +1186,6 @@ implements OutputAlgorithm<Pair<ArrayList<Indexedlength>, ArrayList<Indexedlengt
 
 					}
 
-				
-
 					Indexedlength PointofInterest = new Indexedlength(label, seedLabel, framenumber, ds, lineIntensity,
 							background, endfit, iniparam.fixedpos, newslope, currentintercept, iniparam.originalslope,
 							iniparam.originalintercept, Curvature, Inflection, iniparam.originalds);
@@ -1217,25 +1197,16 @@ implements OutputAlgorithm<Pair<ArrayList<Indexedlength>, ArrayList<Indexedlengt
 
 					FitterUtils.SetProgressBarTime(jpb, percent, framenumber, thirdDimsize);
 
-					
-					
-					
-					
 					return PointofInterest;
 
 				}
-				
-				
-				
+
 			} else
 				return null;
 
-			
-			}
-			
-		
+		}
+
 	}
-	
 
 	private PointSampleList<FloatType> gatherfullData(final int label) {
 		final PointSampleList<FloatType> datalist = new PointSampleList<FloatType>(ndims);
@@ -1243,14 +1214,14 @@ implements OutputAlgorithm<Pair<ArrayList<Indexedlength>, ArrayList<Indexedlengt
 		RandomAccessibleInterval<FloatType> currentimg = imgs.get(label).Actualroi;
 
 		FinalInterval interval = imgs.get(label).interval;
-		
+
 		currentimg = Views.interval(currentimg, interval);
-		
+
 		Cursor<FloatType> localcursor = Views.iterable(currentimg).localizingCursor();
 
 		while (localcursor.hasNext()) {
 			localcursor.fwd();
-			
+
 			Point newpoint = new Point(localcursor);
 			datalist.add(newpoint, localcursor.get().copy());
 
@@ -1258,27 +1229,25 @@ implements OutputAlgorithm<Pair<ArrayList<Indexedlength>, ArrayList<Indexedlengt
 
 		return datalist;
 	}
+
 	public ArrayList<Integer> Getlabel(final Point linepoint) {
 
-		
 		ArrayList<Integer> currentlabel = new ArrayList<Integer>();
-		for (int index = 0; index < imgs.size(); ++index){
-			
+		for (int index = 0; index < imgs.size(); ++index) {
+
 			RandomAccessibleInterval<FloatType> currentimg = imgs.get(index).Actualroi;
 			FinalInterval interval = imgs.get(index).interval;
 			currentimg = Views.interval(currentimg, interval);
-			for (int d = 0; d < ndims; ++d){
-				
-				if (linepoint.getIntPosition(d) >= interval.min(d) && linepoint.getIntPosition(d)<= interval.max(d)){
-					
+			for (int d = 0; d < ndims; ++d) {
+
+				if (linepoint.getIntPosition(d) >= interval.min(d) && linepoint.getIntPosition(d) <= interval.max(d)) {
+
 					currentlabel.add(index);
 				}
-			
+
 			}
-			
+
 		}
-		
-	
 
 		return currentlabel;
 	}
@@ -1306,5 +1275,5 @@ implements OutputAlgorithm<Pair<ArrayList<Indexedlength>, ArrayList<Indexedlengt
 		}
 		return (distance);
 	}
-	
+
 }

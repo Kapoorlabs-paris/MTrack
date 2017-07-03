@@ -203,6 +203,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public double Intensityratio = 0.5;
 	public double slopetolerance = 5;
 	public double Inispacing = 0.5;
+	public double maxdist = 20;
 	public int thirdDimensionslider = 1;
 	public int thirdDimensionsliderInit = 1;
 	public int timeMin = 1;
@@ -2355,6 +2356,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		gd.addNumericField("Initial guess for Min Pixel Intensity (MinPI) belonging to MT (  R =  MinPI / MaxPI), R (enter 0.2 to 0.9) = ", Intensityratio, 2);
 		gd.addNumericField("Initial Spacing between Gaussians along the Polynomial curve = G * Min(Psf), G (enter positive number) = ",
 				Inispacing / Math.min(psf[0], psf[1]), 2);
+		gd.addNumericField("Maximum distance allowed for tips to grow (pixels)", maxdist, 2);
 
 		if (analyzekymo && Kymoimg != null) {
 			gd.addNumericField("On an average, maximum difference in pixels between Kymograph and Program generated curve = ", deltadcutoff, 2);
@@ -2372,6 +2374,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 			userChoiceModel = UserChoiceModel.Splineorderthird;
 		Intensityratio = gd.getNextNumber();
 		Inispacing = gd.getNextNumber() * Math.min(psf[0], psf[1]);
+		maxdist = gd.getNextNumber();
 
 		if (analyzekymo && Kymoimg != null)
 			deltadcutoff = (float) gd.getNextNumber();
@@ -2393,7 +2396,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		gd.addNumericField("Initial guess for Min Pixel Intensity (MinPI) belonging to MT (  R =  MinPI / MaxPI), R (enter 0.2 to 0.9) = ", Intensityratio, 2);
 		gd.addNumericField("Initial Spacing between Gaussians along the Polynomial curve = G * Min(Psf), G (enter positive number ) = ",
 				Inispacing / Math.min(psf[0], psf[1]), 2);
-		
+		gd.addNumericField("Maximum distance allowed for tips to grow (pixels) ", maxdist, 2);
 		gd.addStringField("Choose a different Directory?:", usefolder);
 		gd.addStringField("Choose a different filename?:", addToName);
 		gd.showDialog();
@@ -2410,6 +2413,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 			userChoiceModel = UserChoiceModel.Splineorderthird;
 		Intensityratio = gd.getNextNumber();
 		Inispacing = gd.getNextNumber() * Math.min(psf[0], psf[1]);
+		maxdist = gd.getNextNumber();
 
 		usefolder = gd.getNextString();
 		addToName = gd.getNextString();
