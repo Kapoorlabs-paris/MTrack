@@ -1,6 +1,7 @@
 package peakFitter;
 
 import drawandOverlay.AddGaussian;
+import ij.IJ;
 import net.imglib2.Cursor;
 import net.imglib2.IterableInterval;
 import net.imglib2.RandomAccessibleInterval;
@@ -51,6 +52,7 @@ public class GaussianMaskFitMSER {
 		final double bg = removeBackground(signalIterable);
 
 		double N = 0;
+		double Numphotons = 0;
 		double Nold = 0;
 		int i = 0;
 		do {
@@ -76,11 +78,14 @@ public class GaussianMaskFitMSER {
 			// compute the sums
 			final Cursor<FloatType> cMask = gaussianMask.cursor();
 			final Cursor<FloatType> cImg = signalIterable.localizingCursor();
-			double sumLocSN[] = new double[n]; // int_{all_px} d * S[ d ] * N[ d
+			double sumLocSN[] = new double[n]; // int_{all_px} d * S[ d ] * N[ d ]
 												// ]
 			double sumSN = 0; // int_{all_px} S[ d ] * N[ d ]
+			
 			double sumSS = 0; // int_{all_px} S[ d ] * S[ d ]
-
+            double sumNN = 0; // int_{all_px} N[ d ] * N[ d ]
+            double sumN = 0; // int_{all_px} N[ d ]    
+			
 			while (cMask.hasNext()) {
 				cMask.fwd();
 				cImg.fwd();
@@ -92,9 +97,11 @@ public class GaussianMaskFitMSER {
 				final double weight = 8;
 
 				final double signalmask = signal * mask * weight;
-
+			
 				sumSN += signalmask;
 				sumSS += signal * signal * weight;
+				sumNN += mask * mask * weight;
+				sumN += mask * weight;
 				
 				for (int d = 0; d < n; ++d) {
 					final double l = cImg.getDoublePosition(d);
@@ -107,6 +114,9 @@ public class GaussianMaskFitMSER {
 			Nold = N;	
 			N = sumSN / sumSS;
 
+			Numphotons = ( sumN * sumSN ) / ( sumNN   );
+		
+			
 			++i;
 			if (i >= iterations)
 				break;
@@ -117,6 +127,7 @@ public class GaussianMaskFitMSER {
 
 		// ImageJFunctions.show(gaussianMask);
 		
+		System.out.println("Number of photons on this pixel (Relative): " + Numphotons);
 		
 		
 		

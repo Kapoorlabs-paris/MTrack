@@ -27,7 +27,7 @@ import preProcessing.GetLocalmaxmin;
 import util.Boundingboxes;
 
 public class FitterUtils {
-	
+
 	public static double Distance(final double[] minCorner, final double[] maxCorner) {
 
 		double distance = 0;
@@ -39,100 +39,83 @@ public class FitterUtils {
 		}
 		return Math.sqrt(distance);
 	}
-	public static ArrayList<Integer> Getlabel(final ArrayList<CommonOutputHF> imgs,final Point fixedpoint, 
-			final double originalslope, final double originalintercept) {
 
+	public static ArrayList<Integer> Getlabel(final ArrayList<CommonOutputHF> imgs, final Point fixedpoint,
+			final double originalslope, final double originalintercept) {
 
 		int finallabel = Integer.MIN_VALUE;
 		ArrayList<Integer> alllabels = new ArrayList<Integer>();
-		
-		
-		
-		
+
 		for (int index = 0; index < imgs.size(); ++index) {
 
-				
-				
-				
-				
-				RandomAccessibleInterval<FloatType> currentimg = imgs.get(index).Actualroi;
-				FinalInterval interval = imgs.get(index).interval;
-				currentimg = Views.interval(currentimg, interval);
+			RandomAccessibleInterval<FloatType> currentimg = imgs.get(index).Actualroi;
+			FinalInterval interval = imgs.get(index).interval;
+			currentimg = Views.interval(currentimg, interval);
 
-				if (fixedpoint.getIntPosition(0) >= interval.min(0) && fixedpoint.getIntPosition(0) <= interval.max(0)
-						&& fixedpoint.getIntPosition(1) >= interval.min(1)
-						&& fixedpoint.getIntPosition(1) <= interval.max(1)) {
+			if (fixedpoint.getIntPosition(0) >= interval.min(0) && fixedpoint.getIntPosition(0) <= interval.max(0)
+					&& fixedpoint.getIntPosition(1) >= interval.min(1)
+					&& fixedpoint.getIntPosition(1) <= interval.max(1)) {
 
-					for (int i = 0; i < imgs.get(index).Allrois.size(); ++i){
-					
-						
-						EllipseRoi roi = imgs.get(index).Allrois.get(i);
-						
-						
-						if (roi.contains(fixedpoint.getIntPosition(0), fixedpoint.getIntPosition(1))){
-						
-						
-					finallabel = imgs.get(index).roilabel;
-					
-					alllabels.add(finallabel);
-						
-						}
-					
+				for (int i = 0; i < imgs.get(index).Allrois.size(); ++i) {
+
+					EllipseRoi roi = imgs.get(index).Allrois.get(i);
+
+					if (roi.contains(fixedpoint.getIntPosition(0), fixedpoint.getIntPosition(1))) {
+
+						finallabel = imgs.get(index).roilabel;
+
+						alllabels.add(finallabel);
+
 					}
-				}
 
+				}
 			}
+
+		}
 
 		return alllabels;
 	}
-	
-	public static int getlabelindex(final ArrayList<CommonOutputHF> imgs, int label){
-		
-		
-		
+
+	public static int getlabelindex(final ArrayList<CommonOutputHF> imgs, int label) {
+
 		int labelindex = -1;
-		for (int index = 0; index < imgs.size(); ++index){
-			
-			if (imgs.get(index).roilabel == label){
-		
-			labelindex = index;
-			
-			
+		for (int index = 0; index < imgs.size(); ++index) {
+
+			if (imgs.get(index).roilabel == label) {
+
+				labelindex = index;
+
 			}
 		}
-		
+
 		return labelindex;
-		
-		
+
 	}
-	
-public static int getlabelindexSeed(final ArrayList<CommonOutput> imgs, int label){
-		
-		
-		
+
+	public static int getlabelindexSeed(final ArrayList<CommonOutput> imgs, int label) {
+
 		int labelindex = -1;
-		for (int index = 0; index < imgs.size(); ++index){
-			
-			if (imgs.get(index).roilabel == label){
-		
-			labelindex = index;
-			
-			
+		for (int index = 0; index < imgs.size(); ++index) {
+
+			if (imgs.get(index).roilabel == label) {
+
+				labelindex = index;
+
 			}
 		}
-		
+
 		return labelindex;
-		
-		
+
 	}
-	public static PointSampleList<FloatType> gatherfullDataSeed(final ArrayList<CommonOutput> imgs, final int label, final int ndims) {
+
+	public static PointSampleList<FloatType> gatherfullDataSeed(final ArrayList<CommonOutput> imgs, final int label,
+			final int ndims) {
 		final PointSampleList<FloatType> datalist = new PointSampleList<FloatType>(ndims);
 
-		
 		int labelindex = getlabelindexSeed(imgs, label);
-		
+
 		RandomAccessibleInterval<FloatType> currentimg = imgs.get(labelindex).Actualroi;
-		
+
 		FinalInterval interval = imgs.get(labelindex).interval;
 
 		currentimg = Views.interval(currentimg, interval);
@@ -140,7 +123,7 @@ public static int getlabelindexSeed(final ArrayList<CommonOutput> imgs, int labe
 		Cursor<FloatType> localcursor = Views.iterable(currentimg).localizingCursor();
 
 		while (localcursor.hasNext()) {
-			
+
 			localcursor.fwd();
 
 			if (localcursor.get().get() > 0) {
@@ -151,14 +134,15 @@ public static int getlabelindexSeed(final ArrayList<CommonOutput> imgs, int labe
 
 		return datalist;
 	}
-	public static PointSampleList<FloatType> gatherfullData(final ArrayList<CommonOutputHF> imgs, final int label, final int ndims) {
+
+	public static PointSampleList<FloatType> gatherfullData(final ArrayList<CommonOutputHF> imgs, final int label,
+			final int ndims) {
 		final PointSampleList<FloatType> datalist = new PointSampleList<FloatType>(ndims);
 
-		
 		int labelindex = getlabelindex(imgs, label);
-		
+
 		RandomAccessibleInterval<FloatType> currentimg = imgs.get(labelindex).Actualroi;
-		
+
 		FinalInterval interval = imgs.get(labelindex).interval;
 
 		currentimg = Views.interval(currentimg, interval);
@@ -166,7 +150,7 @@ public static int getlabelindexSeed(final ArrayList<CommonOutput> imgs, int labe
 		Cursor<FloatType> localcursor = Views.iterable(currentimg).localizingCursor();
 
 		while (localcursor.hasNext()) {
-			
+
 			localcursor.fwd();
 
 			if (localcursor.get().get() > 0) {
@@ -177,13 +161,14 @@ public static int getlabelindexSeed(final ArrayList<CommonOutput> imgs, int labe
 
 		return datalist;
 	}
-	
-	public static final Pair<double[], double[]> MakeinitialEndpointguess(ArrayList<CommonOutputHF> imgs, double maxintensityline, 
-			double Intensityratio, int ndims, int label, double slope, double intercept, double Curvature, double Inflection){
+
+	public static final Pair<double[], double[]> MakeinitialEndpointguess(ArrayList<CommonOutputHF> imgs,
+			double maxintensityline, double Intensityratio, int ndims, int label, double slope, double intercept,
+			double Curvature, double Inflection) {
 		long[] newposition = new long[ndims];
 		double[] minVal = { Double.MAX_VALUE, Double.MAX_VALUE };
 		double[] maxVal = { -Double.MIN_VALUE, -Double.MIN_VALUE };
-		
+
 		RandomAccessibleInterval<FloatType> currentimg = imgs.get(label).Roi;
 
 		FinalInterval interval = imgs.get(label).interval;
@@ -191,140 +176,132 @@ public static int getlabelindexSeed(final ArrayList<CommonOutput> imgs, int labe
 		currentimg = Views.interval(currentimg, interval);
 
 		final Cursor<FloatType> outcursor = Views.iterable(currentimg).localizingCursor();
-		
-		
-		
+
 		while (outcursor.hasNext()) {
 
 			outcursor.fwd();
 
 			outcursor.localize(newposition);
-			
-			long pointonline = (int)Math.round(newposition[1] - slope * newposition[0]  - intercept);
-			if (Math.abs(pointonline) <= 50){
-			if (outcursor.getDoublePosition(0) <= minVal[0]
-					&& outcursor.get().get() / maxintensityline > Intensityratio ) {
-				minVal[0] = outcursor.getDoublePosition(0);
-				minVal[1] = outcursor.getDoublePosition(1);
-			}
 
-			if (outcursor.getDoublePosition(0) >= maxVal[0]
-					&& outcursor.get().get() / maxintensityline > Intensityratio ) {
-				maxVal[0] = outcursor.getDoublePosition(0);
-				maxVal[1] = outcursor.getDoublePosition(1);
-			
-		}
-			
-		}
-		}
-		Pair<double[], double[]> minmaxpair = new ValuePair<double[], double[]>(minVal, maxVal);
-		
-		return minmaxpair;
-		
-	}
-	
-	public static final Pair<double[], double[]> MakeinitialEndpointguessUser(ArrayList<CommonOutputHF> imgs, double maxintensityline, 
-			double Intensityratio, int ndims, int label, double slope, double intercept, double Curvature, double Inflection, int rate){
-		long[] newposition = new long[ndims];
-		double[] minVal = { Double.MAX_VALUE, Double.MAX_VALUE };
-		double[] maxVal = { -Double.MIN_VALUE, -Double.MIN_VALUE };
-		
-		RandomAccessibleInterval<FloatType> currentimg = imgs.get(label).Roi;
-
-		FinalInterval interval = imgs.get(label).interval;
-
-		currentimg = Views.interval(currentimg, interval);
-
-		final Cursor<FloatType> outcursor = Views.iterable(currentimg).localizingCursor();
-		
-		
-		
-		while (outcursor.hasNext()) {
-
-			outcursor.fwd();
-
-			outcursor.localize(newposition);
-			
-			long pointonline = (int)Math.round(newposition[1] - slope * newposition[0]  - intercept);
-			
-			if (rate < imgs.get(label).framenumber){
-				
+			long pointonline = (int) Math.round(newposition[1] - slope * newposition[0] - intercept);
+			if (Math.abs(pointonline) <= 50) {
 				if (outcursor.getDoublePosition(0) <= minVal[0]
-						&& outcursor.get().get() / maxintensityline > Intensityratio ) {
+						&& outcursor.get().get() / maxintensityline > Intensityratio) {
 					minVal[0] = outcursor.getDoublePosition(0);
 					minVal[1] = outcursor.getDoublePosition(1);
 				}
 
 				if (outcursor.getDoublePosition(0) >= maxVal[0]
-						&& outcursor.get().get() / maxintensityline > Intensityratio ) {
+						&& outcursor.get().get() / maxintensityline > Intensityratio) {
 					maxVal[0] = outcursor.getDoublePosition(0);
 					maxVal[1] = outcursor.getDoublePosition(1);
-				
-				}
-				
-			}
-			else{
-			if (Math.abs(pointonline) <= 50 ){
-			if (outcursor.getDoublePosition(0) <= minVal[0]
-					&& outcursor.get().get() / maxintensityline > Intensityratio ) {
-				minVal[0] = outcursor.getDoublePosition(0);
-				minVal[1] = outcursor.getDoublePosition(1);
-			}
 
-			if (outcursor.getDoublePosition(0) >= maxVal[0]
-					&& outcursor.get().get() / maxintensityline > Intensityratio ) {
-				maxVal[0] = outcursor.getDoublePosition(0);
-				maxVal[1] = outcursor.getDoublePosition(1);
-			
-			}
-		}
+				}
+
 			}
 		}
 		Pair<double[], double[]> minmaxpair = new ValuePair<double[], double[]>(minVal, maxVal);
-		
+
 		return minmaxpair;
-		
+
 	}
-	
-	public static void SetProgressBar(JProgressBar jpb, double percent){
-		
+
+	public static final Pair<double[], double[]> MakeinitialEndpointguessUser(ArrayList<CommonOutputHF> imgs,
+			double maxintensityline, double Intensityratio, int ndims, int label, double slope, double intercept,
+			double Curvature, double Inflection, int rate) {
+		long[] newposition = new long[ndims];
+		double[] minVal = { Double.MAX_VALUE, Double.MAX_VALUE };
+		double[] maxVal = { -Double.MIN_VALUE, -Double.MIN_VALUE };
+
+		RandomAccessibleInterval<FloatType> currentimg = imgs.get(label).Roi;
+
+		FinalInterval interval = imgs.get(label).interval;
+
+		currentimg = Views.interval(currentimg, interval);
+
+		final Cursor<FloatType> outcursor = Views.iterable(currentimg).localizingCursor();
+
+		while (outcursor.hasNext()) {
+
+			outcursor.fwd();
+
+			outcursor.localize(newposition);
+
+			long pointonline = (int) Math.round(newposition[1] - slope * newposition[0] - intercept);
+
+			if (rate < imgs.get(label).framenumber) {
+
+				if (outcursor.getDoublePosition(0) <= minVal[0]
+						&& outcursor.get().get() / maxintensityline > Intensityratio) {
+					minVal[0] = outcursor.getDoublePosition(0);
+					minVal[1] = outcursor.getDoublePosition(1);
+				}
+
+				if (outcursor.getDoublePosition(0) >= maxVal[0]
+						&& outcursor.get().get() / maxintensityline > Intensityratio) {
+					maxVal[0] = outcursor.getDoublePosition(0);
+					maxVal[1] = outcursor.getDoublePosition(1);
+
+				}
+
+			} else {
+				if (Math.abs(pointonline) <= 50) {
+					if (outcursor.getDoublePosition(0) <= minVal[0]
+							&& outcursor.get().get() / maxintensityline > Intensityratio) {
+						minVal[0] = outcursor.getDoublePosition(0);
+						minVal[1] = outcursor.getDoublePosition(1);
+					}
+
+					if (outcursor.getDoublePosition(0) >= maxVal[0]
+							&& outcursor.get().get() / maxintensityline > Intensityratio) {
+						maxVal[0] = outcursor.getDoublePosition(0);
+						maxVal[1] = outcursor.getDoublePosition(1);
+
+					}
+				}
+			}
+		}
+		Pair<double[], double[]> minmaxpair = new ValuePair<double[], double[]>(minVal, maxVal);
+
+		return minmaxpair;
+
+	}
+
+	public static void SetProgressBar(JProgressBar jpb, double percent) {
+
 		jpb.setValue((int) Math.round(percent));
 		jpb.setOpaque(true);
 		jpb.setStringPainted(true);
-		jpb.setString("Finding MT ends" );
-		
-		
+		jpb.setString("Finding MT ends");
+
 	}
-	
-public static void SetProgressBar(JProgressBar jpb){
-		
+
+	public static void SetProgressBar(JProgressBar jpb) {
+
 		jpb.setIndeterminate(true);
 		jpb.setOpaque(true);
 		jpb.setStringPainted(true);
-		jpb.setString("Pre-processing Image" );
-		
-		
+		jpb.setString("Pre-processing Image");
+
 	}
-	
-public static void SetProgressBarTime(JProgressBar jpb, double percent, int framenumber, int thirdDimsize){
-		
-	jpb.setValue((int) percent);
-	jpb.setOpaque(true);
-	jpb.setStringPainted(true);
-	jpb.setString("Time point = " + framenumber + "/" + thirdDimsize);
-		
-		
+
+	public static void SetProgressBarTime(JProgressBar jpb, double percent, int framenumber, int thirdDimsize) {
+
+		jpb.setValue((int) percent);
+		jpb.setOpaque(true);
+		jpb.setStringPainted(true);
+		jpb.setString("Time point = " + framenumber + "/" + thirdDimsize);
+
 	}
-	
-public static void SetProgressBarTime(JProgressBar jpb, double percent, int framenumber, int thirdDimsize, String message){
-	
-	jpb.setValue((int) percent);
-	jpb.setOpaque(true);
-	jpb.setStringPainted(true);
-	jpb.setString( message +  "= " + framenumber + "/" + thirdDimsize);
-		
-		
+
+	public static void SetProgressBarTime(JProgressBar jpb, double percent, int framenumber, int thirdDimsize,
+			String message) {
+
+		jpb.setValue((int) percent);
+		jpb.setOpaque(true);
+		jpb.setStringPainted(true);
+		jpb.setString(message + "= " + framenumber + "/" + thirdDimsize);
+
 	}
-	
-	
+
 }
