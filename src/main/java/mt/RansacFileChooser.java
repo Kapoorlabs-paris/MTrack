@@ -75,6 +75,7 @@ public class RansacFileChooser extends JPanel {
 	JButton Track;
 	String choosertitleA;
 	boolean Batchmoderun = false;
+	boolean Simplefile = false;
 	File[] AllMovies;
 	public NumberFormat nf = NumberFormat.getInstance(Locale.ENGLISH);
 	
@@ -96,7 +97,7 @@ public class RansacFileChooser extends JPanel {
 		LoadtrackText.setBackground(new Color(1, 0, 1));
 		LoadtrackText.setForeground(new Color(255, 255, 255));
 		final Checkbox Batchmode = new Checkbox("Run in Batch Mode", Batchmoderun);
-
+		final Checkbox Simplemode = new Checkbox("Open simple time-series file", Simplefile);
 		/* Location */
 
 		c.fill = GridBagConstraints.HORIZONTAL;
@@ -108,6 +109,10 @@ public class RansacFileChooser extends JPanel {
 		c.insets = new Insets(10, 10, 10, 0);
 		panelIntro.add(Batchmode, c);
 
+	//	++c.gridy;
+	//	c.insets = new Insets(10, 10, 10, 0);
+	//	panelIntro.add(Simplemode, c);
+		
 		++c.gridy;
 		c.insets = new Insets(10, 10, 10, 0);
 		panelIntro.add(LoadtrackText, c);
@@ -118,6 +123,7 @@ public class RansacFileChooser extends JPanel {
 
 		panelIntro.setVisible(true);
 		Track.addActionListener(new OpenTrackListener(frame));
+		Simplemode.addItemListener(new SimpleListener(frame));
 		Batchmode.addItemListener(new RansacRuninBatchListener(frame));
 		frame.addWindowListener(new FrameListener(frame));
 		frame.add(panelCont, BorderLayout.CENTER);
@@ -127,6 +133,23 @@ public class RansacFileChooser extends JPanel {
 
 	}
 
+	protected class SimpleListener implements ItemListener {
+
+		final Frame parent;
+
+		public SimpleListener(Frame parent) {
+
+			this.parent = parent;
+
+		}
+
+		@Override
+		public void itemStateChanged(ItemEvent e) {
+			Simplefile = true;
+			
+		}
+		
+	}
 	protected class RansacRuninBatchListener implements ItemListener {
 
 		final Frame parent;
@@ -402,6 +425,10 @@ public class RansacFileChooser extends JPanel {
 		if (!Batchmoderun)
 			new InteractiveRANSAC(Tracking.loadMT(new File(chooserA.getSelectedFile().getPath())),
 					chooserA.getSelectedFile()).run(null);
+		
+		if (Simplefile)
+			new InteractiveRANSAC(Tracking.loadsimple(new File(chooserA.getSelectedFile().getPath())),
+					chooserA.getSelectedFile()).run(null);
 		close(parent);
 
 	}
@@ -421,6 +448,9 @@ public class RansacFileChooser extends JPanel {
 
 			if (!Batchmoderun)
 				new InteractiveRANSAC(Tracking.loadMT(new File(chooserA.getSelectedFile().getPath())),
+						chooserA.getSelectedFile()).run(null);
+			if (Simplefile)
+				new InteractiveRANSAC(Tracking.loadsimple(new File(chooserA.getSelectedFile().getPath())),
 						chooserA.getSelectedFile()).run(null);
 			close(parent);
 		}

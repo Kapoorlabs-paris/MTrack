@@ -151,6 +151,55 @@ public class Tracking
 		return points;
 	}
 
+	
+	public static ArrayList< Pair< Integer, Double > > loadsimple( final File file )
+	{
+		final ArrayList< Pair< Integer, Double > > points = new ArrayList< Pair< Integer, Double > >();
+		final ArrayList< Pair< Integer, Double > > normalpoints = new ArrayList< Pair< Integer, Double > >();
+		try
+		{
+			BufferedReader in = Util.openFileRead( file );
+
+			while( in.ready() )
+			{
+				String line = in.readLine().trim();
+
+				while ( line.contains( "\t\t" ) )
+					line = line.replaceAll( "\t\t", "\t" );
+
+				if ( line.length() >= 3 && line.matches( "[0-9].*" ) )
+				{
+					final String[] split = line.trim().split( "\t" );
+
+					final int frame = (int)Double.parseDouble( split[ 0 ] );
+					final double length = Double.parseDouble( split[ 1 ] );
+
+					points.add( new ValuePair< Integer, Double >( frame, length ) );
+				}
+			}
+		}
+		catch ( Exception e )
+		{
+			e.printStackTrace();
+			return null;
+		}
+
+		double maxlength = Double.MIN_VALUE;
+		for( Pair< Integer, Double> point:points){
+			
+			double length = point.getB();
+			if ( length > maxlength)
+				maxlength = length;
+		}
+		for( Pair< Integer, Double> point:points){
+			Pair< Integer, Double> newpoint = new ValuePair< Integer, Double >(point.getA()/ 10 , point.getB() / maxlength );
+			System.out.println(point.getA() + " " + point.getB());
+			normalpoints.add(newpoint);
+		}
+		
+		return normalpoints;
+	}
+	
 	public static XYSeries drawPoints( final List< Pair< Integer, Double > > mts ) { return drawPoints( mts, "MT Length" ); }
 	public static XYSeries drawPoints( final List< Pair< Integer, Double > > mts, final String name )
 	{
@@ -472,7 +521,6 @@ public class Tracking
 
 		return new ValuePair< Double, Double >( min, max );
 	}
-
 	
 	
 }
