@@ -47,12 +47,12 @@ public class FakeMT {
 	
 	public static double[] GetSeeds(RandomAccessibleInterval<FloatType> outimg,
 
-			final Interval range, final int numlines, final double[] sigma) throws IncompatibleTypeException {
+			final Interval range, final int numlines, final double[] sigma, final Random rnd, final double randomslope) throws IncompatibleTypeException {
 
 		
 		final int n = outimg.numDimensions();
-		final Random rnd = new Random(150);
-		final Random rndsec = new Random(80);
+		
+		
 		
 		
 		
@@ -62,14 +62,13 @@ public class FakeMT {
 			double endpos[] = new double[n];
 			double[] startline = new double[n];
 			double[] endline = new double[n];
-			double MaxLength = 50;
+			double MaxLength = 50 * rnd.nextFloat();
 
 			for (int d = 0; d < range.numDimensions(); ++d) {
 				startpos[d] = 150 +  (rnd.nextDouble() * (range.max(d) - range.min(d)) + range.min(d));
 				
 			}
 			
-			double randomslope =  -rndsec.nextDouble();
 			
 			
 			
@@ -116,34 +115,37 @@ public class FakeMT {
 			
 			
 			
-			final double stepsize =  0.5 * sigma[0] ;
+			final double stepsize =  2 * sigma[0] ;
 			double steppos[] = {startline[0], startline[1]};
 			double dx = stepsize / Math.sqrt(1 + slope * slope);
 			double dy = slope * dx;
-			AddGaussian.addGaussian(outimg, steppos, sigma);
-			while (true) {
-				
-				
-				
-				if (steppos[0] > endline[0] || steppos[1] > endline[1] && slope >= 0)
-					break;
-				if (steppos[0] > endline[0] || steppos[1] < endline[1] && slope < 0)
-					break;
-				
 
+			int numGauss = 10;
+			int count = 0;
+			AddGaussian.addGaussian(outimg, steppos, sigma);
+
+			while (true) {
 				steppos[0] += dx;
 				steppos[1] += dy;
+				
 				AddGaussian.addGaussian(outimg, steppos, sigma);
-			}
+				
+				count++;
+				
+				if (count == numGauss)
+					break;
+				
+				
 			
+			}
 			
 		System.out.println(slope + " " + intercept);
  
-			double[] line = { steppos[0], steppos[1], slope, intercept, 0};
+			double[] line = { startline[0], startline[1], steppos[0], steppos[1], slope, intercept, 0};
 			
-			
-			
-			IJ.log("StartX: " + (startline[0] ) + " " + "StartY: " + (startline[1] ) + " " + "EndX: " +  (steppos[0]) + " " + "EndY: "  + (steppos[1] ));
+		double dist =	Distance(startline, steppos);
+			if (dist > 10)
+			IJ.log( (startline[0] ) + " "  + (startline[1] ) + " "  +  (steppos[0]) + " "   + (steppos[1] ));
 
 			
 		return line;
@@ -247,32 +249,66 @@ public class FakeMT {
 			for (int d = 0; d < ndims; ++d)
 				Ci[d] = 1.0 / Math.pow(sigma[d],2);
 			
-			final int numframes = 200;
+			final int numframes = 150;
 			final int numlines = 1;
 
 			
 			
 				
-			RandomAccessibleInterval<FloatType> lineimage = new ArrayImgFactory<FloatType>().create(range, new FloatType());
-			RandomAccessibleInterval<FloatType> noisylines = new ArrayImgFactory<FloatType>().create(range, new FloatType());
 			
 			
-
+			
+			 FileWriter fw;
+		       String usefolder = "/Users/varunkapoor/Documents/FakeAnalysis_Paper";
+				
+				
 		  
-			   
-			
-			  double[]  lineinfo = GetSeeds(lineimage, smallrange, numlines, sigma);
-			  double[] original = {lineinfo[0], lineinfo[1]};
+			  for (int index = 1; index < numframes; ++index) {
+				  RandomAccessibleInterval<FloatType> lineimage = new ArrayImgFactory<FloatType>().create(range, new FloatType());
+					RandomAccessibleInterval<FloatType> noisylines = new ArrayImgFactory<FloatType>().create(range, new FloatType());
+				 // File fichierKy = new File(usefolder + "//" +"Seed" + index +  ".txt");
+				//	fw = new FileWriter(fichierKy);
+				//	BufferedWriter bw = new BufferedWriter(fw);
+				//	bw.write("\tStartX\tStartY\tEndX\tEndY\n");
+				  
+			  
+			  final Random rnd = new Random(150 * (1 + index));
+			  double randomslope = Math.toRadians(index * 20);
+			  if (index > 40)
+				  randomslope = - randomslope;
+			  if (index > 80)
+				  randomslope = Math.toRadians((index - 80 )* 20);
+			  
+			  if (Math.abs(randomslope) > 4)
+				  
+				  randomslope = randomslope / 10;
+			  double[]  lineinfo = GetSeeds(lineimage, smallrange, numlines, sigma, rnd, randomslope);
+			  double[] originalstart = {lineinfo[0], lineinfo[1]};
+			  double[] originalend = {lineinfo[2], lineinfo[3]};
 
-			FloatType minval = new FloatType(0);
-			FloatType maxval = new FloatType(1);
-			Normalize.normalize(Views.iterable(lineimage), minval, maxval);
+			  double dist = Distance(originalstart, originalend);
+				
+			  if (dist > 10){
+				FloatType minval = new FloatType(0);
+				FloatType maxval = new FloatType(1);
+				Normalize.normalize(Views.iterable(lineimage), minval, maxval);
+				Kernels.addBackground(Views.iterable(lineimage), 0.2);
+				//ImageJFunctions.show(lineimage);
+				noisylines = Poissonprocess.poissonProcess(lineimage, 10);
+				
+				
+				ImageJFunctions.show(noisylines);
+			  }
+			  
+			  }
+			
+
 			
 			
-			Kernels.addBackground(Views.iterable(lineimage), 0.2);
-			noisylines = Poissonprocess.poissonProcess(lineimage, 30);
-			ImageJFunctions.show(noisylines);
-			
+		//	Kernels.addBackground(Views.iterable(lineimage), 0.2);
+		//	noisylines = Poissonprocess.poissonProcess(lineimage, 30);
+		//	ImageJFunctions.show(noisylines);
+			/*
 	       ArrayList<double[]> Allseedgrow = new ArrayList<double[]>();
 	       
 	       FileWriter fw;
@@ -325,11 +361,11 @@ public class FakeMT {
 		
 			
 		}
-
+*/
 		
 			
 		
-	
+	}
 
 	
 

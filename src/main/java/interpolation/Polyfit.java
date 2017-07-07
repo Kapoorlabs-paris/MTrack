@@ -87,6 +87,26 @@ public class Polyfit {
             y = GetCoefficients(j) + (x * y);
         return y;
     }
+    
+    // Horner's method to get y values correspoing to x
+    public double predictderivative(double x) {
+        // horner's method for derivative of a function
+        double y = 0;
+        for (int j = degree - 1; j >= 0; j--)
+            y = (j + 1) * GetCoefficients(j + 1) + (x * y);
+        return y;
+    }
+    
+    // Horner's method to get y values correspoing to x
+    public double predictsecderivative(double x) {
+        // horner's method for derivative of a function
+        double y = 0;
+        for (int j = degree - 2; j >= 0; j--)
+            y = j * (j + 1) * GetCoefficients(j + 1) + (x * y);
+        System.out.println(y);
+        return y;
+    }
+    
     public static ArrayList< Pair< Integer, Double > > loadsimple( final File file )
 	{
 		final ArrayList< Pair< Integer, Double > > points = new ArrayList< Pair< Integer, Double > >();

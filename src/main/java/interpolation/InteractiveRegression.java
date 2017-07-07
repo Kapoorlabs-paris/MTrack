@@ -205,6 +205,9 @@ public class InteractiveRegression implements PlugIn {
 		
 		final XYSeriesCollection dataset = new XYSeriesCollection();
 		final ArrayList< Pair< Integer, Double > > mtspoly = new ArrayList< Pair< Integer, Double > >();
+		final ArrayList< Pair< Integer, Double > > mtspolyderiv = new ArrayList< Pair< Integer, Double > >();
+		final ArrayList< Pair< Integer, Double > > mtspolysecderiv = new ArrayList< Pair< Integer, Double > >();
+		final ArrayList< Pair< Integer, Double > > maxima = new ArrayList< Pair< Integer, Double > >();
 		  double[] x = new double[mts.size()];
 	        double[] y = new double[mts.size()];
 	        
@@ -219,88 +222,42 @@ public class InteractiveRegression implements PlugIn {
 	        for ( double t = x[0]; t <=x[x.length - 1] ; ++t )
 			{
 	          double poly = regression.predict(t);
+	          double derivpoly = regression.predictderivative(t);
+	          double derivsecpoly = 0;
 	          
 	          mtspoly.add(new ValuePair< Integer, Double>((int)t, poly));
+	          mtspolyderiv.add(new ValuePair< Integer, Double>((int)t, derivpoly));
+	          mtspolysecderiv.add(new ValuePair< Integer, Double>((int)t, derivsecpoly));
+	          if (Math.abs(derivpoly) <= 0.01 ){
+	  	        System.out.println("Maxima or Minima of the function at: " + t);
+	  	      if (degree >= 2)
+	        	  derivsecpoly = regression.predictsecderivative(t);
+	  	      if (derivsecpoly < 0 && Math.abs(derivsecpoly) < 1.0E7)
+	  	        maxima.add(new ValuePair< Integer, Double>((int)t, poly));
+	  	        
+	          }
 			}
 	        
 	        
 	        dataset.addSeries(Tracking.drawPoints(mtspoly, "Function fit"));
+	        dataset.addSeries(Tracking.drawPoints(maxima, "Extremum"));
 	        dataset.addSeries(Tracking.drawPoints(mts, "Original Data"));
-	     
+	      //  dataset.addSeries(Tracking.drawPoints(mtspolyderiv, "Derivative of Function fit"));
+	      //  dataset.addSeries(Tracking.drawPoints(mtspolysecderiv, " SecondDerivative of Function fit"));
 	        
 	       JFreeChart  chart = Tracking.makeChart(dataset);
-	       Tracking.display(chart, new Dimension(500, 400));
+	       Tracking.display(chart, new Dimension(600, 600));
 	   	Tracking.setColor(chart, i, new Color(255, 0, 0));
 		Tracking.setStroke(chart, i, 0.5f);
 	       
-	       for(int j = degree; j >=0; --j)
-	        System.out.println(regression.GetCoefficients(j)  + " *x power  " + j );
+		 //  for(int j = degree; j >=0; --j)
+		  //      System.out.println(regression.GetCoefficients(j)  + " *x power  " + j );
+	       
 	     
 		
 	}
 
-	protected void sort(final Pair<? extends AbstractFunction2D, ArrayList<PointFunctionMatch>> segment) {
-		Collections.sort(segment.getB(), new Comparator<PointFunctionMatch>() {
-
-			@Override
-			public int compare(final PointFunctionMatch o1, final PointFunctionMatch o2) {
-				final double t1 = o1.getP1().getL()[0];
-				final double t2 = o2.getP1().getL()[0];
-
-				if (t1 < t2)
-					return -1;
-				else if (t1 == t2)
-					return 0;
-				else
-					return 1;
-			}
-		});
-	}
 	
-	protected void sortPoints(final ArrayList<Point> points) {
-		Collections.sort(points, new Comparator<Point>() {
-
-			@Override
-			public int compare(final Point o1, final Point o2) {
-				final double t1 = o1.getL()[0];
-				final double t2 = o2.getL()[0];
-
-				if (t1 < t2)
-					return -1;
-				else if (t1 == t2)
-					return 0;
-				else
-					return 1;
-			}
-		});
-	}
-
-	protected void sort(final ArrayList<Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>>> segments) {
-		for (final Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>> segment : segments)
-			sort(segment);
-
-		Collections.sort(segments, new Comparator<Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>>>() {
-			@Override
-			public int compare(Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>> o1,
-					Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>> o2) {
-				final double t1 = o1.getB().get(0).getP1().getL()[0];
-				final double t2 = o2.getB().get(0).getP1().getL()[0];
-
-				if (t1 < t2)
-					return -1;
-				else if (t1 == t2)
-					return 0;
-				else
-					return 1;
-			}
-		});
-
-		for (final Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>> segment : segments) {
-			System.out.println("\nSEGMENT");
-			for (final PointFunctionMatch pm : segment.getB())
-				System.out.println(pm.getP1().getL()[0] + ", " + pm.getP1().getL()[1]);
-		}
-	}
 
 	public void close() {
 		panelFirst.setVisible(false);

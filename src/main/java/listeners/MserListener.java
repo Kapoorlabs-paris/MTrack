@@ -67,6 +67,7 @@ import updateListeners.DefaultModelHF;
 				final Scrollbar maxSizeS = new Scrollbar(Scrollbar.HORIZONTAL, parent.maxSizeInit, 10, 0, 10 + parent.scrollbarSize);
 				final Button ComputeTree = new Button("Compute Tree and display");
 				final Button FindLinesListener = new Button("Find endpoints");
+				final Button FindLinesbatchListener = new Button("Find endpoints in batch");
 				parent.Unstability_Score = parent.computeValueFromScrollbarPosition(parent.Unstability_ScoreInit, parent.Unstability_ScoreMin, parent.Unstability_ScoreMax, 
 						parent.scrollbarSize);
 				parent.delta = parent.computeValueFromScrollbarPosition(parent.deltaInit, 
@@ -153,6 +154,11 @@ import updateListeners.DefaultModelHF;
 				c.insets = new Insets(10, 180, 0, 180);
 				parent.panelSecond.add(FindLinesListener, c);
 
+				
+				++c.gridy;
+				c.insets = new Insets(10, 180, 0, 180);
+				parent.panelSecond.add(FindLinesbatchListener, c);
+				
 				deltaS.addAdjustmentListener(new DeltaListener(parent, deltaText, parent.deltaMin, parent.deltaMax, 
 						parent.scrollbarSize, deltaS));
 
@@ -174,6 +180,7 @@ import updateListeners.DefaultModelHF;
 				AdvancedOptions.addItemListener(new AdvancedSeedListener(parent));
 				ComputeTree.addActionListener(new ComputeTreeListener(parent));
 				FindLinesListener.addActionListener(new FindLinesListener(parent));
+				FindLinesbatchListener.addActionListener(new FindLinesbatchListener(parent));
 				parent.panelSecond.validate();
 				parent.panelSecond.repaint();
 				parent.Cardframe.pack();

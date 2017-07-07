@@ -787,6 +787,7 @@ public class Interactive_PSFAnalyze implements PlugIn {
 			final Button ComputeTree = new Button("Compute Tree and display");
 			final Button FindBeadsListener = new Button("Fit Gaussian bead Function");
 			final Button FindPolynomialListener = new Button("Fit Gaussian Polynomial Function");
+			final Button FindSimplePolynomialListener = new Button("Fit Simple Gaussian Polynomial Function");
 			Unstability_Score = computeValueFromScrollbarPosition(Unstability_ScoreInit, Unstability_ScoreMin, Unstability_ScoreMax, 
 					scrollbarSize);
 			delta = computeValueFromScrollbarPosition(deltaInit, 
@@ -929,6 +930,8 @@ public class Interactive_PSFAnalyze implements PlugIn {
 			ComputeTree.addActionListener(new ComputeTreeListener(this));
 			FindBeadsListener.addActionListener(new FindBeadsListener(this));
 			FindPolynomialListener.addActionListener(new FindPolynomialListener(this));
+			
+			
 			
 			/*
 

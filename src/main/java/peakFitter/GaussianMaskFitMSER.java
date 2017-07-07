@@ -129,6 +129,19 @@ public class GaussianMaskFitMSER {
 		
 		System.out.println("Number of photons on this pixel (Relative): " + Numphotons);
 		
+		switch (startorend) {
+
+		case StartfitMSER:
+			for (int d = 0; d < n; ++d) 
+			newlocation[d] = newlocation[d] +  0.5* dxvector[d];
+			break;
+
+		case EndfitMSER:
+			for (int d = 0; d < n; ++d) 
+				newlocation[d] = newlocation[d] - 0.5 * dxvector[d];
+			break;
+
+		}
 		
 		
 		return newlocation;

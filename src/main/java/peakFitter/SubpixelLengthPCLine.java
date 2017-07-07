@@ -13,6 +13,7 @@ import LineModels.Gaussiansplinesecfixedds;
 import LineModels.MTFitFunction;
 import LineModels.UseLineModel;
 import LineModels.UseLineModel.UserChoiceModel;
+import ij.IJ;
 import ij.gui.EllipseRoi;
 import labeledObjects.CommonOutput;
 import labeledObjects.Indexedlength;
@@ -57,7 +58,7 @@ implements OutputAlgorithm<Pair<ArrayList<Indexedlength>, ArrayList<Indexedlengt
 	public double termepsilon = 1e-1;
 	//Mask fits iteration param
 	public int iterations = 500;
-	public double cutoffdistance = 10;
+	public double cutoffdistance = 30;
 	public boolean halfgaussian = false;
     public double Intensityratio;
     public double Inispacing;
@@ -280,7 +281,7 @@ public ArrayList<Indexedlength> getEndPoints(){
        			long pointonline = (long)Math.round(inputcursor.getDoublePosition(1) - slope * inputcursor.getDoublePosition(0) -
        					intercept );
        				inputcursor.localize(newposition);
-               if (Math.abs(pointonline)<= 20){
+               if (Math.abs(pointonline)<= 50){
        				if (inputcursor.getDoublePosition(0) <= minVal[0]
     						&& inputcursor.get().get() / maxintensityline > Intensityratio) {
     					minVal[0] = inputcursor.getDoublePosition(0);
@@ -457,7 +458,7 @@ public ArrayList<Indexedlength> getEndPoints(){
 						
 						sigmas+= psf[d] * psf[d];
 					}
-					final int numgaussians = (int) Math.max(Math.round(Math.sqrt(sigmas) /  ds), 2);
+					final int numgaussians = (int) Math.min(Math.round(Math.sqrt(sigmas) / ds), 4);
 				
 				if (DoMask ){
 					System.out.println("Doing Mask Fits: " + numgaussians +  " Gaussian mask used ");
@@ -525,6 +526,9 @@ public ArrayList<Indexedlength> getEndPoints(){
 
 					System.out.println("Fits :" + "StartX:" + startparam[0] + " StartY:" + startparam[1] + " " + "EndX:"
 							+ endparam[0] + "EndY: " + endparam[1] + " " + "ds: " + finalparamstart[4] );
+					
+					
+					IJ.log((startparam[0] ) + " " + (startparam[1]  ) + " " +  (endparam[0]) + " "  + (endparam[1] ));
 
 					System.out.println("Length: " + Distance(new double[]{startparam[0],  startparam[1]},new double[]{endparam[0],  endparam[1]} ));
 
@@ -574,7 +578,7 @@ public ArrayList<Indexedlength> getEndPoints(){
 						
 						sigmas+= psf[d] * psf[d];
 					}
-					final int numgaussians = (int) Math.max(Math.round(Math.sqrt(sigmas) /  ds), 2);
+					final int numgaussians = (int) Math.min(Math.round(Math.sqrt(sigmas) / ds), 4);
 				
 				if (DoMask ){
 					System.out.println("Doing Mask Fits: " + numgaussians +  " Gaussian mask used ");
