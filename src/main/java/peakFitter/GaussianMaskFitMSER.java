@@ -117,12 +117,12 @@ public class GaussianMaskFitMSER {
 
 			case StartfitMSER:
 				for (int d = 0; d < n; ++d) 
-				newlocation[d] = newlocation[d] - (numgaussians - 1) * dxvector[d] / 4 ;
+				newlocation[d] = newlocation[d] - (numgaussians - 1) * dxvector[d] / (2 * sigma[d]) ;
 				break;
 
 			case EndfitMSER:
 				for (int d = 0; d < n; ++d) 
-				newlocation[d] = newlocation[d] + (numgaussians - 1) * dxvector[d] / 4  ;
+				newlocation[d] = newlocation[d] + (numgaussians - 1) * dxvector[d] / (2 * sigma[d])   ;
 				break;
 
 			}
