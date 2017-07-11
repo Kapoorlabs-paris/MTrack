@@ -115,7 +115,7 @@ public class FakeMT {
 			
 			
 			
-			final double stepsize =  2 * sigma[0] ;
+			final double stepsize =   sigma[0] ;
 			double steppos[] = {startline[0], startline[1]};
 			double dx = stepsize / Math.sqrt(1 + slope * slope);
 			double dy = slope * dx;
@@ -275,7 +275,7 @@ public class FakeMT {
 			  final Random rnd = new Random(150 * (1 + index));
 			  double randomslope = Math.toRadians(index * 20);
 			  if (index > 40)
-				  randomslope = - randomslope;
+				  randomslope = Math.toRadians((index - 40) * 20);
 			  if (index > 80)
 				  randomslope = Math.toRadians((index - 80 )* 20);
 			  
@@ -292,12 +292,12 @@ public class FakeMT {
 				FloatType minval = new FloatType(0);
 				FloatType maxval = new FloatType(1);
 				Normalize.normalize(Views.iterable(lineimage), minval, maxval);
-				Kernels.addBackground(Views.iterable(lineimage), 0.2);
-				//ImageJFunctions.show(lineimage);
-				noisylines = Poissonprocess.poissonProcess(lineimage, 10);
+			//	Kernels.addBackground(Views.iterable(lineimage), 0.2);
+			ImageJFunctions.show(lineimage);
+			//	noisylines = Poissonprocess.poissonProcess(lineimage, 30);
 				
 				
-				ImageJFunctions.show(noisylines);
+			//	ImageJFunctions.show(noisylines);
 			  }
 			  
 			  }

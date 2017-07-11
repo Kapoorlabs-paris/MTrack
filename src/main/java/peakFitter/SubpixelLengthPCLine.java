@@ -458,7 +458,7 @@ public ArrayList<Indexedlength> getEndPoints(){
 						
 						sigmas+= psf[d] * psf[d];
 					}
-					final int numgaussians = (int) Math.min(Math.round(Math.sqrt(sigmas) / ds), 4);
+					final int numgaussians = 2;// (int) Math.max(Math.round(Math.sqrt(sigmas) / ds), 2);
 				
 				if (DoMask ){
 					System.out.println("Doing Mask Fits: " + numgaussians +  " Gaussian mask used ");
@@ -578,7 +578,7 @@ public ArrayList<Indexedlength> getEndPoints(){
 						
 						sigmas+= psf[d] * psf[d];
 					}
-					final int numgaussians = (int) Math.min(Math.round(Math.sqrt(sigmas) / ds), 4);
+					final int numgaussians =2;// (int) Math.max(Math.round(Math.sqrt(sigmas) / ds), 2);
 				
 				if (DoMask ){
 					System.out.println("Doing Mask Fits: " + numgaussians +  " Gaussian mask used ");

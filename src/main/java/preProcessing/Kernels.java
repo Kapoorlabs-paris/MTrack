@@ -16,6 +16,7 @@ import net.imglib2.algorithm.region.hypersphere.HyperSphereCursor;
 import net.imglib2.img.Img;
 import net.imglib2.img.array.ArrayImgFactory;
 import net.imglib2.img.array.ArrayImgs;
+import net.imglib2.img.display.imagej.ImageJFunctions;
 import net.imglib2.type.logic.BitType;
 import net.imglib2.type.numeric.complex.ComplexFloatType;
 import net.imglib2.type.numeric.real.FloatType;
@@ -620,6 +621,8 @@ public static void addBackground(final IterableInterval<FloatType> iterable, fin
 		RandomAccessibleInterval<FloatType> meanimg = new ArrayImgFactory<FloatType>().create(inputimg,
 				new FloatType());
 		MeanFilter(Threshcannyimg, meanimg, sigma);
+		
+		
 		
 		return meanimg;
 	}

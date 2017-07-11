@@ -111,6 +111,22 @@ public class GaussianMaskFitMSER {
 				}
 			for (int d = 0; d < n; ++d)
 				newlocation[d] = sumLocSN[d] / sumSN;
+			
+			
+			switch (startorend) {
+
+			case StartfitMSER:
+				for (int d = 0; d < n; ++d) 
+				newlocation[d] = newlocation[d] - (numgaussians - 1) * dxvector[d] / 4 ;
+				break;
+
+			case EndfitMSER:
+				for (int d = 0; d < n; ++d) 
+				newlocation[d] = newlocation[d] + (numgaussians - 1) * dxvector[d] / 4  ;
+				break;
+
+			}
+			
 			Nold = N;	
 			N = sumSN / sumSS;
 
@@ -128,20 +144,10 @@ public class GaussianMaskFitMSER {
 		// ImageJFunctions.show(gaussianMask);
 		
 		System.out.println("Number of photons on this pixel (Relative): " + Numphotons);
+	
+	
 		
-		switch (startorend) {
-
-		case StartfitMSER:
-			for (int d = 0; d < n; ++d) 
-			newlocation[d] = newlocation[d] +  0.5* dxvector[d];
-			break;
-
-		case EndfitMSER:
-			for (int d = 0; d < n; ++d) 
-				newlocation[d] = newlocation[d] - 0.5 * dxvector[d];
-			break;
-
-		}
+		
 		
 		
 		return newlocation;
@@ -185,15 +191,16 @@ public class GaussianMaskFitMSER {
 		
 		for (int n = 0; n < numgaussians; ++n){	
 			
-			
+		
 		for (int d = 0; d < ndims; ++d) {
 			
 			
 				
 				
-				secondlocation[d] = location[d] - (n) * dxvector[d];
+				location[d] = location[d] - (n) * dxvector[d];
 			}
-		AddGaussian.addGaussian(image, maxintensityline, secondlocation, sigma);
+		
+		AddGaussian.addGaussian(image, maxintensityline, location, sigma);
 			
 			}
 		
@@ -222,10 +229,10 @@ public class GaussianMaskFitMSER {
 			
 				
 				
-				secondlocation[d] = location[d] + (n) * dxvector[d];
+				location[d] = location[d] + (n) * dxvector[d];
 			}
 			
-		AddGaussian.addGaussian(image, maxintensityline, secondlocation, sigma);
+		AddGaussian.addGaussian(image, maxintensityline, location, sigma);
 			
 			}
 		

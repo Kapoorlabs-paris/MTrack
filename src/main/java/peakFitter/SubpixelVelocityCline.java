@@ -623,7 +623,7 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 
 						sigmas += psf[d] * psf[d];
 					}
-					final int numgaussians = (int) Math.min(Math.round(Math.sqrt(sigmas) / ds), 4);
+					final int numgaussians =2;
 
 					double[] startfit = startpos;
 					double[] endfit = endpos;
@@ -704,7 +704,7 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 
 						sigmas += psf[d] * psf[d];
 					}
-					final int numgaussians = (int) Math.min(Math.round(Math.sqrt(sigmas) / ds), 4);
+					final int numgaussians =2;
 
 					double[] endfit = endpos;
 					double[] startfit = startpos;
@@ -808,7 +808,7 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 						sigmas += psf[d] * psf[d];
 					}
 
-					final int numgaussians = (int) Math.min(Math.round(Math.sqrt(sigmas) / ds), 4);
+					final int numgaussians =2;
 
 					
 					if (DoMask) {
@@ -913,7 +913,7 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 						sigmas += psf[d] * psf[d];
 					}
 
-					final int numgaussians = (int) Math.min(Math.round(Math.sqrt(sigmas) / ds), 4);
+					final int numgaussians =2;
 
 					
 					
@@ -1022,7 +1022,7 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 						sigmas += psf[d] * psf[d];
 					}
 
-					final int numgaussians = (int) Math.min(Math.round(Math.sqrt(sigmas) / ds), 4);
+					final int numgaussians =2;
 
 					
 					if (DoMask) {
@@ -1129,7 +1129,7 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 						sigmas += psf[d] * psf[d];
 					}
 
-					final int numgaussians = (int) Math.min(Math.round(Math.sqrt(sigmas) / ds), 4);
+					final int numgaussians =2;
 
 					
 					if (DoMask) {

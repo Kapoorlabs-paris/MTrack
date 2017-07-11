@@ -111,7 +111,7 @@ public class AddGaussian {
 	public static int getSuggestedKernelDiameter( final double sigma )
 	{
 	int size = 0;
-    int cutoff = 3; // This number means cutoff is chosen to be cutoff times sigma. 
+    int cutoff = 5; // This number means cutoff is chosen to be cutoff times sigma. 
     if ( sigma > 0 )
 	size = Math.max( cutoff, ( 2 * ( int ) ( cutoff * sigma + 0.5 ) + 1 ) );
 

@@ -14,6 +14,7 @@ import net.imglib2.algorithm.labeling.AllConnectedComponents;
 import net.imglib2.algorithm.labeling.Watershed;
 import net.imglib2.img.ImgFactory;
 import net.imglib2.img.array.ArrayImgFactory;
+import net.imglib2.img.display.imagej.ImageJFunctions;
 import net.imglib2.labeling.DefaultROIStrategyFactory;
 import net.imglib2.labeling.Labeling;
 import net.imglib2.labeling.LabelingROIStrategy;
@@ -73,7 +74,7 @@ implements OutputAlgorithm <RandomAccessibleInterval<IntType>> {
 		distimg = factory.create(source, new FloatType());
 
 		DistanceTransformImage(source, distimg);
-		
+		//ImageJFunctions.show(distimg);
 		// Prepare seed image for watershedding
 				NativeImgLabeling<Integer, IntType> oldseedLabeling = new NativeImgLabeling<Integer, IntType>(
 						new ArrayImgFactory<IntType>().create(source, new IntType()));
