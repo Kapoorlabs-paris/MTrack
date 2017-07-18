@@ -203,7 +203,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public double Intensityratio = 0.5;
 	public double slopetolerance = 5;
 	public double Inispacing = 0.5;
-	public double maxdist = 20;
+	public double maxdist = 50;
 	public int thirdDimensionslider = 1;
 	public int thirdDimensionsliderInit = 1;
 	public int timeMin = 1;
@@ -2401,10 +2401,10 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		gd.addStringField("Choose a different filename?:", addToName);
 		gd.showDialog();
 		indexmodel = gd.getNextChoiceIndex();
+		Domask = gd.getNextBoolean();
 		displayoverlay = gd.getNextBoolean();
 
-		Domask = gd.getNextBoolean();
-
+		
 		if (indexmodel == 0)
 			userChoiceModel = UserChoiceModel.Line;
 		if (indexmodel == 1)

@@ -57,6 +57,45 @@ public class GaussianSplinesecorder implements MTFitFunction {
 	 * 
 	 */
 
+public static double numdiff(double[] x, double[] a, int dim, double[] b) {
+	
+	double [] newa = new double[a.length];
+	final int ndims = x.length;
+	double epsilon = 0.001;
+	double f1 = 0;
+	double f2 = 0;
+	double diff = 0;
+	
+	
+	do{
+		
+		
+	for (int i = 0; i < a.length; ++i){
+		newa[i] = a[i];
+		if (i == dim)
+		newa[i] = a[i] + epsilon;
+	}
+	f1 = (Etotal(x, newa, b)  - Etotal(x, a, b) )/ epsilon ;
+	
+	epsilon/=2;
+	
+	for (int i = 0; i < a.length; ++i){
+		newa[i] = a[i];
+		if (i == dim)
+		newa[i] = a[i] + epsilon;
+	}
+	
+	f2 =  (Etotal(x, newa, b)  - Etotal(x, a, b) )/ epsilon ;
+	
+	diff =  Math.abs(f2 - f1) ;
+	
+	f1 = f2;
+	}while(diff> 1.0E-2);
+	
+	return a[2 * ndims + 2] *f2;
+	
+}
+
 	private static final double Estart(final double[] x, final double[] a, final double[] b) {
 
 		double sum = 0;
@@ -73,6 +112,7 @@ public class GaussianSplinesecorder implements MTFitFunction {
 	private static final double Eds(final double[] x, final double[] a, final double[] b) {
 
 		double di;
+		int count = 1;
 		final int ndims = x.length;
 		double[] minVal = new double[ndims];
 		double[] maxVal = new double[ndims];
@@ -125,9 +165,9 @@ public class GaussianSplinesecorder implements MTFitFunction {
 		dxvectorderivstart[0] = 1 / Math.sqrt(1 + mplus2bxstart* mplus2bxstart);
 		dxvectorderivstart[1] = mplus2bxstart / Math.sqrt(1 + mplus2bxstart * mplus2bxstart);
 				
-		sumofgaussians+= dsum * Math.exp(-sum);
+		sumofgaussians+= count * dsum * Math.exp(-sum);
 		
-		
+		count++;
 		
 		if (minVal[0] > maxVal[0] || minVal[1] > maxVal[1] && slope > 0)
 			break;
@@ -143,6 +183,7 @@ public class GaussianSplinesecorder implements MTFitFunction {
 	private static final double EdC(final double[] x, final double[] a, final double[] b) {
 
 		double di;
+		int count = 1;
 		final int ndims = x.length;
 		double[] minVal = new double[ndims];
 		double[] maxVal = new double[ndims];
@@ -165,21 +206,20 @@ public class GaussianSplinesecorder implements MTFitFunction {
 		
 		double[] dxvectorCstart = {dxbydb, mplus2bxstart* dxbydb + (-(maxVal[0] + minVal[0]) + 2 * minVal[0]) * dxvectorstart[0]};
 		
-	double mplus2bxend = slope + 2 * curvature* maxVal[0];
-		
 
-		double[] dxvectorend = { ds / Math.sqrt(1 + mplus2bxend* mplus2bxend), 
-				mplus2bxend* ds / Math.sqrt(1 + mplus2bxend* mplus2bxend) };
-
-		
-		double dxbydbend = - ds * mplus2bxend * (-(maxVal[0] + minVal[0]) + 2 * maxVal[0]) / (Math.pow(1 + mplus2bxend * mplus2bxend, 3 / 2));
-		
-		double[] dxvectorCend = {dxbydbend, mplus2bxend* dxbydbend + (-(maxVal[0] + minVal[0]) + 2 * maxVal[0]) * dxvectorend[0]};
 
 		double sumofgaussians = 0;
-		while(true){
 		double dsum = 0;
 		double sum = 0;
+		
+		
+		
+		while(true){
+			dsum = 0;
+			sum = 0;
+		
+		
+		
 		for (int i = 0; i < x.length; i++) {
 			minVal[i] += dxvectorstart[i];
 			di = x[i] - minVal[i];
@@ -187,23 +227,16 @@ public class GaussianSplinesecorder implements MTFitFunction {
 			dsum += 2 * b[i] * di * dxvectorCstart[i];
 		}
 		
-		dxbydb = - ds * mplus2bxstart * (-(maxVal[0] + a[0]) + 2 * minVal[0]) / (Math.pow(1 + mplus2bxstart * mplus2bxstart, 3 / 2));
+			
+		
+		mplus2bxstart = slope + 2 * curvature* minVal[0];
+		dxbydb = - ds * mplus2bxstart * (-(maxVal[0] + minVal[0]) + 2 * minVal[0]) / (Math.pow(1 + mplus2bxstart * mplus2bxstart, 3 / 2));
 		dxvectorCstart[0] = dxbydb;
-		dxvectorCstart[1] =  mplus2bxstart* dxbydb + (-(maxVal[0] + a[0]) + 2 * minVal[0]) * dxvectorstart[0];
+		dxvectorCstart[1] =  mplus2bxstart* dxbydb + (-(maxVal[0] + minVal[0]) + 2 * minVal[0]) * dxvectorstart[0];
+		sumofgaussians+= count * dsum * Math.exp(-sum);
 		
-		sumofgaussians+= dsum * Math.exp(-sum);
-		/*
-		double dsumend = 0;
-		double sumend = 0;
-		for (int i = 0; i < x.length; i++) {
-			maxVal[i] -= dxvectorend[i];
-			di = x[i] - maxVal[i];
-			sum += b[i] * di * di;
-			dsum += 2 * b[i] * di * dxvectorCend[i];
-		}
-		sumofgaussians+= dsumend * Math.exp(-sumend);
+		count++;
 		
-		*/
 		if (minVal[0] > maxVal[0] || minVal[1] > maxVal[1] && slope > 0)
 			break;
 		if (minVal[0] > maxVal[0] || minVal[1] < maxVal[1] && slope < 0)

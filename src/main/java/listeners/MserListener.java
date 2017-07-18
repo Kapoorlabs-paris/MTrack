@@ -155,9 +155,9 @@ import updateListeners.DefaultModelHF;
 				parent.panelSecond.add(FindLinesListener, c);
 
 				
-				++c.gridy;
-				c.insets = new Insets(10, 180, 0, 180);
-				parent.panelSecond.add(FindLinesbatchListener, c);
+			//	++c.gridy;
+			//	c.insets = new Insets(10, 180, 0, 180);
+			//	parent.panelSecond.add(FindLinesbatchListener, c);
 				
 				deltaS.addAdjustmentListener(new DeltaListener(parent, deltaText, parent.deltaMin, parent.deltaMax, 
 						parent.scrollbarSize, deltaS));

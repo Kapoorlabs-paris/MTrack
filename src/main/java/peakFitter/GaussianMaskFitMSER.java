@@ -111,22 +111,11 @@ public class GaussianMaskFitMSER {
 				}
 			for (int d = 0; d < n; ++d)
 				newlocation[d] = sumLocSN[d] / sumSN;
+		
+
 			
 			
-			switch (startorend) {
-
-			case StartfitMSER:
-				for (int d = 0; d < n; ++d) 
-				newlocation[d] = newlocation[d] - (numgaussians - 1) * dxvector[d] / (2 * sigma[d]) ;
-				break;
-
-			case EndfitMSER:
-				for (int d = 0; d < n; ++d) 
-				newlocation[d] = newlocation[d] + (numgaussians - 1) * dxvector[d] / (2 * sigma[d])   ;
-				break;
-
-			}
-			
+		
 			Nold = N;	
 			N = sumSN / sumSS;
 
@@ -197,10 +186,10 @@ public class GaussianMaskFitMSER {
 			
 				
 				
-				location[d] = location[d] - (n) * dxvector[d];
+				secondlocation[d] = location[d] - (n) * dxvector[d];
 			}
 		
-		AddGaussian.addGaussian(image, maxintensityline, location, sigma);
+		AddGaussian.addGaussian(image, maxintensityline, secondlocation, sigma);
 			
 			}
 		
@@ -229,12 +218,14 @@ public class GaussianMaskFitMSER {
 			
 				
 				
-				location[d] = location[d] + (n) * dxvector[d];
+				secondlocation[d] = location[d] + (n) * dxvector[d];
 			}
 			
-		AddGaussian.addGaussian(image, maxintensityline, location, sigma);
+		AddGaussian.addGaussian(image, maxintensityline, secondlocation, sigma);
 			
 			}
+		
+		
 		
 	
 	}

@@ -27,8 +27,13 @@ public class GaussianLineds implements MTFitFunction {
 
 		}
 
-		else if (k == 2 * ndims)
+		else if (k == 2 * ndims){
+		
+		//	return numdiff(x, a, k, b);
+			
 			return  a[2 * ndims + 1] *Estartds(x, a, b);
+			
+		}
 		
 		
 		else if (k == 2 * ndims + 1)
@@ -54,6 +59,45 @@ public class GaussianLineds implements MTFitFunction {
 	 * 
 	 */
 
+public static double numdiff(double[] x, double[] a, int dim, double[] b) {
+	
+	double [] newa = new double[a.length];
+	final int ndims = x.length;
+	double epsilon = 0.001;
+	double f1 = 0;
+	double f2 = 0;
+	double diff = 0;
+	
+	
+	do{
+		
+		
+	for (int i = 0; i < a.length; ++i){
+		newa[i] = a[i];
+		if (i == dim)
+		newa[i] = a[i] + epsilon;
+	}
+	f1 = (Etotal(x, newa, b)  - Etotal(x, a, b) )/ epsilon ;
+	
+	epsilon/=2;
+	
+	for (int i = 0; i < a.length; ++i){
+		newa[i] = a[i];
+		if (i == dim)
+		newa[i] = a[i] + epsilon;
+	}
+	
+	f2 =  (Etotal(x, newa, b)  - Etotal(x, a, b) )/ epsilon ;
+	
+	diff =  Math.abs(f2 - f1) ;
+	
+	f1 = f2;
+	}while(diff> 1.0E-2);
+	
+	return a[2 * ndims + 1] *f2;
+	
+}
+
 	private static final double Estart(final double[] x, final double[] a, final double[] b) {
 
 		double sum = 0;
@@ -71,6 +115,7 @@ public class GaussianLineds implements MTFitFunction {
 
 		
 		double di;
+		int count = 1;
 		final int ndims = x.length;
 		double[] minVal = new double[ndims];
 		double[] maxVal = new double[ndims];
@@ -88,9 +133,35 @@ public class GaussianLineds implements MTFitFunction {
 		double[] dxvectorderiv = { 1/ Math.sqrt( 1 + slope * slope) , slope/ Math.sqrt( 1 + slope * slope)  };
 
 		
+	double sumofgaussians = 0;
 		
+		while(true){
 		double dsum = 0;
 		double sum = 0;
+		for (int i = 0; i < x.length; i++) {
+			minVal[i] += dxvector[i];
+			di = x[i] - minVal[i];
+			sum += b[i] * di * di;
+			dsum += 2 * b[i] * di * dxvectorderiv[i];
+		}
+		
+				
+		sumofgaussians+= count * dsum * Math.exp(-sum);
+		
+		count++;
+		
+		if (minVal[0] > maxVal[0] || minVal[1] > maxVal[1] && slope > 0)
+			break;
+		if (minVal[0] > maxVal[0] || minVal[1] < maxVal[1] && slope < 0)
+			break;
+
+	}
+		
+		
+/*		
+		
+		double sum = 0;
+		double dsum = 0;
 		for (int i = 0; i < x.length; i++) {
 			minVal[i] += dxvector[i];
 			di = x[i] - minVal[i];
@@ -108,6 +179,8 @@ public class GaussianLineds implements MTFitFunction {
 			dsumend += -2 * b[i] * di * dxvectorderiv[i];
 		}
 		sumofgaussians+= dsumend * Math.exp(-sumend);
+		
+*/
 		
 		
 		return    sumofgaussians ;

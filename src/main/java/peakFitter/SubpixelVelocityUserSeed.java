@@ -549,7 +549,7 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 
 					sigmas += psf[d] * psf[d];
 				}
-				final int numgaussians = (int) Math.min(Math.round(Math.sqrt(sigmas) / ds), 4);
+				final int numgaussians = 3;
 
 				double[] endfit = endpos;
 				double[] startfit = startpos;
@@ -655,7 +655,7 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 					sigmas += psf[d] * psf[d];
 				}
 
-				final int numgaussians = (int) Math.min(Math.round(Math.sqrt(sigmas) / ds), 4);
+				final int numgaussians = 3;
 
 				
 				if (DoMask) {
@@ -768,7 +768,7 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 					sigmas += psf[d] * psf[d];
 				}
 
-				final int numgaussians = (int) Math.min(Math.round(Math.sqrt(sigmas) / ds), 4);
+				final int numgaussians = 3;
 
 				if (DoMask) {
 

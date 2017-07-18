@@ -1,6 +1,12 @@
 package peakFitter;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+
 import Jama.Matrix;
 import LineModels.MTFitFunction;
+import ij.IJ;
 public class LevenbergMarquardtSolverLine {
 	
 		/**
@@ -61,7 +67,12 @@ public class LevenbergMarquardtSolverLine {
 
 			int iter = 0;
 			int term = 0;	// termination count test
+			File fichier = new File(
+					"AnalyticalDerivativesLine" +  ".txt");
 
+			FileWriter fw = new FileWriter(fichier);
+			BufferedWriter bw = new BufferedWriter(fw);
+			bw.write("\titer\tparam0\tparam1\tparam2\tparam3\tparam4\tparam5\tparam6\tparam7\tparam8\tparam9\n");
 			do {
 				++iter;
 				// hessian approximation
@@ -86,8 +97,40 @@ public class LevenbergMarquardtSolverLine {
 						double[] xi = x[i];
 						g[r] += (y[i]-f.val(xi,a, b)) * f.grad(xi, a, b, r);
 					}
+					
 				} //npts
-
+				
+			
+				try {
+					
+					
+                      if (nparm <= 7 ){
+						
+						bw.write("\t" + iter + "\t" + "\t" +
+						g[0] + "\t" + "\t" + g[1] + "\t" + "\t" + g[2] + "\t" + "\t" + g[3] + "\t" + "\t" + g[4]   
+								+ "\t" + "\t" + g[5] + "\t" + "\t" + g[6]  
+								+"\n");
+						}
+					
+					if (nparm > 7 && nparm < 9){
+						
+						bw.write("\t" + iter + "\t" + "\t" +
+						g[0] + "\t" + "\t" + g[1] + "\t" + "\t" + g[2] + "\t" + "\t" + g[3] + "\t" + "\t" + g[4]   
+								+ "\t" + "\t" + g[5] + "\t" + "\t" + g[6] + "\t" + "\t" + g[7] 
+								+"\n");
+						}
+					
+					if (nparm > 8){
+				
+					bw.write("\t" + iter + "\t" + "\t" +
+					g[0] + "\t" + "\t" + g[1] + "\t" + "\t" + g[2] + "\t" + "\t" + g[3] + "\t" + "\t" + g[4]   
+							+ "\t" + "\t" + g[5] + "\t" + "\t" + g[6] + "\t" + "\t" + g[7] + "\t" + "\t" + g[8]
+							+"\n");
+					}
+					
+				} catch (IOException e) {
+				}
+				
 				// solve H d = -g, evaluate error at new location
 				//double[] d = DoubleMatrix.solve(H, g);
 				double[] d = null;
@@ -149,7 +192,8 @@ public class LevenbergMarquardtSolverLine {
 				
 
 			} while(!done);
-
+			bw.close();
+			fw.close();
 			return iter;
 		} //solve
 	}
