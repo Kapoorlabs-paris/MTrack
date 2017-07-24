@@ -154,8 +154,7 @@ public static double numdiff(double[] x, double[] a, int dim, double[] b) {
 		
 		count++;
 		
-		if (ds < 1.0E-2 * radius)
-			break;
+		
 		
 		if (minVal[0] > maxVal[0] || minVal[1] > maxVal[1] && slope >= 0 )
 			break;
@@ -225,8 +224,7 @@ public static double numdiff(double[] x, double[] a, int dim, double[] b) {
 			}
 			sumofgaussians += Math.exp(-sum);
 
-			if (ds < 1.0E-2 * radius)
-				break;
+			
 			if (minVal[0] >= maxVal[0] || minVal[1] >= maxVal[1] && slope >= 0)
 				break;
 			if (minVal[0] >= maxVal[0] || minVal[1] <= maxVal[1] && slope < 0)

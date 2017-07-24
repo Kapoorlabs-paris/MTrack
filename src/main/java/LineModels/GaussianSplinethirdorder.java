@@ -140,8 +140,7 @@ public class GaussianSplinethirdorder implements MTFitFunction {
 
 			sumofgaussians += count* dsum * Math.exp(-sum);
 			count++;
-			if (ds < 1.0E-2 * radius)
-				break;
+			
 			if (minVal[0] > maxVal[0] || minVal[1] > maxVal[1] && slope >= 0)
 				break;
 			if (minVal[0] > maxVal[0] || minVal[1] < maxVal[1] && slope < 0)
@@ -216,8 +215,7 @@ public class GaussianSplinethirdorder implements MTFitFunction {
 			
 			sumofgaussians += count * dsum * Math.exp(-sum);
 			count++;
-			if (ds < 1.0E-2 * radius)
-				break;
+			
 			if (minVal[0] > maxVal[0] || minVal[1] > maxVal[1] && slope >= 0)
 				break;
 			if (minVal[0] > maxVal[0] || minVal[1] < maxVal[1] && slope < 0)
@@ -293,8 +291,7 @@ public class GaussianSplinethirdorder implements MTFitFunction {
 
 			sumofgaussians += count *dsum * Math.exp(-sum);
 			count++;
-			if (ds < 1.0E-2 * radius)
-				break;
+			
 			if (minVal[0] > maxVal[0] || minVal[1] > maxVal[1] && slope >= 0)
 				break;
 			if (minVal[0] > maxVal[0] || minVal[1] < maxVal[1] && slope < 0)
@@ -363,8 +360,7 @@ public class GaussianSplinethirdorder implements MTFitFunction {
 				sum += b[i] * di * di;
 			}
 			sumofgaussians += Math.exp(-sum);
-			if (ds < 1.0E-2 * radius)
-				break;
+			
 			if (minVal[0] >= maxVal[0] || minVal[1] >= maxVal[1] && slope >= 0)
 				break;
 			if (minVal[0] >= maxVal[0] || minVal[1] <= maxVal[1] && slope < 0)
