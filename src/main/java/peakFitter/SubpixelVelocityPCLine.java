@@ -677,7 +677,7 @@ public void setMaxdist (double maxdist) {
 
 						sigmas += psf[d] * psf[d];
 					}
-					final int numgaussians =3;
+					final int numgaussians =2;
 
 					double[] startfit = startpos;
 					double[] endfit = endpos;
@@ -762,7 +762,7 @@ public void setMaxdist (double maxdist) {
 
 						sigmas += psf[d] * psf[d];
 					}
-					final int numgaussians =3;
+					final int numgaussians =2;
 
 					double[] endfit = endpos;
 					double[] startfit = startpos;
@@ -869,7 +869,7 @@ public void setMaxdist (double maxdist) {
 						sigmas += psf[d] * psf[d];
 					}
 
-					final int numgaussians =3;
+					final int numgaussians =2;
 
 					if (DoMask) {
 
@@ -978,7 +978,7 @@ public void setMaxdist (double maxdist) {
 						sigmas += psf[d] * psf[d];
 					}
 
-					final int numgaussians =3;
+					final int numgaussians =2;
 
 					if (DoMask) {
 
@@ -1090,7 +1090,7 @@ public void setMaxdist (double maxdist) {
 						sigmas += psf[d] * psf[d];
 					}
 
-					final int numgaussians =3;
+					final int numgaussians =2;
 
 					if (DoMask) {
 
@@ -1201,7 +1201,7 @@ public void setMaxdist (double maxdist) {
 						sigmas += psf[d] * psf[d];
 					}
 
-					final int numgaussians =3;
+					final int numgaussians =2;
 
 					if (DoMask) {
 
