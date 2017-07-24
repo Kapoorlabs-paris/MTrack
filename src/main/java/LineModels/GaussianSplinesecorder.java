@@ -286,7 +286,7 @@ public static double numdiff(double[] x, double[] a, int dim, double[] b) {
 		double ds = Math.abs(a[2 * ndims]);
 
 		while (true) {
-
+//
 			sum = 0;
 
 			double dx = ds / Math.sqrt(1 + (slope+ 2 * curvature* minVal[0]) * (slope+ 2 * curvature* minVal[0]));
