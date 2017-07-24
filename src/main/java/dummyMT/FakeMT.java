@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 
-import com.sun.tools.javac.util.Pair;
 
 import drawandOverlay.AddGaussian;
 import fakeMTgenerator.Dummylines;

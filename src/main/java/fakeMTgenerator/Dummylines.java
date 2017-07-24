@@ -3,7 +3,6 @@ package fakeMTgenerator;
 import java.util.ArrayList;
 import java.util.Random;
 
-import com.sun.tools.javac.util.Pair;
 
 import drawandOverlay.AddGaussian;
 import drawandOverlay.PushCurves;
@@ -11,6 +10,8 @@ import net.imglib2.Interval;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.exception.IncompatibleTypeException;
 import net.imglib2.type.numeric.real.FloatType;
+import net.imglib2.util.Pair;
+import net.imglib2.util.ValuePair;
 
 public class Dummylines {
 
@@ -221,11 +222,11 @@ public class Dummylines {
 		 }
 	
 	
-		 Pair<ArrayList<Dummyprops>, ArrayList<Dummyprops>> pair = new  Pair<ArrayList<Dummyprops>, ArrayList<Dummyprops>> (newstlist, newendlist);
+		 Pair<ArrayList<Dummyprops>, ArrayList<Dummyprops>> pair = new  ValuePair<ArrayList<Dummyprops>, ArrayList<Dummyprops>> (newstlist, newendlist);
 	
-		 Pair<ArrayList<double[]>, ArrayList<double[]>> pairdoub = new  Pair<ArrayList<double[]>, ArrayList<double[]>> (startseeds, endseeds);
+		 Pair<ArrayList<double[]>, ArrayList<double[]>> pairdoub = new  ValuePair<ArrayList<double[]>, ArrayList<double[]>> (startseeds, endseeds);
 		 Pair<Pair<ArrayList<Dummyprops>, ArrayList<Dummyprops>>, Pair<ArrayList<double[]>, ArrayList<double[]>>> totalpair = new
-				 Pair<Pair<ArrayList<Dummyprops>, ArrayList<Dummyprops>>, Pair<ArrayList<double[]>, ArrayList<double[]>>> (pair, pairdoub);
+				 ValuePair<Pair<ArrayList<Dummyprops>, ArrayList<Dummyprops>>, Pair<ArrayList<double[]>, ArrayList<double[]>>> (pair, pairdoub);
 	return totalpair;
 		
 	}

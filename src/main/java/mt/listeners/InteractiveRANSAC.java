@@ -302,17 +302,13 @@ public class InteractiveRANSAC implements PlugIn {
 		c.insets = new Insets(30, 150, 0, 150);
 		panelFirst.add(Write, c);
 
-		++c.gridy;
-		c.insets = new Insets(30, 150, 0, 150);
-		panelFirst.add(done, c);
+	
 
 		++c.gridy;
 		c.insets = new Insets(30, 150, 0, 150);
 		panelFirst.add(batch, c);
 
-		++c.gridy;
-		c.insets = new Insets(10, 150, 0, 150);
-		panelFirst.add(cancel, c);
+	
 
 		maxErrorSB.addAdjustmentListener(new MaxErrorListener(this, maxErrorLabel, maxErrorSB));
 		minInliersSB.addAdjustmentListener(new MinInliersListener(this, minInliersLabel, minInliersSB));

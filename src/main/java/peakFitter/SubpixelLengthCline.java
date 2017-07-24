@@ -5,7 +5,6 @@ import java.util.ArrayList;
 
 import javax.swing.JProgressBar;
 
-import com.sun.tools.javac.util.Pair;
 
 import LineModels.GaussianLineds;
 import LineModels.UseLineModel.UserChoiceModel;

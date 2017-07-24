@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 
-import com.sun.tools.javac.util.Pair;
 
 import ij.ImageJ;
 import net.imglib2.FinalInterval;
@@ -15,6 +14,7 @@ import net.imglib2.exception.IncompatibleTypeException;
 import net.imglib2.img.array.ArrayImgFactory;
 import net.imglib2.img.display.imagej.ImageJFunctions;
 import net.imglib2.type.numeric.real.FloatType;
+import net.imglib2.util.Pair;
 import net.imglib2.view.Views;
 import poissonSimulator.Poissonprocess;
 import preProcessing.Kernels;
@@ -87,15 +87,15 @@ public class MovingLines {
 			
 			
 			
-			for (int index = 0; index < pair.fst.fst.size(); ++index){
+			for (int index = 0; index < pair.getA().getA().size(); ++index){
 				double[] prevst = new double[ndims];
 				double[] nextst = new double[ndims];
 				 
 				for (int d = 0; d < ndims; ++d){
 					
-					prevst[d] = pair.fst.fst.get(index).originalpoint[d];
+					prevst[d] = pair.getA().getA().get(index).originalpoint[d];
 					
-					nextst[d] = pair.fst.fst.get(index).newpoint[d];
+					nextst[d] = pair.getA().getA().get(index).newpoint[d];
 					
 				}
 				Indexofline linest = new Indexofline(index, frame, prevst, nextst);
@@ -104,7 +104,7 @@ public class MovingLines {
 		
 			}
 			 
-			for (int index = 0; index < pair.fst.fst.size(); ++index){
+			for (int index = 0; index < pair.getA().getA().size(); ++index){
 				
 				double[] preven = new double[ndims];
 				double[] nexten = new double[ndims];
@@ -112,9 +112,9 @@ public class MovingLines {
 				  
 				for (int d = 0; d < ndims; ++d){
 					
-					preven[d] = pair.fst.snd.get(index).originalpoint[d];
+					preven[d] = pair.getA().getB().get(index).originalpoint[d];
 					
-					nexten[d] = pair.fst.snd.get(index).newpoint[d];
+					nexten[d] = pair.getA().getB().get(index).newpoint[d];
 				}
 				
 				Indexofline lineend = new Indexofline(index, frame,preven, nexten);

@@ -57,6 +57,7 @@ public class LevenbergMarquardtSolverLine {
 			int npts = y.length;
 			int nparm = a.length;
 		
+			
 			double e0 = chiSquared(x, a, b, y, f);
 			boolean done = false;
 
@@ -67,12 +68,14 @@ public class LevenbergMarquardtSolverLine {
 
 			int iter = 0;
 			int term = 0;	// termination count test
+		/*
 			File fichier = new File(
 					"AnalyticalDerivativesLine" +  ".txt");
 
 			FileWriter fw = new FileWriter(fichier);
 			BufferedWriter bw = new BufferedWriter(fw);
 			bw.write("\titer\tparam0\tparam1\tparam2\tparam3\tparam4\tparam5\tparam6\tparam7\tparam8\tparam9\n");
+			*/
 			do {
 				++iter;
 				// hessian approximation
@@ -99,7 +102,7 @@ public class LevenbergMarquardtSolverLine {
 					}
 					
 				} //npts
-				
+			/*	
 			
 				try {
 					
@@ -130,7 +133,7 @@ public class LevenbergMarquardtSolverLine {
 					
 				} catch (IOException e) {
 				}
-				
+				*/
 				// solve H d = -g, evaluate error at new location
 				//double[] d = DoubleMatrix.solve(H, g);
 				double[] d = null;
@@ -179,7 +182,7 @@ public class LevenbergMarquardtSolverLine {
 					}
 				}
 				
-				// New truncation criteria to fasten the solver when it is stuck in a local minima @Varun
+				// New truncation criteria to fasten the solver when it moves slowly during an iteration step @Varun
 				for( int i = 0; i < nparm; i++ ) {
 					if (Math.abs(a[i] - na[i]) < 1.0E-10   )
 						lambda *= 50;
@@ -192,8 +195,8 @@ public class LevenbergMarquardtSolverLine {
 				
 
 			} while(!done);
-			bw.close();
-			fw.close();
+		//	bw.close();
+		//	fw.close();
 			return iter;
 		} //solve
 	}

@@ -132,9 +132,13 @@ public static double numdiff(double[] x, double[] a, int dim, double[] b) {
 		double[] dxvector = { ds / Math.sqrt( 1 + slope * slope) , slope * ds/ Math.sqrt( 1 + slope * slope)  };
 		double[] dxvectorderiv = { 1/ Math.sqrt( 1 + slope * slope) , slope/ Math.sqrt( 1 + slope * slope)  };
 
+		double sigmaX = 1/ Math.sqrt(b[0]);
+		double sigmaY = 1/ Math.sqrt(b[1]);
+		double radius = Math.sqrt(sigmaX*sigmaX + sigmaY*sigmaY);
 		
 	double sumofgaussians = 0;
 		
+	
 		while(true){
 		double dsum = 0;
 		double sum = 0;
@@ -150,7 +154,10 @@ public static double numdiff(double[] x, double[] a, int dim, double[] b) {
 		
 		count++;
 		
-		if (minVal[0] > maxVal[0] || minVal[1] > maxVal[1] && slope > 0)
+		if (ds < 1.0E-2 * radius)
+			break;
+		
+		if (minVal[0] > maxVal[0] || minVal[1] > maxVal[1] && slope >= 0 )
 			break;
 		if (minVal[0] > maxVal[0] || minVal[1] < maxVal[1] && slope < 0)
 			break;
@@ -158,29 +165,7 @@ public static double numdiff(double[] x, double[] a, int dim, double[] b) {
 	}
 		
 		
-/*		
-		
-		double sum = 0;
-		double dsum = 0;
-		for (int i = 0; i < x.length; i++) {
-			minVal[i] += dxvector[i];
-			di = x[i] - minVal[i];
-			sum += b[i] * di * di;
-			dsum += 2 * b[i] * di * dxvectorderiv[i];
-		}
-		double sumofgaussians = dsum * Math.exp(-sum);
-		
-		double dsumend = 0;
-		double sumend = 0;
-		for (int i = 0; i < x.length; i++) {
-			maxVal[i] -= dxvector[i];
-			di = x[i] - maxVal[i];
-			sumend += b[i] * di * di;
-			dsumend += -2 * b[i] * di * dxvectorderiv[i];
-		}
-		sumofgaussians+= dsumend * Math.exp(-sumend);
-		
-*/
+
 		
 		
 		return    sumofgaussians ;
@@ -222,7 +207,9 @@ public static double numdiff(double[] x, double[] a, int dim, double[] b) {
 		double sum = 0;
 		double sumofgaussians = 0;
 		double di;
-		
+		double sigmaX = 1/ Math.sqrt(b[0]);
+		double sigmaY = 1/ Math.sqrt(b[1]);
+		double radius = Math.sqrt(sigmaX*sigmaX + sigmaY*sigmaY);
 		
 		double ds = Math.abs(a[2 * ndims]);
 
@@ -238,8 +225,9 @@ public static double numdiff(double[] x, double[] a, int dim, double[] b) {
 			}
 			sumofgaussians += Math.exp(-sum);
 
-			
-			if (minVal[0] >= maxVal[0] || minVal[1] >= maxVal[1] && slope > 0)
+			if (ds < 1.0E-2 * radius)
+				break;
+			if (minVal[0] >= maxVal[0] || minVal[1] >= maxVal[1] && slope >= 0)
 				break;
 			if (minVal[0] >= maxVal[0] || minVal[1] <= maxVal[1] && slope < 0)
 				break;
