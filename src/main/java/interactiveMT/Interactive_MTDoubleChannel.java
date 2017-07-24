@@ -165,7 +165,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public ArrayList<OvalRoi> AllSeedrois;
 	public float thresholdHoughMin = 0;
 	public float thresholdHoughMax = 1;
-	public float deltaMax = 400f;
+	public float deltaMax = 255f;
 	public float Unstability_ScoreMin = 0;
 	public float Unstability_ScoreMax = 1;
 

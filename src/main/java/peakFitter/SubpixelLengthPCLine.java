@@ -718,28 +718,7 @@ public ArrayList<Indexedlength> getEndPoints(){
 
 		
 
-		private PointSampleList<FloatType> gatherfullData(final int label) {
-			final PointSampleList<FloatType> datalist = new PointSampleList<FloatType>(ndims);
-
-			RandomAccessibleInterval<FloatType> currentimg = imgs.get(label).Actualroi;
-			FinalInterval interval = imgs.get(label).interval;
-			currentimg = Views.interval(currentimg, interval);	
-			
-			Cursor<FloatType> localcursor = Views.iterable(currentimg).localizingCursor();
-
-			while (localcursor.hasNext()) {
-				localcursor.fwd();
-				
-				Point newpoint = new Point(localcursor);
-				datalist.add(newpoint, localcursor.get().copy());
-
-			}
-
-			
-			return datalist;
-          
-          
-		}
+		
 
 		public double Distance(final double[] cordone, final double[] cordtwo) {
 

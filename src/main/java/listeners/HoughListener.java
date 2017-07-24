@@ -99,14 +99,7 @@ public class HoughListener implements ItemListener {
 			++c.gridy;
 			parent.panelSecond.add(Houghparam, c);
 
-			++c.gridy;
-			parent.panelSecond.add(exthresholdText, c);
-			++c.gridy;
-
-			parent.panelSecond.add(exthetaText, c);
-			++c.gridy;
-
-			parent.panelSecond.add(exrhoText, c);
+			
 			++c.gridy;
 
 			parent.panelSecond.add(thresholdText, c);

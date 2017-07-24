@@ -18,8 +18,7 @@ import java.util.ArrayList;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import com.sun.source.util.JavacTask;
-import com.sun.source.util.Plugin;
+
 
 import ij.IJ;
 import ij.ImageJ;

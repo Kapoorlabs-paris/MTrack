@@ -116,7 +116,9 @@ public static double numdiff(double[] x, double[] a, int dim, double[] b) {
 		final int ndims = x.length;
 		double[] minVal = new double[ndims];
 		double[] maxVal = new double[ndims];
-
+		double sigmaX = 1/ Math.sqrt(b[0]);
+		double sigmaY = 1/ Math.sqrt(b[1]);
+		double radius = Math.sqrt(sigmaX*sigmaX + sigmaY*sigmaY);
 		double curvature = a[2 * ndims + 1];
 		for (int i = 0; i < x.length; i++) {
 			minVal[i] = a[i];
@@ -168,7 +170,8 @@ public static double numdiff(double[] x, double[] a, int dim, double[] b) {
 		sumofgaussians+= count * dsum * Math.exp(-sum);
 		
 		count++;
-		
+		if (ds < 1.0E-2 * radius)
+			break;
 		if (minVal[0] > maxVal[0] || minVal[1] > maxVal[1] && slope > 0)
 			break;
 		if (minVal[0] > maxVal[0] || minVal[1] < maxVal[1] && slope < 0)
@@ -187,7 +190,10 @@ public static double numdiff(double[] x, double[] a, int dim, double[] b) {
 		final int ndims = x.length;
 		double[] minVal = new double[ndims];
 		double[] maxVal = new double[ndims];
-
+		double sigmaX = 1/ Math.sqrt(b[0]);
+		double sigmaY = 1/ Math.sqrt(b[1]);
+		double radius = Math.sqrt(sigmaX*sigmaX + sigmaY*sigmaY);
+		
 		double curvature = a[2 * ndims + 1];
 		for (int i = 0; i < x.length; i++) {
 			minVal[i] = a[i];
@@ -236,7 +242,8 @@ public static double numdiff(double[] x, double[] a, int dim, double[] b) {
 		sumofgaussians+= count * dsum * Math.exp(-sum);
 		
 		count++;
-		
+		if (ds < 1.0E-2 * radius)
+			break;
 		if (minVal[0] > maxVal[0] || minVal[1] > maxVal[1] && slope > 0)
 			break;
 		if (minVal[0] > maxVal[0] || minVal[1] < maxVal[1] && slope < 0)
@@ -272,7 +279,10 @@ public static double numdiff(double[] x, double[] a, int dim, double[] b) {
 		final int ndims = x.length;
 		double[] minVal = new double[ndims];
 		double[] maxVal = new double[ndims];
-
+		double sigmaX = 1/ Math.sqrt(b[0]);
+		double sigmaY = 1/ Math.sqrt(b[1]);
+		double radius = Math.sqrt(sigmaX*sigmaX + sigmaY*sigmaY);
+		
 		for (int i = 0; i < x.length; i++) {
 			minVal[i] = a[i];
 			maxVal[i] = a[ndims + i];
@@ -300,7 +310,8 @@ public static double numdiff(double[] x, double[] a, int dim, double[] b) {
 				sum += b[i] * di * di;
 			}
 			sumofgaussians += Math.exp(-sum);
-
+			if (ds < 1.0E-2 * radius)
+				break;
 			
 			if (minVal[0] >= maxVal[0] || minVal[1] >= maxVal[1] && slope > 0)
 				break;

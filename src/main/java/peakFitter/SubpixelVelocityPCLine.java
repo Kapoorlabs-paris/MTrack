@@ -12,7 +12,6 @@ import javax.swing.JProgressBar;
 
 import org.apache.poi.poifs.property.Parent;
 
-import com.sun.source.tree.ParenthesizedTree;
 
 import LineModels.GaussianLineds;
 import LineModels.GaussianLinedsHF;
@@ -628,7 +627,7 @@ public void setMaxdist (double maxdist) {
 			double inicutoffdistanceY = Math.abs(inistartpos[1] - iniendpos[1]);
 			double inicutoffdistanceX = Math.abs(inistartpos[0] - iniendpos[0]);
 			// LM solver part
-			if (inicutoffdistanceY > 0 && inicutoffdistanceX > 0) {
+			if (inicutoffdistanceY > 0 && inicutoffdistanceX > 0){
 				// LM solver part
 
 				try {
