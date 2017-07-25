@@ -65,7 +65,7 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 	public double termepsilon = 1e-3;
 	// Mask fits iteration param
 	public int iterations = 200;
-	public double maxdist = 100;
+	public double maxdist = 20;
 	public double cutoffdistance = 15;
 	public boolean halfgaussian = false;
 	public double Intensityratio;
@@ -262,7 +262,11 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 			final double[] oldstartpoint = Userframe.get(index).currentpos;
 
 			double[] newstartpoint = paramnextframestart.currentpos;
-			double dist = Distance(oldstartpoint, newstartpoint);
+			double pointonline = newstartpoint[1] - originalslope * newstartpoint[0]
+					- originalintercept;
+			double oldpointonline = oldstartpoint[1] - originalslope * oldstartpoint[0]
+					- originalintercept;
+			double dist = Math.abs(pointonline - oldpointonline);
 			if (dist > maxdist && framenumber > startframe + 1){
 				paramnextframestart = Userframe.get(index);
 				newstartpoint = oldstartpoint;

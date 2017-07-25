@@ -82,7 +82,7 @@ public class SubpixelVelocityPCLine extends BenchmarkAlgorithm
 	final int thirdDimsize;
 	private final UserChoiceModel model;
 	public double Inispacing;
-	public double maxdist = 100;
+	public double maxdist = 20;
 
 	public final int startframe;
 	double percent = 0;
@@ -295,7 +295,12 @@ public void setMaxdist (double maxdist) {
 
 				double[] newstartpoint = paramnextframestart.currentpos;
 
-				double dist = Distance(oldstartpoint, newstartpoint);
+				double pointonline = newstartpoint[1] - originalslope * newstartpoint[0]
+						- originalintercept;
+				
+				double oldpointonline = oldstartpoint[1] - originalslope * oldstartpoint[0]
+						- originalintercept;
+				double dist = Math.abs(pointonline - oldpointonline);
 				if (dist > maxdist && framenumber > startframe + 1){
 					paramnextframestart = PrevFrameparamstart.get(index);
 					newstartpoint = oldstartpoint;
@@ -387,7 +392,11 @@ public void setMaxdist (double maxdist) {
 				final double[] oldendpoint = PrevFrameparamend.get(index).currentpos;
 
 				double[] newendpoint = paramnextframeend.currentpos;
-				double dist = Distance(oldendpoint, newendpoint);
+				double pointonline = newendpoint[1] - originalslopeend * newendpoint[0]
+						- originalinterceptend;
+				double oldpointonline = oldendpoint[1] - originalslopeend * oldendpoint[0]
+						- originalinterceptend;
+				double dist = Math.abs(pointonline - oldpointonline);
 				if (dist > maxdist && framenumber > startframe + 1){
 					paramnextframeend = PrevFrameparamend.get(index);
 				    newendpoint = oldendpoint;	
