@@ -46,8 +46,20 @@ public class FitterUtils {
 		int finallabel = Integer.MIN_VALUE;
 		ArrayList<Integer> alllabels = new ArrayList<Integer>();
 
-		for (int index = 0; index < imgs.size(); ++index) {
 
+		int index = 0;
+			if (imgs.get(index).intimg!= null){
+				
+				RandomAccess<IntType> intranac = imgs.get(index).intimg.randomAccess();
+
+				intranac.setPosition(fixedpoint);
+				finallabel = intranac.get().get();
+				alllabels.add(finallabel);
+			
+			}
+			
+			
+			else{
 			RandomAccessibleInterval<FloatType> currentimg = imgs.get(index).Actualroi;
 			FinalInterval interval = imgs.get(index).interval;
 			currentimg = Views.interval(currentimg, interval);
@@ -76,6 +88,7 @@ public class FitterUtils {
 		
 
 		return alllabels;
+		
 	}
 
 	public static int getlabelindex(final ArrayList<CommonOutputHF> imgs, int label) {
