@@ -72,7 +72,7 @@ public class ProgressBeads extends SwingWorker<Void, Void> {
 			}
 
 		}
-
+//work
 		else {
 
 			RandomAccessibleInterval<FloatType> source = parent.currentPreprocessedimg;
