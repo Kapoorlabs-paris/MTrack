@@ -254,29 +254,45 @@ public class RansacFileChooser extends JPanel {
 				}
 			});
 
-			ArrayList<Pair<Integer, Double>> Alllife = new ArrayList<Pair<Integer, Double>>();
+			ArrayList<Pair<Integer, ArrayList<Pair<Integer, Double>>>> Alllife = new ArrayList<Pair<Integer, ArrayList<Pair<Integer, Double>>>>();
 			for (int i = 0; i < AllMovies.length; ++i) {
 
 				
 				BatchRANSAC batch = new BatchRANSAC(Tracking.loadMT((AllMovies[i])), AllMovies[i]);
 				
 				batch.run(null);
-				Pair<Integer, Double> life = new ValuePair<Integer, Double>(i, batch.lifetime);
+				Pair<Integer, ArrayList<Pair<Integer,Double>>> life = new ValuePair<Integer, ArrayList<Pair<Integer,Double>>>(i, batch.lifetime);
 				Alllife.add(life);
 				
 				
 			}
-			List<Double> Xvalues = new ArrayList<Double>();
+			List<Pair<Integer,Double>> Xvalues = new ArrayList<Pair<Integer,Double>>();
 
-			for (final Pair<Integer, Double> key : Alllife){
+			for (final Pair<Integer, ArrayList<Pair<Integer,Double>>> key : Alllife){
 			
-				if (key.getB() > 0)
-				Xvalues.add(key.getB());
+				Xvalues.addAll(key.getB());
 			}
-			int numBins = 50;
-			final JFreeChart histXchart = DisplayHistogram.makehistXChart(Xvalues, numBins);
-
-			DisplayPoints.display(histXchart, new Dimension(800, 500));
+			
+			
+			
+			XYSeries timeseries = Tracking.drawPoints(Xvalues, "Time Distribution");
+			XYSeries counterseries = new XYSeries("Time Distribution");
+			
+			
+			for (final Pair<Integer, Double> key : Xvalues){
+				
+				counterseries.add(key.getB(), key.getA());
+			}
+			
+			
+			XYSeriesCollection dataset = new XYSeriesCollection(counterseries);
+			
+			 final JFreeChart chart =
+					  ChartFactory.createScatterPlot("Time Distribution",
+					  "Time (px)", "Count of growth events", dataset);
+					  
+					  DisplayPoints.display(chart, new Dimension(800, 500));
+	
 
 			LengthDistribution.GetLengthDistribution(AllMovies);
 			Singlefile();

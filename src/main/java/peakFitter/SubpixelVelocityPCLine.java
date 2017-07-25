@@ -253,22 +253,27 @@ public void setMaxdist (double maxdist) {
 					labelindex = labelstart.get(0);
 
 				if (labelindex != Integer.MIN_VALUE) {
-					paramnextframestart = Getfinaltrackparam(PrevFrameparamstart.get(index), labelstart.get(0), psf,
-							framenumber, StartorEnd.Start);
+					
+					
+					
+					
+					
+					paramnextframestart = Getfinaltrackparam(PrevFrameparamstart.get(index), labelstart.get(0),
+							psf, framenumber, StartorEnd.Start); 
 					double[] currentposini = paramnextframestart.currentpos;
 					double[] fixedposini = paramnextframestart.fixedpos;
 					double distmin = Distance(currentposini, fixedposini);
 					double min = Double.MAX_VALUE;
 					
 					if (labelstart.size() > 1) {
-						for (int j = 1; j < labelstart.size(); ++j) {
+						for (int j = 0; j < labelstart.size(); ++j) {
 							System.out.println("Fitting multiple Labels");
 							Indexedlength test = Getfinaltrackparam(PrevFrameparamstart.get(index), labelstart.get(j),
 									psf, framenumber, StartorEnd.Start);
 							double[] currentpos = test.currentpos;
 							double[] fixedpos = test.fixedpos;
-							double pointonline = currentpos[1] - test.originalslope * currentpos[0]
-									- test.originalintercept;
+							double pointonline = currentpos[1] - originalslope * currentpos[0]
+									- originalintercept;
 							double dist = Distance(currentpos, fixedpos);
 							if (Math.abs(pointonline) < min) {
 								min = Math.abs(pointonline);
@@ -346,22 +351,22 @@ public void setMaxdist (double maxdist) {
 					labelindex = labelend.get(0);
 				if (labelindex != Integer.MIN_VALUE) {
 					paramnextframeend = Getfinaltrackparam(PrevFrameparamend.get(index), labelend.get(0), psf,
-							framenumber, StartorEnd.End);
+							framenumber, StartorEnd.End); 
 
 					double min = Double.MAX_VALUE;
 					double[] currentposini = paramnextframeend.currentpos;
 					double[] fixedposini = paramnextframeend.fixedpos;
 					double distmin = Distance(currentposini, fixedposini);
 					if (labelend.size() > 1) {
-						for (int j = 1; j < labelend.size(); ++j) {
+						for (int j = 0; j < labelend.size(); ++j) {
 							System.out.println("Fitting multiple Labels");
 
 							Indexedlength test = Getfinaltrackparam(PrevFrameparamend.get(index), labelend.get(j), psf,
 									framenumber, StartorEnd.End);
 							double[] currentpos = test.currentpos;
 							double[] fixedpos = test.fixedpos;
-							double pointonline = currentpos[1] - test.originalslope * currentpos[0]
-									- test.originalintercept;
+							double pointonline = currentpos[1] - originalslopeend * currentpos[0]
+									- originalinterceptend;
 							double dist = Distance(currentpos, fixedpos);
 							if (Math.abs(pointonline) < min) {
 								min = Math.abs(pointonline);

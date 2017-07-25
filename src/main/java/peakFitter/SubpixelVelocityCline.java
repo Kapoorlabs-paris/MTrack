@@ -211,8 +211,8 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 					labelindex = labelstart.get(0);
 
 				if (labelindex != Integer.MIN_VALUE) {
-					paramnextframe = Getfinaltrackparam(PrevFrameparamstart.get(index), labelstart.get(0), psf,
-							framenumber, StartorEnd.Start);
+					paramnextframe = Getfinaltrackparam(PrevFrameparamstart.get(index), labelstart.get(0),
+							psf, framenumber, StartorEnd.Start);
 
 					double min = Double.MAX_VALUE;
 					double distmin = Double.MAX_VALUE;
@@ -223,7 +223,7 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 									psf, framenumber, StartorEnd.Start);
 							double[] currentpos = test.currentpos;
 							double[] fixedpos = test.fixedpos;
-							double pointonline = currentpos[1] - test.originalslope * currentpos[0]
+							double pointonline = fixedpos[1] - test.originalslope * fixedpos[0]
 									- test.originalintercept;
 							double dist = Distance(currentpos, fixedpos);
 							if (Math.abs(pointonline) < min) {
@@ -313,7 +313,7 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 									framenumber, StartorEnd.End);
 							double[] currentpos = test.currentpos;
 							double[] fixedpos = test.fixedpos;
-							double pointonline = currentpos[1] - test.originalslope * currentpos[0]
+							double pointonline = fixedpos[1] - test.originalslope * fixedpos[0]
 									- test.originalintercept;
 							double dist = Distance(currentpos, fixedpos);
 							if (Math.abs(pointonline) < min) {

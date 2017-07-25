@@ -223,7 +223,8 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 				labelindex = labelstart.get(0);
 
 			if (labelindex != Integer.MIN_VALUE) {
-				paramnextframestart = Getfinaltrackparam(Userframe.get(index), labelstart.get(0), psf, oldframenumber);
+				paramnextframestart = Getfinaltrackparam(Userframe.get(index), labelstart.get(0), psf,
+						framenumber);
 
 				double min = Double.MAX_VALUE;
 				double[] currentposini = paramnextframestart.currentpos;
@@ -231,19 +232,18 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 				double distmin = Distance(currentposini, fixedposini);
 				
 				if (labelstart.size() > 1) {
-					for (int j = 1; j < labelstart.size(); ++j) {
+					for (int j = 0; j < labelstart.size(); ++j) {
 						System.out.println("Fitting multiple Labels" + "User defined");
 						Indexedlength test = Getfinaltrackparam(Userframe.get(index), labelstart.get(j), psf,
 								framenumber);
 						
 						double[] currentpos = test.currentpos;
 						double[] fixedpos = test.fixedpos;
-						double pointonline = currentpos[1] - test.originalslope * currentpos[0]
+						double pointonline = fixedpos[1] - test.originalslope * fixedpos[0]
 								- test.originalintercept;
 						double dist = Distance(currentpos, fixedpos);
 						if (Math.abs(pointonline) < min) {
 							min = Math.abs(pointonline);
-
 							if (dist < distmin) {
 								distmin = dist;
 								labelindex = labelstart.get(j);

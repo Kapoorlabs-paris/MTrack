@@ -120,7 +120,8 @@ public class LengthDistribution {
 		}
 		
 		final XYSeriesCollection dataset = new XYSeriesCollection();
-		  dataset.addSeries(counterseries); final JFreeChart chart =
+		  dataset.addSeries(counterseries); 
+		  final JFreeChart chart =
 		  ChartFactory.createScatterPlot("MT length distribution",
 		  "Length (px)", "Number of MT", dataset);
 		  

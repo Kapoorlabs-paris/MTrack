@@ -90,6 +90,7 @@ import listeners.MinSizeHoughListener;
 import listeners.MinSizeListener;
 import listeners.MserListener;
 import listeners.MserwHoughListener;
+import listeners.RadiusListener;
 import listeners.SeedDisplayListener;
 import listeners.ShowBitimgListener;
 import listeners.ShowwatershedimgListener;
@@ -1234,6 +1235,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 		// ChoiceofTracker.addActionListener(new
 		// TrackerButtonListener(Cardframe));
+		inputFieldradi.addTextListener(new RadiusListener(this));
 		mser.addItemListener(new MserListener(this));
 		Analyzekymo.addItemListener(new AnalyzekymoListener(this));
 		hough.addItemListener(new HoughListener(this));

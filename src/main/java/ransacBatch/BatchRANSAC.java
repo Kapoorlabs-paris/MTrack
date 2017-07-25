@@ -116,7 +116,7 @@ public class BatchRANSAC implements PlugIn {
 
 	};
 
-	public double lifetime;
+	public ArrayList<Pair<Integer, Double>> lifetime;
 	@Override
 	public void run(String arg) {
 		/* JFreeChart */
@@ -323,10 +323,23 @@ public class BatchRANSAC implements PlugIn {
 
 	}
 
-	public double writeratestofile() {
+	public ArrayList<Pair<Integer, Double>> writeratestofile() {
 
 		String file = inputfile.getName().replaceFirst("[.][^.]+$", "");
 		double lifetime = 0;
+		int count = 0;
+		int negcount = 0;
+		int rescount = 0;
+		double timediff = 0;
+		double restimediff = 0;
+		double negtimediff = 0;
+		double averagegrowth = 0;
+		double averageshrink = 0;
+
+		double minstartX = leastStart();
+		double catfrequ = 0;
+		double resfrequ = 0;
+		ArrayList<Pair<Integer, Double>> lifecount = new ArrayList<Pair<Integer, Double>>() ;
 		try {
 			File ratesfile = new File(inputdirectory + "//" + file + "Rates" + ".txt");
 			File frequfile = new File(inputdirectory + "//" + file + "Averages" + ".txt");
@@ -342,18 +355,7 @@ public class BatchRANSAC implements PlugIn {
 			bw.write("\tStartTime (px)\tEndTime(px)\tLinearRateSlope(px)\n");
 			bwfrequ.write(
 					"\tAverageGrowthrate(px)\tAverageShrinkrate(px)\tCatastropheFrequency(px)\tRescueFrequency(px)\n");
-			int count = 0;
-			int negcount = 0;
-			int rescount = 0;
-			double timediff = 0;
-			double restimediff = 0;
-			double negtimediff = 0;
-			double averagegrowth = 0;
-			double averageshrink = 0;
-
-			double minstartX = leastStart();
-			double catfrequ = 0;
-			double resfrequ = 0;
+			
 			
 			for (final Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>> result : segments) {
 
@@ -385,7 +387,7 @@ public class BatchRANSAC implements PlugIn {
 
 						count++;
 						timediff += endX - startX;
-						lifetime = timediff;
+						lifetime = endX - startX;
 						averagegrowth += linearrate;
 
 					}
@@ -419,7 +421,7 @@ public class BatchRANSAC implements PlugIn {
 
 					resfrequ = rescount / restimediff;
 				
-
+				lifecount.add(new  ValuePair<Integer, Double>(count, lifetime));
 			}
 			bwfrequ.write("\t" + nf.format(averagegrowth) + "\t" + "\t" + "\t" + "\t" + nf.format(averageshrink) + "\t"
 					+ "\t" + "\t" + nf.format(catfrequ) + "\t" + "\t" + "\t" + nf.format(resfrequ)
@@ -435,7 +437,9 @@ public class BatchRANSAC implements PlugIn {
 			e.printStackTrace();
 		}
 
-		return lifetime;
+		
+		
+		return lifecount;
 		
 	}
 
