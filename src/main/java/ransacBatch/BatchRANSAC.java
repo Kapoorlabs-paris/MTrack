@@ -356,7 +356,7 @@ public class BatchRANSAC implements PlugIn {
 			bwfrequ.write(
 					"\tAverageGrowthrate(px)\tAverageShrinkrate(px)\tCatastropheFrequency(px)\tRescueFrequency(px)\n");
 			
-			
+			sort(segments);
 			for (final Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>> result : segments) {
 
 				final Pair<Double, Double> minMax = Tracking.fromTo(result.getB());

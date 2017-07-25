@@ -15,6 +15,7 @@ final Interactive_MTDoubleChannel parent;
 	public RadiusListener(final Interactive_MTDoubleChannel parent){
 		
 		this.parent = parent;
+		 parent.updatePreview(ValueChange.SHOWMSER);
 	}
 	
 	
@@ -29,7 +30,10 @@ final Interactive_MTDoubleChannel parent;
 
 		
 		    }
+		    if (parent.inputFieldradi.getText().length() > 0)
+				parent.radiusfactor = Double.parseDouble(parent.inputFieldradi.getText());
 		    parent.updatePreview(ValueChange.SHOWMSER);
+		   
 	}
 
 }
