@@ -60,27 +60,30 @@ public class FitterUtils {
 			
 			
 			else{
-			RandomAccessibleInterval<FloatType> currentimg = imgs.get(index).Actualroi;
-			FinalInterval interval = imgs.get(index).interval;
+				
+			for (int indexx = 0; indexx < imgs.size(); ++indexx){	
+			RandomAccessibleInterval<FloatType> currentimg = imgs.get(indexx).Actualroi;
+			FinalInterval interval = imgs.get(indexx).interval;
 			currentimg = Views.interval(currentimg, interval);
 
 			if (fixedpoint.getIntPosition(0) >= interval.min(0) && fixedpoint.getIntPosition(0) <= interval.max(0)
 					&& fixedpoint.getIntPosition(1) >= interval.min(1)
 					&& fixedpoint.getIntPosition(1) <= interval.max(1)) {
 
-				for (int i = 0; i < imgs.get(index).Allrois.size(); ++i) {
+				for (int i = 0; i < imgs.get(indexx).Allrois.size(); ++i) {
 
-					EllipseRoi roi = imgs.get(index).Allrois.get(i);
+					EllipseRoi roi = imgs.get(indexx).Allrois.get(i);
 
 					if (roi.contains(fixedpoint.getIntPosition(0), fixedpoint.getIntPosition(1))) {
 
-						finallabel = imgs.get(index).roilabel;
+						finallabel = imgs.get(indexx).roilabel;
 
 						alllabels.add(finallabel);
 
 					}
 
 				}
+			}
 			}
 
 		}

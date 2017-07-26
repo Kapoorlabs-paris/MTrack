@@ -284,7 +284,7 @@ public  class SingleTrackBatch {
 					
 			
 					
-					if (count > parent.thirdDimensionSize / 3.0){
+					if (count > parent.thirdDimensionSize / 5.0){
 					
 						try {
 							File fichier = new File(
@@ -457,7 +457,7 @@ public  class SingleTrackBatch {
 					
 			
 					
-					if (count > parent.thirdDimensionSize / 3.0){
+					if (count > parent.thirdDimensionSize / 5.0){
 						try {
 							File fichier = new File(
 									parent.batchfolder + "//" + "Batch_Processed" +  parent.parent.addToName + "SeedLabel" + seedID + "-endB" + ".txt");
@@ -618,7 +618,7 @@ public  class SingleTrackBatch {
 					
 				
 					
-					if (count > parent.thirdDimensionSize / 3.0){
+					if (count > parent.thirdDimensionSize / 5.0){
 						try {
 							File fichier = new File(
 									parent.batchfolder  + "//"+ "Batch_Processed" + parent.parent.addToName + "SeedLabel" + seedID + "-Usermarked" + ".txt");

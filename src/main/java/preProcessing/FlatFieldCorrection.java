@@ -168,7 +168,7 @@ public class FlatFieldCorrection extends BenchmarkAlgorithm implements OutputAlg
 		
 		
 		
-		correctedgaussimg = Kernels.Meanfilterandsupress(correctedgaussimg, radius);
+		correctedgaussimg = Kernels.Meanfilterandsupress(correctedgaussimg, 2 *radius);
 	//	correctedgaussimg = Kernels.SupressLowthresh(correctedgaussimg);
 		final Cursor< FloatType > cursor = out.localizingCursor();
 

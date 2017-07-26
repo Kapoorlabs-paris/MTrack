@@ -2358,7 +2358,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		gd.addNumericField("Initial guess for Min Pixel Intensity (MinPI) belonging to MT (  R =  MinPI / MaxPI), R (enter 0.2 to 0.9) = ", Intensityratio, 2);
 		gd.addNumericField("Initial Spacing between Gaussians along the Polynomial curve = G * Min(Psf), G (enter positive number) = ",
 				Inispacing / Math.min(psf[0], psf[1]), 2);
-		gd.addNumericField("Maximum distance allowed for tips to grow (pixels)", maxdist, 2);
+		gd.addNumericField("Maximum direction change per frame (pixels)", maxdist, 2);
 
 		if (analyzekymo && Kymoimg != null) {
 			gd.addNumericField("On an average, maximum difference in pixels between Kymograph and Program generated curve = ", deltadcutoff, 2);
@@ -2398,7 +2398,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		gd.addNumericField("Initial guess for Min Pixel Intensity (MinPI) belonging to MT (  R =  MinPI / MaxPI), R (enter 0.2 to 0.9) = ", Intensityratio, 2);
 		gd.addNumericField("Initial Spacing between Gaussians along the Polynomial curve = G * Min(Psf), G (enter positive number ) = ",
 				Inispacing / Math.min(psf[0], psf[1]), 2);
-		gd.addNumericField("Maximum distance allowed for tips to grow (pixels) ", maxdist, 2);
+		gd.addNumericField("Maximum direction change per frame (pixels) ", maxdist, 2);
 		gd.addStringField("Choose a different Directory?:", usefolder);
 		gd.addStringField("Choose a different filename?:", addToName);
 		gd.showDialog();

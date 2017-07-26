@@ -339,7 +339,7 @@ public  class Track {
 					}
 					
 				
-					if ( count > parent.thirdDimensionSize / 3.0) {
+					if ( count > parent.thirdDimensionSize / 5.0) {
 						
 						
 						try {
@@ -511,7 +511,7 @@ public  class Track {
 					}
 					
 				
-					if ( count > parent.thirdDimensionSize/3.0) {
+					if ( count > parent.thirdDimensionSize/5.0) {
 						try {
 							File fichier = new File(
 									parent.usefolder + "//" + parent.addToName + "SeedLabel" + seedID + "-endB" + ".txt");
@@ -669,7 +669,7 @@ public  class Track {
 						}
 					
 			
-					if ( count > parent.thirdDimensionSize / 3.0) {
+					if ( count > parent.thirdDimensionSize / 5.0) {
 						
 						try {
 							File fichier = new File(

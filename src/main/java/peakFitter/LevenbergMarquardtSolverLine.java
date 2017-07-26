@@ -191,7 +191,8 @@ public class LevenbergMarquardtSolverLine {
 				if (lambda >= 1.0E50)
 					done = true;
 				
-				
+				if (IJ.escapePressed()) 
+					break;
 				
 
 			} while(!done);
