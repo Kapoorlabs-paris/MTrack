@@ -83,8 +83,8 @@ public class RansacFileChooser extends JPanel {
 
 		final JFrame frame = new JFrame("Welcome to the Ransac Part of MTV tracker");
 
-		Track = new JButton("Choose file");
-
+		Track = new JButton("Run RANSAC fit on a single track file");
+		JButton Measureserial = new JButton("Run RANSAC fits on directory of files (Set parameters individually)");
 		panelCont.add(panelIntro, "1");
 		/* Instantiation */
 		final GridBagLayout layout = new GridBagLayout();
@@ -97,7 +97,6 @@ public class RansacFileChooser extends JPanel {
 		LoadtrackText.setBackground(new Color(1, 0, 1));
 		LoadtrackText.setForeground(new Color(255, 255, 255));
 		final Checkbox Batchmode = new Checkbox("Run in Batch Mode", Batchmoderun);
-		final Checkbox Simplemode = new Checkbox("Open simple time-series file", Simplefile);
 		/* Location */
 
 		c.fill = GridBagConstraints.HORIZONTAL;
@@ -108,7 +107,7 @@ public class RansacFileChooser extends JPanel {
 		++c.gridy;
 		c.insets = new Insets(10, 10, 10, 0);
 		panelIntro.add(Batchmode, c);
-
+	
 	//	++c.gridy;
 	//	c.insets = new Insets(10, 10, 10, 0);
 	//	panelIntro.add(Simplemode, c);
@@ -120,11 +119,15 @@ public class RansacFileChooser extends JPanel {
 		++c.gridy;
 		c.insets = new Insets(10, 10, 10, 0);
 		panelIntro.add(Track, c);
+		
+		++c.gridy;
+		c.insets = new Insets(10, 10, 10, 0);
+		panelIntro.add(Measureserial, c);
 
 		panelIntro.setVisible(true);
 		Track.addActionListener(new OpenTrackListener(frame));
-		Simplemode.addItemListener(new SimpleListener(frame));
 		Batchmode.addItemListener(new RansacRuninBatchListener(frame));
+		Measureserial.addActionListener(new MeasureserialListener(frame));
 		frame.addWindowListener(new FrameListener(frame));
 		frame.add(panelCont, BorderLayout.CENTER);
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -183,8 +186,9 @@ public class RansacFileChooser extends JPanel {
 			LoadDirectoryText.setBackground(new Color(1, 0, 1));
 			LoadDirectoryText.setForeground(new Color(255, 255, 255));
 
-			JButton Measurebatch = new JButton("Select directory of txt trajectory files and obtain RANSAC fits");
-
+			JButton Measurebatch = new JButton("Run RANSAC fits on directory of files (Pre-set parameters)");
+		
+			
 			c.fill = GridBagConstraints.HORIZONTAL;
 			c.gridx = 0;
 			c.gridy = 0;
@@ -198,10 +202,13 @@ public class RansacFileChooser extends JPanel {
 			++c.gridy;
 			c.insets = new Insets(10, 10, 10, 0);
 			panelIntro.add(Measurebatch, c);
+			
+			
 			++c.gridy;
 			c.insets = new Insets(10, 10, 10, 0);
 			panelIntro.add(Done, c);
 			Measurebatch.addActionListener(new MeasurebatchListener(frame));
+			
 			Done.addActionListener(new DoneButtonListener(frame, true));
 			panelIntro.validate();
 			panelIntro.repaint();
@@ -215,6 +222,53 @@ public class RansacFileChooser extends JPanel {
 
 	}
 
+	
+	protected class MeasureserialListener implements ActionListener {
+
+		final Frame parent;
+
+		public MeasureserialListener(Frame parent) {
+
+			this.parent = parent;
+
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent arg0) {
+			chooserA = new JFileChooser();
+
+			chooserA.setCurrentDirectory(new java.io.File("."));
+			chooserA.setDialogTitle(choosertitleA);
+			chooserA.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+			//
+			// disable the "All files" option.
+			//
+			chooserA.setAcceptAllFileFilterUsed(false);
+			FileNameExtensionFilter filter = new FileNameExtensionFilter("Rate Files", "txt");
+
+			chooserA.setFileFilter(filter);
+			chooserA.showOpenDialog(parent);
+
+			AllMovies = chooserA.getSelectedFile().listFiles(new FilenameFilter() {
+
+				@Override
+				public boolean accept(File pathname, String filename) {
+
+					return (filename.endsWith(".txt") && !filename.contains("Rates") && !filename.contains("Average")
+							&& !filename.contains("All"));
+				}
+			});
+
+			
+			new InteractiveRANSAC(AllMovies).run(null);
+			
+			
+		}
+		
+		
+	}
+	
+	
 	protected class MeasurebatchListener implements ActionListener {
 
 		final Frame parent;

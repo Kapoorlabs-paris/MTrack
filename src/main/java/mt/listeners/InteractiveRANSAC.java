@@ -15,6 +15,8 @@ import java.awt.Label;
 import java.awt.Scrollbar;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.text.NumberFormat;
@@ -31,7 +33,11 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.table.DefaultTableModel;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -48,6 +54,8 @@ import fit.polynomial.LinearFunction;
 import fit.polynomial.Polynomial;
 import fit.polynomial.QuadraticFunction;
 import ij.ImageJ;
+import ij.ImagePlus;
+import ij.gui.Overlay;
 import ij.plugin.PlugIn;
 import mpicbg.models.Point;
 import mt.DisplayPoints;
@@ -56,9 +64,11 @@ import mt.LengthCounter;
 import mt.LengthDistribution;
 import mt.RansacFileChooser;
 import mt.Tracking;
+import net.imglib2.img.display.imagej.ImageJFunctions;
 import net.imglib2.util.Pair;
 import net.imglib2.util.ValuePair;
 import ransacBatch.BatchRANSAC;
+import trackerType.TrackModel;
 
 public class InteractiveRANSAC implements PlugIn {
 	public static int MIN_SLIDER = 0;
@@ -75,6 +85,7 @@ public class InteractiveRANSAC implements PlugIn {
 	public static double MIN_CAT = 0.0;
 	public static double MAX_CAT = 100.0;
 	public File inputfile;
+	public File[] inputfiles;
 	public String inputdirectory;
 	public NumberFormat nf = NumberFormat.getInstance(Locale.ENGLISH);
 
@@ -84,8 +95,8 @@ public class InteractiveRANSAC implements PlugIn {
 								// cubic interpolated
 	AbstractFunction2D function;
 	public double lambda;
-	final ArrayList<Pair<Integer, Double>> mts;
-	final ArrayList<Point> points;
+	ArrayList<Pair<Integer, Double>> mts;
+	ArrayList<Point> points;
 	public final int numTimepoints, minTP, maxTP;
 
 	Scrollbar lambdaSB;
@@ -108,6 +119,7 @@ public class InteractiveRANSAC implements PlugIn {
 	public int minInliers = 50;
 	public boolean detectCatastrophe = false;
 	public double minDistanceCatastrophe = 20;
+	public final boolean serial;
 	File[] AllMovies;
 	protected boolean wasCanceled = false;
 
@@ -116,6 +128,13 @@ public class InteractiveRANSAC implements PlugIn {
 		nf.setMaximumFractionDigits(5);
 	}
 
+	
+	public InteractiveRANSAC(File[] file) {
+		this(0, 300, 3.0, 0.1, 10.0, 10, 50, 1, 0.1, file);
+		nf.setMaximumFractionDigits(5);
+	}
+	
+	
 	public InteractiveRANSAC(final ArrayList<Pair<Integer, Double>> mts, final int minTP, final int maxTP,
 			final double maxError, final double minSlope, final double maxSlope, final int maxDist,
 			final int minInliers, final int functionChoice, final double lambda, final File file) {
@@ -134,6 +153,7 @@ public class InteractiveRANSAC implements PlugIn {
 		this.maxDist = Math.min(maxDist, numTimepoints);
 		this.minInliers = Math.min(minInliers, numTimepoints);
 
+		this.serial = false;
 		if (this.minSlope >= this.maxSlope)
 			this.minSlope = this.maxSlope - 0.1;
 
@@ -150,15 +170,69 @@ public class InteractiveRANSAC implements PlugIn {
 
 	};
 
+	public InteractiveRANSAC(final int minTP, final int maxTP,
+			final double maxError, final double minSlope, final double maxSlope, final int maxDist,
+			final int minInliers, final int functionChoice, final double lambda, final File[] file) {
+		this.minTP = minTP;
+		this.maxTP = maxTP;
+		this.numTimepoints = maxTP - minTP + 1;
+		this.functionChoice = functionChoice;
+		this.lambda = lambda;
+		this.mts = null;
+		this.points= null;
+		this.inputfiles = file;
+		this.inputdirectory = file[0].getParent();
+		this.maxError = maxError;
+		this.minSlope = minSlope;
+		this.maxSlope = maxSlope;
+		this.maxDist = Math.min(maxDist, numTimepoints);
+		this.minInliers = Math.min(minInliers, numTimepoints);
+
+		this.serial = true;
+		if (this.minSlope >= this.maxSlope)
+			this.minSlope = this.maxSlope - 0.1;
+
+		this.maxErrorInt = computeScrollbarPositionFromValue(MAX_SLIDER, this.maxError, MIN_ERROR, MAX_ERROR);
+		this.lambdaInt = computeScrollbarPositionFromValue(MAX_SLIDER, this.lambda, 0.0, 1.0);
+		this.minSlopeInt = computeScrollbarPositionValueFromDoubleExp(MAX_SLIDER, this.minSlope, MAX_ABS_SLOPE);
+		this.maxSlopeInt = computeScrollbarPositionValueFromDoubleExp(MAX_SLIDER, this.maxSlope, MAX_ABS_SLOPE);
+		this.maxError = computeValueFromScrollbarPosition(this.maxErrorInt, MAX_SLIDER, MIN_ERROR, MAX_ERROR);
+		this.minSlope = computeValueFromDoubleExpScrollbarPosition(this.minSlopeInt, MAX_SLIDER, MAX_ABS_SLOPE);
+		this.maxSlope = computeValueFromDoubleExpScrollbarPosition(this.maxSlopeInt, MAX_SLIDER, MAX_ABS_SLOPE);
+		this.dataset = new XYSeriesCollection();
+		this.chart = Tracking.makeChart(dataset, "Microtubule Length Plot", "Timepoint", "MT Length");
+		this.jFreeChartFrame = Tracking.display(chart, new Dimension(500, 400));
+
+	};
+	
+	
+	
 	@Override
 	public void run(String arg) {
 		/* JFreeChart */
-		linearlist = new ArrayList<Pair<LinearFunction, ArrayList<PointFunctionMatch>>>();
-		this.dataset.addSeries(Tracking.drawPoints(mts));
-		Tracking.setColor(chart, 0, new Color(64, 64, 64));
-		Tracking.setStroke(chart, 0, 0.75f);
+		
+		
+		if (!serial){
+			
+			
+			linearlist = new ArrayList<Pair<LinearFunction, ArrayList<PointFunctionMatch>>>();
+			this.dataset.addSeries(Tracking.drawPoints(mts));
+			Tracking.setColor(chart, 0, new Color(64, 64, 64));
+			Tracking.setStroke(chart, 0, 0.75f);
 		Card();
 		updateRANSAC();
+		}
+		
+		if (serial){
+			
+			
+			
+			
+	    CardTable();
+	    
+	    
+		}
+		
 
 	}
 
@@ -338,8 +412,252 @@ public class InteractiveRANSAC implements PlugIn {
 	}
 	
 	
+         public void CardTable() {
+		
+		CardLayout cl = new CardLayout();
+		DefaultTableModel userTableModel = new DefaultTableModel(new Object[]{"Track File"}, 0) {
+		    @Override
+		    public boolean isCellEditable(int row, int column) {
+		        return false;
+		    }
+		};
+		
+		File[] AllMovies = inputfiles;
+				
+				
+		
+		for (int i = 0; i < AllMovies.length; ++i) {
+			
+			String[] currenttrack = {(AllMovies[i].getName())};
+			userTableModel.addRow(currenttrack);
+		}
+		
+		
+		 JTable table = new JTable(userTableModel);
+			
+		 JScrollPane scrollPane = new JScrollPane(table);
+		 scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+		 
+		panelCont.setLayout(cl);
+		
+		panelCont.add(panelFirst, "1");
+		panelCont.add(panelSecond, "2");
+		
+		panelFirst.setName("Ransac fits for rates and frequency analysis");
+		
+	
+
+		/* Instantiation */
+		final GridBagLayout layout = new GridBagLayout();
+		final GridBagConstraints c = new GridBagConstraints();
+
+		final Scrollbar maxErrorSB = new Scrollbar(Scrollbar.HORIZONTAL, this.maxErrorInt, 1, MIN_SLIDER,
+				MAX_SLIDER + 1);
+		final Scrollbar minInliersSB = new Scrollbar(Scrollbar.HORIZONTAL, this.minInliers, 1, 2, numTimepoints + 1);
+		final Scrollbar maxDistSB = new Scrollbar(Scrollbar.HORIZONTAL, this.maxDist, 1, 0, numTimepoints + 1);
+		final Scrollbar minSlopeSB = new Scrollbar(Scrollbar.HORIZONTAL, this.minSlopeInt, 1, MIN_SLIDER,
+				MAX_SLIDER + 1);
+		final Scrollbar maxSlopeSB = new Scrollbar(Scrollbar.HORIZONTAL, this.maxSlopeInt, 1, MIN_SLIDER,
+				MAX_SLIDER + 1);
+
+		final Choice choice = new Choice();
+		choice.add("Linear Function only");
+		choice.add("Quadratic function regularized with Linear Function");
+		choice.add("Cubic Function regularized with Linear Function");
+
+		this.lambdaSB = new Scrollbar(Scrollbar.HORIZONTAL, this.lambdaInt, 1, MIN_SLIDER, MAX_SLIDER + 1);
+
+		final Label maxErrorLabel = new Label("Max. Error (px) = " + this.maxError, Label.CENTER);
+		final Label minInliersLabel = new Label("Min. #Points (tp) = " + this.minInliers, Label.CENTER);
+		final Label maxDistLabel = new Label("Max. Gap (tp) = " + this.maxDist, Label.CENTER);
+		this.lambdaLabel = new Label("Linearity (fraction) = " + this.lambda, Label.CENTER);
+		final Label minSlopeLabel = new Label("Min. Segment Slope (px/tp) = " + this.minSlope, Label.CENTER);
+		final Label maxSlopeLabel = new Label("Max. Segment Slope (px/tp) = " + this.maxSlope, Label.CENTER);
+		final Label maxResLabel = new Label(
+				"MT is rescued if the start of event# i + 1 > start of event# i by px =  " + this.restolerance,
+				Label.CENTER);
+
+		final Checkbox findCatastrophe = new Checkbox("Detect Catastrophies", this.detectCatastrophe);
+		final Scrollbar minCatDist = new Scrollbar(Scrollbar.HORIZONTAL, this.minDistCatInt, 1, MIN_SLIDER,
+				MAX_SLIDER + 1);
+		final Scrollbar maxRes = new Scrollbar(Scrollbar.HORIZONTAL, this.restoleranceInt, 1, MIN_SLIDER,
+				MAX_SLIDER + 1);
+		final Label minCatDistLabel = new Label("Min. Catatastrophy height (tp) = " + this.minDistanceCatastrophe,
+				Label.CENTER);
+		final Button done = new Button("Done");
+		final Button batch = new Button("Save Parameters for Batch run");
+		final Button cancel = new Button("Cancel");
+		final Button Write = new Button("Save Rates and Frequencies to File");
+		choice.select(functionChoice);
+		setFunction();
+
+		// Location
+		panelFirst.setLayout(layout);
+		panelSecond.setLayout(layout);
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 0;
+		c.gridy = 0;
+		c.weightx = 1;
+		
+		++c.gridy;
+		c.insets = new Insets(10, 10, 0, 50);
+		panelFirst.add(scrollPane, c);
+		
+		
+		++c.gridy;
+		panelSecond.add(maxErrorSB, c);
+
+		++c.gridy;
+		panelSecond.add(maxErrorLabel, c);
+
+		++c.gridy;
+		c.insets = new Insets(10, 0, 0, 0);
+		panelSecond.add(minInliersSB, c);
+		c.insets = new Insets(0, 0, 0, 0);
+
+		++c.gridy;
+		panelSecond.add(minInliersLabel, c);
+
+		++c.gridy;
+		c.insets = new Insets(10, 0, 0, 0);
+		panelSecond.add(maxDistSB, c);
+		c.insets = new Insets(0, 0, 0, 0);
+
+		++c.gridy;
+		panelSecond.add(maxDistLabel, c);
+
+		++c.gridy;
+		c.insets = new Insets(30, 0, 0, 0);
+		panelSecond.add(choice, c);
+		c.insets = new Insets(0, 0, 0, 0);
+
+		++c.gridy;
+		c.insets = new Insets(10, 0, 0, 0);
+		panelSecond.add(lambdaSB, c);
+		c.insets = new Insets(0, 0, 0, 0);
+
+		++c.gridy;
+		panelSecond.add(lambdaLabel, c);
+
+		++c.gridy;
+		c.insets = new Insets(30, 0, 0, 0);
+		panelSecond.add(minSlopeSB, c);
+		c.insets = new Insets(0, 0, 0, 0);
+
+		++c.gridy;
+		panelSecond.add(minSlopeLabel, c);
+
+		++c.gridy;
+		c.insets = new Insets(10, 0, 0, 0);
+		panelSecond.add(maxSlopeSB, c);
+		c.insets = new Insets(0, 0, 0, 0);
+
+		++c.gridy;
+		panelSecond.add(maxSlopeLabel, c);
+
+		++c.gridy;
+		c.insets = new Insets(20, 120, 0, 120);
+		panelSecond.add(findCatastrophe, c);
+		c.insets = new Insets(0, 0, 0, 0);
+
+		++c.gridy;
+		c.insets = new Insets(10, 0, 0, 0);
+		panelSecond.add(minCatDist, c);
+		c.insets = new Insets(0, 0, 0, 0);
+
+		++c.gridy;
+		panelSecond.add(minCatDistLabel, c);
+
+		++c.gridy;
+		c.insets = new Insets(20, 120, 0, 120);
+		panelSecond.add(Write, c);
+
+	
+
+		++c.gridy;
+		c.insets = new Insets(20, 120, 0, 120);
+		panelSecond.add(batch, c);
 
 		
+		table.addMouseListener(new MouseAdapter() {
+			  public void mouseClicked(MouseEvent e) {
+			    if (e.getClickCount() == 1) {
+			      JTable target = (JTable)e.getSource();
+			      int row = target.getSelectedRow();
+			      // do some action if appropriate column
+			      if (row > 0)
+			      displayclicked(row);
+			      else
+			      displayclicked(0);	  
+			    }
+			  }
+			});
+
+		maxErrorSB.addAdjustmentListener(new MaxErrorListener(this, maxErrorLabel, maxErrorSB));
+		minInliersSB.addAdjustmentListener(new MinInliersListener(this, minInliersLabel, minInliersSB));
+		maxDistSB.addAdjustmentListener(new MaxDistListener(this, maxDistLabel, maxDistSB));
+		choice.addItemListener(new FunctionItemListener(this));
+		lambdaSB.addAdjustmentListener(new LambdaListener(this, lambdaLabel, lambdaSB));
+		minSlopeSB.addAdjustmentListener(new MinSlopeListener(this, minSlopeSB, minSlopeLabel));
+		maxSlopeSB.addAdjustmentListener(new MaxSlopeListener(this, maxSlopeSB, maxSlopeLabel));
+		findCatastrophe
+				.addItemListener(new CatastrophyCheckBoxListener(this, findCatastrophe, minCatDistLabel, minCatDist));
+		minCatDist.addAdjustmentListener(new MinCatastrophyDistanceListener(this, minCatDistLabel, minCatDist));
+
+		Write.addActionListener(new WriteRatesListener(this));
+		done.addActionListener(new FinishButtonListener(this, false));
+		batch.addActionListener(new RansacBatchmodeListener(this));
+		cancel.addActionListener(new FinishButtonListener(this, true));
+		
+		
+		panelFirst.setVisible(true);
+		panelSecond.setVisible(true);
+		
+		
+		
+		cl.show(panelCont, "1");
+		JPanel control = new JPanel();
+		control.add(new JButton(new AbstractAction("\u22b2Prev") {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				CardLayout cl = (CardLayout) panelCont.getLayout();
+				cl.previous(panelCont);
+			}
+		}));
+		control.add(new JButton(new AbstractAction("Next\u22b3") {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				CardLayout cl = (CardLayout) panelCont.getLayout();
+				cl.next(panelCont);
+			}
+		}));
+		Cardframe.add(panelCont, BorderLayout.CENTER);
+	
+		Cardframe.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		Cardframe.pack();
+		Cardframe.add(control, BorderLayout.SOUTH);
+		Cardframe.setVisible(true);
+		Cardframe.pack();
+	}
+	
+	
+         public void displayclicked(final int trackindex){
+     		
+
+     		this.mts = Tracking.loadMT(inputfiles[trackindex]);
+     		this.points = Tracking.toPoints(mts);
+     		linearlist = new ArrayList<Pair<LinearFunction, ArrayList<PointFunctionMatch>>>();
+     		dataset.removeAllSeries();
+            this.dataset.addSeries(Tracking.drawPoints(mts));
+			Tracking.setColor(chart, 0, new Color(64, 64, 64));
+			Tracking.setStroke(chart, 0, 0.75f);
+     		updateRANSAC();
+     		
+     		
+     	}
+     	
 	
 	
 	public void setFunction() {
