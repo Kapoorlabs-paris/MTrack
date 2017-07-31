@@ -12,6 +12,7 @@ import fit.AbstractFunction2D;
 import fit.PointFunctionMatch;
 import fit.polynomial.LinearFunction;
 import fit.polynomial.Polynomial;
+import ij.measure.ResultsTable;
 import mpicbg.models.Point;
 import mt.Tracking;
 import net.imglib2.util.Pair;
@@ -32,18 +33,22 @@ public class WriteRatesListener implements ActionListener {
 
 	}
 	
-	public double leastStart(){
+	
+	public double leastX(){
 		
-		
+// Ignore the event starting from zero time
 		double minstartX = Double.MAX_VALUE;
-		
+	
 		for (final Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>> result : parent.segments) {
 
 			final Pair<Double, Double> minMax = Tracking.fromTo(result.getB());
 
-			double startX = minMax.getA();
+			double startX = minMax.getB();
+		
 			
-			if (minstartX <= startX){
+			
+			
+			if (startX <= minstartX  ){
 				
 				minstartX = startX;
 				
@@ -51,7 +56,37 @@ public class WriteRatesListener implements ActionListener {
 			
 		}
 		
+	
 		return minstartX;
+		
+	}
+	
+	public double leastStart(){
+		
+		
+		double minstartY = Double.MAX_VALUE;
+	
+		double minstartX =  leastX();
+		
+		for (final Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>> result : parent.segments) {
+
+			final Pair<Double, Double> minMax = Tracking.fromTo(result.getB());
+
+			
+			double startX = minMax.getA();
+			Polynomial<?, Point> polynomial = (Polynomial) result.getA();
+			double startY = polynomial.predict(startX);
+			
+			if (startY <= minstartY && startX!= 0  ){
+				
+				minstartY = startY;
+				
+			}
+			
+		}
+		
+		System.out.println(minstartY);
+		return minstartY;
 		
 	}
 	
@@ -77,6 +112,7 @@ public class WriteRatesListener implements ActionListener {
 			
 			bw.write("\tStartTime (px)\tEndTime(px)\tLinearRateSlope(px)\n");
 			bwfrequ.write("\tAverageGrowthrate(px)\tAverageShrinkrate(px)\tCatastropheFrequency(px)\tRescueFrequency(px)\n");
+			ResultsTable rt = new ResultsTable();
 			int count = 0;
 			int negcount = 0;
 			int rescount = 0;
@@ -86,19 +122,37 @@ public class WriteRatesListener implements ActionListener {
 			double averagegrowth = 0;
 			double averageshrink = 0;
 			
-			double minstartX = leastStart();
+			double minstartY = leastStart();
+			
+			double minstartX = Double.MAX_VALUE;
+			double minendX = Double.MAX_VALUE;
 			double catfrequ = 0;
 			double resfrequ = 0;
+			ArrayList<Double> previousendX =  new ArrayList<Double>();
 			for (final Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>> result : parent.segments) {
 
+				
+				
 				final Pair<Double, Double> minMax = Tracking.fromTo(result.getB());
 
 				double startX = minMax.getA();
 				double endX = minMax.getB();
 				
+				
+				
+				
+				
+				
+				if (startX < minstartX){
+					
+					minstartX = startX;
+					minendX = endX;
+				}
+				
 				Polynomial<?, Point> polynomial = (Polynomial) result.getA();
 				
-			
+				
+				double startY = polynomial.predict(startX);
 				parent.sortPoints(parent.points);
 				
 				if (parent.points.get(parent.points.size() - 1).getW()[0] - endX >= parent.tptolerance 
@@ -112,16 +166,17 @@ public class WriteRatesListener implements ActionListener {
 				double linearrate = linear.getCoefficient(1); 
 				
 					
-					if (startX - minstartX > parent.restolerance){
+					if (linearrate > 0 && startY > minstartY  && startX > parent.tptolerance && previousendX.size() > 0 ){
+						System.out.println(startY + " " + previousendX.size());
 					rescount++;
-					restimediff += endX - startX;
+					restimediff += -previousendX.get(previousendX.size() - 1) + startX;
 					
 					
 					
 				}
 				
 				
-				if (linearrate > 0){
+				if (linearrate > 0 &&  startX > parent.tptolerance){
 					
 					
 					count++;
@@ -142,12 +197,21 @@ public class WriteRatesListener implements ActionListener {
 				
 
 				
+				rt.incrementCounter();
+				rt.addValue("Start time", startX);
+				rt.addValue("End time", endX);
+				rt.addValue("Growth Rate", linearrate);
 				
 				bw.write("\t" + parent.nf.format(startX) + "\t" + "\t" + parent.nf.format(endX) + "\t" + "\t"
 						+ parent.nf.format(linearrate) + "\t" + "\t" + "\t" + "\t"
 						+ "\n");
+				if (linearrate > 0)
+					previousendX.add(endX);
 
 			}
+				
+				
+		}
 			
 			if (count > 0)
 				averagegrowth/=count;
@@ -167,18 +231,22 @@ public class WriteRatesListener implements ActionListener {
 			
 			if (rescount > 0){
 				
+				
+				
 				resfrequ = rescount / restimediff;
 			}
+			System.out.println(count + " " + rescount);
+			rt.show("Rates(pixel units)");
+			
+			parent.rtAll.incrementCounter();
+			parent.rtAll.addValue("Average Growth", averagegrowth);
+			parent.rtAll.addValue("Average Shrink", averageshrink);
+			parent.rtAll.addValue("Catastrophe Frequency", catfrequ);
+			parent.rtAll.addValue("Rescue Frequency", resfrequ);
+			
+			parent.rtAll.show("Average Rates and Frequencies (pixel units)");
 			
 			
-			
-		
-			
-		
-
-			
-			
-		} 
 			bwfrequ.write("\t" + parent.nf.format(averagegrowth) + "\t" + "\t" + "\t" + "\t" + parent.nf.format(averageshrink)  + "\t"+ "\t" + "\t" +  parent.nf.format(catfrequ)
 			 + "\t"+ "\t" + "\t" +  parent.nf.format(resfrequ)
 			

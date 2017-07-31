@@ -56,6 +56,7 @@ import fit.polynomial.QuadraticFunction;
 import ij.ImageJ;
 import ij.ImagePlus;
 import ij.gui.Overlay;
+import ij.measure.ResultsTable;
 import ij.plugin.PlugIn;
 import mpicbg.models.Point;
 import mt.DisplayPoints;
@@ -81,7 +82,7 @@ public class InteractiveRANSAC implements PlugIn {
 	public static double MAX_RES = 30.0;
 
 	public static double MAX_ABS_SLOPE = 100.0;
-
+	ResultsTable rtAll;
 	public static double MIN_CAT = 0.0;
 	public static double MAX_CAT = 100.0;
 	public File inputfile;
@@ -117,8 +118,8 @@ public class InteractiveRANSAC implements PlugIn {
 	public double tptolerance = 5;
 	public int maxDist = 300;
 	public int minInliers = 50;
-	public boolean detectCatastrophe = false;
-	public double minDistanceCatastrophe = 20;
+	public boolean detectCatastrophe = true;
+	public double minDistanceCatastrophe = 2;
 	public final boolean serial;
 	File[] AllMovies;
 	protected boolean wasCanceled = false;
@@ -211,7 +212,7 @@ public class InteractiveRANSAC implements PlugIn {
 	public void run(String arg) {
 		/* JFreeChart */
 		
-		
+	rtAll = new ResultsTable();
 		if (!serial){
 			
 			
@@ -488,6 +489,7 @@ public class InteractiveRANSAC implements PlugIn {
 		final Button batch = new Button("Save Parameters for Batch run");
 		final Button cancel = new Button("Cancel");
 		final Button Write = new Button("Save Rates and Frequencies to File");
+		final Button WriteAgain = new Button("Save Rates and Frequencies to File");
 		choice.select(functionChoice);
 		setFunction();
 
@@ -570,8 +572,11 @@ public class InteractiveRANSAC implements PlugIn {
 
 		++c.gridy;
 		c.insets = new Insets(20, 120, 0, 120);
-		panelSecond.add(Write, c);
-
+		panelFirst.add(Write, c);
+	
+		++c.gridy;
+		c.insets = new Insets(20, 120, 0, 120);
+		panelSecond.add(WriteAgain, c);
 	
 
 		++c.gridy;
@@ -605,6 +610,7 @@ public class InteractiveRANSAC implements PlugIn {
 		minCatDist.addAdjustmentListener(new MinCatastrophyDistanceListener(this, minCatDistLabel, minCatDist));
 
 		Write.addActionListener(new WriteRatesListener(this));
+		WriteAgain.addActionListener(new WriteRatesListener(this));
 		done.addActionListener(new FinishButtonListener(this, false));
 		batch.addActionListener(new RansacBatchmodeListener(this));
 		cancel.addActionListener(new FinishButtonListener(this, true));
@@ -616,6 +622,7 @@ public class InteractiveRANSAC implements PlugIn {
 		
 		
 		cl.show(panelCont, "1");
+		
 		JPanel control = new JPanel();
 		control.add(new JButton(new AbstractAction("\u22b2Prev") {
 
@@ -635,17 +642,21 @@ public class InteractiveRANSAC implements PlugIn {
 		}));
 		Cardframe.add(panelCont, BorderLayout.CENTER);
 	
+	
 		Cardframe.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		Cardframe.pack();
 		Cardframe.add(control, BorderLayout.SOUTH);
 		Cardframe.setVisible(true);
 		Cardframe.pack();
+		
 	}
 	
 	
          public void displayclicked(final int trackindex){
      		
 
+        	 this.inputfile = inputfiles[trackindex];
+        	 this.inputdirectory = inputfiles[trackindex].getParent();
      		this.mts = Tracking.loadMT(inputfiles[trackindex]);
      		this.points = Tracking.toPoints(mts);
      		linearlist = new ArrayList<Pair<LinearFunction, ArrayList<PointFunctionMatch>>>();
@@ -701,6 +712,7 @@ public class InteractiveRANSAC implements PlugIn {
 
 		segments = Tracking.findAllFunctions(points, function, maxError, minInliers, maxDist);
 
+		sort(segments);
 		if (segments == null || segments.size() == 0) {
 			--updateCount;
 			return;

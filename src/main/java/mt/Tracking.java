@@ -521,6 +521,19 @@ public class Tracking
 
 		return new ValuePair< Double, Double >( min, max );
 	}
-	
+	public static Pair< Double, Double > fromToY( final ArrayList< PointFunctionMatch > points )
+	{
+		double min = points.get( 1 ).getP1().getW()[ 1 ];
+		double max = min;
+
+		for ( final PointFunctionMatch p : points )
+		{
+			final double value = p.getP1().getW()[ 1 ];
+			min = Math.min( min, value );
+			max = Math.max( max, value );
+		}
+
+		return new ValuePair< Double, Double >( min, max );
+	}
 	
 }

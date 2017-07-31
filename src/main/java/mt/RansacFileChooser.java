@@ -499,7 +499,7 @@ public class RansacFileChooser extends JPanel {
 		if (Simplefile)
 			new InteractiveRANSAC(Tracking.loadsimple(new File(chooserA.getSelectedFile().getPath())),
 					chooserA.getSelectedFile()).run(null);
-		close(parent);
+		
 
 	}
 
@@ -522,7 +522,7 @@ public class RansacFileChooser extends JPanel {
 			if (Simplefile)
 				new InteractiveRANSAC(Tracking.loadsimple(new File(chooserA.getSelectedFile().getPath())),
 						chooserA.getSelectedFile()).run(null);
-			close(parent);
+			
 		}
 	}
 
