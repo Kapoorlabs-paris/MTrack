@@ -127,4 +127,90 @@ public class LengthDistribution {
 		  
 		  DisplayPoints.display(chart, new Dimension(800, 500));
 	}
+	
+	public static void GetLengthDistributionArray(ArrayList<File> AllMovies) {
+
+		ArrayList<Double> maxlist = new ArrayList<Double>();
+		for (int i = 0; i < AllMovies.size(); ++i) {
+
+			double maxlength = LengthDistribution.Lengthdistro(AllMovies.get(i));
+
+			if (maxlength != Double.NaN && maxlength > 0)
+				maxlist.add(maxlength);
+
+		}
+		Collections.sort(maxlist);
+
+		int min = 0;
+		int max = (int) Math.round(maxlist.get(maxlist.size() - 1)) + 1;
+		XYSeries counterseries = new XYSeries("MT length distribution");
+
+		for (int length = 0; length < max; ++length) {
+
+			HashMap<Integer, Integer> frameseed = new HashMap<Integer, Integer>();
+
+			int count = 0;
+			for (int i = 0; i < AllMovies.size(); ++i) {
+
+				File file = AllMovies.get(i);
+
+				double currentlength = LengthDistribution.Lengthdistro(file);
+
+				ArrayList<FLSobject> currentobject = Tracking.loadMTStat(file);
+
+				if (currentlength > length) {
+
+
+					
+					for (int index = 0; index < currentobject.size(); ++index) {
+						ArrayList<Integer> seedlist = new ArrayList<Integer>();
+						if (currentobject.get(index).length >= length) {
+							seedlist.add(currentobject.get(index).seedID);
+							if (frameseed.get(currentobject.get(index).Framenumber) != null
+									&& frameseed.get(currentobject.get(index).Framenumber) != Double.NaN) {
+
+								int currentcount = frameseed.get(currentobject.get(index).Framenumber);
+								frameseed.put(currentobject.get(index).Framenumber, seedlist.size() + currentcount);
+							} else if (currentobject.get(index) != null)
+								frameseed.put(currentobject.get(index).Framenumber, seedlist.size() );
+
+						}
+
+					}
+
+				}
+
+			}
+			
+			
+			// Get maxima length, count
+			int maxvalue = Integer.MIN_VALUE;
+			
+			for (int key: frameseed.keySet()){
+				
+				int Count = frameseed.get(key);
+				
+				if (Count >= maxvalue)
+					maxvalue = Count;
+			}
+			
+			if (maxvalue!=Integer.MIN_VALUE)
+				counterseries.add(length, maxvalue );
+
+			
+			
+			  
+			 
+
+		}
+		
+		final XYSeriesCollection dataset = new XYSeriesCollection();
+		  dataset.addSeries(counterseries); 
+		  final JFreeChart chart =
+		  ChartFactory.createScatterPlot("MT length distribution",
+		  "Length (px)", "Number of MT", dataset);
+		  
+		  DisplayPoints.display(chart, new Dimension(800, 500));
+	}
+	
 }

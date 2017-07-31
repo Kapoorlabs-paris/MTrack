@@ -100,6 +100,7 @@ public class InteractiveRANSAC implements PlugIn {
 	ArrayList<Point> points;
 	public final int numTimepoints, minTP, maxTP;
 
+	public int countfile;
 	Scrollbar lambdaSB;
 	Label lambdaLabel;
 
@@ -114,14 +115,15 @@ public class InteractiveRANSAC implements PlugIn {
 	public double maxError = 3.0;
 	public double minSlope = 0.1;
 	public double maxSlope = 100;
-	public double restolerance = 5;
-	public double tptolerance = 5;
+	public double restolerance = 2;
+	public double tptolerance = 2;
 	public int maxDist = 300;
 	public int minInliers = 50;
 	public boolean detectCatastrophe = true;
+	ArrayList<Pair<Integer, Double>> lifecount  ;
 	public double minDistanceCatastrophe = 2;
 	public final boolean serial;
-	File[] AllMovies;
+	ArrayList<File> AllMovies;
 	protected boolean wasCanceled = false;
 
 	public InteractiveRANSAC(final ArrayList<Pair<Integer, Double>> mts, File file) {
@@ -213,6 +215,9 @@ public class InteractiveRANSAC implements PlugIn {
 		/* JFreeChart */
 		
 	rtAll = new ResultsTable();
+	 lifecount = new ArrayList<Pair<Integer, Double>>();
+	 countfile = 0;
+	 AllMovies = new ArrayList<File>();
 		if (!serial){
 			
 			
@@ -423,13 +428,12 @@ public class InteractiveRANSAC implements PlugIn {
 		    }
 		};
 		
-		File[] AllMovies = inputfiles;
-				
+		
 				
 		
-		for (int i = 0; i < AllMovies.length; ++i) {
+		for (int i = 0; i < inputfiles.length; ++i) {
 			
-			String[] currenttrack = {(AllMovies[i].getName())};
+			String[] currenttrack = {(inputfiles[i].getName())};
 			userTableModel.addRow(currenttrack);
 		}
 		
@@ -489,6 +493,7 @@ public class InteractiveRANSAC implements PlugIn {
 		final Button batch = new Button("Save Parameters for Batch run");
 		final Button cancel = new Button("Cancel");
 		final Button Write = new Button("Save Rates and Frequencies to File");
+		final Button WriteStats = new Button("Compute Length and Lifetime sitribution");
 		final Button WriteAgain = new Button("Save Rates and Frequencies to File");
 		choice.select(functionChoice);
 		setFunction();
@@ -576,6 +581,10 @@ public class InteractiveRANSAC implements PlugIn {
 	
 		++c.gridy;
 		c.insets = new Insets(20, 120, 0, 120);
+		panelFirst.add(WriteStats, c);
+		
+		++c.gridy;
+		c.insets = new Insets(20, 120, 0, 120);
 		panelSecond.add(WriteAgain, c);
 	
 
@@ -610,6 +619,7 @@ public class InteractiveRANSAC implements PlugIn {
 		minCatDist.addAdjustmentListener(new MinCatastrophyDistanceListener(this, minCatDistLabel, minCatDist));
 
 		Write.addActionListener(new WriteRatesListener(this));
+		WriteStats.addActionListener(new WriteStatsListener(this));
 		WriteAgain.addActionListener(new WriteRatesListener(this));
 		done.addActionListener(new FinishButtonListener(this, false));
 		batch.addActionListener(new RansacBatchmodeListener(this));

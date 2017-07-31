@@ -16,6 +16,7 @@ import ij.measure.ResultsTable;
 import mpicbg.models.Point;
 import mt.Tracking;
 import net.imglib2.util.Pair;
+import net.imglib2.util.ValuePair;
 
 public class WriteRatesListener implements ActionListener {
 
@@ -65,9 +66,9 @@ public class WriteRatesListener implements ActionListener {
 		
 		
 		double minstartY = Double.MAX_VALUE;
-	
-		double minstartX =  leastX();
 		
+		double minstartX =  leastX();
+	
 		for (final Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>> result : parent.segments) {
 
 			final Pair<Double, Double> minMax = Tracking.fromTo(result.getB());
@@ -94,8 +95,11 @@ public class WriteRatesListener implements ActionListener {
         public  void writeratestofile(){
 		
 		
-
+        	double lifetime = 0;
 		String file = parent.inputfile.getName().replaceFirst("[.][^.]+$", "");
+		
+
+		
 		try {
 			File ratesfile = new File(parent.inputdirectory + "//" + file + "Rates" + ".txt");
 			File frequfile = new File(parent.inputdirectory + "//" + file + "Averages" + ".txt");
@@ -108,7 +112,7 @@ public class WriteRatesListener implements ActionListener {
 			FileWriter fwfrequ = new FileWriter(frequfile);
 
 			BufferedWriter bwfrequ = new BufferedWriter(fwfrequ);
-			
+			parent.AllMovies.add(parent.inputfile);
 			
 			bw.write("\tStartTime (px)\tEndTime(px)\tLinearRateSlope(px)\n");
 			bwfrequ.write("\tAverageGrowthrate(px)\tAverageShrinkrate(px)\tCatastropheFrequency(px)\tRescueFrequency(px)\n");
@@ -152,21 +156,21 @@ public class WriteRatesListener implements ActionListener {
 				Polynomial<?, Point> polynomial = (Polynomial) result.getA();
 				
 				
-				double startY = polynomial.predict(startX);
-				parent.sortPoints(parent.points);
 				
-				if (parent.points.get(parent.points.size() - 1).getW()[0] - endX >= parent.tptolerance 
-						&& Math.abs(parent.points.get(parent.points.size() - 1).getW()[1] - polynomial.predict(endX)) >= parent.restolerance ){
+				
+			parent.sortPoints(parent.points);
+				
+				if (parent.points.get(parent.points.size() - 1).getW()[0] - endX >= parent.tptolerance  ){
 				
 					
                 LinearFunction linear = new LinearFunction();
 				LinearFunction.slopeFits( result.getB(), linear, parent.minSlope, parent.maxSlope ) ;
 				
-				
+				double startY = polynomial.predict(startX);
 				double linearrate = linear.getCoefficient(1); 
 				
-					
-					if (linearrate > 0 && startY > minstartY  && startX > parent.tptolerance && previousendX.size() > 0 ){
+			
+					if (linearrate > 0 && startY - minstartY > parent.restolerance  && startX > parent.tptolerance && previousendX.size() > 0 ){
 						System.out.println(startY + " " + previousendX.size());
 					rescount++;
 					restimediff += -previousendX.get(previousendX.size() - 1) + startX;
@@ -181,7 +185,7 @@ public class WriteRatesListener implements ActionListener {
 					
 					count++;
 					timediff += endX - startX;
-					
+					lifetime = endX - startX;
 					averagegrowth+=linearrate;
 					
 				}
@@ -235,6 +239,7 @@ public class WriteRatesListener implements ActionListener {
 				
 				resfrequ = rescount / restimediff;
 			}
+			parent.lifecount.add(new  ValuePair<Integer, Double>(count, lifetime));
 			System.out.println(count + " " + rescount);
 			rt.show("Rates(pixel units)");
 			
