@@ -39,6 +39,8 @@ final Interactive_MTDoubleChannel parent;
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				
+			//	System.out.println("Userframe size" + parent.Userframe.size());
+				
 				if(SwingUtilities.isLeftMouseButton(e) && e.isShiftDown() == false && e.isAltDown() == false){
 				
 				int x = canvas.offScreenX(e.getX());
@@ -60,8 +62,8 @@ final Interactive_MTDoubleChannel parent;
 
 				OvalRoi nearestRoiCurr = util.DrawingUtils.getNearestRois(parent.AllSeedrois, new double[] { x, y });
 				
-				if(nearestRoiCurrUser!=null){
-					nearestRoiCurr = nearestRoiCurrUser;
+				if(nearestRoiCurrUser.getStrokeColor()==parent.colorUser){
+					
 				    
 				if(parent.Userframe.size() > 0){
 					

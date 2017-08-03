@@ -1,5 +1,6 @@
 package swingClasses;
 
+import java.awt.Color;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -34,6 +35,7 @@ import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.img.display.imagej.ImageJFunctions;
 import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.util.Pair;
+import net.imglib2.view.Views;
 import trackerType.KFsearch;
 import trackerType.TrackModel;
 import velocityanalyser.Trackend;
@@ -959,7 +961,9 @@ public  class Track {
 			parent.prestack.deleteLastSlice();
 			new ImagePlus("Overlays", parent.prestack).show();
 		}
-
+		
+		
+		DisplayID.displayseeds(Views.hyperSlice(parent.originalimg, 2, 0), parent.IDALL);
 	}
 
 

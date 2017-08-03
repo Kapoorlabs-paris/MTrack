@@ -20,6 +20,7 @@ import LineModels.Gaussiansplinethirdorderfixedds;
 import LineModels.MTFitFunction;
 import LineModels.UseLineModel.UserChoiceModel;
 import graphconstructs.Trackproperties;
+import ij.IJ;
 import ij.gui.OvalRoi;
 import ij.gui.Overlay;
 import ij.gui.Roi;
@@ -196,10 +197,21 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 
 			percent = (Math.round(100 * (index + 1) / (Userframe.size())));
 
-			final double originalslope = Userframe.get(index).originalslope;
+			 double originalslope = Userframe.get(index).originalslope;
 
-			final double originalintercept = Userframe.get(index).originalintercept;
+			
+			
+			
+			 double originalintercept = Userframe.get(index).originalintercept;
 
+			
+			
+              if (framenumber == startframe + 1){
+				
+				
+				originalslope = Userframe.get(index).slope;
+				originalintercept = Userframe.get(index).intercept;
+			}
 			final Point linepoint = new Point(ndims);
 			linepoint.setPosition(new long[] { (long) Userframe.get(index).currentpos[0],
 					(long) Userframe.get(index).currentpos[1] });
@@ -222,9 +234,10 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 
 				labelindex = labelstart.get(0);
 
+			
 			if (labelindex != Integer.MIN_VALUE) {
 				paramnextframestart = Getfinaltrackparam(Userframe.get(index), labelstart.get(0), psf,
-						framenumber);
+						startframe);
 
 				double min = Double.MAX_VALUE;
 				double[] currentposini = paramnextframestart.currentpos;
@@ -235,7 +248,7 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 					for (int j = 0; j < labelstart.size(); ++j) {
 						System.out.println("Fitting multiple Labels" + "User defined");
 						Indexedlength test = Getfinaltrackparam(Userframe.get(index), labelstart.get(j), psf,
-								framenumber);
+								startframe);
 						
 						double[] currentpos = test.currentpos;
 						double[] fixedpos = test.fixedpos;
@@ -272,7 +285,6 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 				newstartpoint = oldstartpoint;
 			}
 			final_paramlistuser.add(paramnextframestart);
-
 			
 			final double newstartslope = paramnextframestart.slope;
 			final double newstartintercept = paramnextframestart.intercept;
@@ -424,10 +436,12 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 			final int rate) {
 
 		final double[] LMparam = MakerepeatedLineguess(iniparam, label, rate);
-
+		
+		
 		if (LMparam == null)
 			return iniparam;
 
+		
 		else {
 
 			final double[] inipos = iniparam.currentpos;

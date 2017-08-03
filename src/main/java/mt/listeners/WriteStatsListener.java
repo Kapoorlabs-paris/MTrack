@@ -133,7 +133,7 @@ public class WriteStatsListener implements ActionListener {
 			XYSeriesCollection dataset = new XYSeriesCollection(counterseries);
 			
 			 final JFreeChart chart =
-					  ChartFactory.createScatterPlot("Time Distribution",
+					  ChartFactory.createScatterPlot("LifeTime Distribution",
 					  "Time (px)", "Count of growth events", dataset);
 					  
 					  DisplayPoints.display(chart, new Dimension(800, 500));

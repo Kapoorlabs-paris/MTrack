@@ -147,7 +147,7 @@ public class FlatFieldCorrection extends BenchmarkAlgorithm implements OutputAlg
 		
 		double[] sigma = new double[in.numDimensions()];
 		for (int d = 0; d < in.numDimensions(); ++d) {
-			sigma[d] = (int) Math.round((in.realMax(d) - in.realMin(d)) / 10.0);
+			sigma[d] = (int) Math.round((in.realMax(d) - in.realMin(d)) / 20.0);
 		}
 		
 		RandomAccessibleInterval<FloatType> gaussimg = util.CopyUtils.copyImage(in);

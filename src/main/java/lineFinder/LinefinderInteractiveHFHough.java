@@ -119,13 +119,13 @@ public class LinefinderInteractiveHFHough implements LinefinderHF {
 			
 		
 				int i = 0; 
-				
+				if (outputcurr.size() > 0){
 				CommonOutputHF currentOutput = new CommonOutputHF(outputcurr.get(i).framenumber, label,
 						outputcurr.get(i).Roi, outputcurr.get(i).Actualroi,parent.intimg,
 						outputcurr.get(i).interval,outputcurr.get(i).Allrois);
 				output.add(currentOutput);
 				
-				
+				}
 
 		
 			
@@ -133,7 +133,7 @@ public class LinefinderInteractiveHFHough implements LinefinderHF {
 		
 		
 		}
-		
+		if (outputcurr.size() > 0)
 		output.sort(Seedcomparison);
 		
 			

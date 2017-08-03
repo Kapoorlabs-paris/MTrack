@@ -73,6 +73,10 @@ final int endtime;
 	@Override
 	protected void done() {
 		try {
+			
+			
+			
+			
 			parent.jpb.setIndeterminate(false);
 			get();
 			parent.frame.dispose();

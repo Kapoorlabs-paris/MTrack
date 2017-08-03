@@ -46,7 +46,7 @@ import org.jfree.data.xy.XYSeriesCollection;
 import ij.ImageJ;
 import ij.ImagePlus;
 import ij.io.Opener;
-
+import ij.measure.ResultsTable;
 import mt.Tracking;
 import mt.listeners.InteractiveRANSAC;
 import net.imglib2.RandomAccessibleInterval;
@@ -181,7 +181,7 @@ public class RansacFileChooser extends JPanel {
 
 			JButton Done = new JButton("Exit");
 
-			final Label LoadDirectoryText = new Label("Using Fiji Prefs we execute the program for all tif files");
+			final Label LoadDirectoryText = new Label("Using Fiji Prefs Ransac fits are done on all MTV tracker generated files");
 
 			LoadDirectoryText.setBackground(new Color(1, 0, 1));
 			LoadDirectoryText.setForeground(new Color(255, 255, 255));
@@ -309,10 +309,12 @@ public class RansacFileChooser extends JPanel {
 			});
 
 			ArrayList<Pair<Integer, ArrayList<Pair<Integer, Double>>>> Alllife = new ArrayList<Pair<Integer, ArrayList<Pair<Integer, Double>>>>();
+			ResultsTable rtAll = new ResultsTable();
+			
 			for (int i = 0; i < AllMovies.length; ++i) {
 
 				
-				BatchRANSAC batch = new BatchRANSAC(Tracking.loadMT((AllMovies[i])), AllMovies[i]);
+				BatchRANSAC batch = new BatchRANSAC(Tracking.loadMT((AllMovies[i])), AllMovies[i], rtAll);
 				
 				batch.run(null);
 				Pair<Integer, ArrayList<Pair<Integer,Double>>> life = new ValuePair<Integer, ArrayList<Pair<Integer,Double>>>(i, batch.lifetime);

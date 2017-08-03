@@ -67,7 +67,7 @@ public class BatchRANSAC implements PlugIn {
 	public static double MAX_CAT = 100.0;
 
 	public NumberFormat nf = NumberFormat.getInstance(Locale.ENGLISH);
-	ResultsTable rtAll;
+
 	public ArrayList<Pair<LinearFunction, ArrayList<PointFunctionMatch>>> linearlist;
 	final Frame frame, jFreeChartFrame;
 	public static int functionChoice = Prefs.getInt(".Functionchoice.int", 2);
@@ -93,23 +93,23 @@ public class BatchRANSAC implements PlugIn {
 	public double maxError = Prefs.getDouble(".MaxError.double", 2.0);
 	public double minSlope = Prefs.getDouble(".Minslope.double", 0.1);
 	public double maxSlope = Prefs.getDouble(".Maxslope.double", 100);
-	public double restolerance = Prefs.getDouble(".Rescue.double", 2);
-	public double tptolerance = Prefs.getDouble(".Timepoint.double", 2);
+	public double restolerance = Prefs.getDouble(".Rescue.double", 5);
+	public double tptolerance = Prefs.getDouble(".Timepoint.double", 5);
 	public int maxDist = (int) Prefs.getDouble(".MaxGap.double", 300);
 	public int minInliers = (int) Prefs.getDouble(".MinPoints.double", 10);
 	public boolean detectCatastrophe = Prefs.getBoolean(".DetectCat.boolean", false);
 	public double minDistanceCatastrophe = Prefs.getDouble(".MinDist.double", 5);
-
+	public final ResultsTable rtAll;
 	protected boolean wasCanceled = false;
 
-	public BatchRANSAC(final ArrayList<Pair<Integer, Double>> mts, final File file) {
+	public BatchRANSAC(final ArrayList<Pair<Integer, Double>> mts, final File file, ResultsTable rtAll) {
 		nf.setMaximumFractionDigits(5);
 
 		this.mts = mts;
 		this.points = Tracking.toPoints(mts);
 		this.inputfile = file;
 		this.inputdirectory = file.getParent();
-
+		this.rtAll = rtAll;
 		this.dataset = new XYSeriesCollection();
 		this.chart = Tracking.makeChart(dataset, "Microtubule Length Plot", "Timepoint", "MT Length");
 		this.jFreeChartFrame = Tracking.display(chart, new Dimension(500, 400));
@@ -118,10 +118,11 @@ public class BatchRANSAC implements PlugIn {
 	};
 
 	public ArrayList<Pair<Integer, Double>> lifetime;
+
 	@Override
 	public void run(String arg) {
 		/* JFreeChart */
-		rtAll = new ResultsTable();
+
 		linearlist = new ArrayList<Pair<LinearFunction, ArrayList<PointFunctionMatch>>>();
 		this.dataset.addSeries(Tracking.drawPoints(mts));
 		Tracking.setColor(chart, 0, new Color(64, 64, 64));
@@ -129,36 +130,30 @@ public class BatchRANSAC implements PlugIn {
 		setFunction();
 		updateRANSAC();
 		lifetime = writeratestofile();
-		
-		
-		
 
 	}
 
-	
-	 public  ArrayList<Pair<Integer, Double>> writeratestofile(){
-			
-			
-     	double lifetime = 0;
+	public ArrayList<Pair<Integer, Double>> writeratestofile() {
+
+		double lifetime = 0;
 		String file = inputfile.getName().replaceFirst("[.][^.]+$", "");
-		ArrayList<Pair<Integer, Double>> lifecount = new ArrayList<Pair<Integer, Double>>() ;
+		ArrayList<Pair<Integer, Double>> lifecount = new ArrayList<Pair<Integer, Double>>();
 
 		try {
 			File ratesfile = new File(inputdirectory + "//" + file + "Rates" + ".txt");
 			File frequfile = new File(inputdirectory + "//" + file + "Averages" + ".txt");
-			
+
 			FileWriter fw = new FileWriter(ratesfile);
 
 			BufferedWriter bw = new BufferedWriter(fw);
-			
-			
+
 			FileWriter fwfrequ = new FileWriter(frequfile);
 
 			BufferedWriter bwfrequ = new BufferedWriter(fwfrequ);
-			
-			
+
 			bw.write("\tStartTime (px)\tEndTime(px)\tLinearRateSlope(px)\n");
-			bwfrequ.write("\tAverageGrowthrate(px)\tAverageShrinkrate(px)\tCatastropheFrequency(px)\tRescueFrequency(px)\n");
+			bwfrequ.write(
+					"\tAverageGrowthrate(px)\tAverageShrinkrate(px)\tCatastropheFrequency(px)\tRescueFrequency(px)\n");
 			ResultsTable rt = new ResultsTable();
 			int count = 0;
 			int negcount = 0;
@@ -168,155 +163,130 @@ public class BatchRANSAC implements PlugIn {
 			double negtimediff = 0;
 			double averagegrowth = 0;
 			double averageshrink = 0;
-			
+
 			double minstartY = leastStart();
-			
+
 			double minstartX = Double.MAX_VALUE;
 			double minendX = Double.MAX_VALUE;
 			double catfrequ = 0;
 			double resfrequ = 0;
-			ArrayList<Double> previousendX =  new ArrayList<Double>();
+			ArrayList<Double> previousendX = new ArrayList<Double>();
 			for (final Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>> result : segments) {
 
-				
-				
 				final Pair<Double, Double> minMax = Tracking.fromTo(result.getB());
 
 				double startX = minMax.getA();
 				double endX = minMax.getB();
-				
-				
-				
-				
-				
-				
-				if (startX < minstartX){
-					
+
+				if (startX < minstartX) {
+
 					minstartX = startX;
 					minendX = endX;
 				}
-				
+
 				Polynomial<?, Point> polynomial = (Polynomial) result.getA();
-				
-				
-				
-				
+
 				sortPoints(points);
-				if (points.get(points.size() - 1).getW()[0] - endX >= tptolerance  ){
-				
+				if (points.get(points.size() - 1).getW()[0] - endX >= tptolerance) {
+
 					double startY = polynomial.predict(startX);
-             LinearFunction linear = new LinearFunction();
-				LinearFunction.slopeFits( result.getB(), linear, minSlope, maxSlope ) ;
-				
-				
-				double linearrate = linear.getCoefficient(1); 
-				
-					
-					if (linearrate > 0 && startY - minstartY > restolerance  && startX > tptolerance && previousendX.size() > 0 ){
+					LinearFunction linear = new LinearFunction();
+					boolean lineartrue = LinearFunction.slopeFits(result.getB(), linear, minSlope, maxSlope);
+
+					double linearrate = linear.getCoefficient(1);
+
+					if (linearrate > 0 && startY - minstartY > restolerance && startX > tptolerance
+							&& previousendX.size() > 0 && lineartrue) {
 						System.out.println(startY + " " + previousendX.size());
-					rescount++;
-					restimediff += -previousendX.get(previousendX.size() - 1) + startX;
-					
-					
-					
-				}
-				
-				
-				if (linearrate > 0 &&  startX > tptolerance){
-					
-					
-					count++;
-					timediff += endX - startX;
-					lifetime = endX - startX;
-					averagegrowth+=linearrate;
-					
-				}
-				
-				if (linearrate < 0){
-					
-					negcount++;
-					negtimediff += endX - startX;
-					
-					averageshrink+=linearrate;
-					
-				}
-				
+						rescount++;
+						restimediff += -previousendX.get(previousendX.size() - 1) + startX;
+
+					}
+
+					if (linearrate > 0 && startX > tptolerance && lineartrue) {
+
+						count++;
+						timediff += endX - startX;
+						lifetime = endX - startX;
+						averagegrowth += linearrate;
+						
+						rt.incrementCounter();
+						rt.addValue("Start time", startX);
+						rt.addValue("End time", endX);
+						rt.addValue("Growth Rate", linearrate);
+
+						lifecount.add(new ValuePair<Integer, Double>(count, lifetime));
+					}
+
+					if (linearrate < 0) {
+
+						negcount++;
+						negtimediff += endX - startX;
+
+						averageshrink += linearrate;
+
+						rt.incrementCounter();
+						rt.addValue("Start time", startX);
+						rt.addValue("End time", endX);
+						rt.addValue("Growth Rate", linearrate);
+					}
 
 				
-				rt.incrementCounter();
-				rt.addValue("Start time", startX);
-				rt.addValue("End time", endX);
-				rt.addValue("Growth Rate", linearrate);
-				
-				bw.write("\t" + nf.format(startX) + "\t" + "\t" + nf.format(endX) + "\t" + "\t"
-						+ nf.format(linearrate) + "\t" + "\t" + "\t" + "\t"
-						+ "\n");
-				if (linearrate > 0)
-					previousendX.add(endX);
+					bw.write("\t" + nf.format(startX) + "\t" + "\t" + nf.format(endX) + "\t" + "\t"
+							+ nf.format(linearrate) + "\t" + "\t" + "\t" + "\t" + "\n");
+					if (linearrate > 0 && lineartrue)
+						previousendX.add(endX);
+
+				}
 
 			}
-				
-				
-		}
-			
+
 			if (count > 0)
-				averagegrowth/=count;
+				averagegrowth /= count;
 			if (negcount > 0)
-				averageshrink/=negcount;
-			
-			
-			
-			
-			
-			
-			if (count > 0){
-				
+				averageshrink /= negcount;
+
+			if (count > 0) {
+
 				catfrequ = count / timediff;
-			
+
 			}
-			
-			if (rescount > 0){
-				
-				
-				
+
+			if (rescount > 0) {
+
 				resfrequ = rescount / restimediff;
 			}
-			lifecount.add(new  ValuePair<Integer, Double>(count, lifetime));
+			
 			System.out.println(count + " " + rescount);
 			rt.show("Rates(pixel units)");
-			
+
 			rtAll.incrementCounter();
 			rtAll.addValue("Average Growth", averagegrowth);
 			rtAll.addValue("Average Shrink", averageshrink);
 			rtAll.addValue("Catastrophe Frequency", catfrequ);
 			rtAll.addValue("Rescue Frequency", resfrequ);
-			
+
 			rtAll.show("Average Rates and Frequencies (pixel units)");
-			
-			
-			bwfrequ.write("\t" + nf.format(averagegrowth) + "\t" + "\t" + "\t" + "\t" + nf.format(averageshrink)  + "\t"+ "\t" + "\t" +  nf.format(catfrequ)
-			 + "\t"+ "\t" + "\t" +  nf.format(resfrequ)
-			
-			+ "\n" + "\n");	
-			
-			
+
+			bwfrequ.write("\t" + nf.format(averagegrowth) + "\t" + "\t" + "\t" + "\t" + nf.format(averageshrink) + "\t"
+					+ "\t" + "\t" + nf.format(catfrequ) + "\t" + "\t" + "\t" + nf.format(resfrequ)
+
+					+ "\n" + "\n");
+
 			bw.close();
 			fw.close();
-			
+
 			bwfrequ.close();
 			fwfrequ.close();
-		
-		}catch (IOException e) {
+
+		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return lifecount;
-		
+
 	}
 
-	
-	
-	
 	public void updateRANSAC() {
 		++updateCount;
 
@@ -501,8 +471,6 @@ public class BatchRANSAC implements PlugIn {
 		return minstartX;
 
 	}
-
-
 
 	protected void sort(final Pair<? extends AbstractFunction2D, ArrayList<PointFunctionMatch>> segment) {
 		Collections.sort(segment.getB(), new Comparator<PointFunctionMatch>() {

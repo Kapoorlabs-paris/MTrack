@@ -30,7 +30,7 @@ import lineFinder.LinefinderInteractiveHFMSERwHough;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.img.display.imagej.ImageJFunctions;
 import net.imglib2.type.numeric.real.FloatType;
-
+import net.imglib2.view.Views;
 import velocityanalyser.Trackend;
 import velocityanalyser.Trackstart;
 
@@ -905,7 +905,7 @@ public  class TrackBatch {
 			new ImagePlus(parent.parent.addToName, parent.prestack).show();
 		}
 		
-
+		DisplayID.displayseeds(Views.hyperSlice(parent.originalimg, 2, 0), parent.IDALL);
 	}
 
 

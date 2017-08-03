@@ -108,6 +108,7 @@ public class InteractiveRANSAC implements PlugIn {
 	final JFreeChart chart;
 	int updateCount = 0;
 	public ArrayList<Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>>> segments;
+	public ArrayList<LinearFunction> linearsegments;
 	public
 	// for scrollbars
 	int maxErrorInt, lambdaInt, minSlopeInt, maxSlopeInt, minDistCatInt, restoleranceInt;
@@ -115,7 +116,7 @@ public class InteractiveRANSAC implements PlugIn {
 	public double maxError = 3.0;
 	public double minSlope = 0.1;
 	public double maxSlope = 100;
-	public double restolerance = 2;
+	public double restolerance = 5;
 	public double tptolerance = 2;
 	public int maxDist = 300;
 	public int minInliers = 50;
@@ -224,7 +225,7 @@ public class InteractiveRANSAC implements PlugIn {
 			linearlist = new ArrayList<Pair<LinearFunction, ArrayList<PointFunctionMatch>>>();
 			this.dataset.addSeries(Tracking.drawPoints(mts));
 			Tracking.setColor(chart, 0, new Color(64, 64, 64));
-			Tracking.setStroke(chart, 0, 0.75f);
+			Tracking.setStroke(chart, 0, 0.2f);
 		Card();
 		updateRANSAC();
 		}
@@ -493,7 +494,7 @@ public class InteractiveRANSAC implements PlugIn {
 		final Button batch = new Button("Save Parameters for Batch run");
 		final Button cancel = new Button("Cancel");
 		final Button Write = new Button("Save Rates and Frequencies to File");
-		final Button WriteStats = new Button("Compute Length and Lifetime sitribution");
+		final Button WriteStats = new Button("Compute Length and Lifetime distribution");
 		final Button WriteAgain = new Button("Save Rates and Frequencies to File");
 		choice.select(functionChoice);
 		setFunction();
@@ -673,7 +674,7 @@ public class InteractiveRANSAC implements PlugIn {
      		dataset.removeAllSeries();
             this.dataset.addSeries(Tracking.drawPoints(mts));
 			Tracking.setColor(chart, 0, new Color(64, 64, 64));
-			Tracking.setStroke(chart, 0, 0.75f);
+			Tracking.setStroke(chart, 0, 0.2f);
      		updateRANSAC();
      		
      		
@@ -739,13 +740,13 @@ public class InteractiveRANSAC implements PlugIn {
 
 				dataset.addSeries(Tracking.drawFunction((Polynomial) result.getA(), minMax.getA(), minMax.getB(), 0.5,
 						"Segment " + segment));
-
+                
 				if (functionChoice > 0) {
 					Tracking.setColor(chart, i, new Color(255, 0, 0));
-					Tracking.setStroke(chart, i, 0.5f);
+					Tracking.setStroke(chart, i, 1f);
 				} else {
 					Tracking.setColor(chart, i, new Color(0, 128, 0));
-					Tracking.setStroke(chart, i, 2f);
+					Tracking.setStroke(chart, i, 0.5f);
 				}
 
 				++i;
@@ -756,11 +757,13 @@ public class InteractiveRANSAC implements PlugIn {
 							"Linear Segment " + segment));
 
 					Tracking.setColor(chart, i, new Color(0, 128, 0));
-					Tracking.setStroke(chart, i, 2f);
+					Tracking.setStroke(chart, i, 0.5f);
 
 					++i;
 
 				}
+				
+				
 
 				dataset.addSeries(Tracking.drawPoints(Tracking.toPairList(result.getB()), "Inliers " + segment));
 
@@ -916,11 +919,13 @@ public class InteractiveRANSAC implements PlugIn {
 			}
 		});
 
+		/*
 		for (final Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>> segment : segments) {
 			System.out.println("\nSEGMENT");
 			for (final PointFunctionMatch pm : segment.getB())
 				System.out.println(pm.getP1().getL()[0] + ", " + pm.getP1().getL()[1]);
 		}
+		*/
 	}
 
 	public void close() {
