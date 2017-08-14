@@ -205,7 +205,6 @@ public class Interactive_MTDoubleChannelBasic implements PlugIn {
 
 		panelCont.add(panelFirst, "1");
 		panelCont.add(panelSecond, "2");
-		panelCont.add(panelThird, "3");
 
 		panelFirst.setName("Choose parameters to find Seeds");
 
@@ -298,9 +297,9 @@ public class Interactive_MTDoubleChannelBasic implements PlugIn {
 		++c.gridy;
 		panelFirst.add(minSizeS, c);
 
-		++c.gridy;
-		c.insets = new Insets(10, 175, 0, 175);
-		panelFirst.add(AdvancedOptions, c);
+	//	++c.gridy;
+	//	c.insets = new Insets(10, 175, 0, 175);
+	//	panelFirst.add(AdvancedOptions, c);
 
 		++c.gridy;
 		c.insets = new Insets(10, 180, 0, 180);
@@ -370,9 +369,22 @@ public class Interactive_MTDoubleChannelBasic implements PlugIn {
 		final Label LeftClick = new Label(
 				"Left click deselects an end, Shift + left click selects a deselected end, Shift + Alt + left click marks a user defined seed.");
 
+		final Label Done = new Label("Hope that everything was to your satisfaction! You can now exit.");
+		final Button Exit = new Button("Close and exit");
+		final Button Record = new Button("Save program parameters for batch mode");
+		
+		Done.setBackground(new Color(1, 0, 1));
+		Done.setForeground(new Color(255, 255, 255));
+		
+		
+		DefaultModelHF loaddefaultHF = new DefaultModelHF(parent);
+		loaddefaultHF.LoadDefault();
+
+		
+		
 		LeftClick.setBackground(new Color(1, 0, 1));
 		LeftClick.setForeground(new Color(255, 255, 255));
-		final Checkbox Finalize = new Checkbox("Confirm the dynamic seed end(s)");
+		final Checkbox Finalize = new Checkbox("Confirm the dynamic seed end(s) and track");
 
 		final Label MTTextHF = new Label("Select ends for tracking", Label.CENTER);
 		final Label Step2 = new Label("Step 2", Label.CENTER);
@@ -424,117 +436,15 @@ public class Interactive_MTDoubleChannelBasic implements PlugIn {
 		c.insets = new Insets(10, 10, 0, 0);
 		panelSecond.add(Finalize, c);
 
-		MoveNext.addActionListener(new MoveNextListener(parent));
-		JumptoFrame.addActionListener(new MoveToFrameListener(parent));
-
-		CardframeSimple.addWindowListener(new FrameListener(CardframeSimple));
-
-		inputFieldX.addTextListener(new BeginTrackListener(parent));
-		inputFieldY.addTextListener(new EndTrackListener(parent));
-		Finalize.addItemListener(new FinalPoint(parent, this));
-
-		CardframeSimple.add(panelCont, BorderLayout.CENTER);
-		CardframeSimple.add(control, BorderLayout.SOUTH);
-		CardframeSimple.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		CardframeSimple.pack();
-		CardframeSimple.setVisible(true);
-	}
-
-	public void DeterministicSimple() {
-
-		parent.showDeterministic = true;
-		final GridBagLayout layout = new GridBagLayout();
-		final GridBagConstraints c = new GridBagConstraints();
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.gridx = 0;
-		c.gridy = 0;
-		c.weightx = 1;
-
-		panelThird.removeAll();
-
-		final Label Step3 = new Label("Step 3", Label.CENTER);
-		panelThird.setLayout(layout);
-		panelThird.add(Step3, c);
-
-		JLabel lbltrack = new JLabel("Display SeedID's");
-
-		String[] choicestrack = new String[parent.IDALL.size() + 1];
-		choicestrack[0] = "Display All";
-		Comparator<Pair<Integer, double[]>> seedIDcomparison = new Comparator<Pair<Integer, double[]>>() {
-
-			@Override
-			public int compare(final Pair<Integer, double[]> A, final Pair<Integer, double[]> B) {
-
-				return A.getA() - B.getA();
-
-			}
-
-		};
-
-		Collections.sort(parent.IDALL, seedIDcomparison);
-		for (int index = 0; index < parent.IDALL.size(); ++index) {
-
-			String currentseed = Double.toString(parent.IDALL.get(index).getA());
-
-			choicestrack[index + 1] = "Seed " + currentseed;
-		}
-
-		JComboBox<String> cbtrack = new JComboBox<String>(choicestrack);
-		DefaultModelHF loaddefault = new DefaultModelHF(parent);
-		loaddefault.LoadDefault();
-
-		final Button SkipframeandTrackEndPoints = new Button(
-				"TrackEndPoints from user specified first and last timepoint");
-		final Button CheckResults = new Button("Check Results (then click next)");
-		final Checkbox RoughResults = new Checkbox("Rates and Statistical Analysis");
-		final Checkbox AdvancedOptions = new Checkbox("Advanced Optimizer Options ", parent.AdvancedChoice);
-
-		final Label Checkres = new Label("The tracker now performs an internal check on the results");
-		Checkres.setBackground(new Color(1, 0, 1));
-		Checkres.setForeground(new Color(255, 255, 255));
-		final Label Done = new Label("Hope that everything was to your satisfaction! You can now exit.");
-		final Button Exit = new Button("Close and exit");
-		final Button Record = new Button("Save program parameters for batch mode");
-
-		Done.setBackground(new Color(1, 0, 1));
-		Done.setForeground(new Color(255, 255, 255));
-
+		
+		
 		++c.gridy;
-		c.insets = new Insets(10, 175, 0, 175);
-		panelThird.add(AdvancedOptions, c);
-
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 175);
-		panelThird.add(SkipframeandTrackEndPoints, c);
-		if (parent.analyzekymo && parent.Kymoimg != null) {
-			++c.gridy;
-			c.insets = new Insets(10, 10, 0, 0);
-			panelThird.add(Checkres, c);
-
-			++c.gridy;
-			c.insets = new Insets(10, 175, 0, 175);
-			panelThird.add(CheckResults, c);
-		}
+		c.insets = new Insets(10, 10, 0, 50);
+		panelSecond.add(Record, c);
 
 		++c.gridy;
 		c.insets = new Insets(10, 10, 0, 50);
-		panelThird.add(lbltrack, c);
-
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 50);
-		panelThird.add(cbtrack, c);
-		/*
-		 * ++c.gridy; c.insets = new Insets(10, 10, 0, 175);
-		 * panelFifth.add(RoughResults, c);
-		 */
-
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 50);
-		panelThird.add(Record, c);
-
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 50);
-		panelThird.add(Done, c);
+		panelSecond.add(Done, c);
 
 		// ++c.gridy;
 		// c.insets = new Insets(10, 10, 0, 50);
@@ -543,17 +453,25 @@ public class Interactive_MTDoubleChannelBasic implements PlugIn {
 		Exit.addActionListener(new FinishedButtonListener(CardframeSimple, true));
 
 		Record.addActionListener(new BatchModeListener(parent));
-		SkipframeandTrackEndPoints.addActionListener(
-				new SkipFramesandTrackendsListener(parent, parent.thirdDimension, parent.thirdDimensionSize));
-		CheckResults.addActionListener(new CheckResultsListener(parent));
-		RoughResults.addItemListener(new AcceptResultsListener(parent));
-		AdvancedOptions.addItemListener(new AdvancedTrackerListener(parent));
-		cbtrack.addActionListener(new SeedDisplayListener(cbtrack, Views.hyperSlice(parent.originalimg, 2, 0), parent));
-		panelThird.repaint();
-		panelThird.validate();
-		CardframeSimple.pack();
 
+		
+		MoveNext.addActionListener(new MoveNextListener(parent));
+		JumptoFrame.addActionListener(new MoveToFrameListener(parent));
+
+		CardframeSimple.addWindowListener(new FrameListener(CardframeSimple));
+
+		inputFieldX.addTextListener(new BeginTrackListener(parent));
+		inputFieldY.addTextListener(new EndTrackListener(parent));
+		Finalize.addItemListener(new FinalPoint(parent, this, parent.thirdDimension, parent.thirdDimensionSize));
+		
+		
+		CardframeSimple.add(panelCont, BorderLayout.CENTER);
+		CardframeSimple.add(control, BorderLayout.SOUTH);
+		CardframeSimple.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		CardframeSimple.pack();
+		CardframeSimple.setVisible(true);
 	}
+
 
 	
 

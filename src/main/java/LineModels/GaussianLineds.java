@@ -11,6 +11,7 @@ public class GaussianLineds implements MTFitFunction {
 		
 	}
 
+	
 	@Override
 	public double grad(double[] x, double[] a, double[] b, int k) {
 		final int ndims = x.length;

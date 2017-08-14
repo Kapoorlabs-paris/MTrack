@@ -1,5 +1,6 @@
 package listeners;
 
+import java.awt.BorderLayout;
 import java.awt.Button;
 import java.awt.Checkbox;
 import java.awt.Color;
@@ -153,6 +154,8 @@ public class HoughListener implements ItemListener {
 			FindLinesListener.addActionListener(new FindLinesListener(parent));
 			parent.panelSecond.validate();
 			parent.panelSecond.repaint();
+			parent.Cardframe.add(parent.jpb, BorderLayout.BEFORE_FIRST_LINE);
+            parent.Cardframe.pack();
 
 		}
 

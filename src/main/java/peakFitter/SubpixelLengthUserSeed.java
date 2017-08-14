@@ -2,6 +2,7 @@ package peakFitter;
 
 import java.util.ArrayList;
 
+import ij.gui.OvalRoi;
 import interactiveMT.Interactive_MTDoubleChannel;
 import labeledObjects.Indexedlength;
 
@@ -16,7 +17,7 @@ public class SubpixelLengthUserSeed {
 		this.parent = parent;
 	}
 	
-	public  Indexedlength UserSeed(final double[] newseed, final int maxSeed){
+	public  Indexedlength UserSeed(final double[] newseed, final int maxSeed, OvalRoi roi){
 		
 		
 		
@@ -41,7 +42,7 @@ public class SubpixelLengthUserSeed {
 		
 		final double[] originalds = new double[] {ds, ds};
 		
-		Indexedlength NewSeed = new Indexedlength(currentLabel, seedLabel, framenumber, ds, lineintensity, background, currentpos, fixedpos, slope, intercept, originalslope, originalintercept, originalds);
+		Indexedlength NewSeed = new Indexedlength(currentLabel, seedLabel, framenumber, ds, lineintensity, background, currentpos, fixedpos, slope, intercept, originalslope, originalintercept, originalds, roi);
 		
 		
 		return NewSeed;

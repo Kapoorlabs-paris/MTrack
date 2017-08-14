@@ -39,7 +39,7 @@ final Interactive_MTDoubleChannel parent;
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				
-			//	System.out.println("Userframe size" + parent.Userframe.size());
+				System.out.println("Userframe size" + parent.Userframe.size());
 				
 				if(SwingUtilities.isLeftMouseButton(e) && e.isShiftDown() == false && e.isAltDown() == false){
 				
@@ -58,18 +58,18 @@ final Interactive_MTDoubleChannel parent;
 			
 				
 				
-				OvalRoi nearestRoiCurrUser = util.DrawingUtils.getNearestRoisPair(parent.ClickedPoints, new double[] { x, y });
 
 				OvalRoi nearestRoiCurr = util.DrawingUtils.getNearestRois(parent.AllSeedrois, new double[] { x, y });
 				
-				if(nearestRoiCurrUser.getStrokeColor()==parent.colorUser){
+				
 					
 				    
 				if(parent.Userframe.size() > 0){
 					
 					for (int index = 0; index < parent.Userframe.size(); ++index){
 						
-						
+						if(nearestRoiCurr.getStrokeColor()==parent.colorUser && parent.Userframe.get(index).roi == nearestRoiCurr ){
+							
 						parent.Userframe.remove(index);
 						
 						--index;
@@ -79,12 +79,21 @@ final Interactive_MTDoubleChannel parent;
 					
 				}
 				
+
+				
+				final OvalRoi Bigroi = nearestRoiCurr;
+				Bigroi.setStrokeColor(parent.colorUnselect);
+				o.add(Bigroi);
+				
 				}
+				
+				
+				
 				Rectangle rect = nearestRoiCurr.getBounds();
 
 				double newx = rect.x + rect.width / 2.0;
 				double newy = rect.y + rect.height / 2.0;
-				final OvalRoi Bigroi = nearestRoiCurr;
+				OvalRoi Bigroi = nearestRoiCurr;
 				Bigroi.setStrokeColor(parent.colorUnselect);
 				o.add(Bigroi);
 				
@@ -97,6 +106,9 @@ final Interactive_MTDoubleChannel parent;
 					}
 					
 				}
+				
+               
+				
 				
 				System.out.println("You deleted: " + newx + "," + newy);
 				}
@@ -124,14 +136,18 @@ final Interactive_MTDoubleChannel parent;
 
 					double newx = rect.x + rect.width / 2.0;
 					double newy = rect.y + rect.height / 2.0;
-					final OvalRoi Bigroi = nearestRoiCurr;
+					OvalRoi Bigroi = nearestRoiCurr;
+					
+					if(nearestRoiCurr.getStrokeColor()==parent.colorUnselect){
 					Bigroi.setStrokeColor(parent.colorConfirm);
 					o.add(Bigroi);
 					
 					Pair<double[], OvalRoi> newpoint = new ValuePair<double[], OvalRoi>(new double[]{newx, newy}, nearestRoiCurr);
 					
 					parent.ClickedPoints.add(newpoint);
+					
 					System.out.println("You added: " + newx + "," + newy);
+					}
 					}
 					
 				if(SwingUtilities.isLeftMouseButton(e) && e.isShiftDown() && e.isAltDown()){
@@ -163,12 +179,13 @@ final Interactive_MTDoubleChannel parent;
 					SubpixelLengthUserSeed newseed = new SubpixelLengthUserSeed(parent);
 					
 					
-					Indexedlength userseed = newseed.UserSeed(new double[]{x, y}, nextseed);
+					Indexedlength userseed = newseed.UserSeed(new double[]{x, y}, nextseed, Bigroi);
 					
 					parent.Userframe.add(userseed);
 					nextseed++;
 					
 					parent.ClickedPoints.add(newpoint);
+					parent.AllSeedrois.add(Bigroi);
 					
 					System.out.println("User clicked: " + x + " ," + y);
 					

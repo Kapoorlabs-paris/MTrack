@@ -14,6 +14,7 @@ import interactiveMT.Interactive_MTDoubleChannel;
 import interactiveMT.Interactive_MTDoubleChannelBasic;
 import interactiveMT.Interactive_MTDoubleChannel.ValueChange;
 import interactiveMT.Interactive_MTDoubleChannel.Whichend;
+import listeners.SkipFramesandTrackendsListener;
 import net.imglib2.util.Pair;
 import net.imglib2.util.ValuePair;
 
@@ -24,12 +25,16 @@ public class FinalPoint implements ItemListener {
 	final Interactive_MTDoubleChannelBasic child;
 
 	final BatchMode batch;
+	 int starttime;
+    int endtime;
 	
-	public FinalPoint(final Interactive_MTDoubleChannel parent, final Interactive_MTDoubleChannelBasic child) {
+	public FinalPoint(final Interactive_MTDoubleChannel parent, final Interactive_MTDoubleChannelBasic child, final int starttime, final int endtime) {
 
 		this.parent = parent;
 		this.child = child;
 		this.batch = null;
+		this.starttime = starttime;
+		this.endtime = endtime;
 	}
 
 	public FinalPoint(final Interactive_MTDoubleChannel parent) {
@@ -37,6 +42,7 @@ public class FinalPoint implements ItemListener {
 		this.parent = parent;
 		this.child = null;
 		this.batch = null;
+		
 	}
 	
 	public FinalPoint(final BatchMode batch) {
@@ -153,8 +159,13 @@ public class FinalPoint implements ItemListener {
 
 		parent.updatePreview(ValueChange.SHOWMSER);
 
-		if (child != null)
-			child.DeterministicSimple();
+		if (child != null){
+			
+			SkipFramesandTrackendsListener track =  new SkipFramesandTrackendsListener(parent, parent.thirdDimension, parent.thirdDimensionSize);
+			track.goSkip();
+			
+		}
+			
 
 	}
 	

@@ -1,5 +1,6 @@
 package listeners;
 
+import java.awt.BorderLayout;
 import java.awt.Button;
 import java.awt.Checkbox;
 import java.awt.Color;
@@ -204,6 +205,8 @@ public class MserwHoughListener implements ItemListener {
 			ComputeTree.addActionListener(new ComputeTreeListener(parent));
 			parent.panelSecond.validate();
 			parent.panelSecond.repaint();
+			parent.Cardframe.add(parent.jpb, BorderLayout.BEFORE_FIRST_LINE);
+
 			parent.Cardframe.pack();
 			parent.updatePreview(ValueChange.SHOWMSER);
 		}

@@ -477,6 +477,12 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		return delta;
 
 	}
+	
+	public void setInitialRadius(final float value) {
+		radiusfactor = value;
+	}
+
+	
 
 	public void setInitialsearchradius(final float value) {
 		initialSearchradius = value;
@@ -634,6 +640,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	
 		usefolder  = userfile.getParentFile().getAbsolutePath();
 
+		
 		SaveTxt = true;
 
 		AllSeedrois = new ArrayList<OvalRoi>();
@@ -655,7 +662,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		setInitialminSize(minSizeInit);
 		setInitialsearchradius(initialSearchradiusInit);
 		setInitialmaxsearchradius(maxSearchradius);
-		
+		setInitialRadius(1);
 		Cannyradius = (long) (radiusfactor * Math.ceil(Math.sqrt(psf[0] * psf[0] + psf[1] * psf[1])));
 		if (originalimg.numDimensions() < 3) {
 
@@ -795,7 +802,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 			long[] min = { (long) standardRectangle.getMinX(), (long) standardRectangle.getMinY() };
 			long[] max = { (long) standardRectangle.getMaxX(), (long) standardRectangle.getMaxY() };
 			interval = new FinalInterval(min, max);
-
+			final long Cannyradius = (long) (radiusfactor * Math.ceil(Math.sqrt(psf[0] * psf[0] + psf[1] * psf[1])));
 			currentimg = util.CopyUtils.extractImage(CurrentView, interval);
 			currentPreprocessedimg = util.CopyUtils.extractImage(CurrentPreprocessedView, interval);
 
@@ -823,7 +830,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 				long[] min = { (long) standardRectangle.getMinX(), (long) standardRectangle.getMinY() };
 				long[] max = { (long) standardRectangle.getMaxX(), (long) standardRectangle.getMaxY() };
 				interval = new FinalInterval(min, max);
-
+				final long Cannyradius = (long) (radiusfactor * Math.ceil(Math.sqrt(psf[0] * psf[0] + psf[1] * psf[1])));
 				currentimg = util.CopyUtils.extractImage(CurrentView, interval);
 				currentPreprocessedimg = util.CopyUtils.extractImage(CurrentPreprocessedView, interval);
 
@@ -856,7 +863,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 				currentimg = util.CopyUtils.extractImage(CurrentView, interval);
 				currentPreprocessedimg = util.CopyUtils.extractImage(CurrentPreprocessedView, interval);
-
+				final long Cannyradius = (long) (radiusfactor * Math.ceil(Math.sqrt(psf[0] * psf[0] + psf[1] * psf[1])));
 				newimg = util.CopyUtils.copytoByteImage(Kernels.CannyEdgeandMean(currentPreprocessedimg, Cannyradius),
 						standardRectangle);
 
@@ -897,7 +904,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 						.CurrentLabelImagepair(intimg, bitimgFloat, label);
 
 				RandomAccessibleInterval<FloatType> roiimg = pair.getA();
-						
+				final long Cannyradius = (long) (radiusfactor * Math.ceil(Math.sqrt(psf[0] * psf[0] + psf[1] * psf[1])));
 				newimg = util.CopyUtils.copytoByteImage(
 						Kernels.CannyEdgeandMean(roiimg, Cannyradius), standardRectangle);
 
@@ -947,7 +954,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 			currentimg = util.CopyUtils.extractImage(CurrentView, interval);
 			currentPreprocessedimg = util.CopyUtils.extractImage(CurrentPreprocessedView, interval);
-
+			final long Cannyradius = (long) (radiusfactor * Math.ceil(Math.sqrt(psf[0] * psf[0] + psf[1] * psf[1])));
 			newimg = util.CopyUtils.copytoByteImage(Kernels.CannyEdgeandMean(currentPreprocessedimg, Cannyradius),
 					standardRectangle);
 
@@ -1155,6 +1162,8 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		TextField inputField = new TextField();
 		inputField.setColumns(10);
 		inputField.setText(userfile.getName().replaceFirst("[.][^.]+$", ""));
+		
+		addToName = inputField.getText();
 		final Checkbox mser = new Checkbox("MSER", Finders, FindLinesViaMSER);
 		final Checkbox hough = new Checkbox("HOUGH", Finders, FindLinesViaHOUGH);
 		final Checkbox mserwhough = new Checkbox("MSERwHOUGH", Finders, FindLinesViaMSERwHOUGH);
@@ -1418,8 +1427,10 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		Exit.addActionListener(new FinishedButtonListener(Cardframe, true));
 
 		Cardframe.add(panelCont, BorderLayout.CENTER);
-		Cardframe.add(control, BorderLayout.SOUTH);
+		
+		Cardframe.add(control, BorderLayout.PAGE_END);
 		Cardframe.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		Cardframe.add(jpb, BorderLayout.BEFORE_FIRST_LINE);
 		Cardframe.pack();
 		Cardframe.setVisible(true);
 
@@ -1441,7 +1452,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		panelFifth.setLayout(layout);
 		panelFifth.add(Step5, c);
 
-		JLabel lbltrack = new JLabel("Display SeedID's");
+		//JLabel lbltrack = new JLabel("Display SeedID's");
 
 		String[] choicestrack = new String[IDALL.size() + 1];
 		choicestrack[0] = "Display All";
@@ -1506,13 +1517,13 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		}
 		
 
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 50);
-		panelFifth.add(lbltrack, c);
+	//	++c.gridy;
+	//	c.insets = new Insets(10, 10, 0, 50);
+	//	panelFifth.add(lbltrack, c);
 		
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 50);
-		panelFifth.add(cbtrack, c);
+	//	++c.gridy;
+	//	c.insets = new Insets(10, 10, 0, 50);
+	//	panelFifth.add(cbtrack, c);
 		/*
 		++c.gridy;
 		c.insets = new Insets(10, 10, 0, 175);
@@ -1538,6 +1549,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		cbtrack.addActionListener(new SeedDisplayListener(cbtrack, Views.hyperSlice(originalimg, 2, 0),this));
 		panelFifth.repaint();
 		panelFifth.validate();
+		Cardframe.add(jpb, BorderLayout.PAGE_END);
 		Cardframe.pack();
 
 	}
@@ -1548,6 +1560,10 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		FindLinesViaMSER = false;
 		FindLinesViaHOUGH = true;
 		FindLinesViaMSERwHOUGH = false;
+		inputradi = new JLabel("Radius Factor for Canny Edge with Mean filter(pixel units): ");
+		inputFieldradi = new TextField();
+		inputFieldradi.setColumns(10);
+		inputFieldradi.setText(String.valueOf(radiusfactor));
 		final GridBagLayout layout = new GridBagLayout();
 		final GridBagConstraints c = new GridBagConstraints();
 		panelFourth.removeAll();
@@ -1606,8 +1622,14 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		c.weighty = 1.5;
 
 		++c.gridy;
+		c.insets = new Insets(10, 10, 10, 0);
 		panelFourth.add(Update, c);
-
+		
+		++c.gridy;
+		panelFourth.add(inputradi, c);
+		++c.gridy;
+		c.insets = new Insets(10, 10, 10, 0);
+		panelFourth.add(inputFieldradi, c);
 		++c.gridy;
 		c.insets = new Insets(10, 10, 0, 0);
 		panelFourth.add(exthresholdText, c);
@@ -1716,7 +1738,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		
 		finalizechoices.addItemListener(new FinalizechoicesListener(this));
 		
-		
+		inputFieldradi.addTextListener(new RadiusListener(this));
 
 		threshold.addAdjustmentListener(new ThresholdHoughHFListener(this, thresholdText, thresholdHoughMin,
 				thresholdHoughMax, scrollbarSize, threshold));
@@ -1739,6 +1761,10 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		FindLinesViaMSER = true;
 		FindLinesViaHOUGH = false;
 		FindLinesViaMSERwHOUGH = false;
+		inputradi = new JLabel("Radius Factor for Canny Edge with Mean filter(pixel units): ");
+		inputFieldradi = new TextField();
+		inputFieldradi.setColumns(10);
+		inputFieldradi.setText(String.valueOf(radiusfactor));
 		final GridBagLayout layout = new GridBagLayout();
 		final GridBagConstraints c = new GridBagConstraints();
 		panelFourth.removeAll();
@@ -1784,7 +1810,11 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		c.weighty = 1.5;
 		++c.gridy;
 		panelFourth.add(Update, c);
-
+		++c.gridy;
+		panelFourth.add(inputradi, c);
+		++c.gridy;
+		c.insets = new Insets(10, 10, 10, 0);
+		panelFourth.add(inputFieldradi, c);
 		++c.gridy;
 		panelFourth.add(deltaText, c);
 
@@ -1854,7 +1884,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		min.addItemListener(new DarktobrightListener(this));
 		DefaultModelHF loaddefault = new DefaultModelHF(this);
 		loaddefault.LoadDefault();
-		
+		inputFieldradi.addTextListener(new RadiusListener(this));
 		finalizechoices.addItemListener(new FinalizechoicesListener(this));
 		panelFourth.validate();
 		panelFourth.repaint();

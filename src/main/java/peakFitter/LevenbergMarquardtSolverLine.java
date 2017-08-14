@@ -141,7 +141,7 @@ public class LevenbergMarquardtSolverLine {
 					d = (new Matrix(H)).lu().solve(new Matrix(g, nparm)).getRowPackedCopy();
 				} catch (RuntimeException re) {
 					// Matrix is singular
-					//lambda *= 10.;
+					lambda *= 10.;
 					continue;
 				}
 				double[] na = (new Matrix(a, nparm)).plus(new Matrix(d, nparm)).getRowPackedCopy();
@@ -184,15 +184,18 @@ public class LevenbergMarquardtSolverLine {
 				
 				// New truncation criteria to fasten the solver when it moves slowly during an iteration step @Varun
 				for( int i = 0; i < nparm; i++ ) {
-					if (Math.abs(a[i] - na[i]) < 1.0E-10   )
+					if (Math.abs(a[i] - na[i]) < 1.0E-10   ){
 						lambda *= 50;
+					
+						
+					}
+					    
 				}
 				
 				if (lambda >= 1.0E50)
 					done = true;
 				
-				if (IJ.escapePressed()) 
-					break;
+				
 				
 
 			} while(!done);

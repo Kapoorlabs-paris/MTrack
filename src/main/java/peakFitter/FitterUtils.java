@@ -247,21 +247,7 @@ public class FitterUtils {
 
 			long pointonline = (int) Math.round(newposition[1] - slope * newposition[0] - intercept);
 
-				if (Math.abs(pointonline) <= 50 &&  imgs.get(label).framenumber > rate && slope!=0 && intercept!=0) {
-					if (outcursor.getDoublePosition(0) <= minVal[0]
-							&& outcursor.get().get() / maxintensityline > Intensityratio) {
-						minVal[0] = outcursor.getDoublePosition(0);
-						minVal[1] = outcursor.getDoublePosition(1);
-					}
-
-					if (outcursor.getDoublePosition(0) >= maxVal[0]
-							&& outcursor.get().get() / maxintensityline > Intensityratio) {
-						maxVal[0] = outcursor.getDoublePosition(0);
-						maxVal[1] = outcursor.getDoublePosition(1);
-
-					}
-				}
-				else  {
+			
 
 					if (outcursor.getDoublePosition(0) <= minVal[0]
 							&& outcursor.get().get() / maxintensityline > Intensityratio) {
@@ -276,7 +262,7 @@ public class FitterUtils {
 
 					}
 
-				}
+				
 		}
 		Pair<double[], double[]> minmaxpair = new ValuePair<double[], double[]>(minVal, maxVal);
 

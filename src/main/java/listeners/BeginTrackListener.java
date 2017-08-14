@@ -1,6 +1,8 @@
 package listeners;
 
 import java.awt.TextComponent;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.TextEvent;
 import java.awt.event.TextListener;
 
@@ -18,13 +20,30 @@ public class BeginTrackListener implements TextListener {
 
 	@Override
 	public void textValueChanged(TextEvent e) {
-		 TextComponent tc = (TextComponent)e.getSource();
+		 final TextComponent tc = (TextComponent)e.getSource();
+		 tc.addKeyListener(new KeyListener(){
+			 @Override
+			    public void keyTyped(KeyEvent arg0) {
+				   
+			    }
+
+			    @Override
+			    public void keyReleased(KeyEvent arg0) {
+			    
+
+			    }
+
+			    @Override
+			    public void keyPressed(KeyEvent arg0) {
+			      
+			    	 String s = tc.getText();
+					 if (s.length() > 0)  {
+					parent.thirdDimension = (int)Float.parseFloat(s);
+					 }
+			    }
+			});
 		 
-		 
-		    String s = tc.getText();
-		 if (s.length() > 0)  {
-		parent.thirdDimension = (int)Float.parseFloat(s);
-		 }
+		   
 	}
 
 }
