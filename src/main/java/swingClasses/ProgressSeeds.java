@@ -39,8 +39,8 @@ final Interactive_MTDoubleChannel parent;
 	protected Void doInBackground() throws Exception {
 
 		// add listener to the imageplus slice slider
-		IJ.log("Starting Chosen Line finder from the seed image (first frame should be seeds)");
-		IJ.log("Current frame: " + parent.thirdDimension);
+		//IJ.log("Starting Chosen Line finder from the seed image (first frame should be seeds)");
+		//IJ.log("Current frame: " + parent.thirdDimension);
 		RandomAccessibleInterval<FloatType> groundframe = parent.currentimg;
 		RandomAccessibleInterval<FloatType> groundframepre = parent.currentPreprocessedimg;
 
@@ -53,12 +53,14 @@ final Interactive_MTDoubleChannel parent;
 				parent.PrevFrameparam = FindlinesVia.LinefindingMethod(groundframe, groundframepre,
 						parent.thirdDimension, parent.psf, newlineMser, UserChoiceModel.Line, parent.Domask, parent.Intensityratio, parent.Inispacing,
 						parent.jpb);
+
+/*				
 				IJ.log("MSER parameters:" + " " + " thirdDimension: " + " " + parent.thirdDimension);
 				IJ.log("Delta " + " " + parent.delta + " " + "minSize " + " " + parent.minSize + " " + "maxSize " + " " + parent.maxSize
 						+ " " + " Unstability_Score " + " " + parent.Unstability_Score + " " + "minDIversity " + " " + parent.minDiversity);
 				IJ.log("Optimization Parameters: " + "R" + parent.Intensityratio + " G"
 						+ parent.Inispacing / Math.min(parent.psf[0], parent.psf[1]));
-
+*/
 			
 
 		}
@@ -72,18 +74,22 @@ final Interactive_MTDoubleChannel parent;
 				parent.PrevFrameparam = FindlinesVia.LinefindingMethod(groundframe, groundframepre,
 						parent.thirdDimension, parent.psf, newlineHough, UserChoiceModel.Line, parent.Domask, parent.Intensityratio, parent.Inispacing,
 						parent.jpb);
+				
+/*				
 				IJ.log("Hough parameters:" + " " + " thirdDimension: " + " " + parent.thirdDimension);
 				IJ.log("thetaPerPixel " + " " + parent.thetaPerPixel + " " + "rhoPerPixel " + " " +parent.rhoPerPixel);
 				IJ.log("Optimization Parameters: " + "R" + parent.Intensityratio + " G"
 						+ parent.Inispacing / Math.min(parent.psf[0], parent.psf[1]));
 
-			
+*/			
 		}
 
 		if (parent.FindLinesViaMSERwHOUGH) {
 			
 				LinefinderInteractiveMSERwHough newlineMserwHough = new LinefinderInteractiveMSERwHough(groundframe,
 						groundframepre, parent.newtree, parent.thirdDimension, parent.thetaPerPixel, parent.rhoPerPixel, parent.jpb);
+				
+/*				
 				IJ.log("MSER parameters:" + " " + " thirdDimension: " + " " + parent.thirdDimension);
 				IJ.log("Delta " + " " + parent.delta + " " + "minSize " + " " + parent.minSize + " " + "maxSize " + " " + parent.maxSize
 						+ " " + " Unstability_Score " + " " + parent.Unstability_Score + " " + "minDIversity " + " " + parent.minDiversity);
@@ -91,6 +97,8 @@ final Interactive_MTDoubleChannel parent;
 				IJ.log("thetaPerPixel " + " " + parent.thetaPerPixel + " " + "rhoPerPixel " + " " + parent.rhoPerPixel);
 				IJ.log("Optimization Parameters: " + "R" + parent.Intensityratio + " G"
 						+ parent.Inispacing / Math.min(parent.psf[0], parent.psf[1]));
+						
+*/						
 				parent.PrevFrameparam = FindlinesVia.LinefindingMethod(groundframe, groundframepre,
 						parent.thirdDimension, parent.psf, newlineMserwHough, UserChoiceModel.Line, parent.Domask, parent.Intensityratio,
 						parent.Inispacing, parent.jpb);

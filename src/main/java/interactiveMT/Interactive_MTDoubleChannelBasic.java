@@ -54,7 +54,6 @@ import listeners.AnalyzekymoListener;
 import listeners.BeginTrackListener;
 import listeners.CheckResultsListener;
 import listeners.ChooseDirectoryListener;
-import listeners.ComputeTreeAgainListener;
 import listeners.ComputeTreeListener;
 import listeners.DeltaListener;
 import listeners.EndTrackListener;
@@ -163,13 +162,11 @@ public class Interactive_MTDoubleChannelBasic implements PlugIn {
 		Roi roi = parent.preprocessedimp.getRoi();
 
 		if (roi == null) {
-			// IJ.log( "A rectangular ROI is required to define the area..." );
 			parent.preprocessedimp.setRoi(parent.standardRectangle);
 			roi = parent.preprocessedimp.getRoi();
 		}
 
 		if (roi.getType() != Roi.RECTANGLE) {
-			IJ.log("Only rectangular rois are supported...");
 			return;
 		}
 
@@ -184,7 +181,6 @@ public class Interactive_MTDoubleChannelBasic implements PlugIn {
 		// check whenever roi is modified to update accordingly
 		parent.preprocessedimp.getCanvas().addMouseListener(parent.roiListener);
 
-		IJ.log(" Third Dimension Size " + parent.thirdDimensionSize);
 
 	}
 
@@ -243,7 +239,7 @@ public class Interactive_MTDoubleChannelBasic implements PlugIn {
 
 		final GridBagLayout layout = new GridBagLayout();
 		final GridBagConstraints c = new GridBagConstraints();
-
+		parent.addToName = inputField.getText();
 		panelFirst.setLayout(layout);
 		panelFirst.add(Step, c);
 		c.fill = GridBagConstraints.HORIZONTAL;

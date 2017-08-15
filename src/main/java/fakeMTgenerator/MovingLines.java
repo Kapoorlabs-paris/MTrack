@@ -59,7 +59,7 @@ public class MovingLines {
 		FloatType maxval = new FloatType(1);
 		Normalize.normalize(Views.iterable(lineimage), minval, maxval);
 		Kernels.addBackground(Views.iterable(lineimage), 0.2);
-		noisylines = Poissonprocess.poissonProcess(lineimage, 10);
+		noisylines = Poissonprocess.poissonProcess(lineimage, 30);
 		ImageJFunctions.show(noisylines);
 		ArrayList<double[]> startseedscopy =  new ArrayList<double[]>();
 		ArrayList<double[]> endseedscopy = new ArrayList<double[]>();
@@ -131,7 +131,7 @@ public class MovingLines {
 		
 		Normalize.normalize(Views.iterable(lineimageframe), minval, maxval);
 		Kernels.addBackground(Views.iterable(lineimageframe), 0.2);
-		noisylinesframe = Poissonprocess.poissonProcess(lineimageframe, 10);
+		noisylinesframe = Poissonprocess.poissonProcess(lineimageframe, 30);
 		
 	
 		ImageJFunctions.show(noisylinesframe);

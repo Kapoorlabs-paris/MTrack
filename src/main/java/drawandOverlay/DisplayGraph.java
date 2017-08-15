@@ -56,7 +56,7 @@ public class DisplayGraph {
 		        final double[] targetedge = graph.getEdgeTarget(e);
 		        
 		        Line newline = new Line(startedge[0], startedge[1], targetedge[0], targetedge[1]);
-				newline.setStrokeColor(Color.RED);
+				newline.setStrokeColor(Color.red);
 				newline.setStrokeWidth(0.8);
 				o.add(newline);
 

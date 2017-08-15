@@ -75,7 +75,7 @@ public  class Track {
 			RandomAccessibleInterval<FloatType> groundframepre = parent.currentPreprocessedimg;
 
 			if (parent.FindLinesViaMSER) {
-				
+		/*		
 				if (index == next) {
 
 					IJ.log("MSER parameters:" + " " + " thirdDimension: " + " " + parent.thirdDimension);
@@ -86,7 +86,7 @@ public  class Track {
 							+ parent.Inispacing / Math.min(parent.psf[0], parent.psf[1]));
 
 				}
-
+*/
 				
 
 				parent.updatePreview(ValueChange.SHOWMSER);
@@ -95,7 +95,7 @@ public  class Track {
 						parent.newtree,  parent.thirdDimension);
 					parent.returnVector = FindlinesVia.LinefindingMethodHF(groundframe, groundframepre, parent.PrevFrameparam,
 							 parent.thirdDimension, parent.psf, newlineMser, parent.userChoiceModel, parent.Domask, parent.Intensityratio,
-							parent.Inispacing, parent.seedmap, parent.jpb, parent.thirdDimensionSize, parent.maxdist, next);
+							parent.Inispacing, parent.seedmap, parent.jpb, parent.thirdDimensionSize, parent.maxdist, next, parent.numgaussians);
 					parent.Accountedframes.add(FindlinesVia.getAccountedframes());
 					
 					
@@ -112,7 +112,7 @@ public  class Track {
 			}
 
 			if (parent.FindLinesViaHOUGH) {
-
+/*
 				if (index == next) {
 
 					IJ.log("Hough parameters:" + " " + " thirdDimension: " + " " + parent.thirdDimension);
@@ -121,7 +121,7 @@ public  class Track {
 							+ parent.Inispacing / Math.min(parent.psf[0], parent.psf[1]));
 
 				}
-
+*/
 				
 
 				parent.updatePreview(ValueChange.SHOWHOUGH);
@@ -131,7 +131,7 @@ public  class Track {
 				
 					parent.returnVector = FindlinesVia.LinefindingMethodHF(groundframe, groundframepre, parent.PrevFrameparam,
 							 parent.thirdDimension, parent.psf, newlineHough, parent.userChoiceModel,parent.Domask, parent.Intensityratio,
-							parent.Inispacing, parent.seedmap, parent.jpb, parent.thirdDimensionSize, parent.maxdist, next);
+							parent.Inispacing, parent.seedmap, parent.jpb, parent.thirdDimensionSize, parent.maxdist, next, parent.numgaussians);
 
 					parent.Accountedframes.add(FindlinesVia.getAccountedframes());
 					
@@ -149,7 +149,7 @@ public  class Track {
 
 			if (parent.FindLinesViaMSERwHOUGH) {
 				
-				
+			/*	
 				if (index == next) {
 
 					IJ.log("MSER parameters:" + " " + " thirdDimension: " + " " + parent.thirdDimension);
@@ -161,13 +161,13 @@ public  class Track {
 							+ parent.Inispacing / Math.min(parent.psf[0], parent.psf[1]));
 
 				} 
-				
+			*/	
 				parent.updatePreview(ValueChange.SHOWMSER);
 				LinefinderInteractiveHFMSERwHough newlineMserwHough = new LinefinderInteractiveHFMSERwHough(groundframe,
 						groundframepre, parent.newtree, parent.thirdDimension, parent.thetaPerPixel, parent.rhoPerPixel);
 					parent.returnVector = FindlinesVia.LinefindingMethodHF(groundframe, groundframepre, parent.PrevFrameparam,
 							 parent.thirdDimension, parent.psf, newlineMserwHough, parent.userChoiceModel, parent.Domask, parent.Intensityratio,
-							parent.Inispacing, parent.seedmap, parent.jpb, parent.thirdDimensionSize, parent.maxdist, next);
+							parent.Inispacing, parent.seedmap, parent.jpb, parent.thirdDimensionSize, parent.maxdist, next, parent.numgaussians);
 
 					parent.Accountedframes.add(FindlinesVia.getAccountedframes());
 					
@@ -520,6 +520,8 @@ public  class Track {
 
 							FileWriter fw = new FileWriter(fichier);
 							BufferedWriter bw = new BufferedWriter(fw);
+							
+							BufferedWriter bwr = new BufferedWriter(fw);
 
 							bw.write(
 									"\tFrame\tLength (px)\tLength (real)\tiD\tCurrentPosX (px)\tCurrentPosY (px)\tCurrentPosX (real)\tCurrentPosY (real)"
@@ -530,9 +532,11 @@ public  class Track {
 								
 								
 								if (parent.endlengthlist.get(index).seedid == seedID ) {
-									if (index > 0 && parent.endlengthlist.get(index).currentpointpixel[0] != parent.endlengthlist.get(index - 1).currentpointpixel[0]
-											&& parent.endlengthlist.get(index).currentpointpixel[1] != parent.endlengthlist.get(index - 1).currentpointpixel[1])
-									bw.write("\t" + parent.endlengthlist.get(index).framenumber + "\t" + "\t"
+								//	if (index > 0 && parent.endlengthlist.get(index).currentpointpixel[0] != parent.endlengthlist.get(index - 1).currentpointpixel[0]
+								//			&& parent.endlengthlist.get(index).currentpointpixel[1] != parent.endlengthlist.get(index - 1).currentpointpixel[1])
+								
+										/*
+										bw.write("\t" + parent.endlengthlist.get(index).framenumber + "\t" + "\t"
 											+ parent.nf.format(parent.endlengthlist.get(index).totallengthpixel) + "\t" + "\t"
 											+ parent.nf.format(parent.endlengthlist.get(index).totallengthreal) + "\t" + "\t"
 											+ parent.nf.format(parent.endlengthlist.get(index).seedid) + "\t" + "\t"
@@ -542,14 +546,20 @@ public  class Track {
 											+ parent.nf.format(parent.endlengthlist.get(index).currentpointreal[1]) + "\t" + "\t"
 											+ parent.nf.format(parent.endlengthlist.get(index).lengthpixelperframe) + "\t" + "\t"
 											+ parent.nf.format(parent.endlengthlist.get(index).lengthrealperframe) + "\n");
+								*/
+										
 								
-										
-										
+								
+									     bwr.write("\t" + parent.endlengthlist.get(index).framenumber + "\t" + "\t"
+													
+											+ parent.nf.format(parent.endlengthlist.get(index).lengthpixelperframe) + "\n");
 									
 
 								}
+	    
 
 							}
+							bwr.close();
 							bw.close();
 							fw.close();
 

@@ -166,7 +166,8 @@ public class BatchMode implements PlugIn, Runnable {
 	public TextField inputFieldT;
 
 	public JProgressBar jpb;
-
+	public int numgaussians = Prefs.getInt(".Numg.int", 2);
+    public double maxdist = Prefs.getDouble(".Maxdist.double", Math.PI / 2);
 	public JLabel label = new JLabel("Progress..");
 	public JFrame frame = new JFrame();
 	public JPanel panel = new JPanel();

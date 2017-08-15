@@ -528,7 +528,7 @@ public ArrayList<Indexedlength> getEndPoints(){
 							+ endparam[0] + "EndY: " + endparam[1] + " " + "ds: " + finalparamstart[4] );
 					
 					
-					IJ.log((startparam[0] ) + " " + (startparam[1]  ) + " " +  (endparam[0]) + " "  + (endparam[1] ));
+				//	IJ.log((startparam[0] ) + " " + (startparam[1]  ) + " " +  (endparam[0]) + " "  + (endparam[1] ));
 
 					System.out.println("Length: " + Distance(new double[]{startparam[0],  startparam[1]},new double[]{endparam[0],  endparam[1]} ));
 

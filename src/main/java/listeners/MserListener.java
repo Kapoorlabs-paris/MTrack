@@ -184,7 +184,6 @@ import updateListeners.DefaultModelHF;
 				FindLinesbatchListener.addActionListener(new FindLinesbatchListener(parent));
 				parent.panelSecond.validate();
 				parent.panelSecond.repaint();
-				parent.Cardframe.add(parent.jpb, BorderLayout.BEFORE_FIRST_LINE);
 				parent.Cardframe.pack();
 				parent.updatePreview(ValueChange.SHOWMSER);
 			}

@@ -21,29 +21,15 @@ public class BeginTrackListener implements TextListener {
 	@Override
 	public void textValueChanged(TextEvent e) {
 		 final TextComponent tc = (TextComponent)e.getSource();
-		 tc.addKeyListener(new KeyListener(){
-			 @Override
-			    public void keyTyped(KeyEvent arg0) {
-				   
-			    }
-
-			    @Override
-			    public void keyReleased(KeyEvent arg0) {
-			    
-
-			    }
-
-			    @Override
-			    public void keyPressed(KeyEvent arg0) {
-			      
+		
 			    	 String s = tc.getText();
 					 if (s.length() > 0)  {
 					parent.thirdDimension = (int)Float.parseFloat(s);
 					 }
 			    }
-			});
+			
 		 
 		   
-	}
+	
 
 }

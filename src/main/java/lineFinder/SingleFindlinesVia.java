@@ -33,14 +33,14 @@ public class SingleFindlinesVia {
 			final RandomAccessibleInterval<FloatType> Preprocessedsource,Pair<ArrayList<Indexedlength>,ArrayList<Indexedlength>> PrevFrameparam,
 			 final int framenumber, final double[] psf,  final LinefinderHF linefinder, final UserChoiceModel model,
 			final boolean DoMask, final double intensityratio, final double Inispacing, final HashMap<Integer, Whichend> Trackstart, final JProgressBar jpb,
-			final int thirdDimsize) {
+			final int thirdDimsize, final int numgaussians) {
 
 		Pair<Pair<ArrayList<Trackproperties>, ArrayList<Trackproperties>>,Pair<ArrayList<Indexedlength>,ArrayList<Indexedlength>>> returnVector = null;
 		
 		
 
 			final SubpixelVelocityCline growthtracker = new SubpixelVelocityCline(source, linefinder,
-					PrevFrameparam.getA(), PrevFrameparam.getB(), psf, framenumber, model, DoMask, Trackstart,jpb, thirdDimsize);
+					PrevFrameparam.getA(), PrevFrameparam.getB(), psf, framenumber, model, DoMask, Trackstart,jpb, thirdDimsize, numgaussians);
 			growthtracker.setIntensityratio(intensityratio);
 			growthtracker.setInispacing(Inispacing);
 			//growthtracker.setSlopetolerance(slopetolerance);

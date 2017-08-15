@@ -78,6 +78,7 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 	double percent = 0;
 	int maxghost = 5;
 
+	public final int numgaussians;
 	public void setInispacing(double Inispacing) {
 
 		this.Inispacing = Inispacing;
@@ -136,7 +137,7 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 	public SubpixelVelocityCline(final RandomAccessibleInterval<FloatType> source, final LinefinderHF finder,
 			final ArrayList<Indexedlength> PrevFrameparamstart, final ArrayList<Indexedlength> PrevFrameparamend,
 			final double[] psf, final int framenumber, final UserChoiceModel model, final boolean DoMask,
-			final HashMap<Integer, Whichend> Trackstart, final JProgressBar jpb, final int thirdDimsize) {
+			final HashMap<Integer, Whichend> Trackstart, final JProgressBar jpb, final int thirdDimsize, final int numgaussians) {
 		finder.checkInput();
 		finder.process();
 		imgs = finder.getResult();
@@ -151,6 +152,7 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 		this.ndims = source.numDimensions();
 		this.Trackstart = Trackstart;
 		this.thirdDimsize = thirdDimsize;
+		this.numgaussians = numgaussians;
 
 	}
 
@@ -623,7 +625,6 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 
 						sigmas += psf[d] * psf[d];
 					}
-					final int numgaussians =2;
 
 					double[] startfit = startpos;
 					double[] endfit = endpos;
@@ -704,7 +705,6 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 
 						sigmas += psf[d] * psf[d];
 					}
-					final int numgaussians =2;
 
 					double[] endfit = endpos;
 					double[] startfit = startpos;
@@ -808,7 +808,6 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 						sigmas += psf[d] * psf[d];
 					}
 
-					final int numgaussians =2;
 
 					
 					if (DoMask) {
@@ -913,7 +912,6 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 						sigmas += psf[d] * psf[d];
 					}
 
-					final int numgaussians =2;
 
 					
 					
@@ -1022,7 +1020,6 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 						sigmas += psf[d] * psf[d];
 					}
 
-					final int numgaussians =2;
 
 					
 					if (DoMask) {
@@ -1129,7 +1126,6 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 						sigmas += psf[d] * psf[d];
 					}
 
-					final int numgaussians =2;
 
 					
 					if (DoMask) {

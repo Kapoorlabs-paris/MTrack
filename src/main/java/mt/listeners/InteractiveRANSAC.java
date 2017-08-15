@@ -205,7 +205,7 @@ public class InteractiveRANSAC implements PlugIn {
 		this.maxSlope = computeValueFromDoubleExpScrollbarPosition(this.maxSlopeInt, MAX_SLIDER, MAX_ABS_SLOPE);
 		this.dataset = new XYSeriesCollection();
 		this.chart = Tracking.makeChart(dataset, "Microtubule Length Plot", "Timepoint", "MT Length");
-		this.jFreeChartFrame = Tracking.display(chart, new Dimension(500, 400));
+		this.jFreeChartFrame = Tracking.display(chart, new Dimension(1000, 1000));
 
 	};
 	

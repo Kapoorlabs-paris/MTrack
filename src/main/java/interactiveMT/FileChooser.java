@@ -360,7 +360,7 @@ public class FileChooser extends JPanel {
 				final GridBagConstraints c = new GridBagConstraints();
 
 				panelIntro.setLayout(layout);
-
+				final Label ModuleText = new Label("Load pre-processed tracking image");
 				final Label LoadtrackText = new Label("Load pre-processed tracking image");
 				final Label LoadMeasureText = new Label("Load original image");
 				final Label KymoText = new Label("Kymo mode (only 1 MT, pick Kymograph image) else skip");
@@ -406,6 +406,11 @@ public class FileChooser extends JPanel {
 				c.weightx = 1;
 				c.weighty = 1.5;
 
+				
+				++c.gridy;
+				c.insets = new Insets(10, 10, 10, 0);
+				panelIntro.add(ModuleText, c);
+				
 				++c.gridy;
 				c.insets = new Insets(10, 10, 10, 0);
 				panelIntro.add(Simple, c);

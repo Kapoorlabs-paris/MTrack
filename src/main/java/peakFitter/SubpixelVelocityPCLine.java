@@ -84,6 +84,7 @@ public class SubpixelVelocityPCLine extends BenchmarkAlgorithm
 	public double Inispacing;
 	public double maxdist = 20;
 
+	public final int numgaussians;
 	public final int startframe;
 	double percent = 0;
 	int maxghost = 5;
@@ -166,7 +167,7 @@ public void setMaxdist (double maxdist) {
 	public SubpixelVelocityPCLine(final RandomAccessibleInterval<FloatType> source, final LinefinderHF linefinder,
 			final ArrayList<Indexedlength> PrevFrameparamstart, final ArrayList<Indexedlength> PrevFrameparamend,
 			final double[] psf, final int framenumber, final UserChoiceModel model, final boolean DoMask,
-			final HashMap<Integer, Whichend> Trackstart, final JProgressBar jpb, final int thirdDimsize, final int startframe) {
+			final HashMap<Integer, Whichend> Trackstart, final JProgressBar jpb, final int thirdDimsize, final int startframe, final int numgaussians) {
 
 		linefinder.checkInput();
 		linefinder.process();
@@ -184,7 +185,7 @@ public void setMaxdist (double maxdist) {
 		this.thirdDimsize = thirdDimsize;
 		this.Trackstart = Trackstart;
 		this.startframe = startframe;
-
+        this.numgaussians = numgaussians;
 		assert (PrevFrameparamend.size() == PrevFrameparamstart.size());
 	}
 
@@ -300,7 +301,10 @@ public void setMaxdist (double maxdist) {
 				
 				double oldpointonline = oldstartpoint[1] - originalslope * oldstartpoint[0]
 						- originalintercept;
-				double dist = Math.abs(pointonline - oldpointonline);
+				
+				double oldslope = PrevFrameparamstart.get(index).slope;
+				double newslope = paramnextframestart.slope;
+				double dist = Math.abs(Math.atan(newslope - oldslope));
 				if (dist > maxdist && framenumber > startframe + 1){
 					paramnextframestart = PrevFrameparamstart.get(index);
 					newstartpoint = oldstartpoint;
@@ -396,7 +400,9 @@ public void setMaxdist (double maxdist) {
 						- originalinterceptend;
 				double oldpointonline = oldendpoint[1] - originalslopeend * oldendpoint[0]
 						- originalinterceptend;
-				double dist = Math.abs(pointonline - oldpointonline);
+				double oldslope = PrevFrameparamend.get(index).slope;
+				double newslope = paramnextframeend.slope;
+				double dist = Math.abs(Math.atan(newslope - oldslope));
 				if (dist > maxdist && framenumber > startframe + 1){
 					paramnextframeend = PrevFrameparamend.get(index);
 				    newendpoint = oldendpoint;	
@@ -690,7 +696,6 @@ public void setMaxdist (double maxdist) {
 
 						sigmas += psf[d] * psf[d];
 					}
-					final int numgaussians =2;
 
 					double[] startfit = startpos;
 					double[] endfit = endpos;
@@ -775,7 +780,6 @@ public void setMaxdist (double maxdist) {
 
 						sigmas += psf[d] * psf[d];
 					}
-					final int numgaussians =2;
 
 					double[] endfit = endpos;
 					double[] startfit = startpos;
@@ -882,7 +886,6 @@ public void setMaxdist (double maxdist) {
 						sigmas += psf[d] * psf[d];
 					}
 
-					final int numgaussians =2;
 
 					if (DoMask) {
 
@@ -991,7 +994,6 @@ public void setMaxdist (double maxdist) {
 						sigmas += psf[d] * psf[d];
 					}
 
-					final int numgaussians =2;
 
 					if (DoMask) {
 
@@ -1103,7 +1105,6 @@ public void setMaxdist (double maxdist) {
 						sigmas += psf[d] * psf[d];
 					}
 
-					final int numgaussians =2;
 
 					if (DoMask) {
 
@@ -1214,7 +1215,6 @@ public void setMaxdist (double maxdist) {
 						sigmas += psf[d] * psf[d];
 					}
 
-					final int numgaussians =2;
 
 					if (DoMask) {
 

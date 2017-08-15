@@ -240,6 +240,7 @@ public class Interactive_MTSingleChannel implements PlugIn {
 	public int thirdDimensionsliderInit = 1;
 	public int timeMin = 1;
 
+	public int numgaussians = 2;
 	public float minDiversityMin = 0;
 	public float minDiversityMax = 1;
 
@@ -2403,7 +2404,8 @@ public class Interactive_MTSingleChannel implements PlugIn {
 		gd.addNumericField("Initial guess for Min Pixel Intensity (MinPI) belonging to MT (  R =  MinPI / MaxPI), R (enter 0.2 to 0.9) = ", Intensityratio, 2);
 		gd.addNumericField("Initial Spacing between Gaussians along the Polynomial curve = G * Min(Psf), G (enter positive number ) = ",
 				Inispacing / Math.min(psf[0], psf[1]), 2);
-		
+		gd.addNumericField("Number of gaussians = ", numgaussians,
+				2);
 		gd.addStringField("Choose a different Directory?:", usefolder);
 		gd.addStringField("Choose a different filename?:", addToName);
 		gd.showDialog();
@@ -2421,6 +2423,7 @@ public class Interactive_MTSingleChannel implements PlugIn {
 		Intensityratio = gd.getNextNumber();
 		Inispacing = gd.getNextNumber() * Math.min(psf[0], psf[1]);
 
+		numgaussians = (int) gd.getNextNumber();
 		usefolder = gd.getNextString();
 		addToName = gd.getNextString();
 

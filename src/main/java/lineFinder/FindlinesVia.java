@@ -71,14 +71,14 @@ public  class FindlinesVia {
 			final RandomAccessibleInterval<FloatType> Preprocessedsource,Pair<ArrayList<Indexedlength>,ArrayList<Indexedlength>> PrevFrameparam,
 			 final int framenumber, final double[] psf,  final LinefinderHF linefinder, final UserChoiceModel model,
 			final boolean DoMask, final double intensityratio, final double Inispacing, final HashMap<Integer, Whichend> Trackstart, final JProgressBar jpb,
-			final int thirdDimsize, final double maxdist, final int startframe) {
+			final int thirdDimsize, final double maxdist, final int startframe, final int numgaussians) {
 
 		Pair<Pair<ArrayList<Trackproperties>, ArrayList<Trackproperties>>,Pair<ArrayList<Indexedlength>,ArrayList<Indexedlength>>> returnVector = null;
 		
 		
 
 			final SubpixelVelocityPCLine growthtracker = new SubpixelVelocityPCLine(source, linefinder,
-					PrevFrameparam.getA(), PrevFrameparam.getB(), psf, framenumber, model, DoMask, Trackstart,jpb, thirdDimsize, startframe);
+					PrevFrameparam.getA(), PrevFrameparam.getB(), psf, framenumber, model, DoMask, Trackstart,jpb, thirdDimsize, startframe, numgaussians);
 			growthtracker.setIntensityratio(intensityratio);
 			growthtracker.setInispacing(Inispacing);
 			growthtracker.setMaxdist(maxdist);

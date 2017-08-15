@@ -119,7 +119,7 @@ public class Dummylines {
 		
 		final int n = outimg.numDimensions();
 		
-        double growrate = 22* Math.sin(0.2 * frame) ;
+        double growrate = 12* Math.sin(0.2 * frame) ;
         double motion = 5;
 		ArrayList<Dummyprops> newstlist = new ArrayList<Dummyprops>();
 		ArrayList<Dummyprops> newendlist = new ArrayList<Dummyprops>();

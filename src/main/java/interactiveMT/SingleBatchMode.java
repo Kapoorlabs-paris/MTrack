@@ -144,7 +144,7 @@ public class SingleBatchMode implements PlugIn, Runnable {
 	public final int scrollbarSizebig = 1000;
 	public boolean AdvancedChoice = false;
 	public boolean AdvancedChoiceSeeds = false;
-
+	   public double maxdist = Prefs.getDouble(".Maxdist.double", Math.PI / 4);
 	boolean Simplemode = false;
 	boolean Advancedmode = false;
 	boolean Kymomode = false;
@@ -299,6 +299,7 @@ public class SingleBatchMode implements PlugIn, Runnable {
 	public int inix = Prefs.getInt(".IniX.int", 1);
 	public int iniy = Prefs.getInt(".IniY.int", 1);
 
+	public int numgaussians = Prefs.getInt(".Numg.int", 2);
 	public double[] calibration;
 	public double radiusfactor = 1;
 	public MserTree<UnsignedByteType> newtree;

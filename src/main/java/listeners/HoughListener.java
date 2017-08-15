@@ -154,7 +154,6 @@ public class HoughListener implements ItemListener {
 			FindLinesListener.addActionListener(new FindLinesListener(parent));
 			parent.panelSecond.validate();
 			parent.panelSecond.repaint();
-			parent.Cardframe.add(parent.jpb, BorderLayout.BEFORE_FIRST_LINE);
             parent.Cardframe.pack();
 
 		}

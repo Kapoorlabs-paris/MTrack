@@ -204,7 +204,8 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public double Intensityratio = 0.5;
 	public double slopetolerance = 5;
 	public double Inispacing = 0.5;
-	public double maxdist = 10;
+	public double maxdist = Math.PI/2;
+	public int numgaussians = 2;
 	public int thirdDimensionslider = 1;
 	public int thirdDimensionsliderInit = 1;
 	public int timeMin = 1;
@@ -1430,7 +1431,6 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		
 		Cardframe.add(control, BorderLayout.PAGE_END);
 		Cardframe.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		Cardframe.add(jpb, BorderLayout.BEFORE_FIRST_LINE);
 		Cardframe.pack();
 		Cardframe.setVisible(true);
 
@@ -1549,7 +1549,6 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		cbtrack.addActionListener(new SeedDisplayListener(cbtrack, Views.hyperSlice(originalimg, 2, 0),this));
 		panelFifth.repaint();
 		panelFifth.validate();
-		Cardframe.add(jpb, BorderLayout.PAGE_END);
 		Cardframe.pack();
 
 	}
@@ -2388,7 +2387,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		gd.addNumericField("Initial guess for Min Pixel Intensity (MinPI) belonging to MT (  R =  MinPI / MaxPI), R (enter 0.2 to 0.9) = ", Intensityratio, 2);
 		gd.addNumericField("Initial Spacing between Gaussians along the Polynomial curve = G * Min(Psf), G (enter positive number) = ",
 				Inispacing / Math.min(psf[0], psf[1]), 2);
-		gd.addNumericField("Maximum direction change per frame (pixels)", maxdist, 2);
+		gd.addNumericField("Maximum direction change per frame (pi divided by, eneter number)", maxdist, 2);
 
 		if (analyzekymo && Kymoimg != null) {
 			gd.addNumericField("On an average, maximum difference in pixels between Kymograph and Program generated curve = ", deltadcutoff, 2);
@@ -2428,7 +2427,9 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		gd.addNumericField("Initial guess for Min Pixel Intensity (MinPI) belonging to MT (  R =  MinPI / MaxPI), R (enter 0.2 to 0.9) = ", Intensityratio, 2);
 		gd.addNumericField("Initial Spacing between Gaussians along the Polynomial curve = G * Min(Psf), G (enter positive number ) = ",
 				Inispacing / Math.min(psf[0], psf[1]), 2);
+		
 		gd.addNumericField("Maximum direction change per frame (pixels) ", maxdist, 2);
+		gd.addNumericField("Number of Gaussians for mask fits ", numgaussians, 2);
 		gd.addStringField("Choose a different Directory?:", usefolder);
 		gd.addStringField("Choose a different filename?:", addToName);
 		gd.showDialog();
@@ -2447,6 +2448,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		Inispacing = gd.getNextNumber() * Math.min(psf[0], psf[1]);
 		maxdist = gd.getNextNumber();
 
+		numgaussians = (int) gd.getNextNumber();
 		usefolder = gd.getNextString();
 		addToName = gd.getNextString();
 

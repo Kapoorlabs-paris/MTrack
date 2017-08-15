@@ -72,7 +72,6 @@ public class RansacFileChooser extends JPanel {
 	JFileChooser chooserA;
 	boolean wasDone = false;
 	boolean isFinished = false;
-	JButton Track;
 	String choosertitleA;
 	boolean Batchmoderun = false;
 	boolean Simplefile = false;
@@ -83,7 +82,6 @@ public class RansacFileChooser extends JPanel {
 
 		final JFrame frame = new JFrame("Welcome to the Ransac Part of MTV tracker");
 
-		Track = new JButton("Run RANSAC fit on a single track file");
 		JButton Measureserial = new JButton("Run RANSAC fits on directory of files (Set parameters individually)");
 		panelCont.add(panelIntro, "1");
 		/* Instantiation */
@@ -116,16 +114,12 @@ public class RansacFileChooser extends JPanel {
 		c.insets = new Insets(10, 10, 10, 0);
 		panelIntro.add(LoadtrackText, c);
 
-		++c.gridy;
-		c.insets = new Insets(10, 10, 10, 0);
-		panelIntro.add(Track, c);
 		
 		++c.gridy;
 		c.insets = new Insets(10, 10, 10, 0);
 		panelIntro.add(Measureserial, c);
 
 		panelIntro.setVisible(true);
-		Track.addActionListener(new OpenTrackListener(frame));
 		Batchmode.addItemListener(new RansacRuninBatchListener(frame));
 		Measureserial.addActionListener(new MeasureserialListener(frame));
 		frame.addWindowListener(new FrameListener(frame));
