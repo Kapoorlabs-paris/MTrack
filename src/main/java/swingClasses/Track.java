@@ -521,7 +521,6 @@ public  class Track {
 							FileWriter fw = new FileWriter(fichier);
 							BufferedWriter bw = new BufferedWriter(fw);
 							
-							BufferedWriter bwr = new BufferedWriter(fw);
 
 							bw.write(
 									"\tFrame\tLength (px)\tLength (real)\tiD\tCurrentPosX (px)\tCurrentPosY (px)\tCurrentPosX (real)\tCurrentPosY (real)"
@@ -532,10 +531,10 @@ public  class Track {
 								
 								
 								if (parent.endlengthlist.get(index).seedid == seedID ) {
-								//	if (index > 0 && parent.endlengthlist.get(index).currentpointpixel[0] != parent.endlengthlist.get(index - 1).currentpointpixel[0]
-								//			&& parent.endlengthlist.get(index).currentpointpixel[1] != parent.endlengthlist.get(index - 1).currentpointpixel[1])
+									if (index > 0 && parent.endlengthlist.get(index).currentpointpixel[0] != parent.endlengthlist.get(index - 1).currentpointpixel[0]
+											&& parent.endlengthlist.get(index).currentpointpixel[1] != parent.endlengthlist.get(index - 1).currentpointpixel[1])
 								
-										/*
+										
 										bw.write("\t" + parent.endlengthlist.get(index).framenumber + "\t" + "\t"
 											+ parent.nf.format(parent.endlengthlist.get(index).totallengthpixel) + "\t" + "\t"
 											+ parent.nf.format(parent.endlengthlist.get(index).totallengthreal) + "\t" + "\t"
@@ -546,20 +545,17 @@ public  class Track {
 											+ parent.nf.format(parent.endlengthlist.get(index).currentpointreal[1]) + "\t" + "\t"
 											+ parent.nf.format(parent.endlengthlist.get(index).lengthpixelperframe) + "\t" + "\t"
 											+ parent.nf.format(parent.endlengthlist.get(index).lengthrealperframe) + "\n");
-								*/
+								
 										
 								
 								
-									     bwr.write("\t" + parent.endlengthlist.get(index).framenumber + "\t" + "\t"
-													
-											+ parent.nf.format(parent.endlengthlist.get(index).lengthpixelperframe) + "\n");
+									  
 									
 
 								}
 	    
 
 							}
-							bwr.close();
 							bw.close();
 							fw.close();
 

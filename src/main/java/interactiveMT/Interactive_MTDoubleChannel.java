@@ -204,7 +204,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public double Intensityratio = 0.5;
 	public double slopetolerance = 5;
 	public double Inispacing = 0.5;
-	public double maxdist = Math.PI/2;
+	public double maxdist = 20;
 	public int numgaussians = 2;
 	public int thirdDimensionslider = 1;
 	public int thirdDimensionsliderInit = 1;
@@ -338,9 +338,20 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public ImagePlus Kymoimp;
 	public RandomAccessibleInterval<FloatType> originalimg;
 	public RandomAccessibleInterval<FloatType> originalPreprocessedimg;
+	
+	public RandomAccessibleInterval<FloatType> originalseedimg;
+	public RandomAccessibleInterval<FloatType> originalPreprocessedseedimg;
+	
+	public RandomAccessibleInterval<FloatType> originaldynamicimg;
+	public RandomAccessibleInterval<FloatType> originalPreprocesseddynamicimg;
+	
 	public RandomAccessibleInterval<FloatType> Kymoimg;
 	public RandomAccessibleInterval<FloatType> CurrentView;
 	public RandomAccessibleInterval<FloatType> CurrentPreprocessedView;
+	
+	
+	
+	
 	public int inix = 1;
 	public int iniy = 1;
 	public double[] calibration;
@@ -615,6 +626,9 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		System.out.println(calibration[0] + " " + calibration[1]);
 
 	}
+	
+	
+	
 
 	public Interactive_MTDoubleChannel(final RandomAccessibleInterval<FloatType> originalimg,
 			final RandomAccessibleInterval<FloatType> originalPreprocessedimg,
@@ -2387,7 +2401,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		gd.addNumericField("Initial guess for Min Pixel Intensity (MinPI) belonging to MT (  R =  MinPI / MaxPI), R (enter 0.2 to 0.9) = ", Intensityratio, 2);
 		gd.addNumericField("Initial Spacing between Gaussians along the Polynomial curve = G * Min(Psf), G (enter positive number) = ",
 				Inispacing / Math.min(psf[0], psf[1]), 2);
-		gd.addNumericField("Maximum direction change per frame (pi divided by, eneter number)", maxdist, 2);
+		gd.addNumericField("Maximum direction change per frame (in degrees)", maxdist, 2);
 
 		if (analyzekymo && Kymoimg != null) {
 			gd.addNumericField("On an average, maximum difference in pixels between Kymograph and Program generated curve = ", deltadcutoff, 2);

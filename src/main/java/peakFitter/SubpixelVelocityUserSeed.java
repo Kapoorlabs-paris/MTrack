@@ -279,9 +279,10 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 					- originalintercept;
 			double oldpointonline = oldstartpoint[1] - originalslope * oldstartpoint[0]
 					- originalintercept;
-			double oldslope = Userframe.get(index).slope;
+			double oldslope = originalslope;
 			double newslope = paramnextframestart.slope;
-			double dist = Math.abs(Math.atan(newslope - oldslope));
+			double dist = Math.toDegrees(Math.abs(Math.atan(Math.toRadians(newslope)) - Math.atan(Math.toRadians(oldslope))));
+			System.out.println(dist);
 			if (dist > maxdist && framenumber > startframe + 1){
 				paramnextframestart = Userframe.get(index);
 				newstartpoint = oldstartpoint;

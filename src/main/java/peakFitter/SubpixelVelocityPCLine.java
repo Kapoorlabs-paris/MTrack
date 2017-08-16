@@ -302,9 +302,10 @@ public void setMaxdist (double maxdist) {
 				double oldpointonline = oldstartpoint[1] - originalslope * oldstartpoint[0]
 						- originalintercept;
 				
-				double oldslope = PrevFrameparamstart.get(index).slope;
+				double oldslope = PrevFrameparamstart.get(index).originalslope;
 				double newslope = paramnextframestart.slope;
-				double dist = Math.abs(Math.atan(newslope - oldslope));
+				double dist = Math.toDegrees(Math.abs(Math.atan(Math.toRadians(newslope)) - Math.atan(Math.toRadians(oldslope))));
+				System.out.println(dist);
 				if (dist > maxdist && framenumber > startframe + 1){
 					paramnextframestart = PrevFrameparamstart.get(index);
 					newstartpoint = oldstartpoint;
@@ -400,9 +401,11 @@ public void setMaxdist (double maxdist) {
 						- originalinterceptend;
 				double oldpointonline = oldendpoint[1] - originalslopeend * oldendpoint[0]
 						- originalinterceptend;
-				double oldslope = PrevFrameparamend.get(index).slope;
+				double oldslope = PrevFrameparamend.get(index).originalslope;
 				double newslope = paramnextframeend.slope;
-				double dist = Math.abs(Math.atan(newslope - oldslope));
+				double dist = Math.toDegrees(Math.abs(Math.atan(Math.toRadians(newslope)) - Math.atan(Math.toRadians(oldslope))));
+				System.out.println(dist);
+
 				if (dist > maxdist && framenumber > startframe + 1){
 					paramnextframeend = PrevFrameparamend.get(index);
 				    newendpoint = oldendpoint;	
