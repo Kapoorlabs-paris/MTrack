@@ -140,17 +140,17 @@ public class MainFileChooser extends JPanel {
 		++c.gridy;
 		c.insets = new Insets(10, 10, 10, 0);
 		panelIntro.add(inputLabelX, c);
-
+		
 		++c.gridy;
-		c.insets = new Insets(10, 10, 10, 0);
+		c.insets = new Insets(10, 10, 10, 500);
 		panelIntro.add(inputFieldX, c);
 
 		++c.gridy;
 		c.insets = new Insets(10, 10, 10, 0);
 		panelIntro.add(inputLabelY, c);
-
+		
 		++c.gridy;
-		c.insets = new Insets(10, 10, 10, 0);
+		c.insets = new Insets(10, 10, 10, 500);
 		panelIntro.add(inputFieldY, c);
 
 		/*
@@ -297,6 +297,16 @@ public class MainFileChooser extends JPanel {
 
 	}
 
+	
+	public RandomAccessibleInterval<FloatType> Preprocess(IntervalView<FloatType> originalimg) {
+
+		final FlatFieldCorrection flatfilter = new FlatFieldCorrection(originalimg, 1);
+		flatfilter.process();
+		RandomAccessibleInterval<FloatType> ProgramPreprocessedimg = flatfilter.getResult();
+		return ProgramPreprocessedimg;
+
+	}
+	
 	protected class RunSimpleListener implements ItemListener {
 
 		@Override
@@ -469,81 +479,199 @@ public class MainFileChooser extends JPanel {
 				final ImgFactory<FloatType> factory = Util.getArrayOrCellImgFactory(originalimg, type);
 				RandomAccessibleInterval<FloatType> originalPreprocessedimg = factory.create(originalimg, type);
 
+				
 				if (impA != null)
 					originalPreprocessedimg = ImageJFunctions.convertFloat(impA);
-				else
-
-					originalPreprocessedimg = Preprocess(originalimg);
-
-			
-
+				else 
+					originalPreprocessedimg = null;
 				// Normalize image intnesity
 				Normalize.normalize(Views.iterable(originalimg), minval, maxval);
-				Normalize.normalize(Views.iterable(originalPreprocessedimg), minval, maxval);
+
 
 				if (nChannels > 1){
 					
 					
 					switch (JOptionPane.showConfirmDialog(null,
-							"It appears this image has " + nChannels + ".\n"
-									, "Is seed image in channel 1? ", JOptionPane.YES_NO_CANCEL_OPTION)) {
+							"Image has " + nChannels + "Channels, Is seed image in channel 1?\n"
+									, " ", JOptionPane.YES_NO_CANCEL_OPTION)) {
 
 					case JOptionPane.YES_OPTION:
 						// Do concetation
-						RandomAccessibleInterval<FloatType> seedimgStack = Views.hyperSlice(originalimg, 4 , 0);
-						RandomAccessibleInterval<FloatType> seedimgpreStack = Views.hyperSlice(originalPreprocessedimg, 4 , 0);
+						RandomAccessibleInterval<FloatType> seedimgStack = Views.hyperSlice(originalimg, 2 , 0);
+						
 						
 					
 						
-						RandomAccessibleInterval<FloatType> dynamicimgStack = Views.hyperSlice(originalimg, 4 , 1);
-						RandomAccessibleInterval<FloatType> dynamicgpreimgStack = Views.hyperSlice(originalPreprocessedimg, 4 , 1);
+						RandomAccessibleInterval<FloatType> dynamicimgStack = Views.hyperSlice(originalimg, 2 , 1);
+						
+						
+				
 						
 						
 						long[] dim = { dynamicimgStack.dimension(0), dynamicimgStack.dimension(1), dynamicimgStack.dimension(2) };
 						RandomAccessibleInterval<FloatType> totalimg = factory.create(dim, type);
 						RandomAccessibleInterval<FloatType> pretotalimg = factory.create(dim, type);
-						final long nz = totalimg.dimension( 2 );
+						final long nz = dynamicimgStack.dimension( 2 );
 						
 						
 						IntervalView< FloatType > slice = Views.hyperSlice( seedimgStack, 2, 0 );
 						IntervalView< FloatType > outputSlice = Views.hyperSlice( totalimg, 2, 0 );
 
-						IntervalView< FloatType > preslice = Views.hyperSlice( seedimgpreStack, 2, 0 );
-						IntervalView< FloatType > preoutputSlice = Views.hyperSlice( pretotalimg, 2, 0 );
 						
 						
 						processSlice( slice, outputSlice );
-						processSlice( preslice, preoutputSlice );
 						for ( long z = 1; z < nz; z++ )
 						{
 							slice = Views.hyperSlice( dynamicimgStack, 2, z );
 							outputSlice = Views.hyperSlice( totalimg, 2, z );
 						   
 
-							preslice = Views.hyperSlice( dynamicgpreimgStack, 2, 0 );
-							preoutputSlice = Views.hyperSlice( pretotalimg, 2, 0 );
 							
 							processSlice( slice, outputSlice );
+						}
+						IntervalView< FloatType > preoutputSlice;
+						if (originalPreprocessedimg!=null){
+							
+							
+							RandomAccessibleInterval<FloatType> dynamicgpreimgStack = Views.hyperSlice(originalPreprocessedimg, 2 , 1);
+							
+							
+							preoutputSlice = Views.hyperSlice( pretotalimg, 2, 0 );
+
+							RandomAccessibleInterval<FloatType> seedimgpreStack = Views.hyperSlice(originalPreprocessedimg, 2 , 0);
+
+							IntervalView< FloatType > preslice = Views.hyperSlice( seedimgpreStack, 2, 0 );
+
 							processSlice( preslice, preoutputSlice );
+							
+							for ( long z = 1; z < nz; z++ )
+							{
+								
+								preslice = Views.hyperSlice( dynamicgpreimgStack, 2, z );
+								preoutputSlice = Views.hyperSlice( pretotalimg, 2, z );
+
+								processSlice( preslice, preoutputSlice );
+
+								
+							}
+							Normalize.normalize(Views.iterable(pretotalimg), minval, maxval);
+							ImageJFunctions.show(pretotalimg).setTitle("Preprocessed Movie");
+						}
+						
+						else{
+							
+							preoutputSlice = (IntervalView<FloatType>) Preprocess(outputSlice);
+							Normalize.normalize(Views.iterable(pretotalimg), minval, maxval);
+							ImageJFunctions.show(pretotalimg).setTitle("Preprocessed Movie");
 						}
 						
 						
-						Normalize.normalize(Views.iterable(outputSlice), minval, maxval);
-						Normalize.normalize(Views.iterable(preoutputSlice), minval, maxval);
+						Normalize.normalize(Views.iterable(totalimg), minval, maxval);
 						
-						ImageJFunctions.show(preoutputSlice).setTitle("Preprocessed Movie");
+						
+						
 						
 						
 						
 						
 						if (Simplemode)
-							new Interactive_MTDoubleChannelBasic(new Interactive_MTDoubleChannel(outputSlice,
-									preoutputSlice, psf, calibration, chooserB.getSelectedFile())).run(null);
+							new Interactive_MTDoubleChannelBasic(new Interactive_MTDoubleChannel(totalimg,
+									pretotalimg, psf, calibration, chooserB.getSelectedFile())).run(null);
 						else
-							new Interactive_MTDoubleChannel(outputSlice, preoutputSlice, psf, calibration,
+							new Interactive_MTDoubleChannel(totalimg, pretotalimg, psf, calibration,
 									chooserB.getSelectedFile()).run(null);
 						
 						break;
+						
+						
+					case JOptionPane.NO_OPTION:
+						// Do concetation
+						seedimgStack = Views.hyperSlice(originalimg, 2 , 1);
+						
+						
+					
+						
+						dynamicimgStack = Views.hyperSlice(originalimg, 2 , 0);
+						
+						
+				
+						long[] dimsec = { dynamicimgStack.dimension(0), dynamicimgStack.dimension(1), dynamicimgStack.dimension(2) };
+						
+						totalimg = factory.create(dimsec, type);
+						pretotalimg = factory.create(dimsec, type);
+						long nzsec = dynamicimgStack.dimension( 2 );
+						
+						
+						slice = Views.hyperSlice( seedimgStack, 2, 0 );
+						outputSlice = Views.hyperSlice( totalimg, 2, 0 );
+
+						
+						
+						processSlice( slice, outputSlice );
+						for ( long z = 1; z < nzsec; z++ )
+						{
+							slice = Views.hyperSlice( dynamicimgStack, 2, z );
+							outputSlice = Views.hyperSlice( totalimg, 2, z );
+						   
+
+							
+							processSlice( slice, outputSlice );
+						}
+						if (originalPreprocessedimg!=null){
+							
+							
+							RandomAccessibleInterval<FloatType> dynamicgpreimgStack = Views.hyperSlice(originalPreprocessedimg, 2 , 0);
+							
+							
+							preoutputSlice = Views.hyperSlice( pretotalimg, 2, 0 );
+
+							RandomAccessibleInterval<FloatType> seedimgpreStack = Views.hyperSlice(originalPreprocessedimg, 2 , 1);
+
+							IntervalView< FloatType > preslice = Views.hyperSlice( seedimgpreStack, 2, 0 );
+
+							processSlice( preslice, preoutputSlice );
+							
+							for ( long z = 1; z < nzsec; z++ )
+							{
+								
+								preslice = Views.hyperSlice( dynamicgpreimgStack, 2, z );
+								preoutputSlice = Views.hyperSlice( pretotalimg, 2, z );
+
+								processSlice( preslice, preoutputSlice );
+
+								
+							}
+							Normalize.normalize(Views.iterable(pretotalimg), minval, maxval);
+							ImageJFunctions.show(pretotalimg).setTitle("Preprocessed Movie");
+						}
+						
+						else{
+							
+							preoutputSlice = (IntervalView<FloatType>) Preprocess(outputSlice);
+							Normalize.normalize(Views.iterable(pretotalimg), minval, maxval);
+							ImageJFunctions.show(pretotalimg).setTitle("Preprocessed Movie");
+						}
+						
+						
+						Normalize.normalize(Views.iterable(totalimg), minval, maxval);
+						
+						
+						
+						
+						
+						
+						
+						if (Simplemode)
+							new Interactive_MTDoubleChannelBasic(new Interactive_MTDoubleChannel(totalimg,
+									pretotalimg, psf, calibration, chooserB.getSelectedFile())).run(null);
+						else
+							new Interactive_MTDoubleChannel(totalimg, pretotalimg, psf, calibration,
+									chooserB.getSelectedFile()).run(null);
+						
+						break;
+						
+					
+						
 					case JOptionPane.CANCEL_OPTION:
 						
 						
@@ -554,8 +682,12 @@ public class MainFileChooser extends JPanel {
 				}
 
 					else{
-						
+						if (impA != null)
+							originalPreprocessedimg = ImageJFunctions.convertFloat(impA);
+						else
 
+							originalPreprocessedimg = Preprocess(originalimg);
+						Normalize.normalize(Views.iterable(originalPreprocessedimg), minval, maxval);
 						switch (JOptionPane.showConfirmDialog(null,
 								"Is this a double channel image?","" , JOptionPane.YES_NO_CANCEL_OPTION)) {
 						
