@@ -95,7 +95,6 @@ public class Interactive_MTDoubleChannelBasic implements PlugIn {
 
 	@Override
 	public void run(String arg) {
-	
 		parent.usefolder = parent.userfile.getParentFile().getAbsolutePath();
 
 		parent.FindLinesViaMSER = true;
@@ -123,6 +122,8 @@ public class Interactive_MTDoubleChannelBasic implements PlugIn {
 
 		parent.Cannyradius = (long) (parent.radiusfactor
 				* Math.ceil(Math.sqrt(parent.psf[0] * parent.psf[0] + parent.psf[1] * parent.psf[1])));
+		
+		System.out.println(parent.Cannyradius + " " + parent.psf[0] + " " + parent.psf[1]);
 		if (parent.originalimg.numDimensions() < 3) {
 
 			parent.thirdDimensionSize = 0;

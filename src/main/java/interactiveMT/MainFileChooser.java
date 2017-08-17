@@ -459,6 +459,8 @@ public class MainFileChooser extends JPanel {
 				// Tracking is done with imageA measurment is performed on imageB
 				calibration[0] = impB.getCalibration().pixelWidth;
 				calibration[1] = impB.getCalibration().pixelHeight;
+				psf[0] = Float.parseFloat(inputFieldX.getText());
+				psf[1] = Float.parseFloat(inputFieldY.getText());
 				new Normalize();
 
 				RandomAccessibleInterval<FloatType> originalimg = ImageJFunctions.convertFloat(impB);
@@ -524,6 +526,16 @@ public class MainFileChooser extends JPanel {
 							processSlice( slice, outputSlice );
 							processSlice( preslice, preoutputSlice );
 						}
+						
+						
+						Normalize.normalize(Views.iterable(outputSlice), minval, maxval);
+						Normalize.normalize(Views.iterable(preoutputSlice), minval, maxval);
+						
+						ImageJFunctions.show(preoutputSlice).setTitle("Preprocessed Movie");
+						
+						
+						
+						
 						if (Simplemode)
 							new Interactive_MTDoubleChannelBasic(new Interactive_MTDoubleChannel(outputSlice,
 									preoutputSlice, psf, calibration, chooserB.getSelectedFile())).run(null);
@@ -533,24 +545,35 @@ public class MainFileChooser extends JPanel {
 						
 						break;
 					case JOptionPane.CANCEL_OPTION:
-						// Choose single or double channel
 						
 						
+						
+						return;
+
+					}
+				}
+
+					else{
+						
+
 						switch (JOptionPane.showConfirmDialog(null,
 								"Is this a double channel image?","" , JOptionPane.YES_NO_CANCEL_OPTION)) {
 						
 										case JOptionPane.YES_OPTION:
 											// Put constructor for double channel
+											ImageJFunctions.show(originalPreprocessedimg).setTitle("Preprocessed Movie");
 											if (Simplemode)
 												new Interactive_MTDoubleChannelBasic(new Interactive_MTDoubleChannel(originalimg,
-														originalPreprocessedimg, psf, calibration, chooserB.getSelectedFile())).run(null);
+														originalPreprocessedimg, psf, calibration, chooserB.getSelectedFile()))
+																.run(null);
 											else
 												new Interactive_MTDoubleChannel(originalimg, originalPreprocessedimg, psf, calibration,
 														chooserB.getSelectedFile()).run(null);
 											break;
 											
-										case JOptionPane.CANCEL_OPTION:
+										case JOptionPane.NO_OPTION:
 											// Put constructor for single channel
+											ImageJFunctions.show(originalPreprocessedimg).setTitle("Preprocessed Movie");
 											if (Simplemode)
 												
 												new Interactive_MTSingleChannelBasic(new Interactive_MTSingleChannel(originalimg,
@@ -561,7 +584,11 @@ public class MainFileChooser extends JPanel {
 											
 											break;
 											
-						
+										case JOptionPane.CANCEL_OPTION:
+											
+											
+											
+											return;
 						
 						
 						}
@@ -569,11 +596,9 @@ public class MainFileChooser extends JPanel {
 						
 						
 						
-						return;
-
+						
+						
 					}
-
-					
 					
 					
 					
@@ -581,22 +606,14 @@ public class MainFileChooser extends JPanel {
 				
 				
 			
-				psf[0] = Float.parseFloat(inputFieldX.getText());
-				psf[1] = Float.parseFloat(inputFieldY.getText());
+				
 				// frametosec = Float.parseFloat(inputFieldT.getText());
-				ImageJFunctions.show(originalPreprocessedimg).setTitle("ProgramPreprocessed");
+			
 
 			
-					if (Simplemode)
-						new Interactive_MTDoubleChannelBasic(new Interactive_MTDoubleChannel(originalimg,
-								originalPreprocessedimg, psf, calibration, chooserB.getSelectedFile())).run(null);
-					else
-						new Interactive_MTDoubleChannel(originalimg, originalPreprocessedimg, psf, calibration,
-								chooserB.getSelectedFile()).run(null);
-
 				
 				close(parent);
-			}
+			
 
 		}
 	}

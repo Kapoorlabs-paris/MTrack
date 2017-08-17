@@ -679,6 +679,8 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		setInitialmaxsearchradius(maxSearchradius);
 		setInitialRadius(1);
 		Cannyradius = (long) (radiusfactor * Math.ceil(Math.sqrt(psf[0] * psf[0] + psf[1] * psf[1])));
+		
+
 		if (originalimg.numDimensions() < 3) {
 
 			thirdDimensionSize = 0;
@@ -2580,7 +2582,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		new ImageJ();
 
 		JFrame frame = new JFrame("");
-		FileChooser panel = new FileChooser();
+		MainFileChooser panel = new MainFileChooser();
 
 		frame.getContentPane().add(panel, "Center");
 		frame.setSize(panel.getPreferredSize());
