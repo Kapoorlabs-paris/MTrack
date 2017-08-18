@@ -156,8 +156,8 @@ public class FakeMT {
 
 		
 		final int n = outimg.numDimensions();
-		final Random rnd = new Random(150);
-		final Random rndsec = new Random(80);
+		final Random rnd = new Random(-20);
+		final Random rndsec = new Random(-8);
 		
 		
 		
@@ -261,7 +261,7 @@ public static double[] Growseeds (RandomAccessibleInterval<FloatType> outimg, do
 		
 		final int n = outimg.numDimensions();
 		
-        double growrate =  2 * Math.sin(0.1 * frame) ;
+        double growrate =  0.2 * Math.sin(0.01 * frame) ;
         
      
         
@@ -299,7 +299,7 @@ public static double[] Growseeds (RandomAccessibleInterval<FloatType> outimg, do
 						break;
 					
 					
-				   dy += 0.01*dx*dx;
+				   dy += -0.01*dx*dx;
 					
 				   
 					
@@ -353,10 +353,10 @@ public static double[] Growseeds (RandomAccessibleInterval<FloatType> outimg, do
 			for (int d = 0; d < ndims; ++d)
 				Ci[d] = 1.0 / Math.pow(sigma[d],2);
 			
-			final int numframes = 140;
+			final int numframes = 100;
 			final int numlines = 1;
 
-			final int SNR = 50;
+			final int SNR = 10;
 			
 			
 				
@@ -376,8 +376,7 @@ public static double[] Growseeds (RandomAccessibleInterval<FloatType> outimg, do
 			
 			
 			Kernels.addBackground(Views.iterable(lineimage), 0.2);
-			noisylines = lineimage;
-					//Poissonprocess.poissonProcess(lineimage, SNR);
+			noisylines = Poissonprocess.poissonProcess(lineimage, SNR);
 			ImageJFunctions.show(noisylines);
 		
 			
@@ -385,7 +384,7 @@ public static double[] Growseeds (RandomAccessibleInterval<FloatType> outimg, do
 	       
 	       FileWriter fw;
 	       String usefolder = "/Volumes/Varun_disk/DummyAnalysis/";
-			File fichierKy = new File(usefolder + "//" +"Dummyend" + ".txt");
+			File fichierKy = new File(usefolder + "//" +"DummyendCurved3" + ".txt");
 			fw = new FileWriter(fichierKy);
 			BufferedWriter bw = new BufferedWriter(fw);
 			bw.write("\tFramenumber\tDeltaL\n");
@@ -412,8 +411,7 @@ public static double[] Growseeds (RandomAccessibleInterval<FloatType> outimg, do
 				
 				
 				Kernels.addBackground(Views.iterable(lineimageframe), 0.2);
-				noisylinesframe = lineimageframe;
-					//	Poissonprocess.poissonProcess(lineimageframe, SNR);
+				noisylinesframe = Poissonprocess.poissonProcess(lineimageframe, SNR);
 				ImageJFunctions.show(noisylinesframe);
 			
 			

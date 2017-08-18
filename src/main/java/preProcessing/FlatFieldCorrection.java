@@ -2,6 +2,8 @@ package preProcessing;
 
 import java.util.Arrays;
 
+import javax.swing.JProgressBar;
+
 import net.imglib2.Cursor;
 import net.imglib2.IterableInterval;
 import net.imglib2.RandomAccess;
@@ -22,6 +24,7 @@ import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.util.Util;
 import net.imglib2.view.IntervalView;
 import net.imglib2.view.Views;
+import peakFitter.FitterUtils;
 
 /**
  * A simple flat field and median filter that operates on 1D, 2D or 3D images.
@@ -43,6 +46,8 @@ public class FlatFieldCorrection extends BenchmarkAlgorithm implements OutputAlg
 	private RandomAccessibleInterval< FloatType > output;
 
 	private final int radius;
+	
+	private  JProgressBar jpb;
 
 	/**
 	 * Instantiate a new Flat field correction filter that will operate on the specified
@@ -58,6 +63,14 @@ public class FlatFieldCorrection extends BenchmarkAlgorithm implements OutputAlg
 	{
 		this.source = source;
 		this.radius = radius;
+	}
+	
+	
+	public FlatFieldCorrection( final RandomAccessibleInterval<FloatType> source, final int radius, final JProgressBar jpb )
+	{
+		this.source = source;
+		this.radius = radius;
+		this.jpb = jpb;
 	}
 
 	@Override
@@ -85,15 +98,25 @@ public class FlatFieldCorrection extends BenchmarkAlgorithm implements OutputAlg
 		final ImgFactory< FloatType > factory = Util.getArrayOrCellImgFactory( source, type );
 		this.output = factory.create( source, type );
 
+		
+		
 		if ( source.numDimensions() > 2 )
 		{
 			final long nz = source.dimension( 2 );
+			
+			double percent = 0;
 			for ( long z = 0; z < nz; z++ )
 			{
+				
+				percent++;
 				final IntervalView< FloatType > slice = Views.hyperSlice( source, 2, z );
 				final IntervalView< FloatType > outputSlice = Views.hyperSlice( output, 2, z );
 			   
+				FitterUtils.SetProgressBar(jpb, 100 * percent/nz, "PreProcessing, please wait..");
 				processSlice( slice, outputSlice );
+				
+				
+				
 			}
 		}
 		else

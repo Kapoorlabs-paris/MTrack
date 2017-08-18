@@ -278,9 +278,19 @@ public class FitterUtils {
 		jpb.setString("Finding MT ends");
 
 	}
+	
+	
+	public static void SetProgressBar(JProgressBar jpb, double percent, String message) {
+
+		jpb.setValue((int) Math.round(percent));
+		jpb.setOpaque(true);
+		jpb.setStringPainted(true);
+		jpb.setString(message);
+
+	}
 
 	public static void SetProgressBar(JProgressBar jpb) {
-
+		jpb.setValue(0);
 		jpb.setIndeterminate(true);
 		jpb.setOpaque(true);
 		jpb.setStringPainted(true);

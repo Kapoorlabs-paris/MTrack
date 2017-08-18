@@ -1,8 +1,17 @@
 package interactiveMT;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
+
 import ij.ImagePlus;
 import ij.io.Opener;
+import listeners.FireTrigger;
+import listeners.FirepreTrigger;
+import listeners.SelfFirepreTrigger;
 import net.imglib2.Cursor;
 import net.imglib2.IterableInterval;
 import net.imglib2.RandomAccess;
@@ -16,7 +25,9 @@ import net.imglib2.view.IntervalView;
 import net.imglib2.view.Views;
 import preProcessing.FlatFieldCorrection;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.awt.*;
 
 public class MainFileChooser extends JPanel {
@@ -31,47 +42,79 @@ public class MainFileChooser extends JPanel {
 	JButton Measurebatch;
 	JButton Kymo;
 	JButton Done;
+	public int selectedindex;
 	File[] AllMovies;
-	JFileChooser chooserA;
-	String choosertitleA;
-	RandomAccessibleInterval<FloatType> ProgramPreprocessedimg;
-	JFileChooser chooserB;
-	String choosertitleB;
-	double[] calibration = new double[2];
+	public JFileChooser chooserA;
+	public String choosertitleA;
+	public RandomAccessibleInterval<FloatType> originalimg;
+	public RandomAccessibleInterval<FloatType> originalPreprocessedimg;
+	public RandomAccessibleInterval<FloatType> ProgramPreprocessedimg;
+	public JFileChooser chooserB;
+	public String choosertitleB;
+	public double[] calibration = new double[2];
 	float frametosec;
+	public JProgressBar jpb;
 	JFileChooser chooserC;
 	String choosertitleC;
-	double[] psf = new double[2];
+	public double[] psf = new double[2];
 	private JLabel inputLabelX, inputLabelY, inputLabelT;
-	private TextField inputFieldX, inputFieldY, inputFieldT;
+	public JTextField inputFieldX;
+	public JTextField inputFieldY;
+	private JTextField inputFieldT;
 	JPanel panelCont = new JPanel();
-	JPanel panelIntro = new JPanel();
-	boolean Simplemode = true;
+	public JPanel panelIntro = new JPanel();
+
+	boolean loadpre = true;
+	public boolean Simplemode = true;
 	boolean Advancedmode = false;
 	boolean Kymomode = false;
 	boolean Loadpreimage = false;
+	boolean Generatepre = false;
 	boolean Batchmoderun = false;
 
-	FloatType minval = new FloatType(0);
-	FloatType maxval = new FloatType(1);
+	public FloatType minval = new FloatType(0);
+	public FloatType maxval = new FloatType(1);
+	private static final Insets insets = new Insets(10, 0, 0, 0);
+
+	private JPanel Modechoice = new JPanel();
+	private JPanel Microscope = new JPanel();
+	private JPanel Start = new JPanel();
+	public JFrame frame = new JFrame("Welcome to MTV Tracker ");
+
+	/* Instantiation */
+	public GridBagLayout layout = new GridBagLayout();
+	public GridBagConstraints c = new GridBagConstraints();
 
 	public MainFileChooser() {
-		final JFrame frame = new JFrame("Welcome to MTV Tracker ");
 
+		
+		jpb = new JProgressBar();
+		
 		panelCont.add(panelIntro, "1");
-		/* Instantiation */
-		final GridBagLayout layout = new GridBagLayout();
-		final GridBagConstraints c = new GridBagConstraints();
+
+		c.insets = new Insets(5, 5, 5, 5);
 
 		panelIntro.setLayout(layout);
-		CheckboxGroup mode = new CheckboxGroup();
-		final Checkbox Batchmode = new Checkbox("Run in Batch Mode", mode, Batchmoderun);
-		final Label LoadtrackText = new Label("Load pre-processed tracking image");
-		final Label LoadMeasureText = new Label("Load original image");
-		final Label StartText = new Label("Input Microscope parameters");
+		Modechoice.setLayout(layout);
+		Microscope.setLayout(layout);
+		Start.setLayout(layout);
 
+		CheckboxGroup mode = new CheckboxGroup();
+
+		final Checkbox Batchmode = new Checkbox("Run in Batch Mode", mode, Batchmoderun);
 		final Checkbox Simple = new Checkbox("Run in Simple mode ", mode, Simplemode);
 		final Checkbox Advanced = new Checkbox("Run in Advanced mode ", mode, Advancedmode);
+
+		final Label LoadtrackText = new Label(
+				"Pre-processed movies ease object recognition, load yours else let MTV tracker do it");
+		final Label LoadMeasureText = new Label("Choose image format and load : ");
+
+		final Checkbox loadrun = new Checkbox("Load Pre-processed movie and begin tracking module", Loadpreimage);
+		final Checkbox justrun = new Checkbox("Generate Pre-processed movie and begin tracking module", Generatepre);
+
+		Border border = new CompoundBorder(new TitledBorder("Program run modes"), new EmptyBorder(c.insets));
+		Border microborder = new CompoundBorder(new TitledBorder("Microscope Parameters"), new EmptyBorder(c.insets));
+		Border runborder = new CompoundBorder(new TitledBorder("Preprocessing Options (Select only one)"), new EmptyBorder(c.insets));
 
 		LoadtrackText.setBackground(new Color(1, 0, 1));
 		LoadtrackText.setForeground(new Color(255, 255, 255));
@@ -79,20 +122,22 @@ public class MainFileChooser extends JPanel {
 		LoadMeasureText.setBackground(new Color(1, 0, 1));
 		LoadMeasureText.setForeground(new Color(255, 255, 255));
 
-		StartText.setBackground(new Color(1, 0, 1));
-		StartText.setForeground(new Color(255, 255, 255));
-
-		Track = new JButton("Optionally, Open Pre-processed movie (Done internally if movie not supplied)");
-		Measure = new JButton("Open UN-preprocessed movie for performing measurments");
+		Track = new JButton("Load pre-processed movie");
+		Measure = new JButton("Open Un-preprocessed movie");
 		Kymo = new JButton("Open Kymograph for the MT");
 		Done = new JButton("Done");
-		inputLabelX = new JLabel("Enter sigmaX of Microscope PSF (pixel units): ");
-		inputFieldX = new TextField();
-		inputFieldX.setColumns(10);
+		inputLabelX = new JLabel("Enter Sigma (X and Y) of PSF (in pixels): ");
+		inputFieldX = new JTextField(5);
 
-		inputLabelY = new JLabel("Enter sigmaY of Microscope PSF (pixel units): ");
-		inputFieldY = new TextField();
-		inputFieldY.setColumns(10);
+		inputFieldX.setText("2");
+
+		inputLabelY = new JLabel("Enter SigmaY of PSF (px): ");
+		inputFieldY = new JTextField(5);
+		inputFieldY.setText("2");
+
+		String[] Imagetype = { "Two channel image as hyperstack", "Concated seed image followed by time-lapse images",
+				"Single channel time-lapse images" };
+		JComboBox<String> ChooseImage = new JComboBox<String>(Imagetype);
 
 		// inputLabelT = new JLabel("Enter time frame to second conversion: ");
 		// inputFieldT = new TextField();
@@ -100,81 +145,66 @@ public class MainFileChooser extends JPanel {
 
 		/* Location */
 
-		c.fill = GridBagConstraints.HORIZONTAL;
+		c.anchor = GridBagConstraints.CENTER;
+
+		c.weightx = 0;
+		c.weighty = 0;
+
+		c.gridy = 1;
 		c.gridx = 0;
-		c.gridy = 0;
-		c.weightx = 1;
-		c.weighty = 1.5;
-		++c.gridy;
-		c.insets = new Insets(10, 10, 10, 0);
-		panelIntro.add(Batchmode, c);
 
-		++c.gridy;
-		c.insets = new Insets(10, 10, 10, 0);
-		panelIntro.add(Simple, c);
+		Modechoice.add(Batchmode, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
+				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+		Modechoice.add(Simple, new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
+				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+		Modechoice.add(Advanced, new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
+				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 
-		++c.gridy;
-		c.insets = new Insets(10, 10, 10, 0);
-		panelIntro.add(Advanced, c);
+		Modechoice.setBorder(border);
+		panelIntro.add(Modechoice);
 
-		++c.gridy;
-		c.insets = new Insets(10, 10, 10, 0);
-		panelIntro.add(LoadMeasureText, c);
+		Microscope.add(inputLabelX, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
+				GridBagConstraints.RELATIVE, insets, 0, 0));
+		Microscope.add(inputFieldX, new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
+				GridBagConstraints.RELATIVE, insets, 0, 0));
 
-		++c.gridy;
-		c.insets = new Insets(10, 10, 10, 0);
-		panelIntro.add(Measure, c);
+		Microscope.add(inputFieldY, new GridBagConstraints(1, 1, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+				GridBagConstraints.RELATIVE, insets, 0, 0));
 
-		++c.gridy;
-		c.insets = new Insets(10, 10, 10, 0);
-		panelIntro.add(LoadtrackText, c);
+		Microscope.setBorder(microborder);
 
-		++c.gridy;
-		c.insets = new Insets(10, 10, 10, 0);
-		panelIntro.add(Track, c);
+		panelIntro.add(Microscope);
 
-		++c.gridy;
-		c.insets = new Insets(10, 10, 10, 0);
-		panelIntro.add(StartText, c);
+		panelIntro.add(LoadMeasureText, new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
+				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 
-		++c.gridy;
-		c.insets = new Insets(10, 10, 10, 0);
-		panelIntro.add(inputLabelX, c);
-		
-		++c.gridy;
-		c.insets = new Insets(10, 10, 10, 500);
-		panelIntro.add(inputFieldX, c);
+		panelIntro.add(ChooseImage, new GridBagConstraints(0, 4, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
+				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 
-		++c.gridy;
-		c.insets = new Insets(10, 10, 10, 0);
-		panelIntro.add(inputLabelY, c);
-		
-		++c.gridy;
-		c.insets = new Insets(10, 10, 10, 500);
-		panelIntro.add(inputFieldY, c);
+		panelIntro.add(LoadtrackText, new GridBagConstraints(0, 6, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
+				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 
-		/*
-		 * ++c.gridy; c.insets = new Insets(10, 10, 10, 0);
-		 * panelIntro.add(inputLabelT, c);
-		 * 
-		 * ++c.gridy; c.insets = new Insets(10, 10, 10, 0);
-		 * panelIntro.add(inputFieldT, c);
-		 */
-		++c.gridy;
-		++c.gridy;
-		++c.gridy;
-		++c.gridy;
-		c.insets = new Insets(10, 10, 10, 0);
-		panelIntro.add(Done, c);
+		Start.add(loadrun, new GridBagConstraints(0, 7, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
+				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+
+		Start.add(justrun, new GridBagConstraints(0, 8, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+
+		Start.setBorder(runborder);
+
+		panelIntro.add(Start, new GridBagConstraints(0, 9, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+
 		panelIntro.setVisible(true);
-		Track.addActionListener(new OpenTrackListener(frame));
-		Measure.addActionListener(new MeasureListener(frame));
+		loadrun.addItemListener(new FirepreTrigger(this));
+		justrun.addItemListener(new SelfFirepreTrigger(this));
 		Batchmode.addItemListener(new RuninBatchListener(frame));
-		Done.addActionListener(new DoneButtonListener(frame, true));
 		Simple.addItemListener(new RunSimpleListener());
 		Advanced.addItemListener(new RunAdvancedListener());
+		ChooseImage.addActionListener(new FireTrigger(this, ChooseImage));
 		frame.addWindowListener(new FrameListener(frame));
 		frame.add(panelCont, BorderLayout.CENTER);
+		frame.add(jpb, BorderLayout.PAGE_END);
 		frame.pack();
 
 		frame.setVisible(true);
@@ -232,7 +262,7 @@ public class MainFileChooser extends JPanel {
 
 			Measurebatch.addActionListener(new MeasurebatchListener(frame));
 			Done.addActionListener(new DoneButtonListener(frame, true));
-			panelIntro.validate();
+			panelIntro.revalidate();
 			panelIntro.repaint();
 			frame.addWindowListener(new FrameListener(frame));
 			frame.add(panelCont, BorderLayout.CENTER);
@@ -297,7 +327,6 @@ public class MainFileChooser extends JPanel {
 
 	}
 
-	
 	public RandomAccessibleInterval<FloatType> Preprocess(IntervalView<FloatType> originalimg) {
 
 		final FlatFieldCorrection flatfilter = new FlatFieldCorrection(originalimg, 1);
@@ -306,7 +335,7 @@ public class MainFileChooser extends JPanel {
 		return ProgramPreprocessedimg;
 
 	}
-	
+
 	protected class RunSimpleListener implements ItemListener {
 
 		@Override
@@ -431,16 +460,16 @@ public class MainFileChooser extends JPanel {
 				// Preprocessed image
 				ImagePlus impA = null;
 				if (chooserA != null) {
-					
+
 					impA = new Opener().openImage(chooserA.getSelectedFile().getPath());
 
 				}
 				// Actual image
 				ImagePlus impB = new Opener().openImage(chooserB.getSelectedFile().getPath());
-				
-				if (impA!=null)
-					assert(impA.getDimensions() == impB.getDimensions());
-				
+
+				if (impA != null)
+					assert (impA.getDimensions() == impB.getDimensions());
+
 				int nChannels = impB.getNChannels();
 				int nSlices = impB.getStackSize();
 				int nFrames = impB.getNFrames();
@@ -455,8 +484,8 @@ public class MainFileChooser extends JPanel {
 
 					case JOptionPane.YES_OPTION:
 						impB.setDimensions(nChannels, nFrames, nSlices);
-						if (impA!=null)
-						impA.setDimensions(nChannels, nFrames, nSlices);
+						if (impA != null)
+							impA.setDimensions(nChannels, nFrames, nSlices);
 						break;
 					case JOptionPane.CANCEL_OPTION:
 						return;
@@ -464,9 +493,9 @@ public class MainFileChooser extends JPanel {
 					}
 
 				}
-				
-				
-				// Tracking is done with imageA measurment is performed on imageB
+
+				// Tracking is done with imageA measurment is performed on
+				// imageB
 				calibration[0] = impB.getCalibration().pixelWidth;
 				calibration[1] = impB.getCalibration().pixelHeight;
 				psf[0] = Float.parseFloat(inputFieldX.getText());
@@ -479,299 +508,228 @@ public class MainFileChooser extends JPanel {
 				final ImgFactory<FloatType> factory = Util.getArrayOrCellImgFactory(originalimg, type);
 				RandomAccessibleInterval<FloatType> originalPreprocessedimg = factory.create(originalimg, type);
 
-				
 				if (impA != null)
 					originalPreprocessedimg = ImageJFunctions.convertFloat(impA);
-				else 
+				else
 					originalPreprocessedimg = null;
 				// Normalize image intnesity
 				Normalize.normalize(Views.iterable(originalimg), minval, maxval);
 
+				if (nChannels > 1) {
 
-				if (nChannels > 1){
-					
-					
 					switch (JOptionPane.showConfirmDialog(null,
-							"Image has " + nChannels + "Channels, Is seed image in channel 1?\n"
-									, " ", JOptionPane.YES_NO_CANCEL_OPTION)) {
+							"Image has " + nChannels + "Channels, Is seed image in channel 1?\n", " ",
+							JOptionPane.YES_NO_CANCEL_OPTION)) {
 
 					case JOptionPane.YES_OPTION:
 						// Do concetation
-						RandomAccessibleInterval<FloatType> seedimgStack = Views.hyperSlice(originalimg, 2 , 0);
-						
-						
-					
-						
-						RandomAccessibleInterval<FloatType> dynamicimgStack = Views.hyperSlice(originalimg, 2 , 1);
-						
-						
-				
-						
-						
-						long[] dim = { dynamicimgStack.dimension(0), dynamicimgStack.dimension(1), dynamicimgStack.dimension(2) };
+						RandomAccessibleInterval<FloatType> seedimgStack = Views.hyperSlice(originalimg, 2, 0);
+
+						RandomAccessibleInterval<FloatType> dynamicimgStack = Views.hyperSlice(originalimg, 2, 1);
+
+						long[] dim = { dynamicimgStack.dimension(0), dynamicimgStack.dimension(1),
+								dynamicimgStack.dimension(2) };
 						RandomAccessibleInterval<FloatType> totalimg = factory.create(dim, type);
 						RandomAccessibleInterval<FloatType> pretotalimg = factory.create(dim, type);
-						final long nz = dynamicimgStack.dimension( 2 );
-						
-						
-						IntervalView< FloatType > slice = Views.hyperSlice( seedimgStack, 2, 0 );
-						IntervalView< FloatType > outputSlice = Views.hyperSlice( totalimg, 2, 0 );
+						final long nz = dynamicimgStack.dimension(2);
 
-						
-						
-						processSlice( slice, outputSlice );
-						for ( long z = 1; z < nz; z++ )
-						{
-							slice = Views.hyperSlice( dynamicimgStack, 2, z );
-							outputSlice = Views.hyperSlice( totalimg, 2, z );
-						   
+						IntervalView<FloatType> slice = Views.hyperSlice(seedimgStack, 2, 0);
+						IntervalView<FloatType> outputSlice = Views.hyperSlice(totalimg, 2, 0);
 
-							
-							processSlice( slice, outputSlice );
+						processSlice(slice, outputSlice);
+						for (long z = 1; z < nz; z++) {
+							slice = Views.hyperSlice(dynamicimgStack, 2, z);
+							outputSlice = Views.hyperSlice(totalimg, 2, z);
+
+							processSlice(slice, outputSlice);
 						}
-						IntervalView< FloatType > preoutputSlice;
-						if (originalPreprocessedimg!=null){
-							
-							
-							RandomAccessibleInterval<FloatType> dynamicgpreimgStack = Views.hyperSlice(originalPreprocessedimg, 2 , 1);
-							
-							
-							preoutputSlice = Views.hyperSlice( pretotalimg, 2, 0 );
+						IntervalView<FloatType> preoutputSlice;
+						if (originalPreprocessedimg != null) {
 
-							RandomAccessibleInterval<FloatType> seedimgpreStack = Views.hyperSlice(originalPreprocessedimg, 2 , 0);
+							RandomAccessibleInterval<FloatType> dynamicgpreimgStack = Views
+									.hyperSlice(originalPreprocessedimg, 2, 1);
 
-							IntervalView< FloatType > preslice = Views.hyperSlice( seedimgpreStack, 2, 0 );
+							preoutputSlice = Views.hyperSlice(pretotalimg, 2, 0);
 
-							processSlice( preslice, preoutputSlice );
-							
-							for ( long z = 1; z < nz; z++ )
-							{
-								
-								preslice = Views.hyperSlice( dynamicgpreimgStack, 2, z );
-								preoutputSlice = Views.hyperSlice( pretotalimg, 2, z );
+							RandomAccessibleInterval<FloatType> seedimgpreStack = Views
+									.hyperSlice(originalPreprocessedimg, 2, 0);
 
-								processSlice( preslice, preoutputSlice );
+							IntervalView<FloatType> preslice = Views.hyperSlice(seedimgpreStack, 2, 0);
 
-								
+							processSlice(preslice, preoutputSlice);
+
+							for (long z = 1; z < nz; z++) {
+
+								preslice = Views.hyperSlice(dynamicgpreimgStack, 2, z);
+								preoutputSlice = Views.hyperSlice(pretotalimg, 2, z);
+
+								processSlice(preslice, preoutputSlice);
+
 							}
-							Normalize.normalize(Views.iterable(pretotalimg), minval, maxval);
+							Normalize.normalize(Views.iterable(totalimg), minval, maxval);
 							ImageJFunctions.show(pretotalimg).setTitle("Preprocessed Movie");
 						}
-						
-						else{
-							
+
+						else {
+
 							preoutputSlice = (IntervalView<FloatType>) Preprocess(outputSlice);
 							Normalize.normalize(Views.iterable(pretotalimg), minval, maxval);
 							ImageJFunctions.show(pretotalimg).setTitle("Preprocessed Movie");
 						}
-						
-						
+
 						Normalize.normalize(Views.iterable(totalimg), minval, maxval);
-						
-						
-						
-						
-						
-						
-						
+
 						if (Simplemode)
-							new Interactive_MTDoubleChannelBasic(new Interactive_MTDoubleChannel(totalimg,
-									pretotalimg, psf, calibration, chooserB.getSelectedFile())).run(null);
+							new Interactive_MTDoubleChannelBasic(new Interactive_MTDoubleChannel(totalimg, pretotalimg,
+									psf, calibration, chooserB.getSelectedFile())).run(null);
 						else
 							new Interactive_MTDoubleChannel(totalimg, pretotalimg, psf, calibration,
 									chooserB.getSelectedFile()).run(null);
-						
+
 						break;
-						
-						
+
 					case JOptionPane.NO_OPTION:
 						// Do concetation
-						seedimgStack = Views.hyperSlice(originalimg, 2 , 1);
-						
-						
-					
-						
-						dynamicimgStack = Views.hyperSlice(originalimg, 2 , 0);
-						
-						
-				
-						long[] dimsec = { dynamicimgStack.dimension(0), dynamicimgStack.dimension(1), dynamicimgStack.dimension(2) };
-						
+						seedimgStack = Views.hyperSlice(originalimg, 2, 1);
+
+						dynamicimgStack = Views.hyperSlice(originalimg, 2, 0);
+
+						long[] dimsec = { dynamicimgStack.dimension(0), dynamicimgStack.dimension(1),
+								dynamicimgStack.dimension(2) };
+
 						totalimg = factory.create(dimsec, type);
 						pretotalimg = factory.create(dimsec, type);
-						long nzsec = dynamicimgStack.dimension( 2 );
-						
-						
-						slice = Views.hyperSlice( seedimgStack, 2, 0 );
-						outputSlice = Views.hyperSlice( totalimg, 2, 0 );
+						long nzsec = dynamicimgStack.dimension(2);
 
-						
-						
-						processSlice( slice, outputSlice );
-						for ( long z = 1; z < nzsec; z++ )
-						{
-							slice = Views.hyperSlice( dynamicimgStack, 2, z );
-							outputSlice = Views.hyperSlice( totalimg, 2, z );
-						   
+						slice = Views.hyperSlice(seedimgStack, 2, 0);
+						outputSlice = Views.hyperSlice(totalimg, 2, 0);
 
-							
-							processSlice( slice, outputSlice );
+						processSlice(slice, outputSlice);
+						for (long z = 1; z < nzsec; z++) {
+							slice = Views.hyperSlice(dynamicimgStack, 2, z);
+							outputSlice = Views.hyperSlice(totalimg, 2, z);
+
+							processSlice(slice, outputSlice);
 						}
-						if (originalPreprocessedimg!=null){
-							
-							
-							RandomAccessibleInterval<FloatType> dynamicgpreimgStack = Views.hyperSlice(originalPreprocessedimg, 2 , 0);
-							
-							
-							preoutputSlice = Views.hyperSlice( pretotalimg, 2, 0 );
+						if (originalPreprocessedimg != null) {
 
-							RandomAccessibleInterval<FloatType> seedimgpreStack = Views.hyperSlice(originalPreprocessedimg, 2 , 1);
+							RandomAccessibleInterval<FloatType> dynamicgpreimgStack = Views
+									.hyperSlice(originalPreprocessedimg, 2, 0);
 
-							IntervalView< FloatType > preslice = Views.hyperSlice( seedimgpreStack, 2, 0 );
+							preoutputSlice = Views.hyperSlice(pretotalimg, 2, 0);
 
-							processSlice( preslice, preoutputSlice );
-							
-							for ( long z = 1; z < nzsec; z++ )
-							{
-								
-								preslice = Views.hyperSlice( dynamicgpreimgStack, 2, z );
-								preoutputSlice = Views.hyperSlice( pretotalimg, 2, z );
+							RandomAccessibleInterval<FloatType> seedimgpreStack = Views
+									.hyperSlice(originalPreprocessedimg, 2, 1);
 
-								processSlice( preslice, preoutputSlice );
+							IntervalView<FloatType> preslice = Views.hyperSlice(seedimgpreStack, 2, 0);
 
-								
+							processSlice(preslice, preoutputSlice);
+
+							for (long z = 1; z < nzsec; z++) {
+
+								preslice = Views.hyperSlice(dynamicgpreimgStack, 2, z);
+								preoutputSlice = Views.hyperSlice(pretotalimg, 2, z);
+
+								processSlice(preslice, preoutputSlice);
+
 							}
 							Normalize.normalize(Views.iterable(pretotalimg), minval, maxval);
 							ImageJFunctions.show(pretotalimg).setTitle("Preprocessed Movie");
 						}
-						
-						else{
-							
+
+						else {
+
 							preoutputSlice = (IntervalView<FloatType>) Preprocess(outputSlice);
 							Normalize.normalize(Views.iterable(pretotalimg), minval, maxval);
 							ImageJFunctions.show(pretotalimg).setTitle("Preprocessed Movie");
 						}
-						
-						
+
 						Normalize.normalize(Views.iterable(totalimg), minval, maxval);
-						
-						
-						
-						
-						
-						
-						
+
 						if (Simplemode)
-							new Interactive_MTDoubleChannelBasic(new Interactive_MTDoubleChannel(totalimg,
-									pretotalimg, psf, calibration, chooserB.getSelectedFile())).run(null);
+							new Interactive_MTDoubleChannelBasic(new Interactive_MTDoubleChannel(totalimg, pretotalimg,
+									psf, calibration, chooserB.getSelectedFile())).run(null);
 						else
 							new Interactive_MTDoubleChannel(totalimg, pretotalimg, psf, calibration,
 									chooserB.getSelectedFile()).run(null);
-						
+
 						break;
-						
-					
-						
+
 					case JOptionPane.CANCEL_OPTION:
-						
-						
-						
+
 						return;
 
 					}
 				}
 
-					else{
-						if (impA != null)
-							originalPreprocessedimg = ImageJFunctions.convertFloat(impA);
+				else {
+					if (impA != null)
+						originalPreprocessedimg = ImageJFunctions.convertFloat(impA);
+					else
+
+						originalPreprocessedimg = Preprocess(originalimg);
+					Normalize.normalize(Views.iterable(originalPreprocessedimg), minval, maxval);
+					switch (JOptionPane.showConfirmDialog(null, "Is this a double channel image?", "",
+							JOptionPane.YES_NO_CANCEL_OPTION)) {
+
+					case JOptionPane.YES_OPTION:
+						// Put constructor for double channel
+						ImageJFunctions.show(originalPreprocessedimg).setTitle("Preprocessed Movie");
+						if (Simplemode)
+							new Interactive_MTDoubleChannelBasic(new Interactive_MTDoubleChannel(originalimg,
+									originalPreprocessedimg, psf, calibration, chooserB.getSelectedFile())).run(null);
 						else
+							new Interactive_MTDoubleChannel(originalimg, originalPreprocessedimg, psf, calibration,
+									chooserB.getSelectedFile()).run(null);
+						break;
 
-							originalPreprocessedimg = Preprocess(originalimg);
-						Normalize.normalize(Views.iterable(originalPreprocessedimg), minval, maxval);
-						switch (JOptionPane.showConfirmDialog(null,
-								"Is this a double channel image?","" , JOptionPane.YES_NO_CANCEL_OPTION)) {
-						
-										case JOptionPane.YES_OPTION:
-											// Put constructor for double channel
-											ImageJFunctions.show(originalPreprocessedimg).setTitle("Preprocessed Movie");
-											if (Simplemode)
-												new Interactive_MTDoubleChannelBasic(new Interactive_MTDoubleChannel(originalimg,
-														originalPreprocessedimg, psf, calibration, chooserB.getSelectedFile()))
-																.run(null);
-											else
-												new Interactive_MTDoubleChannel(originalimg, originalPreprocessedimg, psf, calibration,
-														chooserB.getSelectedFile()).run(null);
-											break;
-											
-										case JOptionPane.NO_OPTION:
-											// Put constructor for single channel
-											ImageJFunctions.show(originalPreprocessedimg).setTitle("Preprocessed Movie");
-											if (Simplemode)
-												
-												new Interactive_MTSingleChannelBasic(new Interactive_MTSingleChannel(originalimg,
-														originalPreprocessedimg, psf, calibration, chooserB.getSelectedFile())).run(null);
-											else
-												new Interactive_MTSingleChannel(originalimg, originalPreprocessedimg, psf, calibration,
-														chooserB.getSelectedFile()).run(null);
-											
-											break;
-											
-										case JOptionPane.CANCEL_OPTION:
-											
-											
-											
-											return;
-						
-						
-						}
-						
-						
-						
-						
-						
-						
+					case JOptionPane.NO_OPTION:
+						// Put constructor for single channel
+						ImageJFunctions.show(originalPreprocessedimg).setTitle("Preprocessed Movie");
+						if (Simplemode)
+
+							new Interactive_MTSingleChannelBasic(new Interactive_MTSingleChannel(originalimg,
+									originalPreprocessedimg, psf, calibration, chooserB.getSelectedFile())).run(null);
+						else
+							new Interactive_MTSingleChannel(originalimg, originalPreprocessedimg, psf, calibration,
+									chooserB.getSelectedFile()).run(null);
+
+						break;
+
+					case JOptionPane.CANCEL_OPTION:
+
+						return;
+
 					}
-					
-					
-					
+
 				}
-				
-				
-			
-				
-				// frametosec = Float.parseFloat(inputFieldT.getText());
-			
 
-			
-				
-				close(parent);
-			
+			}
+
+			// frametosec = Float.parseFloat(inputFieldT.getText());
+
+			close(parent);
 
 		}
 	}
 
-	
-	protected void processSlice(RandomAccessibleInterval<FloatType> slice, IterableInterval<FloatType> outputSlice){
-		
-		final Cursor< FloatType > cursor = outputSlice.localizingCursor();
-		final RandomAccess< FloatType > ranac = slice.randomAccess();
-		
-		while(cursor.hasNext()){
-			
-			
+	public void processSlice(RandomAccessibleInterval<FloatType> slice, IterableInterval<FloatType> outputSlice) {
+
+		final Cursor<FloatType> cursor = outputSlice.localizingCursor();
+		final RandomAccess<FloatType> ranac = slice.randomAccess();
+
+		while (cursor.hasNext()) {
+
 			cursor.fwd();
-			
-			
+
 			ranac.setPosition(cursor);
-			
+
 			cursor.get().set(ranac.get());
-			
+
 		}
-		
-		
-		
+
 	}
-	
+
 	protected final void close(final Frame parent) {
 		if (parent != null)
 			parent.dispose();
