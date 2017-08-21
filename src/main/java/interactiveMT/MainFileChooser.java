@@ -57,9 +57,9 @@ public class MainFileChooser extends JPanel {
 	JFileChooser chooserC;
 	String choosertitleC;
 	public double[] psf = new double[2];
-	private JLabel inputLabelX, inputLabelY, inputLabelT;
-	public JTextField inputFieldX;
-	public JTextField inputFieldY;
+	private JLabel inputLabelX, inputLabelY, inputLabelT, inputLabelcalX, inputLabelcalY;
+	public JTextField inputFieldX, inputFieldcalX;
+	public JTextField inputFieldY, inputFieldcalY;
 	private JTextField inputFieldT;
 	JPanel panelCont = new JPanel();
 	public JPanel panelIntro = new JPanel();
@@ -74,10 +74,11 @@ public class MainFileChooser extends JPanel {
 
 	public FloatType minval = new FloatType(0);
 	public FloatType maxval = new FloatType(1);
-	private static final Insets insets = new Insets(10, 0, 0, 0);
+	private static final Insets insets = new Insets(0, 0, 0, 0);
 
 	private JPanel Modechoice = new JPanel();
 	private JPanel Microscope = new JPanel();
+	private JPanel Original = new JPanel();
 	private JPanel Start = new JPanel();
 	public JFrame frame = new JFrame("Welcome to MTV Tracker ");
 
@@ -97,30 +98,28 @@ public class MainFileChooser extends JPanel {
 		panelIntro.setLayout(layout);
 		Modechoice.setLayout(layout);
 		Microscope.setLayout(layout);
+		Original.setLayout(layout);
 		Start.setLayout(layout);
 
 		CheckboxGroup mode = new CheckboxGroup();
 
-		final Checkbox Batchmode = new Checkbox("Run in Batch Mode", mode, Batchmoderun);
-		final Checkbox Simple = new Checkbox("Run in Simple mode ", mode, Simplemode);
-		final Checkbox Advanced = new Checkbox("Run in Advanced mode ", mode, Advancedmode);
+		final Checkbox Batchmode = new Checkbox("Batch mode", mode, Batchmoderun);
+		final Checkbox Simple = new Checkbox("Simple mode ", mode, Simplemode);
+		final Checkbox Advanced = new Checkbox("Advanced mode ", mode, Advancedmode);
 
 		final Label LoadtrackText = new Label(
-				"Pre-processed movies ease object recognition, load yours else let MTV tracker do it");
+				"Load Preprocessed movie or generate here");
 		final Label LoadMeasureText = new Label("Choose image format and load : ");
 
-		final Checkbox loadrun = new Checkbox("Load Pre-processed movie and begin tracking module", Loadpreimage);
-		final Checkbox justrun = new Checkbox("Generate Pre-processed movie and begin tracking module", Generatepre);
+		String[] preimage ={"Load Preprocessed movie and begin tracking module","Generate Preprocessed movie and begin tracking module" };
+		
 
-		Border border = new CompoundBorder(new TitledBorder("Program run modes"), new EmptyBorder(c.insets));
+		Border border = new CompoundBorder(new TitledBorder("Choose Mode"), new EmptyBorder(c.insets));
 		Border microborder = new CompoundBorder(new TitledBorder("Microscope Parameters"), new EmptyBorder(c.insets));
-		Border runborder = new CompoundBorder(new TitledBorder("Preprocessing Options (Select only one)"), new EmptyBorder(c.insets));
+		Border runborder = new CompoundBorder(new TitledBorder("Preprocessing Options"), new EmptyBorder(c.insets));
+		Border origborder = new CompoundBorder(new TitledBorder("Input movie"), new EmptyBorder(c.insets));
 
-		LoadtrackText.setBackground(new Color(1, 0, 1));
-		LoadtrackText.setForeground(new Color(255, 255, 255));
-
-		LoadMeasureText.setBackground(new Color(1, 0, 1));
-		LoadMeasureText.setForeground(new Color(255, 255, 255));
+		
 
 		Track = new JButton("Load pre-processed movie");
 		Measure = new JButton("Open Un-preprocessed movie");
@@ -134,74 +133,115 @@ public class MainFileChooser extends JPanel {
 		inputLabelY = new JLabel("Enter SigmaY of PSF (px): ");
 		inputFieldY = new JTextField(5);
 		inputFieldY.setText("2");
+		
+		
+		inputLabelcalX = new JLabel("Enter pixel calibration in X, Y");
+		inputFieldcalX = new JTextField(5);
+		inputFieldcalX.setText("1");
+		
+		inputLabelcalY = new JLabel("Enter pixel calibration in Y");
+		inputFieldcalY = new JTextField(5);
+		inputFieldcalY.setText("1");
+		
+		
+	    inputLabelT = new JLabel("Enter time frame to second conversion: ");
+		inputFieldT = new JTextField(5);
+		inputFieldT.setText("1");
+		
 
 		String[] Imagetype = { "Two channel image as hyperstack", "Concated seed image followed by time-lapse images",
 				"Single channel time-lapse images" };
 		JComboBox<String> ChooseImage = new JComboBox<String>(Imagetype);
-
-		// inputLabelT = new JLabel("Enter time frame to second conversion: ");
-		// inputFieldT = new TextField();
-		// inputFieldT.setColumns(2);
+		JComboBox<String> ChoosepreImage = new JComboBox<String>(preimage);
+		
+		
+		
+		
+		
 
 		/* Location */
 
-		c.anchor = GridBagConstraints.CENTER;
+		c.anchor = GridBagConstraints.BOTH;
+		c.ipadx = 35;
 
-		c.weightx = 0;
-		c.weighty = 0;
-
+		c.gridwidth = 10;
+		c.gridheight = 10;
 		c.gridy = 1;
 		c.gridx = 0;
 
-		Modechoice.add(Batchmode, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
+		Modechoice.add(Simple, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
 				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
-		Modechoice.add(Simple, new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
+		Modechoice.add(Advanced, new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
 				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
-		Modechoice.add(Advanced, new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
+		Modechoice.add(Batchmode, new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
 				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 
 		Modechoice.setBorder(border);
-		panelIntro.add(Modechoice);
+		panelIntro.add(Modechoice,new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+		
+		Original.add(ChooseImage, new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
+				GridBagConstraints.RELATIVE, new Insets(10, 10, 0, 10), 0, 0));
 
-		Microscope.add(inputLabelX, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
+		Original.setBorder(origborder);
+		
+		panelIntro.add(Original,new GridBagConstraints(3, 0, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+				GridBagConstraints.HORIZONTAL, new Insets(0, 10, 0, 10), 0, 0));
+
+		Microscope.add(inputLabelX, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
 				GridBagConstraints.RELATIVE, insets, 0, 0));
-		Microscope.add(inputFieldX, new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
+		
+		Microscope.add(inputFieldX, new GridBagConstraints(3, 0, 3, 1, 0.1, 0.0, GridBagConstraints.WEST,
 				GridBagConstraints.RELATIVE, insets, 0, 0));
 
-		Microscope.add(inputFieldY, new GridBagConstraints(1, 1, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+		Microscope.add(inputFieldY, new GridBagConstraints(3, 0, 3, 1, 0.1, 0.0, GridBagConstraints.CENTER,
+				GridBagConstraints.RELATIVE, insets, 0, 0));
+		
+		Microscope.add(inputLabelcalX, new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
+				GridBagConstraints.RELATIVE, insets, 0, 0));
+		
+		Microscope.add(inputFieldcalX, new GridBagConstraints(3, 2, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
+				GridBagConstraints.RELATIVE, insets, 0, 0));
+
+		Microscope.add(inputFieldcalY, new GridBagConstraints(3, 2, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER,
+				GridBagConstraints.RELATIVE, insets, 0, 0));
+		
+		Microscope.add(inputLabelT, new GridBagConstraints(0, 4, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+				GridBagConstraints.RELATIVE, insets, 0, 0));
+		
+		Microscope.add(inputFieldT, new GridBagConstraints(3, 4, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
 				GridBagConstraints.RELATIVE, insets, 0, 0));
 
 		Microscope.setBorder(microborder);
 
-		panelIntro.add(Microscope);
-
-		panelIntro.add(LoadMeasureText, new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
+		panelIntro.add(Microscope, new GridBagConstraints(1, 1, 5, 1, 0.0, 0.0, GridBagConstraints.CENTER,
 				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 
-		panelIntro.add(ChooseImage, new GridBagConstraints(0, 4, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
-				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+	
 
-		panelIntro.add(LoadtrackText, new GridBagConstraints(0, 6, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
-				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
-
-		Start.add(loadrun, new GridBagConstraints(0, 7, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
-				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
-
-		Start.add(justrun, new GridBagConstraints(0, 8, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
-				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+		Start.add(LoadtrackText , new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
+					GridBagConstraints.RELATIVE, new Insets(10, 10, 0, 10), 0, 0));
+		Start.add(ChoosepreImage, new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
+				GridBagConstraints.RELATIVE, new Insets(10, 10, 0, 10), 0, 0));
+	
 
 		Start.setBorder(runborder);
-
-		panelIntro.add(Start, new GridBagConstraints(0, 9, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+		panelIntro.add(Start, new GridBagConstraints(1, 2, 5, 1, 0.0, 0.0, GridBagConstraints.CENTER,
 				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+		
+		
+		
+		
+
 
 		panelIntro.setVisible(true);
-		loadrun.addItemListener(new FirepreTrigger(this));
-		justrun.addItemListener(new SelfFirepreTrigger(this));
+
 		Batchmode.addItemListener(new RuninBatchListener(frame));
 		Simple.addItemListener(new RunSimpleListener());
 		Advanced.addItemListener(new RunAdvancedListener());
 		ChooseImage.addActionListener(new FireTrigger(this, ChooseImage));
+		ChoosepreImage.addActionListener(new FirepreTrigger(this, ChoosepreImage));
+		
 		frame.addWindowListener(new FrameListener(frame));
 		frame.add(panelCont, BorderLayout.CENTER);
 		frame.add(jpb, BorderLayout.PAGE_END);

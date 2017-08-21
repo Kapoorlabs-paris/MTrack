@@ -13,6 +13,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JLabel;
+import javax.swing.JScrollBar;
 import javax.swing.JTextArea;
 import javax.swing.UIManager;
 
@@ -114,9 +115,9 @@ public class CheckResultsListener implements ActionListener {
 
 			final Button Analyze = new Button("Do Rough Analysis");
 
-			final Scrollbar startS = new Scrollbar(Scrollbar.HORIZONTAL, parent.thirdDimensionsliderInit, 10, 0,
+			final JScrollBar startS = new JScrollBar(Scrollbar.HORIZONTAL, parent.thirdDimensionsliderInit, 10, 0,
 					10 + parent.scrollbarSize);
-			final Scrollbar endS = new Scrollbar(Scrollbar.HORIZONTAL, parent.thirdDimensionsliderInit, 10, 0,
+			final JScrollBar endS = new JScrollBar(Scrollbar.HORIZONTAL, parent.thirdDimensionsliderInit, 10, 0,
 					10 + parent.scrollbarSize);
 			parent.starttime = (int) parent.computeValueFromScrollbarPosition(parent.thirdDimensionsliderInit, 0, parent.thirdDimensionSize,
 					parent.scrollbarSize);
@@ -163,9 +164,9 @@ public class CheckResultsListener implements ActionListener {
 			c.insets = new Insets(10, 10, 0, 50);
 			parent.panelEighth.add(Done, c);
 
-			startS.addAdjustmentListener(new StarttimeListener(parent, startText, parent.thirdDimensionsliderInit,
+			startS.addAdjustmentListener(new StarttimeListener(parent, startText, startText.getName(), parent.thirdDimensionsliderInit,
 					parent.thirdDimensionSize, parent.scrollbarSize, startS));
-			endS.addAdjustmentListener(new EndtimeListener(parent, endText, parent.thirdDimensionsliderInit, parent.thirdDimensionSize,
+			endS.addAdjustmentListener(new EndtimeListener(parent, endText, endText.getName(), parent.thirdDimensionsliderInit, parent.thirdDimensionSize,
 					parent.scrollbarSize, endS));
 			Analyze.addActionListener(new AnalyzeListener(parent));
 

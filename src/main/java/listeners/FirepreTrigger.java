@@ -33,26 +33,27 @@ import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.util.Util;
 import net.imglib2.view.IntervalView;
 import net.imglib2.view.Views;
+import swingClasses.Preprocess;
 
-public class FirepreTrigger implements ItemListener {
+public class FirepreTrigger implements ActionListener {
 
 	
 	final MainFileChooser parent;
+	final JComboBox<String> choice;
 	
-	
-	public FirepreTrigger(MainFileChooser parent ){
+	public FirepreTrigger(MainFileChooser parent,final JComboBox<String> choice ){
 		
 		this.parent = parent;
-		
+		this.choice = choice;
 	}
 	
 	@Override
-	public void itemStateChanged(ItemEvent e) {
+	public void actionPerformed(ActionEvent e) {
 		
 	
+		int preindex = choice.getSelectedIndex();
 		
-		
-		
+		if (preindex == 0){
 		
 		parent.chooserA = new JFileChooser();
 		if (parent.chooserB != null)
@@ -70,7 +71,7 @@ public class FirepreTrigger implements ItemListener {
 			parent.chooserA = null;
 		}
 		
-		
+		if(parent.chooserA!=null){
 		ImagePlus impA = new Opener().openImage(parent.chooserA.getSelectedFile().getPath());
 		// Tracking is done with imageA measurment is performed on
 		// imageB
@@ -169,10 +170,22 @@ public class FirepreTrigger implements ItemListener {
 			
 			
 		}
+		parent.frame.dispose();
+		}
+		}
+		else{
+			
+			
+			new Normalize();
+			
+			
+			Preprocess prestep = new Preprocess(parent);
+			
+		    prestep.execute();
+			
+		}
 		
-		
-		
+	
+
 	}
-
-
 }

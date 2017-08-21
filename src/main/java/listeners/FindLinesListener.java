@@ -1,21 +1,30 @@
 package listeners;
 
+import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.SwingUtilities;
 
 import interactiveMT.Interactive_MTDoubleChannel;
+import interactiveMT.Interactive_MTDoubleChannelBasic;
 import swingClasses.ProgressSeeds;
 
 public class FindLinesListener implements ActionListener {
 
 	
 final Interactive_MTDoubleChannel parent;
-	
+final Interactive_MTDoubleChannelBasic child;
 	public FindLinesListener (final Interactive_MTDoubleChannel parent ){
 		
 		this.parent = parent;
+		this.child = null;
+	}
+	
+public FindLinesListener (final Interactive_MTDoubleChannel parent, final Interactive_MTDoubleChannelBasic child ){
+		
+		this.parent = parent;
+		this.child = child;
 	}
 	
 	@Override
@@ -46,8 +55,11 @@ final Interactive_MTDoubleChannel parent;
 		parent.frame.setLocationRelativeTo(parent.panelCont);
 		parent.frame.setVisible(true);
 
-		ProgressSeeds trackMT = new ProgressSeeds(parent);
+		ProgressSeeds trackMT = new ProgressSeeds(parent, child);
 		trackMT.execute();
+		
+		
+		
 		parent.displayBitimg = false;
 		parent.displayWatershedimg = false;
 

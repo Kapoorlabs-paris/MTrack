@@ -80,15 +80,16 @@ public class FireTrigger implements ActionListener {
 			    ee.printStackTrace();
 			}
 			
+			int scale = 100;
 			if (img !=null && imgsec!=null && imgthird!=null){
-			Image dimg = img.getScaledInstance(50, 50,
+			Image dimg = img.getScaledInstance(scale, scale,
 			        Image.SCALE_SMOOTH);
 			
 			ImageIcon image = new ImageIcon(dimg);
 			JLabel seedimage = new JLabel("", image, JLabel.CENTER);
 			
 			
-			Image dimgsec = imgsec.getScaledInstance(50, 50,
+			Image dimgsec = imgsec.getScaledInstance(scale, scale,
 			        Image.SCALE_SMOOTH);
 			
 			ImageIcon imagesec = new ImageIcon(dimgsec);
@@ -96,7 +97,7 @@ public class FireTrigger implements ActionListener {
 			
 			
 			
-			Image dimgthird = imgthird.getScaledInstance(50, 50,
+			Image dimgthird = imgthird.getScaledInstance(scale, scale,
 			        Image.SCALE_SMOOTH);
 			
 			ImageIcon imagethird = new ImageIcon(dimgthird);
@@ -104,16 +105,13 @@ public class FireTrigger implements ActionListener {
 			
 			
 			
+			parent.panelIntro.add(seedimage,new GridBagConstraints(1, 3, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER,
+					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 			
-			parent.panelIntro.add(seedimage, new GridBagConstraints(0, 5, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
-					GridBagConstraints.RELATIVE, new Insets(0, 10, 0, 10), 0, 0));
-			
-			
-			parent.panelIntro.add(dynamicimage, new GridBagConstraints(1, 5, 3, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST,
-					GridBagConstraints.RELATIVE, new Insets(0, 10, 0, 10), 0, 0));
-			
-			parent.panelIntro.add(dynamicimagesec, new GridBagConstraints(2, 5, 3, 1, 0.0, 0.0, GridBagConstraints.NORTHEAST,
-					GridBagConstraints.REMAINDER, new Insets(0, 10, 0, 10), 0, 0));
+			parent.panelIntro.add(dynamicimage,new GridBagConstraints(2, 3, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER,
+					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+			parent.panelIntro.add(dynamicimagesec,new GridBagConstraints(3, 3, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER,
+					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 			
 			parent.panelIntro.validate();
 			parent.frame.pack();
@@ -147,7 +145,7 @@ public class FireTrigger implements ActionListener {
 			System.out.println("No Selection ");
 			parent.chooserB = null;
 		}
-		
+		if (parent.chooserB!=null){
 		// Actual image
 		ImagePlus impB = new Opener().openImage(parent.chooserB.getSelectedFile().getPath());
 		// Tracking is done with imageA measurment is performed on
@@ -200,7 +198,7 @@ public class FireTrigger implements ActionListener {
 				parent.processSlice(slice, outputSlice);
 			}
 			Normalize.normalize(Views.iterable(totalimg), parent.minval, parent.maxval);
-			ImageJFunctions.show(totalimg).setTitle("Un-Preprocessed Movie");
+			ImageJFunctions.show(totalimg).setTitle("Original Movie");
 			
 			parent.originalimg = totalimg;
 			
@@ -209,7 +207,7 @@ public class FireTrigger implements ActionListener {
 		}
 		
 		
-	
+		}
 		
 		
 		

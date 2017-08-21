@@ -5,8 +5,10 @@ import java.awt.Scrollbar;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 
+import ij.IJ;
 import interactiveMT.Interactive_MTDoubleChannel;
 import interactiveMT.Interactive_MTDoubleChannel.ValueChange;
+import updateListeners.Markends;
 
 public class DeltaListener implements AdjustmentListener {
 	final Label label;
@@ -36,8 +38,11 @@ public class DeltaListener implements AdjustmentListener {
 
 		deltaScrollbar.setValue(parent.computeScrollbarPositionFromValue(parent.delta, min, max, scrollbarSize));
 
-		label.setText("Grey Level Seperation between Components = " + parent.delta);
+		label.setText("Intensity threshold = " + parent.delta);
 
 		
 	}
+	
+	
+	
 }

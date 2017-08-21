@@ -1,5 +1,6 @@
 package swingClasses;
 
+import java.awt.BorderLayout;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
@@ -12,11 +13,13 @@ import ij.gui.OvalRoi;
 import ij.gui.Overlay;
 import ij.gui.Roi;
 import interactiveMT.Interactive_MTDoubleChannel;
+import interactiveMT.Interactive_MTDoubleChannelBasic;
 import labeledObjects.KalmanIndexedlength;
 import lineFinder.FindlinesVia;
 import lineFinder.LinefinderInteractiveHough;
 import lineFinder.LinefinderInteractiveMSER;
 import lineFinder.LinefinderInteractiveMSERwHough;
+import listeners.SecondPanel;
 import mpicbg.imglib.util.Util;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.type.numeric.real.FloatType;
@@ -27,13 +30,20 @@ public class ProgressSeeds extends SwingWorker<Void, Void> {
 
 	
 final Interactive_MTDoubleChannel parent;
+final Interactive_MTDoubleChannelBasic child;	
 	
-	
-	public ProgressSeeds(final Interactive_MTDoubleChannel parent){
+	public ProgressSeeds(final Interactive_MTDoubleChannel parent ){
 	
 		this.parent = parent;
+		this.child = null;
 	}
 	
+
+	public ProgressSeeds(final Interactive_MTDoubleChannel parent, final Interactive_MTDoubleChannelBasic child ){
+	
+		this.parent = parent;
+		this.child = child;
+	}
 	
 	@Override
 	protected Void doInBackground() throws Exception {
@@ -162,6 +172,20 @@ final Interactive_MTDoubleChannel parent;
 	@Override
 	protected void done() {
 		try {
+			
+			
+			parent.Cardframe.add(parent.controlnext, BorderLayout.PAGE_END);
+			parent.Cardframe.validate();
+			parent.Cardframe.pack();
+			if (child!=null){
+				
+					
+					child.CardframeSimple.add(child.controlnext, BorderLayout.PAGE_END);
+					child.CardframeSimple.validate();
+					SecondPanel paintsecond = new SecondPanel(parent, child);
+					paintsecond.Paint();
+			}
+			
 			parent.jpb.setIndeterminate(false);
 			get();
 			parent.frame.dispose();
@@ -173,6 +197,8 @@ final Interactive_MTDoubleChannel parent;
 		}
 
 	}
+	
+	
 
 
 

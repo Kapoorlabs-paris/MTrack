@@ -15,6 +15,7 @@ import java.util.Comparator;
 
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JScrollBar;
 
 import interactiveMT.Interactive_MTDoubleChannel;
 import net.imglib2.util.Pair;
@@ -57,9 +58,9 @@ public class AcceptResultsListener implements ItemListener {
 			Optional.setBackground(new Color(1, 0, 1));
 			Optional.setForeground(new Color(255, 255, 255));
 
-			final Scrollbar startS = new Scrollbar(Scrollbar.HORIZONTAL, parent.thirdDimensionsliderInit, 10, 0,
+			final JScrollBar startS = new JScrollBar(Scrollbar.HORIZONTAL, parent.thirdDimensionsliderInit, 10, 0,
 					10 + parent.scrollbarSize);
-			final Scrollbar endS = new Scrollbar(Scrollbar.HORIZONTAL, parent.thirdDimensionsliderInit, 10, 0,
+			final JScrollBar endS = new JScrollBar(Scrollbar.HORIZONTAL, parent.thirdDimensionsliderInit, 10, 0,
 					10 + parent.scrollbarSize);
 			parent.starttime = (int) parent.computeValueFromScrollbarPosition(parent.thirdDimensionsliderInit, 0, parent.thirdDimensionSize,
 					parent.scrollbarSize);
@@ -151,9 +152,9 @@ public class AcceptResultsListener implements ItemListener {
 			// c.insets = new Insets(10, 10, 0, 50);
 			// parent.panelEighth.add(Stats, c);
 
-			startS.addAdjustmentListener(new StarttimeListener(parent, startText, parent.thirdDimensionsliderInit,
+			startS.addAdjustmentListener(new StarttimeListener(parent, startText, startText.getName(), parent.thirdDimensionsliderInit,
 					parent.thirdDimensionSize, parent.scrollbarSize, startS));
-			endS.addAdjustmentListener(new EndtimeListener(parent, endText, parent.thirdDimensionsliderInit, parent.thirdDimensionSize,
+			endS.addAdjustmentListener(new EndtimeListener(parent, endText, endText.getName(), parent.thirdDimensionsliderInit, parent.thirdDimensionSize,
 					parent.scrollbarSize, endS));
 			Analyze.addActionListener(new AnalyzeListener(parent));
 			Stats.addActionListener(new StatsAnalyzeListener(parent));

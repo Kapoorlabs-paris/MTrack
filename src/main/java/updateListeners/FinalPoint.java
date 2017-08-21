@@ -1,5 +1,7 @@
 package updateListeners;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
@@ -18,7 +20,7 @@ import listeners.SkipFramesandTrackendsListener;
 import net.imglib2.util.Pair;
 import net.imglib2.util.ValuePair;
 
-public class FinalPoint implements ItemListener {
+public class FinalPoint implements ActionListener {
 
 	final Interactive_MTDoubleChannel parent;
 
@@ -54,16 +56,12 @@ public class FinalPoint implements ItemListener {
 	
 
 	@Override
-	public void itemStateChanged(ItemEvent arg0) {
-		if (arg0.getStateChange() == ItemEvent.DESELECTED)
-			parent.finalpoint = false;
-
-		else if (arg0.getStateChange() == ItemEvent.SELECTED) {
-			parent.finalpoint = true;
+	public void actionPerformed(ActionEvent arg0) {
+		
 
 			FinalizeEnds();
 
-		}
+		
 
 	}
 
@@ -161,7 +159,7 @@ public class FinalPoint implements ItemListener {
 
 		if (child != null){
 			
-			SkipFramesandTrackendsListener track =  new SkipFramesandTrackendsListener(parent, parent.thirdDimension, parent.thirdDimensionSize);
+			SkipFramesandTrackendsListener track =  new SkipFramesandTrackendsListener(parent, starttime, endtime);
 			track.goSkip();
 			
 		}

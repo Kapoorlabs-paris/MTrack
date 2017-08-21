@@ -90,11 +90,11 @@ public class MserwHoughListener implements ItemListener {
 
 			final Checkbox min = new Checkbox("Look for Minima ", parent.darktobright);
 
-			final Label deltaText = new Label("Grey Level Seperation between Components = " + parent.delta, Label.CENTER);
+			final Label deltaText = new Label("Intensity threshold = " + parent.delta, Label.CENTER);
 			final Label Unstability_ScoreText = new Label("Unstability Score = " + parent.Unstability_Score, Label.CENTER);
 			final Label minDiversityText = new Label("minDiversity = " +parent.minDiversity, Label.CENTER);
-			final Label minSizeText = new Label("Min # of pixels inside MSER Ellipses = " + parent.minSize, Label.CENTER);
-			final Label maxSizeText = new Label("Max # of pixels inside MSER Ellipses = " + parent.maxSize, Label.CENTER);
+			final Label minSizeText = new Label("Min size of red Ellipses = " + parent.minSize, Label.CENTER);
+			final Label maxSizeText = new Label("Max size of red Ellipses = " + parent.maxSize, Label.CENTER);
 			
 			
 			final Checkbox AdvancedOptions = new Checkbox("Advanced Optimizer Options ", parent.AdvancedChoiceSeeds);
