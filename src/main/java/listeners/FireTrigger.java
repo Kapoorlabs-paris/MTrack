@@ -46,7 +46,7 @@ public class FireTrigger implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		
 		int selectedindex = choice.getSelectedIndex();
-		
+	
 		if(selectedindex == 0){
 			
 			
@@ -150,19 +150,21 @@ public class FireTrigger implements ActionListener {
 		ImagePlus impB = new Opener().openImage(parent.chooserB.getSelectedFile().getPath());
 		// Tracking is done with imageA measurment is performed on
 		// imageB
-		parent.calibration[0] = impB.getCalibration().pixelWidth;
-		parent.calibration[1] = impB.getCalibration().pixelHeight;
-		parent.psf[0] = Float.parseFloat(parent.inputFieldX.getText());
-		parent.psf[1] = Float.parseFloat(parent.inputFieldY.getText());
+		parent.inputFieldcalX.setText(String.valueOf(impB.getCalibration().pixelWidth));
+		parent.inputFieldcalY.setText(String.valueOf(impB.getCalibration().pixelHeight));
+		parent.inputFieldT.setText(String.valueOf(impB.getCalibration().pixelDepth));
+		parent.inputFieldX.setText(String.valueOf(parent.psf[0]));
+		parent.inputFieldY.setText(String.valueOf(parent.psf[1]));
+	
 		
 		final TextField LoadtrackText = new TextField(
 				"Image read: " + parent.chooserB.getSelectedFile());
-		LoadtrackText.setColumns(20);
+		LoadtrackText.setColumns(30);
 		
 		new Normalize();
 		
-		parent.panelIntro.add(LoadtrackText, new GridBagConstraints(0, 10, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER,
-				GridBagConstraints.RELATIVE, new Insets(0, 10, 0, 10), 0, 0));
+		parent.panelIntro.add(LoadtrackText, new GridBagConstraints(0, 4, 20, 1, 0.0, 0.0, GridBagConstraints.CENTER,
+				GridBagConstraints.HORIZONTAL, new Insets(0, 10, 0, 10), 0, 0));
 		parent.panelIntro.validate();
 		parent.frame.pack();
 		parent.originalimg = ImageJFunctions.convertFloat(impB);

@@ -531,7 +531,7 @@ public ArrayList<Indexedlength> getEndPoints(){
 				//	IJ.log((startparam[0] ) + " " + (startparam[1]  ) + " " +  (endparam[0]) + " "  + (endparam[1] ));
 
 					System.out.println("Length: " + Distance(new double[]{startparam[0],  startparam[1]},new double[]{endparam[0],  endparam[1]} ));
-
+					
 					final Indexedlength startPart = new Indexedlength(label, label, framenumber, finalparamstart[4],
 							finalparamstart[5], finalparamstart[6], startparam,
 							startparam , currentslope, currentintercept , currentslope, currentintercept, 0, 0, new double[]{dx, dy});
@@ -547,8 +547,10 @@ public ArrayList<Indexedlength> getEndPoints(){
 					
 					FitterUtils.SetProgressBar(jpb, percent);
 					return pair;
-					
 					}
+				
+					
+					
 					
 			
 						
@@ -640,6 +642,10 @@ public ArrayList<Indexedlength> getEndPoints(){
 					}
 					
 				}
+				
+				
+			
+				
 					final double currentslope = (endparam[1] - startparam[1]) / (endparam[0] - startparam[0]);
 					final double currentintercept = endparam[1] - currentslope * endparam[0];
 
@@ -663,7 +669,11 @@ public ArrayList<Indexedlength> getEndPoints(){
 					final Pair<Indexedlength, Indexedlength> pair = new ValuePair<Indexedlength, Indexedlength> ( startPart, endPart);
 					FitterUtils.SetProgressBar(jpb, percent);
 					return pair;
-					}
+					
+					
+				}
+				
+				
 
 			
 

@@ -107,7 +107,7 @@ final Interactive_MTDoubleChannel parent;
 					
 				}
 				
-               
+               System.out.println("clicked" + parent.ClickedPoints.size());
 				
 				
 				System.out.println("You deleted: " + newx + "," + newy);

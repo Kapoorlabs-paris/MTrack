@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+import ij.gui.Overlay;
 import interactiveMT.BatchMode;
 import interactiveMT.Interactive_MTDoubleChannel;
 import interactiveMT.Interactive_MTDoubleChannelBasic;
@@ -65,6 +66,18 @@ public class FinalPoint implements ActionListener {
 
 	}
 
+	public double Distance(final double[] cordone, final double[] cordtwo) {
+
+		double distance = 0;
+
+		int ndims = cordone.length;
+		for (int d = 0; d < ndims; ++d) {
+
+			distance += Math.pow((cordone[d] - cordtwo[d]), 2);
+
+		}
+		return Math.sqrt(distance);
+	}
 
 
 	public void FinalizeEnds() {
@@ -84,16 +97,18 @@ public class FinalPoint implements ActionListener {
 
 		for (int i = 0; i < parent.PrevFrameparam.getA().size(); ++i) {
 
+			
+		
 			endAmap.put(parent.PrevFrameparam.getA().get(i).seedLabel, parent.PrevFrameparam.getA().get(i).fixedpos);
 
 		}
 
 		for (int i = 0; i < parent.PrevFrameparam.getB().size(); ++i) {
 
+			
 			endBmap.put(parent.PrevFrameparam.getB().get(i).seedLabel, parent.PrevFrameparam.getB().get(i).fixedpos);
 
 		}
-
 		for (int i = minSeed; i < maxSeed + 1; ++i) {
 
 			
@@ -102,42 +117,46 @@ public class FinalPoint implements ActionListener {
 				double mindistA = 0;
 				double mindistB = 0;
 
+				double cutdist = 1;
 				mindistA = util.Boundingboxes.Distance(parent.ClickedPoints.get(index).getA(), endAmap.get(i));
 				mindistB = util.Boundingboxes.Distance(parent.ClickedPoints.get(index).getA(), endBmap.get(i));
 
-				if (mindistA <= 1 && parent.seedmap.get(i) != Whichend.end) {
+				if ( mindistA <= cutdist && mindistB > cutdist && parent.seedmap.get(i) != Whichend.end) {
 
 					parent.seedmap.put(i, Whichend.start);
 
 					int seedid = i;
-					double[] seedpos = parent.ClickedPoints.get(index).getA();
+					double[] seedpos = parent.PrevFrameparam.getA().get(i).fixedpos;
 					Pair<Integer, double[]> seedpair = new ValuePair<Integer, double[]>(seedid, seedpos);
 					parent.IDALL.add(seedpair);
 				}
 
-				else if (mindistB <= 1 && parent.seedmap.get(i) != Whichend.start) {
+				else if (mindistB <= cutdist && mindistA > cutdist && parent.seedmap.get(i) != Whichend.start) {
 
 					parent.seedmap.put(i, Whichend.end);
 
 					int seedid = i;
-					double[] seedpos = parent.ClickedPoints.get(index).getA();
+					double[] seedpos = parent.PrevFrameparam.getB().get(i).fixedpos;
 					Pair<Integer, double[]> seedpair = new ValuePair<Integer, double[]>(seedid, seedpos);
 					parent.IDALL.add(seedpair);
 
 				}
 
-				else if (parent.seedmap.get(i) == Whichend.start && mindistB <= 1) {
+				else if (parent.seedmap.get(i) == Whichend.start && mindistB <= cutdist && mindistA > cutdist ) {
 					parent.seedmap.put(i, Whichend.both);
 
 				}
 
-				else if (parent.seedmap.get(i) == Whichend.end && mindistA <= 1) {
+				else if (parent.seedmap.get(i) == Whichend.end && mindistA <= cutdist && mindistB > cutdist) {
 					parent.seedmap.put(i, Whichend.both);
 				}
 
 				else if (parent.seedmap.get(i) == null) {
 					parent.seedmap.put(i, Whichend.none);
+                  
 				}
+				
+				
 
 			}
 

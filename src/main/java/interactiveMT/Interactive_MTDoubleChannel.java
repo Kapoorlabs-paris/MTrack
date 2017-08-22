@@ -113,6 +113,7 @@ import updateListeners.BatchModeListener;
 import updateListeners.DefaultModelHF;
 import updateListeners.FinalPoint;
 import updateListeners.FinalizechoicesListener;
+import updateListeners.Markends;
 import updateListeners.MoveNextListener;
 import updateListeners.MoveToFrameListener;
 import util.Boundingboxes;
@@ -303,7 +304,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public int maxSearchradiusInit = 200;
 	public float maxSearchradiusMin = 10;
 	public float maxSearchradiusMax = 500;
-
+	public Markends newends;
 	public int missedframesInit = missedframes;
 	public float missedframesMin = 0;
 	public float missedframesMax = 100;
@@ -393,7 +394,8 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	}
 
 	public static enum ValueChange {
-		ROI, ALL, DELTA, FindLinesVia, Unstability_Score, MINDIVERSITY, DARKTOBRIGHT, MINSIZE, MAXSIZE, SHOWMSER, FRAME, SHOWHOUGH, thresholdHough, DISPLAYBITIMG, DISPLAYWATERSHEDIMG, rhoPerPixel, thetaPerPixel, THIRDDIM, iniSearch, maxSearch, missedframes, THIRDDIMTrack, MEDIAN, kymo, SHOWMSERinHough;
+		ROI, ALL, DELTA, FindLinesVia, Unstability_Score, MINDIVERSITY, DARKTOBRIGHT, MINSIZE, MAXSIZE, SHOWMSER, FRAME, SHOWHOUGH, thresholdHough, 
+		DISPLAYBITIMG, DISPLAYWATERSHEDIMG, rhoPerPixel, thetaPerPixel, THIRDDIM, iniSearch, maxSearch, missedframes, THIRDDIMTrack, MEDIAN, kymo, SHOWMSERinHough, THIRDDIMmouse;
 	}
 
 	public boolean isFinished = false;
@@ -610,7 +612,8 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 		this.userfile = userfile;
 		calibration = imgCal;
-		System.out.println(calibration[0] + " " + calibration[1]);
+		System.out.println(calibration[0] + " " + calibration[1] + " " + calibration[2]);
+		System.out.println(psf[0] + " " + psf[1]);
 
 	}
 
@@ -639,7 +642,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public void run(String arg) {
 
 		usefolder = userfile.getParentFile().getAbsolutePath();
-
+		 newends = new Markends(this);
 		SaveTxt = true;
 
 		starttime = 2;
@@ -773,6 +776,30 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 			}
 
 			preprocessedimp.setTitle("Active image" + " " + "time point : " + thirdDimension);
+			}
+		
+		if (change == ValueChange.THIRDDIMmouse) {
+
+			if (preprocessedimp == null){
+				preprocessedimp = ImageJFunctions.show(CurrentView);
+			
+			}
+			
+			else {
+				final float[] pixels = (float[]) preprocessedimp.getProcessor().getPixels();
+				final Cursor<FloatType> c = Views.iterable(CurrentView).cursor();
+
+				for (int i = 0; i < pixels.length; ++i)
+					pixels[i] = c.next().get();
+
+				preprocessedimp.updateAndDraw();
+
+			}
+
+			preprocessedimp.setTitle("Active image" + " " + "time point : " + thirdDimension);
+			
+			newends.markend();
+			
 			}
 
 

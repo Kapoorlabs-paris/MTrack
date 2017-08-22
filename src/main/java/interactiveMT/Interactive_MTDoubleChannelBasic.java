@@ -79,6 +79,7 @@ import updateListeners.BatchModeListener;
 import updateListeners.DefaultModel;
 import updateListeners.DefaultModelHF;
 import updateListeners.FinalPoint;
+import updateListeners.Markends;
 import updateListeners.MoveNextListener;
 import updateListeners.MoveToFrameListener;
 
@@ -110,7 +111,7 @@ public class Interactive_MTDoubleChannelBasic implements PlugIn {
 		parent.doMserSegmentation = true;
 
 		
-		
+		parent.newends = new Markends(parent);
 		parent.AllSeedrois = new ArrayList<OvalRoi>();
 		parent.jpb = new JProgressBar();
 		parent.newHoughtree = new HashMap<Integer, MserTree<UnsignedByteType>>();
@@ -134,7 +135,6 @@ public class Interactive_MTDoubleChannelBasic implements PlugIn {
 		parent.Cannyradius = (long) (parent.radiusfactor
 				* Math.ceil(Math.sqrt(parent.psf[0] * parent.psf[0] + parent.psf[1] * parent.psf[1])));
 		
-		System.out.println(parent.Cannyradius + " " + parent.psf[0] + " " + parent.psf[1]);
 		if (parent.originalimg.numDimensions() < 3) {
 
 			parent.thirdDimensionSize = 0;

@@ -119,9 +119,7 @@ public class FirepreTrigger implements ActionListener {
 						
 						parent.originalPreprocessedimg = totalimg;
 					
-			//preoutputSlice = (IntervalView<FloatType>) parent.Preprocess(outputSlice);
-			//			Normalize.normalize(Views.iterable(pretotalimg), parent.minval, parent.maxval);
-			//			ImageJFunctions.show(pretotalimg).setTitle("Preprocessed Movie");
+		
 						
 				
 						if (parent.Simplemode)

@@ -31,7 +31,7 @@ public class TimeListener implements AdjustmentListener {
 		this.scrollbarSize = scrollbarSize;
 
 		this.deltaScrollbar = deltaScrollbar;
-		deltaScrollbar.addMouseListener(new StandardMouseListener(parent, ValueChange.THIRDDIM));
+		deltaScrollbar.addMouseListener(new StandardMouseListener(parent, ValueChange.THIRDDIMmouse));
 
 	}
 
@@ -47,7 +47,7 @@ public class TimeListener implements AdjustmentListener {
 		shownew();
 
 	}
-
+	
 	public void shownew() {
 
 		if (parent.thirdDimension > parent.thirdDimensionSize) {
@@ -65,9 +65,9 @@ public class TimeListener implements AdjustmentListener {
 					parent.thirdDimension, parent.thirdDimensionSize);
 		}
 
-		parent.updatePreview(ValueChange.THIRDDIM);
-		Markends newends = new Markends(parent);
-		newends.markend();
+		
+		
+	
 
 		
 	}

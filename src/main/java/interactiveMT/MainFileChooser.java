@@ -9,8 +9,13 @@ import javax.swing.border.TitledBorder;
 
 import ij.ImagePlus;
 import ij.io.Opener;
+import listeners.CalTListener;
+import listeners.CalXListener;
+import listeners.CalYListener;
 import listeners.FireTrigger;
 import listeners.FirepreTrigger;
+import listeners.PsfXListener;
+import listeners.PsfYListener;
 import listeners.SelfFirepreTrigger;
 import net.imglib2.Cursor;
 import net.imglib2.IterableInterval;
@@ -51,16 +56,16 @@ public class MainFileChooser extends JPanel {
 	public RandomAccessibleInterval<FloatType> ProgramPreprocessedimg;
 	public JFileChooser chooserB;
 	public String choosertitleB;
-	public double[] calibration = new double[2];
+	public double[] calibration = new double[3];
 	float frametosec;
 	public JProgressBar jpb;
 	JFileChooser chooserC;
 	String choosertitleC;
 	public double[] psf = new double[2];
-	private JLabel inputLabelX, inputLabelY, inputLabelT, inputLabelcalX, inputLabelcalY;
-	public JTextField inputFieldX, inputFieldcalX;
-	public JTextField inputFieldY, inputFieldcalY;
-	private JTextField inputFieldT;
+	private Label inputLabelX, inputLabelY, inputLabelT, inputLabelcalX, inputLabelcalY;
+	public TextField inputFieldX, inputFieldcalX;
+	public TextField inputFieldY, inputFieldcalY;
+	public TextField inputFieldT;
 	JPanel panelCont = new JPanel();
 	public JPanel panelIntro = new JPanel();
 
@@ -125,29 +130,30 @@ public class MainFileChooser extends JPanel {
 		Measure = new JButton("Open Un-preprocessed movie");
 		Kymo = new JButton("Open Kymograph for the MT");
 		Done = new JButton("Done");
-		inputLabelX = new JLabel("Enter Sigma (X and Y) of PSF (in pixels): ");
-		inputFieldX = new JTextField(5);
+		inputLabelX = new Label("Enter Sigma (X and Y) of PSF (in pixels): ");
+		inputFieldX = new TextField(5);
 
 		inputFieldX.setText("2");
 
-		inputLabelY = new JLabel("Enter SigmaY of PSF (px): ");
-		inputFieldY = new JTextField(5);
+	
+		inputFieldY = new TextField(5);
 		inputFieldY.setText("2");
 		
 		
-		inputLabelcalX = new JLabel("Enter pixel calibration in X, Y");
-		inputFieldcalX = new JTextField(5);
+		inputLabelcalX = new Label("Enter pixel calibration in X, Y");
+		inputFieldcalX = new TextField(5);
 		inputFieldcalX.setText("1");
 		
-		inputLabelcalY = new JLabel("Enter pixel calibration in Y");
-		inputFieldcalY = new JTextField(5);
+		inputLabelcalY = new Label("Enter pixel calibration in Y");
+		inputFieldcalY = new TextField(5);
 		inputFieldcalY.setText("1");
 		
 		
-	    inputLabelT = new JLabel("Enter time frame to second conversion: ");
-		inputFieldT = new JTextField(5);
+	    inputLabelT = new Label("Enter time frame to second conversion: ");
+		inputFieldT = new TextField(5);
 		inputFieldT.setText("1");
-		
+		psf[0] = Float.parseFloat(inputFieldX.getText());
+		psf[1] = Float.parseFloat(inputFieldY.getText());
 
 		String[] Imagetype = { "Two channel image as hyperstack", "Concated seed image followed by time-lapse images",
 				"Single channel time-lapse images" };
@@ -241,6 +247,13 @@ public class MainFileChooser extends JPanel {
 		Advanced.addItemListener(new RunAdvancedListener());
 		ChooseImage.addActionListener(new FireTrigger(this, ChooseImage));
 		ChoosepreImage.addActionListener(new FirepreTrigger(this, ChoosepreImage));
+		inputFieldX.addTextListener(new PsfXListener(this));
+		inputFieldY.addTextListener(new PsfYListener(this));
+		inputFieldcalX.addTextListener(new CalXListener(this));
+		inputFieldcalY.addTextListener(new CalYListener(this));
+		inputFieldT.addTextListener(new CalTListener(this));
+		
+		
 		
 		frame.addWindowListener(new FrameListener(frame));
 		frame.add(panelCont, BorderLayout.CENTER);
