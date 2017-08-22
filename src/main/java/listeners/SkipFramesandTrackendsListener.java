@@ -1,8 +1,15 @@
 package listeners;
 
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.GridBagConstraints;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.AbstractAction;
+import javax.swing.JButton;
+import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import interactiveMT.Interactive_MTDoubleChannel;
@@ -50,6 +57,34 @@ public class SkipFramesandTrackendsListener implements ActionListener {
 		parent.frame.setLocationRelativeTo(parent.panelCont);
 		parent.frame.setVisible(true);
 
+		
+		parent.Cardframe.remove(parent.controlnext);
+		
+		
+		JPanel review = new JPanel();
+		
+		review.add(new JButton(new AbstractAction("\u22b2Review Panels") {
+
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				CardLayout cl = (CardLayout) parent.panelCont.getLayout();
+
+				cl.previous(parent.panelCont);
+			}
+		}));
+		
+
+	
+		
+		parent.Cardframe.add(review,  BorderLayout.PAGE_END);
+		parent.Cardframe.validate();
+		parent.Cardframe.pack();
+		
 		ProgressSkip trackMT = new ProgressSkip(parent, starttime, endtime);
 		trackMT.execute();
 

@@ -52,12 +52,9 @@ import interactiveMT.Interactive_MTDoubleChannel.RoiListener;
 import interactiveMT.Interactive_MTDoubleChannel.ValueChange;
 import labeledObjects.CommonOutputHF;
 import labeledObjects.Indexedlength;
-import listeners.AcceptResultsListener;
 import listeners.AdvancedSeedListener;
 import listeners.AdvancedTrackerListener;
-import listeners.AnalyzekymoListener;
 import listeners.BeginTrackListener;
-import listeners.CheckResultsListener;
 import listeners.ChooseDirectoryListener;
 import listeners.ComputeTreeListener;
 import listeners.DeltaListener;
@@ -258,6 +255,7 @@ public class Interactive_MTDoubleChannelBasic implements PlugIn {
 		
 		panelFirst.setLayout(layout);
 		panelSecond.setLayout(layout);
+		
 		Mserparam.setLayout(layout);
 		Directoryoptions.setLayout(layout);
 		
@@ -319,7 +317,6 @@ public class Interactive_MTDoubleChannelBasic implements PlugIn {
 		panelFirst.setVisible(true);
 		cl.show(panelCont, "1");
 
-		Analyzekymo.addItemListener(new AnalyzekymoListener(parent));
 		ChooseDirectory.addActionListener(new ChooseDirectoryListener(parent, inputField, parent.userfile));
 		deltaS.addAdjustmentListener(
 				new DeltaListener(parent, deltaText, parent.deltaMin, parent.deltaMax, parent.scrollbarSize, deltaS));

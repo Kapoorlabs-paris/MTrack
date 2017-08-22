@@ -13,6 +13,10 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
 import javax.swing.JPanel;
+import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
 
 import interactiveMT.Interactive_MTDoubleChannel;
 import interactiveMT.Interactive_MTDoubleChannel.ValueChange;
@@ -53,13 +57,11 @@ import updateListeners.DefaultModelHF;
 				parent.radiusfactor = Double.parseDouble(parent.inputFieldradi.getText());
 				
 				
-				final GridBagLayout layout = new GridBagLayout();
-				final GridBagConstraints c = new GridBagConstraints();
-				final Label Step = new Label("Step 2", Label.CENTER);
+				
 
-				parent.panelSecond.setLayout(layout);
-
-				parent.panelSecond.add(Step, c);
+				parent.panelSecond.setLayout(parent.layout);
+				parent.Mserparam.setLayout(parent.layout);
+				Border msborder = new CompoundBorder(new TitledBorder("MSER parameters"), new EmptyBorder(parent.c.insets));
 				final Scrollbar deltaS = new Scrollbar(Scrollbar.HORIZONTAL, parent.deltaInit, 10, 0, 10 + parent.scrollbarSize);
 				final Scrollbar Unstability_ScoreS = new Scrollbar(Scrollbar.HORIZONTAL, parent.Unstability_ScoreInit, 10, 0, 10 + parent.scrollbarSize);
 				final Scrollbar minDiversityS = new Scrollbar(Scrollbar.HORIZONTAL, parent.minDiversityInit, 10, 0,
@@ -89,6 +91,7 @@ import updateListeners.DefaultModelHF;
 
 				
 
+				parent.controlnext.setEnabled(false);
 				final Label MSparam = new Label("Determine MSER parameters");
 				MSparam.setBackground(new Color(1, 0, 1));
 				MSparam.setForeground(new Color(255, 255, 255));
@@ -98,62 +101,53 @@ import updateListeners.DefaultModelHF;
 				loaddefault.LoadDefault();
 				
 				/* Location */
-				parent.panelSecond.setLayout(layout);
+				parent.panelSecond.setLayout(parent.layout);
 
-				c.fill = GridBagConstraints.HORIZONTAL;
-				c.gridx = 0;
-				c.gridy = 0;
-				c.weightx = 4;
-				c.weighty = 1.5;
-
-				++c.gridy;
-
-				parent.panelSecond.add(MSparam, c);
-
-				++c.gridy;
-
-				parent.panelSecond.add(deltaText, c);
-
-				++c.gridy;
-				parent.panelSecond.add(deltaS, c);
-
-				++c.gridy;
-
-				parent.panelSecond.add(Unstability_ScoreText, c);
-
-				++c.gridy;
-				parent.panelSecond.add(Unstability_ScoreS, c);
-/*
-				++c.gridy;
-
-				parent.panelSecond.add(minDiversityText, c);
-
-				++c.gridy;
-				parent.panelSecond.add(minDiversityS, c);
-*/
-				++c.gridy;
-
-				parent.panelSecond.add(minSizeText, c);
-
-				++c.gridy;
-				parent.panelSecond.add(minSizeS, c);
-
-				++c.gridy;
-
-				parent.panelSecond.add(maxSizeText, c);
-
-				++c.gridy;
-				parent.panelSecond.add(maxSizeS, c);
+				parent.c.fill = GridBagConstraints.HORIZONTAL;
+				parent.c.gridx = 0;
+				parent.c.gridy = 0;
+				parent.c.weightx = 4;
+				parent.c.weighty = 1.5;
 
 				
-				++c.gridy;
-				c.insets = new Insets(10, 175, 0, 175);
-				parent.panelSecond.add(AdvancedOptions, c);
+				 parent.Mserparam.add(deltaText,  new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+							GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+				 
+				 parent.Mserparam.add(deltaS,  new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+							GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 
+				 parent.Mserparam.add(Unstability_ScoreText,  new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+							GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 
-				++c.gridy;
-				c.insets = new Insets(10, 180, 0, 180);
-				parent.panelSecond.add(FindLinesListener, c);
+				 parent.Mserparam.add(Unstability_ScoreS,  new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+							GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+				   
+				 parent.Mserparam.add(minSizeText,  new GridBagConstraints(0, 4, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+							GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+
+				 parent.Mserparam.add(minSizeS,  new GridBagConstraints(0, 5, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+							GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+				 parent.Mserparam.add(maxSizeText,  new GridBagConstraints(0, 6, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+							GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+				 parent.Mserparam.add(maxSizeS,  new GridBagConstraints(0, 6, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+							GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+				 
+				 parent.Mserparam.add(AdvancedOptions, new GridBagConstraints(0,7, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+							GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+				 
+				 parent.Mserparam.add(FindLinesListener, new GridBagConstraints(0,8, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+							GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+
+				 parent.Mserparam.setBorder(msborder);
+				
+				 parent.panelSecond.add(parent.Mserparam, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+							GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+				
+				
+				
+				
+				
+			
 
 				
 			//	++c.gridy;

@@ -63,10 +63,8 @@ import ij.plugin.PlugIn;
 import ij.process.ColorProcessor;
 import labeledObjects.CommonOutputHF;
 import labeledObjects.Indexedlength;
-import listeners.AcceptResultsListener;
 import listeners.AdvancedTrackerListener;
 import listeners.BeginTrackListener;
-import listeners.CheckResultsListener;
 import listeners.ChooseDirectoryListener;
 import listeners.ComputeMserinHoughListener;
 import listeners.DarktobrightListener;
@@ -110,6 +108,7 @@ import preProcessing.Kernels;
 import preProcessing.MedianFilter2D;
 import trackerType.MTTracker;
 import updateListeners.BatchModeListener;
+import updateListeners.DefaultModel;
 import updateListeners.DefaultModelHF;
 import updateListeners.FinalPoint;
 import updateListeners.FinalizechoicesListener;
@@ -720,7 +719,8 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 			IJ.log("Only rectangular rois are supported...");
 			return;
 		}
-
+		starttime = 2;
+		endtime = thirdDimensionSize;
 		// copy the ImagePlus into an ArrayImage<FloatType> for faster access
 		// displaySliders();
 		Card();
@@ -1114,25 +1114,28 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public JFrame Cardframe = new JFrame("MicroTubule Velocity Tracker (Advanced Mode)");
 
 	public JPanel panelCont = new JPanel();
+	public JPanel panelNext = new JPanel();
 	public JPanel panelFirst = new JPanel();
 	public JPanel panelSecond = new JPanel();
 	public JPanel panelThird = new JPanel();
 	public JPanel panelFourth = new JPanel();
-	public JPanel panelFifth = new JPanel();
-	public JPanel panelSixth = new JPanel();
-	public JPanel panelSeventh = new JPanel();
-	public JPanel panelEighth = new JPanel();
-	public JPanel panelNinth = new JPanel();
-	public JPanel panelTenth = new JPanel();
+	
 	public JPanel controlnext = new JPanel();
-	public JPanel controlprevious = new JPanel();
 	private JPanel Methodchoice = new JPanel();
 	private JPanel Cannychoice = new JPanel();
 	private JPanel Directoryoptions = new JPanel();
+	public JPanel Mserparam = new JPanel();
+	public JPanel MserparamHF = new JPanel();
+	public JPanel Houghparam = new JPanel();
+	public JPanel HoughparamHF = new JPanel();
+	public JPanel MserwHoughparam = new JPanel();
+	public JPanel Optimize = new JPanel();
+	
+	
 	private static final Insets insets = new Insets(10, 0, 0, 0);
 	
-	final GridBagLayout layout = new GridBagLayout();
-	final GridBagConstraints c = new GridBagConstraints();
+	public final GridBagLayout layout = new GridBagLayout();
+	public final GridBagConstraints c = new GridBagConstraints();
 	
 	
 	public void Card() {
@@ -1145,7 +1148,6 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		panelCont.add(panelSecond, "2");
 		panelCont.add(panelThird, "3");
 		panelCont.add(panelFourth, "4");
-		panelCont.add(panelFifth, "5");
 		// Insets for labels : c.insets = new Insets(20, 100, 0, 200);
 
 		// First Panel
@@ -1176,7 +1178,8 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		JComboBox<String> ChooseMethod = new JComboBox<String>(Method);
 
 		panelFirst.setLayout(layout);
-
+        panelThird.setLayout(layout);
+		panelNext.setLayout(layout);
 		Cannychoice.setLayout(layout);
 		Directoryoptions.setLayout(layout);
 		
@@ -1231,23 +1234,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		panelFirst.add(Directoryoptions, new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 
-		
 
-		panelFirst.setVisible(true);
-		cl.show(panelCont, "1");
-
-		// MedFiltercur.addItemListener(new MediancurrListener() );
-
-		// ChoiceofTracker.addActionListener(new
-		// TrackerButtonListener(Cardframe));
-		inputFieldradi.addTextListener(new RadiusListener(this));
-	//	mser.addItemListener(new MserListener(this));
-	//	hough.addItemListener(new HoughListener(this));
-	//	mserwhough.addItemListener(new MserwHoughListener(this));
-		ChooseDirectory.addActionListener(new ChooseDirectoryListener(this, inputField, userfile));
-        ChooseMethod.addActionListener(new MethodListener(this, ChooseMethod));
-		
-		
         controlnext.add(new JButton(new AbstractAction("\u22b2Prev") {
 
 			/**
@@ -1276,140 +1263,34 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 			}
 		}));
 
-		Cardframe.add(controlnext, BorderLayout.PAGE_END);
+		panelNext.add(controlnext,  new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER,
+				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+	
+		controlnext.setVisible(false);
+		
+		panelFirst.add(panelNext,  new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+		panelFirst.setVisible(true);
+		cl.show(panelCont, "1");
 
-		// Panel Third
-		final Button MoveNext = new Button("Choose first image in the dynamic channel to mark ends to track");
-		final Button JumptoFrame = new Button("Choose a later time point in the dynamic channel to mark ends to track");
+		// MedFiltercur.addItemListener(new MediancurrListener() );
 
-		final Label ORText = new Label("If the dynamic ends are not visible", Label.CENTER);
+		// ChoiceofTracker.addActionListener(new
+		// TrackerButtonListener(Cardframe));
+		inputFieldradi.addTextListener(new RadiusListener(this));
+	//	mser.addItemListener(new MserListener(this));
+	//	hough.addItemListener(new HoughListener(this));
+	//	mserwhough.addItemListener(new MserwHoughListener(this));
+		ChooseDirectory.addActionListener(new ChooseDirectoryListener(this, inputField, userfile));
+        ChooseMethod.addActionListener(new MethodListener(this, ChooseMethod));
+		
+		
+		
 
-		ORText.setBackground(new Color(1, 0, 1));
-		ORText.setForeground(new Color(255, 255, 255));
 
-		final Label LeftClick = new Label(
-				"Left click deselects an end, Shift + left click selects a deselected end, Shift + Alt + left click marks a user defined seed.");
-
-		LeftClick.setBackground(new Color(1, 0, 1));
-		LeftClick.setForeground(new Color(255, 255, 255));
-
-		final JButton Finalize = new JButton("Confirm the dynamic seed end(s)");
-
-		CheckboxGroup Segmentation = new CheckboxGroup();
-		final Checkbox Doseg = new Checkbox("DoWatershed +  MSER based segmentation ", Segmentation, doSegmentation);
-		final Checkbox DoMserseg = new Checkbox("Do MSER based segmentation", Segmentation, doMserSegmentation);
-		final Label Step3 = new Label("Step 3", Label.CENTER);
-		final Label SegChoice = new Label("Choose MSER or Watershed based Segmentation", Label.CENTER);
-
-		SegChoice.setBackground(new Color(1, 0, 1));
-		SegChoice.setForeground(new Color(255, 255, 255));
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.gridx = 0;
-		c.gridy = 0;
-		c.weightx = 0.5;
-
-		panelThird.setLayout(layout);
-		panelThird.add(Step3, c);
-		panelEighth.setLayout(layout);
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 0);
-		panelThird.add(LeftClick, c);
 
 	
-
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 150);
-		panelThird.add(MoveNext, c);
-
-		++c.gridy;
-		c.insets = new Insets(20, 100, 0, 200);
-		panelThird.add(ORText, c);
-
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 150);
-		panelThird.add(JumptoFrame, c);
-
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 0);
-		panelThird.add(Finalize, c);
-
-		++c.gridy;
-		c.insets = new Insets(20, 100, 0, 200);
-		panelThird.add(SegChoice, c);
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 180);
-		panelThird.add(Doseg, c);
-
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 180);
-		panelThird.add(DoMserseg, c);
-
-		MoveNext.addActionListener(new MoveNextListener(this));
-		JumptoFrame.addActionListener(new MoveToFrameListener(this));
-
-		thirdDimensionslider
-				.addAdjustmentListener(new thirdDimensionsliderListener(timeText, timeMin, thirdDimensionSize));
-		Cardframe.addWindowListener(new FrameListener(Cardframe));
-		JumpinTime.addActionListener(
-				new moveInThirdDimListener(thirdDimensionslider, timeText, timeMin, thirdDimensionSize));
-
-		Finalize.addActionListener(new FinalPoint(this));
-		Doseg.addItemListener(new DoSegmentation(this));
-		DoMserseg.addItemListener(new DoMserSegmentation(this));
-
-
-
-		if (analyzekymo == false && Kymoimg == null) {
-
-			/*
-			 * final Label Step6 = new Label("Step 6", Label.CENTER);
-			 * panelSixth.setLayout(layout);
-			 * 
-			 * c.fill = GridBagConstraints.HORIZONTAL; c.gridx = 0; c.gridy = 0;
-			 * c.weightx = 1; panelSixth.add(Step6, c); // final Checkbox
-			 * KalmanTracker = new Checkbox("Use Kalman Filter for tracking");
-			 * final Checkbox DeterTracker = new Checkbox(
-			 * "Use Deterministic method for tracking"); // final Label Kal =
-			 * new Label("Use Kalman Filter for probabilistic tracking"); final
-			 * Label Det = new Label(
-			 * "Use Deterministic tracker using the fixed Seed points"); //
-			 * Kal.setBackground(new Color(1, 0, 1)); // Kal.setForeground(new
-			 * Color(255, 255, 255)); Det.setBackground(new Color(1, 0, 1));
-			 * Det.setForeground(new Color(255, 255, 255));
-			 * 
-			 * // ++c.gridy; // c.insets = new Insets(10, 10, 0, 50); //
-			 * panelSixth.add(Kal, c);
-			 * 
-			 * // ++c.gridy; // c.insets = new Insets(10, 10, 0, 50); //
-			 * panelSixth.add(KalmanTracker, c);
-			 * 
-			 * ++c.gridy; c.insets = new Insets(10, 10, 0, 50);
-			 * panelSixth.add(Det, c);
-			 * 
-			 * ++c.gridy; c.insets = new Insets(10, 10, 0, 50);
-			 * panelSixth.add(DeterTracker, c);
-			 * 
-			 * // KalmanTracker.addItemListener(new KalmanchoiceListener());
-			 * DeterTracker.addItemListener(new DeterchoiceListener());
-			 */
-		}
-
-		panelNinth.setLayout(layout);
-		final Label Done = new Label("Hope that everything was to your satisfaction!");
-		final Button Exit = new Button("Close and exit");
-
-		Done.setBackground(new Color(1, 0, 1));
-		Done.setForeground(new Color(255, 255, 255));
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 50);
-		panelNinth.add(Done, c);
-
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 50);
-		panelNinth.add(Exit, c);
-
-		Exit.addActionListener(new FinishedButtonListener(Cardframe, true));
-
+		
 		Cardframe.add(panelCont, BorderLayout.CENTER);
 
 		Cardframe.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -1419,7 +1300,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	}
 
 	public void Deterministic() {
-
+/*
 		showDeterministic = true;
 		final GridBagLayout layout = new GridBagLayout();
 		final GridBagConstraints c = new GridBagConstraints();
@@ -1502,17 +1383,18 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		 * ++c.gridy; c.insets = new Insets(10, 10, 0, 175);
 		 * panelFifth.add(RoughResults, c);
 		 */
+		/*
 		++c.gridy;
 		c.insets = new Insets(10, 10, 0, 50);
 		panelFifth.add(Record, c);
 		++c.gridy;
 		c.insets = new Insets(10, 10, 0, 50);
 		panelFifth.add(Done, c);
-
+*/
 		// ++c.gridy;
 		// c.insets = new Insets(10, 10, 0, 50);
 		// panelFifth.add(Exit, c);
-
+/*
 		Exit.addActionListener(new FinishedButtonListener(Cardframe, true));
 		SkipframeandTrackEndPoints
 				.addActionListener(new SkipFramesandTrackendsListener(this, thirdDimension, thirdDimensionSize));
@@ -1524,25 +1406,30 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		panelFifth.repaint();
 		panelFifth.validate();
 		Cardframe.pack();
-
+*/
 	}
 
 	public void UpdateHough() {
 
+		
+		
+		panelFourth.removeAll();
+		
 		FindLinesViaMSER = false;
 		FindLinesViaHOUGH = true;
 		FindLinesViaMSERwHOUGH = false;
-		inputradi = new JLabel("Radius Factor for Canny Edge with Mean filter(pixel units): ");
-		inputFieldradi = new TextField();
-		inputFieldradi.setColumns(10);
-		inputFieldradi.setText(String.valueOf(radiusfactor));
-		final GridBagLayout layout = new GridBagLayout();
-		final GridBagConstraints c = new GridBagConstraints();
-		panelFourth.removeAll();
-		final Label Step = new Label("Step 4", Label.CENTER);
-		panelFourth.setLayout(layout);
+		
 
-		panelFourth.add(Step, c);
+		final Button Record = new Button("Save program parameters for batch mode");
+		final JButton Finalize = new JButton("Start tracking");
+		panelFourth.setLayout(layout);
+		HoughparamHF.setLayout(layout);
+		Optimize.setLayout(layout);
+		
+		Border houghborder = new CompoundBorder(new TitledBorder("Watershed and MSER parameters"), new EmptyBorder(c.insets));
+		Border optborder = new CompoundBorder(new TitledBorder("Tracker options"), new EmptyBorder(c.insets));
+		
+		
 		final Label exthresholdText = new Label("threshold = threshold to create Bitimg for watershedding.",
 				Label.CENTER);
 
@@ -1554,8 +1441,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		final Checkbox displayBit = new Checkbox("Display Bitimage ", displayBitimg);
 		final Checkbox displayWatershed = new Checkbox("Display Watershedimage ", displayWatershedimg);
 
-		final Button Dowatershed = new Button("Do watershedding");
-		final Label Update = new Label("Update parameters for dynamic channel");
+
 
 		final Scrollbar deltaS = new Scrollbar(Scrollbar.HORIZONTAL, deltaInit, 10, 0, 10 + scrollbarSize);
 		final Scrollbar Unstability_ScoreS = new Scrollbar(Scrollbar.HORIZONTAL, Unstability_ScoreInit, 10, 0,
@@ -1565,151 +1451,85 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		final Scrollbar minSizeS = new Scrollbar(Scrollbar.HORIZONTAL, minSizeInit, 10, 0, 10 + scrollbarSize);
 		final Scrollbar maxSizeS = new Scrollbar(Scrollbar.HORIZONTAL, maxSizeInit, 10, 0, 10 + scrollbarSize);
 
-		final Label deltaText = new Label("Grey Level Seperation between Components = " + delta, Label.CENTER);
-		final Label Unstability_ScoreText = new Label("Unstability Score = " + Unstability_Score, Label.CENTER);
-		final Label minDiversityText = new Label("minDiversity = " + minDiversity, Label.CENTER);
-		final Label minSizeText = new Label("Min # of pixels inside MSER Ellipses = " + minSize, Label.CENTER);
-		final Label maxSizeText = new Label("Max # of pixels inside MSER Ellipses = " + maxSize, Label.CENTER);
-		final Checkbox min = new Checkbox("Look for Minima ", darktobright);
-		final Checkbox finalizechoices = new Checkbox("Finalize Choices", false);
-		inputLabelX = new JLabel("Enter start time point for tracking");
-		inputFieldX = new TextField();
-		inputFieldX.setColumns(5);
+		final Label deltaText = new Label("Intensity threshold = " + delta, Label.CENTER);
+		final Label Unstability_ScoreText = new Label("Unstability score = " + Unstability_Score, Label.CENTER);
+		final Label minDiversityText = new Label("minDiversity = " +minDiversity, Label.CENTER);
+		final Label minSizeText = new Label("Min size of red ellipses = " + minSize, Label.CENTER);
+		final Label maxSizeText = new Label("Max size of red ellipses = " + maxSize, Label.CENTER);
 
-		inputLabelY = new JLabel("Enter end time point for tracking");
-		inputFieldY = new TextField();
-		inputFieldY.setColumns(10);
-		inputFieldX.setText(String.valueOf(2));
-		inputFieldY.setText(String.valueOf(thirdDimensionSize));
-		final Button ComputeTree = new Button("Compute Tree in each Watershed label and display");
-
-		Update.setBackground(new Color(1, 0, 1));
-		Update.setForeground(new Color(255, 255, 255));
-		/* Location */
-		panelFourth.setLayout(layout);
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.gridx = 0;
-		c.gridy = 0;
-		c.weightx = 4;
-		c.weighty = 1.5;
-
-		++c.gridy;
-		c.insets = new Insets(10, 10, 10, 0);
-		panelFourth.add(Update, c);
-
-		++c.gridy;
-		panelFourth.add(inputradi, c);
-		++c.gridy;
-		c.insets = new Insets(10, 10, 10, 0);
-		panelFourth.add(inputFieldradi, c);
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 0);
-		panelFourth.add(exthresholdText, c);
-
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 0);
-		panelFourth.add(thresholdText, c);
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 0);
-		panelFourth.add(threshold, c);
-
-		++c.gridy;
-		c.insets = new Insets(10, 175, 0, 175);
-		c.insets = new Insets(10, 10, 0, 0);
-		panelFourth.add(displayBit, c);
-
-		++c.gridy;
-		c.insets = new Insets(10, 175, 0, 175);
-		c.insets = new Insets(10, 10, 0, 0);
-		panelFourth.add(displayWatershed, c);
-
-		// ++c.gridy;
-		// c.insets = new Insets(10, 175, 0, 175);
-		// panelFourth.add(Dowatershed, c);
-
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 0);
-		panelFourth.add(deltaText, c);
-
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 0);
-		panelFourth.add(deltaS, c);
-
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 0);
-		panelFourth.add(Unstability_ScoreText, c);
-
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 0);
-		panelFourth.add(Unstability_ScoreS, c);
-		/*
-		 * ++c.gridy; c.insets = new Insets(10, 10, 0, 0);
-		 * panelFourth.add(minDiversityText, c);
-		 * 
-		 * ++c.gridy; c.insets = new Insets(10, 10, 0, 0);
-		 * panelFourth.add(minDiversityS, c);
-		 */
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 0);
-		panelFourth.add(minSizeText, c);
-
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 0);
-		panelFourth.add(minSizeS, c);
-
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 0);
-		panelFourth.add(maxSizeText, c);
-
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 0);
-		panelFourth.add(maxSizeS, c);
-		++c.gridy;
-		c.insets = new Insets(10, 10, 10, 0);
-		panelFourth.add(inputLabelX, c);
-
-		++c.gridy;
-		c.insets = new Insets(10, 10, 10, 0);
-		panelFourth.add(inputFieldX, c);
-
-		++c.gridy;
-		c.insets = new Insets(10, 10, 10, 0);
-		panelFourth.add(inputLabelY, c);
-
-		++c.gridy;
-		c.insets = new Insets(10, 10, 10, 0);
-		panelFourth.add(inputFieldY, c);
-
-		++c.gridy;
-		c.insets = new Insets(10, 10, 10, 0);
-		panelFourth.add(finalizechoices, c);
-
-		deltaS.addAdjustmentListener(
-				new DeltaHoughListener(this, deltaText, deltaMin, deltaMax, scrollbarSize, deltaS));
-
-		Unstability_ScoreS.addAdjustmentListener(new Unstability_ScoreHoughListener(this, Unstability_ScoreText,
-				Unstability_ScoreMin, Unstability_ScoreMax, scrollbarSize, Unstability_ScoreS));
-
-		minDiversityS.addAdjustmentListener(new MinDiversityHoughListener(this, minDiversityText, minDiversityMin,
-				minDiversityMax, scrollbarSize, minDiversityS));
-
-		minSizeS.addAdjustmentListener(
-				new MinSizeHoughListener(this, minSizeText, minSizemin, minSizemax, scrollbarSize, minSizeS));
-
-		maxSizeS.addAdjustmentListener(
-				new MaxSizeHoughListener(this, maxSizeText, maxSizemin, maxSizemax, scrollbarSize, maxSizeS));
-
-		min.addItemListener(new DarktobrightListener(this));
-		ComputeTree.addActionListener(new ComputeMserinHoughListener(this));
-		inputFieldX.addTextListener(new BeginTrackListener(this));
-		inputFieldY.addTextListener(new EndTrackListener(this));
+		final Checkbox AdvancedOptions = new Checkbox("Advanced Optimizer Options ", AdvancedChoiceSeeds);
 		DefaultModelHF loaddefault = new DefaultModelHF(this);
 		loaddefault.LoadDefault();
+		
+		panelFourth.add(Cannychoice, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+		
+		
+		HoughparamHF.add(thresholdText,  new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+	 
+		HoughparamHF.add(threshold,  new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 
-		finalizechoices.addItemListener(new FinalizechoicesListener(this));
+		HoughparamHF.add(displayBit,  new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 
+		HoughparamHF.add(displayWatershed,  new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+	   
+	
+		
+		HoughparamHF.add(deltaText,  new GridBagConstraints(0, 4, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+		 
+		HoughparamHF.add(deltaS,  new GridBagConstraints(0, 5, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+
+		HoughparamHF.add(Unstability_ScoreText,  new GridBagConstraints(0, 6, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+
+		HoughparamHF.add(Unstability_ScoreS,  new GridBagConstraints(0, 7, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+		   
+		HoughparamHF.add(minSizeText,  new GridBagConstraints(0, 8, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+
+		HoughparamHF.add(minSizeS,  new GridBagConstraints(0, 9, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+		  
+		HoughparamHF.add(maxSizeText,  new GridBagConstraints(0, 10, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+		 
+		HoughparamHF.add(maxSizeS,  new GridBagConstraints(0, 11, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+		 
+		
+
+		HoughparamHF.setBorder(houghborder);
+		
+		
+		 panelFourth.add(HoughparamHF, new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+		
+		Optimize.add(AdvancedOptions, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+		 
+		Optimize.add(Finalize, new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+		
+		Optimize.add(Record, new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+		
+		Optimize.setBorder(optborder);
+	
+		 panelFourth.add(Optimize, new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+		
 		inputFieldradi.addTextListener(new RadiusListener(this));
-
+		Finalize.addActionListener(new SkipFramesandTrackendsListener(this, starttime, endtime));
+		Record.addActionListener(new BatchModeListener(this));
+		AdvancedOptions.addItemListener(new AdvancedTrackerListener(this));
+	
 		threshold.addAdjustmentListener(new ThresholdHoughHFListener(this, thresholdText, thresholdHoughMin,
 				thresholdHoughMax, scrollbarSize, threshold));
 
@@ -1728,133 +1548,113 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	}
 
 	public void UpdateMser() {
+	
+		
+		panelFourth.removeAll();
 		FindLinesViaMSER = true;
 		FindLinesViaHOUGH = false;
 		FindLinesViaMSERwHOUGH = false;
-		inputradi = new JLabel("Radius Factor for Canny Edge with Mean filter(pixel units): ");
-		inputFieldradi = new TextField();
-		inputFieldradi.setColumns(10);
-		inputFieldradi.setText(String.valueOf(radiusfactor));
-		final GridBagLayout layout = new GridBagLayout();
-		final GridBagConstraints c = new GridBagConstraints();
-		panelFourth.removeAll();
-		final Label Step = new Label("Step 4", Label.CENTER);
+		
+		final Button Record = new Button("Save program parameters for batch mode");
+		final JButton Finalize = new JButton("Start tracking");
 		panelFourth.setLayout(layout);
-		panelFourth.add(Step, c);
+		MserparamHF.setLayout(layout);
+		Optimize.setLayout(layout);
+		
+		Border msborder = new CompoundBorder(new TitledBorder("MSER parameters"), new EmptyBorder(c.insets));
+		Border optborder = new CompoundBorder(new TitledBorder("Tracker options"), new EmptyBorder(c.insets));
+		
 		final Scrollbar deltaS = new Scrollbar(Scrollbar.HORIZONTAL, deltaInit, 10, 0, 10 + scrollbarSize);
-		final Scrollbar Unstability_ScoreS = new Scrollbar(Scrollbar.HORIZONTAL, Unstability_ScoreInit, 10, 0,
-				10 + scrollbarSize);
+		final Scrollbar Unstability_ScoreS = new Scrollbar(Scrollbar.HORIZONTAL, Unstability_ScoreInit, 10, 0, 10 + scrollbarSize);
 		final Scrollbar minDiversityS = new Scrollbar(Scrollbar.HORIZONTAL, minDiversityInit, 10, 0,
 				10 + scrollbarSize);
 		final Scrollbar minSizeS = new Scrollbar(Scrollbar.HORIZONTAL, minSizeInit, 10, 0, 10 + scrollbarSize);
 		final Scrollbar maxSizeS = new Scrollbar(Scrollbar.HORIZONTAL, maxSizeInit, 10, 0, 10 + scrollbarSize);
+	
+		Unstability_Score = computeValueFromScrollbarPosition(Unstability_ScoreInit, Unstability_ScoreMin, Unstability_ScoreMax, 
+				scrollbarSize);
+		delta = computeValueFromScrollbarPosition(deltaInit, 
+				deltaMin, deltaMax, scrollbarSize);
+		minDiversity = computeValueFromScrollbarPosition(minDiversityInit, minDiversityMin, 
+				minDiversityMax,
+				scrollbarSize);
+		minSize = (int) computeValueFromScrollbarPosition(minSizeInit, 
+				minSizemin, minSizemax, scrollbarSize);
+		maxSize = (int) computeValueFromScrollbarPosition(maxSizeInit, 
+				maxSizemin, maxSizemax, scrollbarSize);
 
-		final Label deltaText = new Label("Grey Level Seperation between Components = " + delta, Label.CENTER);
-		final Label Unstability_ScoreText = new Label("Unstability Score = " + Unstability_Score, Label.CENTER);
-		final Label minDiversityText = new Label("minDiversity = " + minDiversity, Label.CENTER);
-		final Label minSizeText = new Label("Min # of pixels inside MSER Ellipses = " + minSize, Label.CENTER);
-		final Label maxSizeText = new Label("Max # of pixels inside MSER Ellipses = " + maxSize, Label.CENTER);
-		final Checkbox finalizechoices = new Checkbox("Finalize Choices", false);
-		final Checkbox min = new Checkbox("Look for Minima ", darktobright);
-		inputLabelX = new JLabel("Enter start time point for tracking");
-		inputFieldX = new TextField();
-		inputFieldX.setColumns(5);
+		final Label deltaText = new Label("Intensity threshold = " + delta, Label.CENTER);
+		final Label Unstability_ScoreText = new Label("Unstability score = " + Unstability_Score, Label.CENTER);
+		final Label minDiversityText = new Label("minDiversity = " +minDiversity, Label.CENTER);
+		final Label minSizeText = new Label("Min size of red ellipses = " + minSize, Label.CENTER);
+		final Label maxSizeText = new Label("Max size of red ellipses = " + maxSize, Label.CENTER);
 
-		inputLabelY = new JLabel("Enter end time point for tracking");
-		inputFieldY = new TextField();
-		inputFieldY.setColumns(10);
-		inputFieldX.setText(String.valueOf(2));
-		inputFieldY.setText(String.valueOf(thirdDimensionSize));
-		final Button ComputeTree = new Button("Compute Tree and display");
-		/* Location */
+		
 
-		final Label Update = new Label("Update parameters for dynamic channel");
-		Update.setBackground(new Color(1, 0, 1));
-		Update.setForeground(new Color(255, 255, 255));
-		panelFourth.setLayout(layout);
+		
+		final Label MSparam = new Label("Determine MSER parameters");
+		MSparam.setBackground(new Color(1, 0, 1));
+		MSparam.setForeground(new Color(255, 255, 255));
 
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.gridx = 0;
-		c.gridy = 0;
-		c.weightx = 4;
-		c.weighty = 1.5;
-		++c.gridy;
-		panelFourth.add(Update, c);
-		++c.gridy;
-		panelFourth.add(inputradi, c);
-		++c.gridy;
-		c.insets = new Insets(10, 10, 10, 0);
-		panelFourth.add(inputFieldradi, c);
-		++c.gridy;
-		panelFourth.add(deltaText, c);
-
-		++c.gridy;
-		panelFourth.add(deltaS, c);
-
-		++c.gridy;
-
-		panelFourth.add(Unstability_ScoreText, c);
-
-		++c.gridy;
-		panelFourth.add(Unstability_ScoreS, c);
-		/*
-		 * ++c.gridy;
-		 * 
-		 * panelFourth.add(minDiversityText, c);
-		 * 
-		 * ++c.gridy; panelFourth.add(minDiversityS, c);
-		 */
-		++c.gridy;
-
-		panelFourth.add(minSizeText, c);
-
-		++c.gridy;
-		panelFourth.add(minSizeS, c);
-
-		++c.gridy;
-
-		panelFourth.add(maxSizeText, c);
-
-		++c.gridy;
-		panelFourth.add(maxSizeS, c);
-		++c.gridy;
-		c.insets = new Insets(10, 10, 10, 0);
-		panelFourth.add(inputLabelX, c);
-
-		++c.gridy;
-		c.insets = new Insets(10, 10, 10, 0);
-		panelFourth.add(inputFieldX, c);
-
-		++c.gridy;
-		c.insets = new Insets(10, 10, 10, 0);
-		panelFourth.add(inputLabelY, c);
-		++c.gridy;
-		c.insets = new Insets(10, 10, 10, 0);
-		panelFourth.add(inputFieldY, c);
-		++c.gridy;
-		c.insets = new Insets(10, 10, 10, 0);
-		panelFourth.add(finalizechoices, c);
-
-		deltaS.addAdjustmentListener(new DeltaListener(this, deltaText, deltaMin, deltaMax, scrollbarSize, deltaS));
-
-		Unstability_ScoreS.addAdjustmentListener(new Unstability_ScoreListener(this, Unstability_ScoreText,
-				Unstability_ScoreMin, Unstability_ScoreMax, scrollbarSize, Unstability_ScoreS));
-
-		minDiversityS.addAdjustmentListener(new MinDiversityListener(this, minDiversityText, minDiversityMin,
-				minDiversityMax, scrollbarSize, minDiversityS));
-
-		minSizeS.addAdjustmentListener(
-				new MinSizeListener(this, minSizeText, minSizemin, minSizemax, scrollbarSize, minSizeS));
-
-		maxSizeS.addAdjustmentListener(
-				new MaxSizeListener(this, maxSizeText, maxSizemin, maxSizemax, scrollbarSize, maxSizeS));
-		inputFieldX.addTextListener(new BeginTrackListener(this));
-		inputFieldY.addTextListener(new EndTrackListener(this));
-		min.addItemListener(new DarktobrightListener(this));
+		final Checkbox AdvancedOptions = new Checkbox("Advanced Optimizer Options ", AdvancedChoiceSeeds);
 		DefaultModelHF loaddefault = new DefaultModelHF(this);
 		loaddefault.LoadDefault();
+		
+		
+		
+		panelFourth.add(Cannychoice, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+		
+		
+		MserparamHF.add(deltaText,  new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+		 
+		MserparamHF.add(deltaS,  new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+
+		MserparamHF.add(Unstability_ScoreText,  new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+
+		MserparamHF.add(Unstability_ScoreS,  new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+		   
+		MserparamHF.add(minSizeText,  new GridBagConstraints(0, 4, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+
+		MserparamHF.add(minSizeS,  new GridBagConstraints(0, 5, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+		  
+		MserparamHF.add(maxSizeText,  new GridBagConstraints(0, 6, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+		 
+		MserparamHF.add(maxSizeS,  new GridBagConstraints(0, 7, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+		 
+		
+
+		MserparamHF.setBorder(msborder);
+		
+		 panelFourth.add(MserparamHF, new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+		
+		Optimize.add(AdvancedOptions, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+		 
+		Optimize.add(Finalize, new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+		
+		Optimize.add(Record, new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+		
+		Optimize.setBorder(optborder);
+	
+		 panelFourth.add(Optimize, new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+		
 		inputFieldradi.addTextListener(new RadiusListener(this));
-		finalizechoices.addItemListener(new FinalizechoicesListener(this));
+		Finalize.addActionListener(new SkipFramesandTrackendsListener(this, starttime, endtime));
+		Record.addActionListener(new BatchModeListener(this));
+		AdvancedOptions.addItemListener(new AdvancedTrackerListener(this));
 		panelFourth.validate();
 		panelFourth.repaint();
 		Cardframe.pack();
@@ -2403,10 +2203,9 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 				"Initial Spacing between Gaussians along the Polynomial curve = G * Min(Psf), G (enter positive number ) = ",
 				Inispacing / Math.min(psf[0], psf[1]), 2);
 
-		gd.addNumericField("Maximum direction change per frame (pixels) ", maxdist, 2);
+		gd.addNumericField("Maximum direction change per frame (in degrees)", maxdist, 2);
 		gd.addNumericField("Number of Gaussians for mask fits ", numgaussians, 2);
-		gd.addStringField("Choose a different Directory?:", usefolder);
-		gd.addStringField("Choose a different filename?:", addToName);
+		
 		gd.showDialog();
 		indexmodel = gd.getNextChoiceIndex();
 		Domask = gd.getNextBoolean();
@@ -2423,8 +2222,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		maxdist = gd.getNextNumber();
 
 		numgaussians = (int) gd.getNextNumber();
-		usefolder = gd.getNextString();
-		addToName = gd.getNextString();
+	
 
 		return !gd.wasCanceled();
 	}

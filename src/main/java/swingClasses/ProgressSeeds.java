@@ -1,10 +1,13 @@
 package swingClasses;
 
 import java.awt.BorderLayout;
+import java.awt.GridBagConstraints;
+import java.awt.Insets;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
+import javax.swing.JPanel;
 import javax.swing.SwingWorker;
 
 import LineModels.UseLineModel.UserChoiceModel;
@@ -20,6 +23,7 @@ import lineFinder.LinefinderInteractiveHough;
 import lineFinder.LinefinderInteractiveMSER;
 import lineFinder.LinefinderInteractiveMSERwHough;
 import listeners.SecondPanel;
+import listeners.ThirdPanel;
 import mpicbg.imglib.util.Util;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.type.numeric.real.FloatType;
@@ -184,6 +188,17 @@ final Interactive_MTDoubleChannelBasic child;
 					child.CardframeSimple.validate();
 					SecondPanel paintsecond = new SecondPanel(parent, child);
 					paintsecond.Paint();
+			}
+			if (child==null){
+			
+			
+				parent.controlnext.setVisible(true);
+				
+			
+			ThirdPanel paintthird = new ThirdPanel(parent);
+			paintthird.Paint();
+			
+			
 			}
 			
 			parent.jpb.setIndeterminate(false);

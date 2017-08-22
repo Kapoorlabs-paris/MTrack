@@ -12,6 +12,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JComboBox;
+import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
 
 import interactiveMT.Interactive_MTDoubleChannel;
 import interactiveMT.Interactive_MTDoubleChannel.ValueChange;
@@ -29,13 +33,17 @@ public class MethodListener implements ActionListener {
 		
 		this.parent = parent;
 		this.choice = choice;
-		
 	}
 	
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		int selectedindex = choice.getSelectedIndex();
+		
+		parent.controlnext.setVisible(true);
+	
+	
+		
 		
 		if (selectedindex == 0){
 			
@@ -48,13 +56,11 @@ public class MethodListener implements ActionListener {
 			parent.radiusfactor = Double.parseDouble(parent.inputFieldradi.getText());
 			
 			
-			final GridBagLayout layout = new GridBagLayout();
-			final GridBagConstraints c = new GridBagConstraints();
-			final Label Step = new Label("Step 2", Label.CENTER);
+			
 
-			parent.panelSecond.setLayout(layout);
-
-			parent.panelSecond.add(Step, c);
+			parent.panelSecond.setLayout(parent.layout);
+			parent.Mserparam.setLayout(parent.layout);
+			Border msborder = new CompoundBorder(new TitledBorder("MSER parameters"), new EmptyBorder(parent.c.insets));
 			final Scrollbar deltaS = new Scrollbar(Scrollbar.HORIZONTAL, parent.deltaInit, 10, 0, 10 + parent.scrollbarSize);
 			final Scrollbar Unstability_ScoreS = new Scrollbar(Scrollbar.HORIZONTAL, parent.Unstability_ScoreInit, 10, 0, 10 + parent.scrollbarSize);
 			final Scrollbar minDiversityS = new Scrollbar(Scrollbar.HORIZONTAL, parent.minDiversityInit, 10, 0,
@@ -76,14 +82,15 @@ public class MethodListener implements ActionListener {
 			parent.maxSize = (int) parent.computeValueFromScrollbarPosition(parent.maxSizeInit, 
 					parent.maxSizemin, parent.maxSizemax, parent.scrollbarSize);
 
-			final Label deltaText = new Label("Grey Level Seperation between Components = " + parent.delta, Label.CENTER);
-			final Label Unstability_ScoreText = new Label("Unstability Score = " + parent.Unstability_Score, Label.CENTER);
+			final Label deltaText = new Label("Intensity threshold = " + parent.delta, Label.CENTER);
+			final Label Unstability_ScoreText = new Label("Unstability score = " + parent.Unstability_Score, Label.CENTER);
 			final Label minDiversityText = new Label("minDiversity = " +parent.minDiversity, Label.CENTER);
-			final Label minSizeText = new Label("Min # of pixels inside MSER Ellipses = " + parent.minSize, Label.CENTER);
-			final Label maxSizeText = new Label("Max # of pixels inside MSER Ellipses = " + parent.maxSize, Label.CENTER);
+			final Label minSizeText = new Label("Min size of red ellipses = " + parent.minSize, Label.CENTER);
+			final Label maxSizeText = new Label("Max size of red ellipses = " + parent.maxSize, Label.CENTER);
 
 			
 
+			
 			final Label MSparam = new Label("Determine MSER parameters");
 			MSparam.setBackground(new Color(1, 0, 1));
 			MSparam.setForeground(new Color(255, 255, 255));
@@ -93,62 +100,49 @@ public class MethodListener implements ActionListener {
 			loaddefault.LoadDefault();
 			
 			/* Location */
-			parent.panelSecond.setLayout(layout);
-
-			c.fill = GridBagConstraints.HORIZONTAL;
-			c.gridx = 0;
-			c.gridy = 0;
-			c.weightx = 4;
-			c.weighty = 1.5;
-
-			++c.gridy;
-
-			parent.panelSecond.add(MSparam, c);
-
-			++c.gridy;
-
-			parent.panelSecond.add(deltaText, c);
-
-			++c.gridy;
-			parent.panelSecond.add(deltaS, c);
-
-			++c.gridy;
-
-			parent.panelSecond.add(Unstability_ScoreText, c);
-
-			++c.gridy;
-			parent.panelSecond.add(Unstability_ScoreS, c);
-/*
-			++c.gridy;
-
-			parent.panelSecond.add(minDiversityText, c);
-
-			++c.gridy;
-			parent.panelSecond.add(minDiversityS, c);
-*/
-			++c.gridy;
-
-			parent.panelSecond.add(minSizeText, c);
-
-			++c.gridy;
-			parent.panelSecond.add(minSizeS, c);
-
-			++c.gridy;
-
-			parent.panelSecond.add(maxSizeText, c);
-
-			++c.gridy;
-			parent.panelSecond.add(maxSizeS, c);
+			parent.panelSecond.setLayout(parent.layout);
 
 			
-			++c.gridy;
-			c.insets = new Insets(10, 175, 0, 175);
-			parent.panelSecond.add(AdvancedOptions, c);
+			 parent.Mserparam.add(deltaText,  new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+			 
+			 parent.Mserparam.add(deltaS,  new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 
+			 parent.Mserparam.add(Unstability_ScoreText,  new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 
-			++c.gridy;
-			c.insets = new Insets(10, 180, 0, 180);
-			parent.panelSecond.add(FindLinesListener, c);
+			 parent.Mserparam.add(Unstability_ScoreS,  new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+			   
+			 parent.Mserparam.add(minSizeText,  new GridBagConstraints(0, 4, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+
+			 parent.Mserparam.add(minSizeS,  new GridBagConstraints(0, 5, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+			  
+			 parent.Mserparam.add(maxSizeText,  new GridBagConstraints(0, 6, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+			 
+			 parent.Mserparam.add(maxSizeS,  new GridBagConstraints(0, 7, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+			 
+			 parent.Mserparam.add(AdvancedOptions, new GridBagConstraints(0,8, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+			 
+			 parent.Mserparam.add(FindLinesListener, new GridBagConstraints(0,9, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+
+			 parent.Mserparam.setBorder(msborder);
+			
+			 parent.panelSecond.add(parent.Mserparam, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+			
+			
+			
+			
+			
+		
 
 			
 		//	++c.gridy;
@@ -190,26 +184,22 @@ public class MethodListener implements ActionListener {
 			parent.FindLinesViaMSER = false;
 			parent.FindLinesViaMSERwHOUGH = false;
 			/* Instantiation */
-			final GridBagLayout layout = new GridBagLayout();
-			final GridBagConstraints c = new GridBagConstraints();
+			
 			if (parent.inputFieldradi.getText().length() > 0)
 			parent.radiusfactor = Double.parseDouble(parent.inputFieldradi.getText());
 
 			parent.panelSecond.removeAll();
-			final Label Step = new Label("Step 2", Label.CENTER);
+			
 
-			parent.panelSecond.setLayout(layout);
-			parent.panelSecond.add(Step, c);
-			final Label exthresholdText = new Label("threshold = threshold to create Bitimg for watershedding.",
-					Label.CENTER);
-			final Label exthetaText = new Label("thetaPerPixel = Pixel Size in theta direction for Hough space.",
-					Label.CENTER);
-			final Label exrhoText = new Label("rhoPerPixel = Pixel Size in rho direction for Hough space.",
-					Label.CENTER);
+			parent.panelSecond.setLayout(parent.layout);
+		    parent.Houghparam.setLayout(parent.layout);
+		
 
 			final Label thresholdText = new Label("thresholdValue = " + parent.thresholdHough, Label.CENTER);
 			final Label thetaText = new Label("Size of Hough Space in Theta = " + parent.thetaPerPixel, Label.CENTER);
 			final Label rhoText = new Label("Size of Hough Space in Rho = " + parent.rhoPerPixel, Label.CENTER);
+			
+			
 			final Scrollbar threshold = new Scrollbar(Scrollbar.HORIZONTAL, (int) parent.thresholdHoughInit, 10, 0,
 					10 + parent.scrollbarSize);
 			parent.thresholdHough = parent.computeValueFromScrollbarPosition((int) parent.thresholdHoughInit, parent.thresholdHoughMin,
@@ -237,53 +227,54 @@ public class MethodListener implements ActionListener {
 			DefaultModel loaddefault = new DefaultModel(parent);
 			loaddefault.LoadDefault();
 			/* Location */
-			parent.panelSecond.setLayout(layout);
+			parent.panelSecond.setLayout(parent.layout);
 
-			c.fill = GridBagConstraints.HORIZONTAL;
-			c.gridx = 0;
-			c.gridy = 0;
-			c.weightx = 4;
-			c.weighty = 1.5;
-			++c.gridy;
-			parent.panelSecond.add(Houghparam, c);
-
+			parent.c.fill = GridBagConstraints.HORIZONTAL;
+			parent.c.gridx = 0;
+			parent.c.gridy = 0;
+			parent.c.weightx = 4;
+			parent.c.weighty = 1.5;
 			
-			++c.gridy;
+			Border houghborder = new CompoundBorder(new TitledBorder("Hough Transform parameters"), new EmptyBorder(parent.c.insets));
+			
+			 parent.Houghparam.add(thresholdText,  new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+			 
+			 parent.Houghparam.add(threshold,  new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 
-			parent.panelSecond.add(thresholdText, c);
-			++c.gridy;
+			 parent.Houghparam.add(thetaText,  new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 
-			parent.panelSecond.add(threshold, c);
-			++c.gridy;
+			 parent.Houghparam.add(thetaSize,  new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+			   
+			 parent.Houghparam.add(rhoText,  new GridBagConstraints(0, 4, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 
-			parent.panelSecond.add(thetaText, c);
-			++c.gridy;
-			parent.panelSecond.add(thetaSize, c);
-			++c.gridy;
+			 parent.Houghparam.add(rhoSize,  new GridBagConstraints(0, 5, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+			  
+			 parent.Houghparam.add(displayBit,  new GridBagConstraints(0, 6, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+			 
+			 parent.Houghparam.add(displayWatershed,  new GridBagConstraints(0, 7, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+			 
+			 parent.Houghparam.add(AdvancedOptions, new GridBagConstraints(0, 8, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+			 
+			 parent.Houghparam.add(FindLinesListener, new GridBagConstraints(0, 9, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 
-			parent.panelSecond.add(rhoText, c);
-
-			++c.gridy;
-
-			parent.panelSecond.add(rhoSize, c);
-
-			++c.gridy;
-			c.insets = new Insets(10, 175, 0, 175);
-			parent.panelSecond.add(displayBit, c);
-
-			++c.gridy;
-			c.insets = new Insets(10, 175, 0, 175);
-			parent.panelSecond.add(displayWatershed, c);
-		
+			 parent.Houghparam.setBorder(houghborder);
+			
+			 parent.panelSecond.add(parent.Houghparam, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 			
 			
-			++c.gridy;
-			c.insets = new Insets(10, 175, 0, 175);
-			parent.panelSecond.add(AdvancedOptions, c);
-			++c.gridy;
-
-			c.insets = new Insets(10, 175, 0, 175);
-			parent.panelSecond.add(FindLinesListener, c);
+			
+			
 
 			threshold.addAdjustmentListener(new ThresholdHoughListener(parent, thresholdText, parent.thresholdHoughMin,
 					parent.thresholdHoughMax, parent.scrollbarSize, threshold));
@@ -311,16 +302,16 @@ public class MethodListener implements ActionListener {
 			parent.FindLinesViaMSER = false;
 			parent.FindLinesViaHOUGH = false;
 
-			final GridBagLayout layout = new GridBagLayout();
-			final GridBagConstraints c = new GridBagConstraints();
+			
 			parent.panelSecond.removeAll();
-			final Label Step = new Label("Step 2", Label.CENTER);
 			if (parent.inputFieldradi.getText().length() > 0)
 			parent.radiusfactor = Double.parseDouble(parent.inputFieldradi.getText());
 
-			parent.panelSecond.setLayout(layout);
+			parent.panelSecond.setLayout(parent.layout);
+			parent.MserwHoughparam.setLayout(parent.layout);
+			Border mserwhoughborder = new CompoundBorder(new TitledBorder("Mser w Hough Transform parameters"), new EmptyBorder(parent.c.insets));
 			
-
+			
 			final Checkbox rhoEnable = new Checkbox("Enable Manual Adjustment of rhoPerPixel", parent.enablerhoPerPixel);
 
 			final Scrollbar thetaSize = new Scrollbar(Scrollbar.HORIZONTAL, (int) parent.thetaPerPixelInit, 10, 0,
@@ -371,81 +362,78 @@ public class MethodListener implements ActionListener {
 			loaddefault.LoadDefault();
 			/* Location */
 
-			parent.panelSecond.setLayout(layout);
+			parent.panelSecond.setLayout(parent.layout);
 
-			c.fill = GridBagConstraints.HORIZONTAL;
-			c.gridx = 0;
-			c.gridy = 0;
-			c.weightx = 4;
-			c.weighty = 1.5;
-
-			
-			++c.gridy;
-			parent.panelSecond.add(Step, c);
-			
-			++c.gridy;
-			parent.panelSecond.add(deltaText, c);
-
-			++c.gridy;
-			parent.panelSecond.add(deltaS, c);
-
-			++c.gridy;
-
-			parent.panelSecond.add(Unstability_ScoreText, c);
-
-			++c.gridy;
-			parent.panelSecond.add(Unstability_ScoreS, c);
-
-			/*
-			++c.gridy;
-
-			parent.panelSecond.add(minDiversityText, c);
-
-			++c.gridy;
-			parent.panelSecond.add(minDiversityS, c);
-
-			*/
-			++c.gridy;
-
-			parent.panelSecond.add(minSizeText, c);
-
-			++c.gridy;
-			parent.panelSecond.add(minSizeS, c);
-
-			++c.gridy;
-
-			parent.panelSecond.add(maxSizeText, c);
-
-			++c.gridy;
-			parent.panelSecond.add(maxSizeS, c);
-
-		
-		
-
-			++c.gridy;
-			parent.panelSecond.add(thetaText, c);
-			++c.gridy;
-			parent.panelSecond.add(thetaSize, c);
-			++c.gridy;
-
-			parent.panelSecond.add(rhoText, c);
-
-			++c.gridy;
-
-			parent.panelSecond.add(rhoSize, c);
-
-			++c.gridy;
-			c.insets = new Insets(0, 175, 0, 175);
-			parent.panelSecond.add(rhoEnable, c);
+			parent.c.fill = GridBagConstraints.HORIZONTAL;
+			parent.c.gridx = 0;
+			parent.c.gridy = 0;
+			parent.c.weightx = 4;
+			parent.c.weighty = 1.5;
 
 			
-			++c.gridy;
-			c.insets = new Insets(10, 175, 0, 175);
-			parent.panelSecond.add(AdvancedOptions, c);
 			
-			++c.gridy;
-			c.insets = new Insets(10, 175, 0, 175);
-			parent.panelSecond.add(FindLinesListener, c);
+			 parent.MserwHoughparam.add(deltaText,  new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+			 
+			 parent.MserwHoughparam.add(deltaS,  new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+
+			 parent.MserwHoughparam.add(Unstability_ScoreText,  new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+
+			 parent.MserwHoughparam.add(Unstability_ScoreS,  new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+			   
+			 parent.MserwHoughparam.add(minSizeText,  new GridBagConstraints(0, 4, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+
+			 parent.MserwHoughparam.add(minSizeS,  new GridBagConstraints(0, 5, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+			  
+			 parent.MserwHoughparam.add(maxSizeText,  new GridBagConstraints(0, 6, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+			 
+			 parent.MserwHoughparam.add(maxSizeS,  new GridBagConstraints(0, 7, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+			 
+			  
+			 parent.MserwHoughparam.add(thetaText,  new GridBagConstraints(0, 8, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+			 
+			 parent.MserwHoughparam.add(thetaSize,  new GridBagConstraints(0, 9, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+			 
+			 parent.MserwHoughparam.add(rhoText,  new GridBagConstraints(0, 10, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+			 
+			 parent.MserwHoughparam.add(rhoSize,  new GridBagConstraints(0, 11, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+			 
+			 parent.MserwHoughparam.add(rhoEnable,  new GridBagConstraints(0, 12, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+
+			 
+			 
+			 
+			 
+			 
+			 
+			 parent.MserwHoughparam.add(AdvancedOptions, new GridBagConstraints(0, 13, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+			 
+			 parent.MserwHoughparam.add(FindLinesListener, new GridBagConstraints(0, 14, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+
+			 parent.MserwHoughparam.setBorder(mserwhoughborder);
+			
+			 parent.panelSecond.add(parent.MserwHoughparam, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+			
+			
+			
+			
+			
+			
 
 			deltaS.addAdjustmentListener(new DeltaListener(parent, deltaText, parent.deltaMin, parent.deltaMax, parent.scrollbarSize, deltaS));
 
@@ -475,6 +463,7 @@ public class MethodListener implements ActionListener {
 			parent.panelSecond.validate();
 			parent.panelSecond.repaint();
 
+			
 			parent.Cardframe.pack();
 			parent.updatePreview(ValueChange.SHOWMSER);
 		}
