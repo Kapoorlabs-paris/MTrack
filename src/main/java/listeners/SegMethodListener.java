@@ -49,41 +49,7 @@ public class SegMethodListener implements ActionListener {
 		
 		parent.controlnext.setVisible(true);
 		
-	
-		
-		
-		if (selectedindex == 0){
-			
-			
-			parent.FindLinesViaHOUGH = true;
-			parent.doSegmentation = true;
-			
-			parent.thirdDimension = parent.starttime;
-			FinalPoint finalpoint = new FinalPoint(parent);
-			finalpoint.FinalizeEnds();
-
-			if (parent.thirdDimension > parent.thirdDimensionSize) {
-				IJ.log("Max frame number exceeded, moving to last frame instead");
-				parent.thirdDimension = parent.thirdDimensionSize;
-				parent.CurrentView = util.CopyUtils.getCurrentView(parent.originalimg, parent.thirdDimension,
-						parent.thirdDimensionSize);
-				parent.CurrentPreprocessedView = util.CopyUtils.getCurrentPreView(parent.originalPreprocessedimg,
-						parent.thirdDimension, parent.thirdDimensionSize);
-			} else {
-
-				parent.CurrentView = util.CopyUtils.getCurrentView(parent.originalimg, parent.thirdDimension,
-						parent.thirdDimensionSize);
-				parent.CurrentPreprocessedView = util.CopyUtils.getCurrentPreView(parent.originalPreprocessedimg,
-						parent.thirdDimension, parent.thirdDimensionSize);
-			}
-			parent.updatePreview(ValueChange.THIRDDIM);
-			parent.UpdateHough();
-
-			
-			
-		}
-		
-		if (selectedindex == 1){
+          if (selectedindex == 0){
 			
 			
 			parent.FindLinesViaMSER = true;
@@ -116,6 +82,40 @@ public class SegMethodListener implements ActionListener {
 			
 
 		}
+		
+		
+		if (selectedindex == 1){
+			
+			
+			parent.FindLinesViaHOUGH = true;
+			parent.doSegmentation = true;
+			
+			parent.thirdDimension = parent.starttime;
+			FinalPoint finalpoint = new FinalPoint(parent);
+			finalpoint.FinalizeEnds();
+
+			if (parent.thirdDimension > parent.thirdDimensionSize) {
+				IJ.log("Max frame number exceeded, moving to last frame instead");
+				parent.thirdDimension = parent.thirdDimensionSize;
+				parent.CurrentView = util.CopyUtils.getCurrentView(parent.originalimg, parent.thirdDimension,
+						parent.thirdDimensionSize);
+				parent.CurrentPreprocessedView = util.CopyUtils.getCurrentPreView(parent.originalPreprocessedimg,
+						parent.thirdDimension, parent.thirdDimensionSize);
+			} else {
+
+				parent.CurrentView = util.CopyUtils.getCurrentView(parent.originalimg, parent.thirdDimension,
+						parent.thirdDimensionSize);
+				parent.CurrentPreprocessedView = util.CopyUtils.getCurrentPreView(parent.originalPreprocessedimg,
+						parent.thirdDimension, parent.thirdDimensionSize);
+			}
+			parent.updatePreview(ValueChange.THIRDDIM);
+			parent.UpdateHough();
+
+			
+			
+		}
+		
+		
 		
 		
 		parent.controlnext.removeAll();

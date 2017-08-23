@@ -66,7 +66,7 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 	public double termepsilon = 1e-3;
 	// Mask fits iteration param
 	public int iterations = 200;
-	public double maxdist = 20;
+	public double maxdist = 30;
 	public double cutoffdistance = 15;
 	public boolean halfgaussian = false;
 	public double Intensityratio;
@@ -79,17 +79,16 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 	double percent = 0;
 	int maxghost = 5;
 
-	
-	public void setMaxdist (double maxdist) {
-		
+	public void setMaxdist(double maxdist) {
+
 		this.maxdist = maxdist;
 	}
-	
-	public double getMaxdist(){
-		
+
+	public double getMaxdist() {
+
 		return maxdist;
 	}
-	
+
 	public void setInispacing(double Inispacing) {
 
 		this.Inispacing = Inispacing;
@@ -147,7 +146,8 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 
 	public SubpixelVelocityUserSeed(final RandomAccessibleInterval<FloatType> source, final LinefinderHF linefinder,
 			final ArrayList<Indexedlength> Userframe, final double[] psf, final int framenumber,
-			final UserChoiceModel model, final boolean DoMask, final JProgressBar jpb, final int thirdDimsize, int startframe) {
+			final UserChoiceModel model, final boolean DoMask, final JProgressBar jpb, final int thirdDimsize,
+			int startframe) {
 
 		linefinder.checkInput();
 		linefinder.process();
@@ -183,6 +183,9 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 
 	@Override
 	public boolean process() {
+		double originalslope = 0;
+
+		double originalintercept = 0;
 
 		Intensityratio = getIntensityratio();
 		Inispacing = getInispacing();
@@ -190,25 +193,12 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 		final_paramlistuser = new ArrayList<Indexedlength>();
 
 		startinuserframe = new ArrayList<Trackproperties>();
-		final int oldframenumber = Userframe.get(Userframe.size() - 1).framenumber;
 		for (int index = 0; index < Userframe.size(); ++index) {
-
-			final int framediff = framenumber - oldframenumber;
 
 			percent = (Math.round(100 * (index + 1) / (Userframe.size())));
 
-			 double originalslope = Userframe.get(index).originalslope;
+			if (framenumber == startframe + 1) {
 
-			
-			
-			
-			 double originalintercept = Userframe.get(index).originalintercept;
-
-			
-			
-              if (framenumber == startframe + 1){
-				
-				
 				originalslope = Userframe.get(index).slope;
 				originalintercept = Userframe.get(index).intercept;
 			}
@@ -234,26 +224,23 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 
 				labelindex = labelstart.get(0);
 
-			
 			if (labelindex != Integer.MIN_VALUE) {
-				paramnextframestart = Getfinaltrackparam(Userframe.get(index), labelstart.get(0), psf,
-						startframe);
+				paramnextframestart = Getfinaltrackparam(Userframe.get(index), labelstart.get(0), psf, startframe);
 
 				double min = Double.MAX_VALUE;
 				double[] currentposini = paramnextframestart.currentpos;
 				double[] fixedposini = paramnextframestart.fixedpos;
 				double distmin = Distance(currentposini, fixedposini);
-				
+
 				if (labelstart.size() > 1) {
 					for (int j = 0; j < labelstart.size(); ++j) {
 						System.out.println("Fitting multiple Labels" + "User defined");
 						Indexedlength test = Getfinaltrackparam(Userframe.get(index), labelstart.get(j), psf,
 								startframe);
-						
+
 						double[] currentpos = test.currentpos;
 						double[] fixedpos = test.fixedpos;
-						double pointonline = fixedpos[1] - test.originalslope * fixedpos[0]
-								- test.originalintercept;
+						double pointonline = fixedpos[1] - test.originalslope * fixedpos[0] - test.originalintercept;
 						double dist = Distance(currentpos, fixedpos);
 						if (Math.abs(pointonline) < min) {
 							min = Math.abs(pointonline);
@@ -275,20 +262,19 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 			final double[] oldstartpoint = Userframe.get(index).currentpos;
 
 			double[] newstartpoint = paramnextframestart.currentpos;
-			double pointonline = newstartpoint[1] - originalslope * newstartpoint[0]
-					- originalintercept;
-			double oldpointonline = oldstartpoint[1] - originalslope * oldstartpoint[0]
-					- originalintercept;
-			double oldslope = originalslope;
+			double pointonline = newstartpoint[1] - originalslope * newstartpoint[0] - originalintercept;
+			double oldpointonline = oldstartpoint[1] - originalslope * oldstartpoint[0] - originalintercept;
+			double oldslope = Userframe.get(index).slope;
 			double newslope = paramnextframestart.slope;
-			double dist = Math.toDegrees(Math.abs(Math.atan(Math.toRadians(newslope)) - Math.atan(Math.toRadians(oldslope))));
-			System.out.println(dist);
-			if (dist > maxdist && framenumber > startframe + 1){
+			double dist = Math.toDegrees(Math.atan(Math.toRadians((newslope - oldslope) / (1 + newslope * oldslope))));
+
+			System.out.println("User" + dist);
+			if (Math.abs(dist) > maxdist && framenumber > startframe + 1) {
 				paramnextframestart = Userframe.get(index);
 				newstartpoint = oldstartpoint;
 			}
 			final_paramlistuser.add(paramnextframestart);
-			
+
 			final double newstartslope = paramnextframestart.slope;
 			final double newstartintercept = paramnextframestart.intercept;
 
@@ -439,12 +425,10 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 			final int rate) {
 
 		final double[] LMparam = MakerepeatedLineguess(iniparam, label, rate);
-		
-		
+
 		if (LMparam == null)
 			return iniparam;
 
-		
 		else {
 
 			final double[] inipos = iniparam.currentpos;
@@ -678,7 +662,6 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 
 				final int numgaussians = 2;
 
-				
 				if (DoMask) {
 
 					try {

@@ -798,6 +798,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 			preprocessedimp.setTitle("Active image" + " " + "time point : " + thirdDimension);
 			
+			preprocessedimp.getCanvas().removeMouseListener(ml);
 			newends.markend();
 			
 			}
@@ -1421,8 +1422,8 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		final Label deltaText = new Label("Intensity threshold = " + delta, Label.CENTER);
 		final Label Unstability_ScoreText = new Label("Unstability score = " + Unstability_Score, Label.CENTER);
 		final Label minDiversityText = new Label("minDiversity = " +minDiversity, Label.CENTER);
-		final Label minSizeText = new Label("Min size of red ellipses = " + minSize, Label.CENTER);
-		final Label maxSizeText = new Label("Max size of red ellipses = " + maxSize, Label.CENTER);
+		final Label minSizeText = new Label("Min size of ellipses = " + minSize, Label.CENTER);
+		final Label maxSizeText = new Label("Max size of ellipses = " + maxSize, Label.CENTER);
 
 		final Checkbox AdvancedOptions = new Checkbox("Advanced Optimizer Options ", AdvancedChoiceSeeds);
 		DefaultModelHF loaddefault = new DefaultModelHF(this);
@@ -1527,7 +1528,21 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		Finalize.addActionListener(new SkipFramesandTrackendsListener(this, starttime, endtime));
 		Record.addActionListener(new BatchModeListener(this));
 		AdvancedOptions.addItemListener(new AdvancedTrackerListener(this));
-	
+
+		 
+		deltaS.addAdjustmentListener(new DeltaListener(this, deltaText, deltaMin, deltaMax,scrollbarSize, deltaS));
+
+		Unstability_ScoreS.addAdjustmentListener(
+				new Unstability_ScoreListener(this, Unstability_ScoreText, Unstability_ScoreMin, Unstability_ScoreMax, scrollbarSize, Unstability_ScoreS));
+
+		minDiversityS.addAdjustmentListener(new MinDiversityListener(this, minDiversityText, minDiversityMin,
+				minDiversityMax, scrollbarSize, minDiversityS));
+
+		minSizeS.addAdjustmentListener(
+				new MinSizeListener(this, minSizeText, minSizemin, minSizemax, scrollbarSize, minSizeS));
+
+		maxSizeS.addAdjustmentListener(
+				new MaxSizeListener(this, maxSizeText, maxSizemin, maxSizemax, scrollbarSize, maxSizeS));
 		threshold.addAdjustmentListener(new ThresholdHoughHFListener(this, thresholdText, thresholdHoughMin,
 				thresholdHoughMax, scrollbarSize, threshold));
 
@@ -1584,8 +1599,8 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		final Label deltaText = new Label("Intensity threshold = " + delta, Label.CENTER);
 		final Label Unstability_ScoreText = new Label("Unstability score = " + Unstability_Score, Label.CENTER);
 		final Label minDiversityText = new Label("minDiversity = " +minDiversity, Label.CENTER);
-		final Label minSizeText = new Label("Min size of red ellipses = " + minSize, Label.CENTER);
-		final Label maxSizeText = new Label("Max size of red ellipses = " + maxSize, Label.CENTER);
+		final Label minSizeText = new Label("Min size of ellipses = " + minSize, Label.CENTER);
+		final Label maxSizeText = new Label("Max size of ellipses = " + maxSize, Label.CENTER);
 
 		
 
@@ -1676,7 +1691,21 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		
 			
 		 
-		 
+			deltaS.addAdjustmentListener(new DeltaListener(this, deltaText, deltaMin, deltaMax,scrollbarSize, deltaS));
+
+			Unstability_ScoreS.addAdjustmentListener(
+					new Unstability_ScoreListener(this, Unstability_ScoreText, Unstability_ScoreMin, Unstability_ScoreMax, scrollbarSize, Unstability_ScoreS));
+
+			minDiversityS.addAdjustmentListener(new MinDiversityListener(this, minDiversityText, minDiversityMin,
+					minDiversityMax, scrollbarSize, minDiversityS));
+
+			minSizeS.addAdjustmentListener(
+					new MinSizeListener(this, minSizeText, minSizemin, minSizemax, scrollbarSize, minSizeS));
+
+			maxSizeS.addAdjustmentListener(
+					new MaxSizeListener(this, maxSizeText, maxSizemin, maxSizemax, scrollbarSize, maxSizeS));
+
+
 		inputFieldradi.addTextListener(new RadiusListener(this));
 		Finalize.addActionListener(new SkipFramesandTrackendsListener(this, starttime, endtime));
 		Record.addActionListener(new BatchModeListener(this));

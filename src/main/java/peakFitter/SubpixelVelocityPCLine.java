@@ -296,17 +296,13 @@ public void setMaxdist (double maxdist) {
 
 				double[] newstartpoint = paramnextframestart.currentpos;
 
-				double pointonline = newstartpoint[1] - originalslope * newstartpoint[0]
-						- originalintercept;
+			
 				
-				double oldpointonline = oldstartpoint[1] - originalslope * oldstartpoint[0]
-						- originalintercept;
-				
-				double oldslope = PrevFrameparamstart.get(index).originalslope;
+				double oldslope = PrevFrameparamstart.get(index).slope;
 				double newslope = paramnextframestart.slope;
-				double dist = Math.toDegrees(Math.abs(Math.atan(Math.toRadians(newslope)) - Math.atan(Math.toRadians(oldslope))));
+				double dist = Math.toDegrees(Math.atan(Math.toRadians((newslope - oldslope)/(1 + newslope * oldslope))));
 				System.out.println(dist);
-				if (dist > maxdist && framenumber > startframe + 1){
+				if (Math.abs(dist) > maxdist && framenumber > startframe + 1){
 					paramnextframestart = PrevFrameparamstart.get(index);
 					newstartpoint = oldstartpoint;
 					
@@ -330,7 +326,6 @@ public void setMaxdist (double maxdist) {
 
 		for (int index = 0; index < PrevFrameparamend.size(); ++index) {
 			final int oldframenumber = PrevFrameparamend.get(PrevFrameparamend.size() - 1).framenumber;
-			final int framediff = framenumber - oldframenumber;
 
 			if (Trackstart.get(PrevFrameparamend.get(index).seedLabel) == Whichend.end
 					|| Trackstart.get(PrevFrameparamend.get(index).seedLabel) == Whichend.both) {
@@ -401,12 +396,12 @@ public void setMaxdist (double maxdist) {
 						- originalinterceptend;
 				double oldpointonline = oldendpoint[1] - originalslopeend * oldendpoint[0]
 						- originalinterceptend;
-				double oldslope = PrevFrameparamend.get(index).originalslope;
+				double oldslope = PrevFrameparamend.get(index).slope;
 				double newslope = paramnextframeend.slope;
-				double dist = Math.toDegrees(Math.abs(Math.atan(Math.toRadians(newslope)) - Math.atan(Math.toRadians(oldslope))));
+				double dist = Math.toDegrees(Math.atan(Math.toRadians((newslope - oldslope)/(1 + newslope * oldslope))));
 				System.out.println(dist);
 
-				if (dist > maxdist && framenumber > startframe + 1){
+				if (Math.abs(dist) > maxdist && framenumber > startframe + 1){
 					paramnextframeend = PrevFrameparamend.get(index);
 				    newendpoint = oldendpoint;	
 				}

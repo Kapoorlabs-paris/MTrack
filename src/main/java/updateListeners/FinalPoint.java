@@ -121,7 +121,7 @@ public class FinalPoint implements ActionListener {
 				mindistA = util.Boundingboxes.Distance(parent.ClickedPoints.get(index).getA(), endAmap.get(i));
 				mindistB = util.Boundingboxes.Distance(parent.ClickedPoints.get(index).getA(), endBmap.get(i));
 
-				if ( mindistA <= cutdist && mindistB > cutdist && parent.seedmap.get(i) != Whichend.end) {
+				if ( mindistA <= cutdist  && parent.seedmap.get(i) != Whichend.end) {
 
 					parent.seedmap.put(i, Whichend.start);
 
@@ -131,7 +131,7 @@ public class FinalPoint implements ActionListener {
 					parent.IDALL.add(seedpair);
 				}
 
-				else if (mindistB <= cutdist && mindistA > cutdist && parent.seedmap.get(i) != Whichend.start) {
+				else if (mindistB <= cutdist  && parent.seedmap.get(i) != Whichend.start) {
 
 					parent.seedmap.put(i, Whichend.end);
 
@@ -142,12 +142,12 @@ public class FinalPoint implements ActionListener {
 
 				}
 
-				else if (parent.seedmap.get(i) == Whichend.start && mindistB <= cutdist && mindistA > cutdist ) {
+				else if (parent.seedmap.get(i) == Whichend.start && mindistB <= cutdist  ) {
 					parent.seedmap.put(i, Whichend.both);
 
 				}
 
-				else if (parent.seedmap.get(i) == Whichend.end && mindistA <= cutdist && mindistB > cutdist) {
+				else if (parent.seedmap.get(i) == Whichend.end && mindistA <= cutdist ) {
 					parent.seedmap.put(i, Whichend.both);
 				}
 

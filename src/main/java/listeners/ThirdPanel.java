@@ -100,13 +100,11 @@ public class ThirdPanel {
 		
 		
 		
-		String[] SegMethod = { "DoWatershed +  MSER based segmentation ", "Do MSER based segmentation" };
+		String[] SegMethod = {  "Do MSER based segmentation", "Do Watershed +  MSER based segmentation " };
 		JComboBox<String> ChooseMethod = new JComboBox<String>(SegMethod);
 		
 		
-		CheckboxGroup Segmentation = new CheckboxGroup();
-		final Checkbox Doseg = new Checkbox("DoWatershed +  MSER based segmentation ", Segmentation, parent.doSegmentation);
-		final Checkbox DoMserseg = new Checkbox("Do MSER based segmentation", Segmentation, parent.doMserSegmentation);
+		
 		
 		
 		Deselect.add(LeftClick,new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,

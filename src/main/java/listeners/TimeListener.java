@@ -31,8 +31,7 @@ public class TimeListener implements AdjustmentListener {
 		this.scrollbarSize = scrollbarSize;
 
 		this.deltaScrollbar = deltaScrollbar;
-		deltaScrollbar.addMouseListener(new StandardMouseListener(parent, ValueChange.THIRDDIMmouse));
-
+		deltaScrollbar.addMouseMotionListener(new NonStandardMouseListener(parent, ValueChange.THIRDDIMmouse));
 	}
 
 	@Override
