@@ -249,6 +249,8 @@ public class FitterUtils {
 
 			
 
+			if (rate > imgs.get(0).framenumber){
+				if (Math.abs(pointonline) <= 50) {
 					if (outcursor.getDoublePosition(0) <= minVal[0]
 							&& outcursor.get().get() / maxintensityline > Intensityratio) {
 						minVal[0] = outcursor.getDoublePosition(0);
@@ -262,8 +264,34 @@ public class FitterUtils {
 
 					}
 
+				}
+			}
+			
+			else{
+					if (outcursor.getDoublePosition(0) <= minVal[0]
+							&& outcursor.get().get() / maxintensityline > Intensityratio) {
+						minVal[0] = outcursor.getDoublePosition(0);
+						minVal[1] = outcursor.getDoublePosition(1);
+					}
+
+					if (outcursor.getDoublePosition(0) >= maxVal[0]
+							&& outcursor.get().get() / maxintensityline > Intensityratio) {
+						maxVal[0] = outcursor.getDoublePosition(0);
+						maxVal[1] = outcursor.getDoublePosition(1);
+
+					}
+					
+			}
+					
+
 				
 		}
+		
+		
+		
+		System.out.println(maxVal[0]);
+		
+		
 		Pair<double[], double[]> minmaxpair = new ValuePair<double[], double[]>(minVal, maxVal);
 
 		return minmaxpair;

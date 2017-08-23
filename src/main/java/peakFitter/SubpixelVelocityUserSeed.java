@@ -224,6 +224,8 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 
 				labelindex = labelstart.get(0);
 
+			System.out.println(labelindex);
+			
 			if (labelindex != Integer.MIN_VALUE) {
 				paramnextframestart = Getfinaltrackparam(Userframe.get(index), labelstart.get(0), psf, startframe);
 
@@ -262,13 +264,12 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 			final double[] oldstartpoint = Userframe.get(index).currentpos;
 
 			double[] newstartpoint = paramnextframestart.currentpos;
-			double pointonline = newstartpoint[1] - originalslope * newstartpoint[0] - originalintercept;
-			double oldpointonline = oldstartpoint[1] - originalslope * oldstartpoint[0] - originalintercept;
+	
 			double oldslope = Userframe.get(index).slope;
 			double newslope = paramnextframestart.slope;
 			double dist = Math.toDegrees(Math.atan(Math.toRadians((newslope - oldslope) / (1 + newslope * oldslope))));
 
-			System.out.println("User" + dist);
+			System.out.println("User " + dist);
 			if (Math.abs(dist) > maxdist && framenumber > startframe + 1) {
 				paramnextframestart = Userframe.get(index);
 				newstartpoint = oldstartpoint;
@@ -320,7 +321,7 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 			final double maxintensityline = GetLocalmaxmin.computeMaxIntensity(currentimg);
 			final double minintensityline = 0;
 			Pair<double[], double[]> minmaxpair = FitterUtils.MakeinitialEndpointguessUser(imgs, maxintensityline,
-					Intensityratio, ndims, labelindex, iniparam.slope, iniparam.intercept, iniparam.Curvature,
+					Intensityratio, ndims, labelindex, iniparam.originalslope, iniparam.originalintercept, iniparam.Curvature,
 					iniparam.Inflection, rate);
 
 			for (int d = 0; d < ndims; ++d) {

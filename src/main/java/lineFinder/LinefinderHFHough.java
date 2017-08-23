@@ -101,7 +101,7 @@ public class LinefinderHFHough implements LinefinderHF {
 			
 			
 				
-			 Roiindex = count;
+			 Roiindex = label;
 			CommonOutputHF currentOutput = new CommonOutputHF(framenumber, Roiindex , roiimg, ActualRoiimg, intimg, Realinterval);
 			
 			
