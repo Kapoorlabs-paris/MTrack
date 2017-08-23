@@ -102,7 +102,6 @@ public class LinefinderInteractiveHFHough implements LinefinderHF {
 		output = new ArrayList<CommonOutputHF>();
 		
 		
-
 		for (int label = 1; label < Maxlabel - 1; ++label){
 		
 			Pair<RandomAccessibleInterval<FloatType>, FinalInterval> pair =  Boundingboxes.CurrentLabelImagepair(parent.intimg, Preprocessedsource, label);
@@ -127,14 +126,12 @@ public class LinefinderInteractiveHFHough implements LinefinderHF {
 				
 				}
 
-		
 			
 		
 		
 		
 		}
-		if (outputcurr.size() > 0)
-		output.sort(Seedcomparison);
+		
 		
 			
 		return true;
