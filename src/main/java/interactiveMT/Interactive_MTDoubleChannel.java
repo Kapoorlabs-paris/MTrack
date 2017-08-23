@@ -1121,6 +1121,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public JPanel panelFourth = new JPanel();
 	
 	public JPanel controlnext = new JPanel();
+	public JPanel controlprevious = new JPanel();
 	private JPanel Methodchoice = new JPanel();
 	private JPanel Cannychoice = new JPanel();
 	private JPanel Directoryoptions = new JPanel();
@@ -1235,41 +1236,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 
 
-        controlnext.add(new JButton(new AbstractAction("\u22b2Prev") {
-
-			/**
-			 * 
-			 */
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				CardLayout cl = (CardLayout) panelCont.getLayout();
-
-				cl.previous(panelCont);
-			}
-		}));
-		controlnext.add(new JButton(new AbstractAction("Next\u22b3") {
-
-			/**
-			 * 
-			 */
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				CardLayout cl = (CardLayout) panelCont.getLayout();
-				cl.next(panelCont);
-			}
-		}));
-
-		panelNext.add(controlnext,  new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER,
-				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
-	
-		controlnext.setVisible(false);
-		
-		panelFirst.add(panelNext,  new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
-				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+       
 		panelFirst.setVisible(true);
 		cl.show(panelCont, "1");
 
@@ -1525,6 +1492,37 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		 panelFourth.add(Optimize, new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 		
+		 
+		 
+			controlnext.removeAll();
+			controlnext.add(new JButton(new AbstractAction("\u22b2Prev") {
+
+			
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					CardLayout cl = (CardLayout) panelCont.getLayout();
+
+					cl.previous(panelCont);
+				}
+			}));
+		 
+		
+
+			panelNext.add(controlnext,  new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER,
+					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+		
+			controlnext.setVisible(true);
+			
+			panelFourth.add(panelNext,  new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+		
+			
+		 
+		 
+		 
+		 
 		inputFieldradi.addTextListener(new RadiusListener(this));
 		Finalize.addActionListener(new SkipFramesandTrackendsListener(this, starttime, endtime));
 		Record.addActionListener(new BatchModeListener(this));
@@ -1651,6 +1649,34 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		 panelFourth.add(Optimize, new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 		
+		 
+		 controlnext.removeAll();
+			controlnext.add(new JButton(new AbstractAction("\u22b2Prev") {
+
+				
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					CardLayout cl = (CardLayout) panelCont.getLayout();
+
+					cl.previous(panelCont);
+				}
+			}));
+		 
+		
+
+			panelNext.add(controlnext,  new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER,
+					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+		
+			controlnext.setVisible(true);
+			
+			panelFourth.add(panelNext,  new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+		
+			
+		 
+		 
 		inputFieldradi.addTextListener(new RadiusListener(this));
 		Finalize.addActionListener(new SkipFramesandTrackendsListener(this, starttime, endtime));
 		Record.addActionListener(new BatchModeListener(this));

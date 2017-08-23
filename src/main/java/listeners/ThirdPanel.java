@@ -1,6 +1,7 @@
 package listeners;
 
 import java.awt.Button;
+import java.awt.CardLayout;
 import java.awt.Checkbox;
 import java.awt.CheckboxGroup;
 import java.awt.Frame;
@@ -14,7 +15,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
+import javax.swing.AbstractAction;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
@@ -96,6 +99,11 @@ public class ThirdPanel {
 		final Label SALeftClick = new Label( "Shift + Alt + left click marks a user defined seed.");
 		
 		
+		
+		String[] SegMethod = { "DoWatershed +  MSER based segmentation ", "Do MSER based segmentation" };
+		JComboBox<String> ChooseMethod = new JComboBox<String>(SegMethod);
+		
+		
 		CheckboxGroup Segmentation = new CheckboxGroup();
 		final Checkbox Doseg = new Checkbox("DoWatershed +  MSER based segmentation ", Segmentation, parent.doSegmentation);
 		final Checkbox DoMserseg = new Checkbox("Do MSER based segmentation", Segmentation, parent.doMserSegmentation);
@@ -145,11 +153,10 @@ public class ThirdPanel {
 		
 		
 		
-		Segselect.add(Doseg, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+		Segselect.add(ChooseMethod, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0) );
 		
-		Segselect.add(DoMserseg, new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
-				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0) );
+		
 		
 		Segselect.setBorder(batchborder);
 		
@@ -170,11 +177,16 @@ public class ThirdPanel {
 				starttimeslider.addAdjustmentListener(new StarttimeListener(parent, timeTextstart, starttimestring, parent.thirdDimensionsliderInit, parent.thirdDimensionSize, parent.scrollbarSize,starttimeslider));
 				endtimeslider.addAdjustmentListener(new EndtimeListener(parent, timeTextend, endtimestring, parent.thirdDimensionsliderInit, parent.thirdDimensionSize, parent.scrollbarSize,endtimeslider));
 			
-				Doseg.addItemListener(new DoSegmentation(parent));
-				DoMserseg.addItemListener(new DoMserSegmentation(parent));
+				ChooseMethod.addActionListener(new SegMethodListener(parent, ChooseMethod));
+				
+			
+			
+			 
+				
+
+				parent.panelThird.validate();
 				
 				
-				parent.panelThird.revalidate();
 				parent.Cardframe.pack();
 	
 		

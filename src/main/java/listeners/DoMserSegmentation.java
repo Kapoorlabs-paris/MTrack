@@ -1,7 +1,14 @@
 package listeners;
 
+import java.awt.CardLayout;
+import java.awt.GridBagConstraints;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+
+import javax.swing.AbstractAction;
+import javax.swing.JButton;
 
 import ij.IJ;
 import interactiveMT.Interactive_MTDoubleChannel;
@@ -51,8 +58,44 @@ final Interactive_MTDoubleChannel parent;
 			parent.updatePreview(ValueChange.THIRDDIM);
 			parent.UpdateMser();
 
+/*
+			parent.controlnext.removeAll();
+			parent.controlnext.add(new JButton(new AbstractAction("\u22b2Prev") {
 
+				
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					CardLayout cl = (CardLayout) parent.panelCont.getLayout();
+
+					cl.previous(parent.panelCont);
+				}
+			}));
+		 
+			parent.controlnext.add(new JButton(new AbstractAction("Next\u22b3") {
+
+				
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					CardLayout cl = (CardLayout) parent.panelCont.getLayout();
+					cl.next(parent.panelCont);
+				}
+			}));
+
+			parent.panelNext.add(parent.controlnext,  new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER,
+					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+		
 			parent.controlnext.setVisible(true);
+			
+			parent.panelThird.add(parent.panelNext,  new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+		
+			parent.panelThird.validate();
+			
+			*/
 		}
 
 	}

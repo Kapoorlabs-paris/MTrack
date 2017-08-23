@@ -11,8 +11,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
 import interactiveMT.Interactive_MTDoubleChannel;
-import listeners.AcceptResultsListener;
-import listeners.CheckResultsListener;
+
 import listeners.SkipFramesandTrackendsListener;
 import listeners.TrackendsListener;
 

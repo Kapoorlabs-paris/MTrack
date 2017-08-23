@@ -1,12 +1,16 @@
 package swingClasses;
 
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
+import javax.swing.AbstractAction;
+import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.SwingWorker;
 
@@ -192,7 +196,45 @@ final Interactive_MTDoubleChannelBasic child;
 			if (child==null){
 			
 			
+				parent.controlnext.removeAll();
+				parent.controlnext.add(new JButton(new AbstractAction("\u22b2Prev") {
+
+					/**
+					 * 
+					 */
+					private static final long serialVersionUID = 1L;
+
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						CardLayout cl = (CardLayout) parent.panelCont.getLayout();
+
+						cl.previous(parent.panelCont);
+					}
+				}));
+			 
+				parent.controlnext.add(new JButton(new AbstractAction("Next\u22b3") {
+
+					/**
+					 * 
+					 */
+					private static final long serialVersionUID = 1L;
+
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						CardLayout cl = (CardLayout) parent.panelCont.getLayout();
+						cl.next(parent.panelCont);
+					}
+				}));
+
+				parent.panelNext.add(parent.controlnext,  new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+			
 				parent.controlnext.setVisible(true);
+				
+				parent.panelSecond.add(parent.panelNext,  new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+			
+				parent.panelSecond.validate();
 				
 			
 			ThirdPanel paintthird = new ThirdPanel(parent);

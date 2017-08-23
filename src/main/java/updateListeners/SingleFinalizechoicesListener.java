@@ -4,7 +4,6 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
 import interactiveMT.Interactive_MTSingleChannel;
-import listeners.AnalyzekymoListener;
 
 public class SingleFinalizechoicesListener implements ItemListener {
 	

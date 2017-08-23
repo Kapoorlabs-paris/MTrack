@@ -1,6 +1,7 @@
 package listeners;
 
 import java.awt.Button;
+import java.awt.CardLayout;
 import java.awt.Checkbox;
 import java.awt.Color;
 import java.awt.GridBagConstraints;
@@ -11,7 +12,10 @@ import java.awt.Scrollbar;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.AbstractAction;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JPanel;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
@@ -40,8 +44,29 @@ public class MethodListener implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		int selectedindex = choice.getSelectedIndex();
 		
-		parent.controlnext.setVisible(true);
+		parent.controlnext.removeAll();
+		parent.controlnext.add(new JButton(new AbstractAction("Next\u22b3") {
+
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				CardLayout cl = (CardLayout) parent.panelCont.getLayout();
+				cl.next(parent.panelCont);
+			}
+		}));
+
+		parent.panelNext.add(parent.controlnext,  new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER,
+				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 	
+		parent.controlnext.setVisible(true);
+		
+		parent.panelFirst.add(parent.panelNext,  new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+		parent.panelFirst.validate();
 	
 		
 		
@@ -140,9 +165,6 @@ public class MethodListener implements ActionListener {
 			
 			
 			
-			
-			
-		
 
 			
 		//	++c.gridy;
@@ -467,6 +489,8 @@ public class MethodListener implements ActionListener {
 			parent.Cardframe.pack();
 			parent.updatePreview(ValueChange.SHOWMSER);
 		}
+		
+	
 		
 	}
 
