@@ -89,7 +89,7 @@ public class LinefinderHFHough implements LinefinderHF {
 	    intimg = WaterafterDisttransform.getResult();
 		Maxlabel = WaterafterDisttransform.GetMaxlabelsseeded(intimg);
 		int count = 0;
-		for (int label = 1; label < Maxlabel ; label++) {
+		for (int label = 0; label <= Maxlabel ; label++) {
 
 			
            // Do not offset here
@@ -101,7 +101,7 @@ public class LinefinderHFHough implements LinefinderHF {
 			
 			
 				
-			 Roiindex = label;
+			 Roiindex = count;
 			CommonOutputHF currentOutput = new CommonOutputHF(framenumber, Roiindex , roiimg, ActualRoiimg, intimg, Realinterval);
 			
 			

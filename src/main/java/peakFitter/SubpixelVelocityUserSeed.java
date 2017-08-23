@@ -228,11 +228,10 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 			
 			if (labelindex != Integer.MIN_VALUE) {
 				paramnextframestart = Getfinaltrackparam(Userframe.get(index), labelstart.get(0), psf, startframe);
-
-				double min = Double.MAX_VALUE;
+System.out.println(paramnextframestart.currentLabel);
 				double[] currentposini = paramnextframestart.currentpos;
-				double[] fixedposini = paramnextframestart.fixedpos;
-				double distmin = Distance(currentposini, fixedposini);
+				double[] previouspos = Userframe.get(index).currentpos;
+				double distmin = Distance(currentposini, previouspos);
 
 				if (labelstart.size() > 1) {
 					for (int j = 0; j < labelstart.size(); ++j) {
@@ -241,16 +240,14 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 								startframe);
 
 						double[] currentpos = test.currentpos;
-						double[] fixedpos = test.fixedpos;
-						double pointonline = fixedpos[1] - test.originalslope * fixedpos[0] - test.originalintercept;
-						double dist = Distance(currentpos, fixedpos);
-						if (Math.abs(pointonline) < min) {
-							min = Math.abs(pointonline);
+						double dist = Distance(currentpos, previouspos);
+						
+							
 							if (dist < distmin) {
 								distmin = dist;
 								labelindex = labelstart.get(j);
 								paramnextframestart = test;
-							}
+							
 						}
 					}
 				}
@@ -311,6 +308,9 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 		double[] minVal = new double[ndims];
 		double[] maxVal = new double[ndims];
 		int labelindex = FitterUtils.getlabelindex(imgs, label);
+		
+		
+		
 		if (labelindex != -1) {
 
 			RandomAccessibleInterval<FloatType> currentimg = imgs.get(labelindex).Roi;
@@ -321,8 +321,8 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 			final double maxintensityline = GetLocalmaxmin.computeMaxIntensity(currentimg);
 			final double minintensityline = 0;
 			Pair<double[], double[]> minmaxpair = FitterUtils.MakeinitialEndpointguessUser(imgs, maxintensityline,
-					Intensityratio, ndims, labelindex, iniparam.originalslope, iniparam.originalintercept, iniparam.Curvature,
-					iniparam.Inflection, rate);
+					Intensityratio, ndims, labelindex, iniparam.slope, iniparam.intercept, iniparam.Curvature,
+					iniparam.Inflection, rate, framenumber);
 
 			for (int d = 0; d < ndims; ++d) {
 
@@ -473,6 +473,7 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 
 			Accountedframes = framenumber;
 
+			
 			System.out.println("Label: " + label + " " + "Initial guess: " + " StartX: " + LMparam[0] + " StartY: "
 					+ LMparam[1] + " EndX: " + LMparam[2] + " EndY: " + LMparam[3]);
 

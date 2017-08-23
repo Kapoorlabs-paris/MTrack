@@ -262,9 +262,8 @@ public void setMaxdist (double maxdist) {
 					paramnextframestart = Getfinaltrackparam(PrevFrameparamstart.get(index), labelstart.get(0),
 							psf, framenumber, StartorEnd.Start); 
 					double[] currentposini = paramnextframestart.currentpos;
-					double[] fixedposini = paramnextframestart.fixedpos;
-					double distmin = Distance(currentposini, fixedposini);
-					double min = Double.MAX_VALUE;
+					double[] previousposini = PrevFrameparamstart.get(index).currentpos;
+					double distmin = Distance(currentposini, previousposini);
 					
 					if (labelstart.size() > 1) {
 						for (int j = 0; j < labelstart.size(); ++j) {
@@ -272,17 +271,14 @@ public void setMaxdist (double maxdist) {
 							Indexedlength test = Getfinaltrackparam(PrevFrameparamstart.get(index), labelstart.get(j),
 									psf, framenumber, StartorEnd.Start);
 							double[] currentpos = test.currentpos;
-							double[] fixedpos = test.fixedpos;
-							double pointonline = currentpos[1] - originalslope * currentpos[0]
-									- originalintercept;
-							double dist = Distance(currentpos, fixedpos);
-							if (Math.abs(pointonline) < min) {
-								min = Math.abs(pointonline);
+							
+							double dist = Distance(currentpos, previousposini);
+							
 								if (dist < distmin) {
 									distmin = dist;
 									labelindex = labelstart.get(j);
 									paramnextframestart = test;
-								}
+								
 							}
 						}
 					}
@@ -325,7 +321,6 @@ public void setMaxdist (double maxdist) {
 		}
 
 		for (int index = 0; index < PrevFrameparamend.size(); ++index) {
-			final int oldframenumber = PrevFrameparamend.get(PrevFrameparamend.size() - 1).framenumber;
 
 			if (Trackstart.get(PrevFrameparamend.get(index).seedLabel) == Whichend.end
 					|| Trackstart.get(PrevFrameparamend.get(index).seedLabel) == Whichend.both) {
@@ -358,10 +353,9 @@ public void setMaxdist (double maxdist) {
 					paramnextframeend = Getfinaltrackparam(PrevFrameparamend.get(index), labelend.get(0), psf,
 							framenumber, StartorEnd.End); 
 
-					double min = Double.MAX_VALUE;
 					double[] currentposini = paramnextframeend.currentpos;
-					double[] fixedposini = paramnextframeend.fixedpos;
-					double distmin = Distance(currentposini, fixedposini);
+					double[] previousposini = PrevFrameparamend.get(index).currentpos;
+					double distmin = Distance(currentposini, previousposini);
 					if (labelend.size() > 1) {
 						for (int j = 0; j < labelend.size(); ++j) {
 							System.out.println("Fitting multiple Labels");
@@ -369,17 +363,14 @@ public void setMaxdist (double maxdist) {
 							Indexedlength test = Getfinaltrackparam(PrevFrameparamend.get(index), labelend.get(j), psf,
 									framenumber, StartorEnd.End);
 							double[] currentpos = test.currentpos;
-							double[] fixedpos = test.fixedpos;
-							double pointonline = currentpos[1] - originalslopeend * currentpos[0]
-									- originalinterceptend;
-							double dist = Distance(currentpos, fixedpos);
-							if (Math.abs(pointonline) < min) {
-								min = Math.abs(pointonline);
+							
+							double dist = Distance(currentpos, previousposini);
+						
 								if (dist < distmin) {
 									distmin = dist;
 									labelindex = labelend.get(j);
 									paramnextframeend = test;
-								}
+								
 							}
 						}
 					}
@@ -392,10 +383,7 @@ public void setMaxdist (double maxdist) {
 				final double[] oldendpoint = PrevFrameparamend.get(index).currentpos;
 
 				double[] newendpoint = paramnextframeend.currentpos;
-				double pointonline = newendpoint[1] - originalslopeend * newendpoint[0]
-						- originalinterceptend;
-				double oldpointonline = oldendpoint[1] - originalslopeend * oldendpoint[0]
-						- originalinterceptend;
+				
 				double oldslope = PrevFrameparamend.get(index).slope;
 				double newslope = paramnextframeend.slope;
 				double dist = Math.toDegrees(Math.atan(Math.toRadians((newslope - oldslope)/(1 + newslope * oldslope))));
@@ -453,7 +441,7 @@ public void setMaxdist (double maxdist) {
 		double[] maxVal = new double[ndims];
 
 		int labelindex = FitterUtils.getlabelindex(imgs, label);
-
+		
 		if (labelindex != -1) {
 
 			RandomAccessibleInterval<FloatType> currentimg = imgs.get(labelindex).Roi;

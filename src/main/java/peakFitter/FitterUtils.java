@@ -96,7 +96,10 @@ public class FitterUtils {
 
 	public static int getlabelindex(final ArrayList<CommonOutputHF> imgs, int label) {
 
-		int labelindex = -1;
+		
+		
+		
+		int labelindex = - 1;
 		for (int index = 0; index < imgs.size(); ++index) {
 
 			if (imgs.get(index).roilabel == label) {
@@ -112,9 +115,11 @@ public class FitterUtils {
 
 	public static int getlabelindexSeed(final ArrayList<CommonOutput> imgs, int label) {
 
-		int labelindex = -1;
+		int labelindex = - 1;
 		for (int index = 0; index < imgs.size(); ++index) {
 
+			
+			
 			if (imgs.get(index).roilabel == label) {
 
 				labelindex = index;
@@ -201,8 +206,9 @@ public class FitterUtils {
 
 			outcursor.localize(newposition);
 
-			long pointonline = (int) Math.round(newposition[1] - slope * newposition[0] - intercept);
-			if (Math.abs(pointonline) <= 50) {
+			long pointonline = (int) Math.round(newposition[1] - slope * newposition[0]
+					-  intercept);
+		
 				if (outcursor.getDoublePosition(0) <= minVal[0]
 						&& outcursor.get().get() / maxintensityline > Intensityratio) {
 					minVal[0] = outcursor.getDoublePosition(0);
@@ -216,7 +222,7 @@ public class FitterUtils {
 
 				}
 
-			}
+			
 		}
 		Pair<double[], double[]> minmaxpair = new ValuePair<double[], double[]>(minVal, maxVal);
 
@@ -226,7 +232,7 @@ public class FitterUtils {
 
 	public static final Pair<double[], double[]> MakeinitialEndpointguessUser(ArrayList<CommonOutputHF> imgs,
 			double maxintensityline, double Intensityratio, int ndims, int label, double slope, double intercept,
-			double Curvature, double Inflection, int rate) {
+			double Curvature, double Inflection, int startframe, int framenumber) {
 		long[] newposition = new long[ndims];
 		double[] minVal = { Double.MAX_VALUE, Double.MAX_VALUE };
 		double[] maxVal = { -Double.MIN_VALUE, -Double.MIN_VALUE };
@@ -245,29 +251,12 @@ public class FitterUtils {
 
 			outcursor.localize(newposition);
 
-			long pointonline = (int) Math.round(newposition[1] - slope * newposition[0] - intercept);
+			long pointonline = (int) Math.round(newposition[1] - slope * newposition[0] 
+					- Curvature* newposition[0]* newposition[0]  - intercept);
 
 			
 
-			if (rate > imgs.get(0).framenumber){
-				if (Math.abs(pointonline) <= 50) {
-					if (outcursor.getDoublePosition(0) <= minVal[0]
-							&& outcursor.get().get() / maxintensityline > Intensityratio) {
-						minVal[0] = outcursor.getDoublePosition(0);
-						minVal[1] = outcursor.getDoublePosition(1);
-					}
-
-					if (outcursor.getDoublePosition(0) >= maxVal[0]
-							&& outcursor.get().get() / maxintensityline > Intensityratio) {
-						maxVal[0] = outcursor.getDoublePosition(0);
-						maxVal[1] = outcursor.getDoublePosition(1);
-
-					}
-
-				}
-			}
 			
-			else{
 					if (outcursor.getDoublePosition(0) <= minVal[0]
 							&& outcursor.get().get() / maxintensityline > Intensityratio) {
 						minVal[0] = outcursor.getDoublePosition(0);
@@ -281,7 +270,7 @@ public class FitterUtils {
 
 					}
 					
-			}
+			
 					
 
 				
