@@ -269,8 +269,7 @@ public class Interactive_MTSingleChannel implements PlugIn {
 	private TextField Maxdmicro;
 
 	public  File userfile;
-	public int starttimetrack;
-	public int endtimetrack;
+
 	public int minDiversityInit = 1;
 
 	public int radius = 1;
@@ -675,8 +674,7 @@ public class Interactive_MTSingleChannel implements PlugIn {
 		usefolder  = userfile.getParentFile().getAbsolutePath();
 		 newends = new SingleMarkends(this);
 		SaveTxt = true;
-		starttime = 2;
-		endtime = thirdDimensionSize;
+		
 		
 		AllSeedrois = new ArrayList<OvalRoi>();
 		jpb = new JProgressBar();
@@ -722,6 +720,9 @@ public class Interactive_MTSingleChannel implements PlugIn {
 			Kymoimp = ImageJFunctions.show(Kymoimg);
 
 		}
+		
+		starttime = 2;
+		endtime = thirdDimensionSize;
 		prestack = new ImageStack((int) originalimg.dimension(0), (int) originalimg.dimension(1),
 				java.awt.image.ColorModel.getRGBdefault());
 
@@ -760,7 +761,6 @@ public class Interactive_MTSingleChannel implements PlugIn {
 		roiListener = new RoiListener();
 		preprocessedimp.getCanvas().addMouseListener(roiListener);
 
-		IJ.log(" Third Dimension Size " + thirdDimensionSize);
 
 	}
 
@@ -1154,6 +1154,7 @@ public class Interactive_MTSingleChannel implements PlugIn {
 	
 	public JPanel panelCont = new JPanel();
 	public JPanel panelNext = new JPanel();
+	public JPanel panelPrevious = new JPanel();
 	public JPanel panelFirst = new JPanel();
 	public JPanel panelSecond = new JPanel();
 	public JPanel panelThird = new JPanel();
@@ -1206,7 +1207,7 @@ private static final Insets insets = new Insets(10, 0, 0, 0);
 				inputFieldradi = new TextField();
 				inputFieldradi.setColumns(10);
 				inputFieldradi.setText(String.valueOf(radiusfactor));
-				CheckboxGroup Finders = new CheckboxGroup();
+				
 				final Scrollbar thirdDimensionslider = new Scrollbar(Scrollbar.HORIZONTAL, thirdDimensionsliderInit, 0, 0,
 						thirdDimensionSize);
 				thirdDimensionslider.setBlockIncrement(1);
@@ -1220,9 +1221,7 @@ private static final Insets insets = new Insets(10, 0, 0, 0);
 				inputField.setText(userfile.getName().replaceFirst("[.][^.]+$", ""));
 
 				addToName = inputField.getText();
-				final Checkbox mser = new Checkbox("MSER", Finders, FindLinesViaMSER);
-				final Checkbox hough = new Checkbox("HOUGH", Finders, FindLinesViaHOUGH);
-				final Checkbox mserwhough = new Checkbox("MSERwHOUGH", Finders, FindLinesViaMSERwHOUGH);
+				
 
 				String[] Method = { "MSER", "HOUGH","MSERwHOUGH" };
 				JComboBox<String> ChooseMethod = new JComboBox<String>(Method);
@@ -1312,91 +1311,7 @@ private static final Insets insets = new Insets(10, 0, 0, 0);
 				Cardframe.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 				Cardframe.pack();
 				Cardframe.setVisible(true);
-		// Panel Third
-		final Button MoveNext = new Button("Deselect seed ends");
-		final Button JumptoFrame = new Button("Choose a later time point in the dynamic channel to mark ends to track");
-
-		final Label ORText = new Label("If the dynamic ends are not visible", Label.CENTER);
-
-		ORText.setBackground(new Color(1, 0, 1));
-		ORText.setForeground(new Color(255, 255, 255));
-
-		final Label LeftClick = new Label("Left click deselects an end, Shift + left click selects a deselected end, Shift + Alt + left click marks a user defined seed.");
-
-
-		LeftClick.setBackground(new Color(1, 0, 1));
-		LeftClick.setForeground(new Color(255, 255, 255));
-
 		
-
-		final Checkbox Finalize = new Checkbox("Confirm the dynamic seed end(s)");
-
-		CheckboxGroup Segmentation = new CheckboxGroup();
-		final Checkbox Doseg = new Checkbox(
-				"DoWatershed +  MSER based segmentation ", Segmentation,
-				doSegmentation);
-		final Checkbox DoMserseg = new Checkbox(
-				"Do MSER based segmentation", Segmentation,
-				doMserSegmentation);
-		final Label MTTextHF = new Label("Select ends for tracking", Label.CENTER);
-		final Label Step3 = new Label("Step 3", Label.CENTER);
-		final Label SegChoice = new Label("Choose MSER or Watershed based Segmentation", Label.CENTER);
-
-		SegChoice.setBackground(new Color(1, 0, 1));
-		SegChoice.setForeground(new Color(255, 255, 255));
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.gridx = 0;
-		c.gridy = 0;
-		c.weightx = 0.5;
-
-		panelThird.setLayout(layout);
-		panelThird.add(Step3, c);
-	
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 0);
-		panelThird.add(LeftClick, c);
-		
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 0);
-		panelThird.add(MTTextHF, c);
-
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 150);
-		panelThird.add(MoveNext, c);
-
-		
-
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 0);
-		panelThird.add(Finalize, c);
-
-		++c.gridy;
-		c.insets = new Insets(20, 100, 0, 200);
-		panelThird.add(SegChoice, c);
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 180);
-		panelThird.add(Doseg, c);
-
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 180);
-		panelThird.add(DoMserseg, c);
-
-		
-		
-		
-		MoveNext.addActionListener(new SingleMoveNextListener(this));
-
-		thirdDimensionslider
-				.addAdjustmentListener(new thirdDimensionsliderListener(timeText, timeMin, thirdDimensionSize));
-		Cardframe.addWindowListener(new FrameListener(Cardframe));
-		JumpinTime.addActionListener(
-				new moveInThirdDimListener(thirdDimensionslider, timeText, timeMin, thirdDimensionSize));
-		
-		Finalize.addItemListener(new SingleFinalPoint(this));
-		Doseg.addItemListener(new SingleDoSegmentation(this));
-		DoMserseg.addItemListener(new SingleDoMserSegmentation(this));
-
-	
 
 
 	
@@ -1634,7 +1549,7 @@ panelFourth.removeAll();
 		 
 		 
 			controlnext.removeAll();
-			controlnext.add(new JButton(new AbstractAction("\u22b2Prev") {
+			controlprevious.add(new JButton(new AbstractAction("\u22b2Prev") {
 
 			
 				private static final long serialVersionUID = 1L;
@@ -1649,12 +1564,12 @@ panelFourth.removeAll();
 		 
 		
 
-			panelNext.add(controlnext,  new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER,
+			panelPrevious.add(controlprevious,  new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER,
 					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 		
-			controlnext.setVisible(true);
+			controlprevious.setVisible(true);
 			
-			panelFourth.add(panelNext,  new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+			panelFourth.add(panelPrevious,  new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 		
 			
@@ -1802,9 +1717,9 @@ panelFourth.removeAll();
 		
 		 
 		 controlnext.removeAll();
-			controlnext.add(new JButton(new AbstractAction("\u22b2Prev") {
+			controlprevious.add(new JButton(new AbstractAction("\u22b2Prev") {
 
-				
+			
 				private static final long serialVersionUID = 1L;
 
 				@Override
@@ -1817,12 +1732,12 @@ panelFourth.removeAll();
 		 
 		
 
-			panelNext.add(controlnext,  new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER,
+			panelPrevious.add(controlprevious,  new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER,
 					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 		
-			controlnext.setVisible(true);
+			controlprevious.setVisible(true);
 			
-			panelFourth.add(panelNext,  new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+			panelFourth.add(panelPrevious,  new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 		
 			
@@ -1952,46 +1867,8 @@ panelFourth.removeAll();
 
 	
 
-	public boolean DialogueAnalysis() {
 
-		GenericDialog gd = new GenericDialog("Analyze");
 
-		gd.addNumericField("Start time of event", starttime, 0);
-		gd.addNumericField("Enfd time of event", endtime, 0);
-
-		gd.addCheckbox("Compute Velocity from Kymograph", numberKymo);
-
-		gd.addCheckbox("Compute Velocity by Tracker", numberTracker);
-
-		gd.showDialog();
-
-		starttime = (int) gd.getNextNumber();
-		endtime = (int) gd.getNextNumber();
-		numberKymo = gd.getNextBoolean();
-		numberTracker = gd.getNextBoolean();
-
-		if (starttime < 0)
-			starttime = 0;
-		if (endtime > thirdDimensionSize)
-			endtime = thirdDimensionSize;
-
-		return !gd.wasCanceled();
-
-	}
-
-	protected class SaveasXLS implements ItemListener {
-
-		@Override
-		public void itemStateChanged(ItemEvent arg0) {
-			if (arg0.getStateChange() == ItemEvent.DESELECTED)
-				SaveXLS = false;
-
-			else if (arg0.getStateChange() == ItemEvent.SELECTED)
-				SaveXLS = true;
-
-		}
-
-	}
 
 	public Comparator<Indexedlength> Seedcompare = new Comparator<Indexedlength>() {
 
@@ -2028,12 +1905,10 @@ panelFourth.removeAll();
 
 				DialogueMedian();
 
-				IJ.log(" Applying Median Filter to the whole stack (takes some time)");
 
 				final MedianFilter2D<FloatType> medfilter = new MedianFilter2D<FloatType>(originalPreprocessedimg,
 						radius);
 				medfilter.process();
-				IJ.log(" Median filter sucessfully applied to the whole stack");
 				originalPreprocessedimg = medfilter.getResult();
 				CurrentPreprocessedView = util.CopyUtils.getCurrentPreView(originalPreprocessedimg, thirdDimension,
 						thirdDimensionSize);

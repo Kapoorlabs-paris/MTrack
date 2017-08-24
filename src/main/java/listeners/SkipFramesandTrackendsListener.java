@@ -61,6 +61,7 @@ public class SkipFramesandTrackendsListener implements ActionListener {
 		parent.Cardframe.remove(parent.controlnext);
 		
 		parent.controlnext.removeAll();
+		parent.controlprevious.removeAll();
 		JPanel review = new JPanel();
 		
 		review.add(new JButton(new AbstractAction("\u22b2Review Panels") {

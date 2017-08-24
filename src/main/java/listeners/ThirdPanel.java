@@ -178,7 +178,34 @@ public class ThirdPanel {
 				ChooseMethod.addActionListener(new SegMethodListener(parent, ChooseMethod));
 				
 			
+
+				// Previous button for the third panel
+				
+				parent.controlprevious.add(new JButton(new AbstractAction("\u22b2Prev") {
+
+					/**
+					 * 
+					 */
+					private static final long serialVersionUID = 1L;
+
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						CardLayout cl = (CardLayout) parent.panelCont.getLayout();
+						cl.next(parent.panelCont);
+					}
+				}));
+				
+				parent.panelPrevious.add(parent.controlprevious,  new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 			
+				parent.controlprevious.setVisible(true);
+				
+				parent.panelThird.add(parent.panelPrevious,  new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+				parent.panelThird.validate();
+			 
+				
+
 			 
 				
 

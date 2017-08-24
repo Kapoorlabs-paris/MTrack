@@ -150,7 +150,7 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 	public SubpixelVelocityCline(final RandomAccessibleInterval<FloatType> source, final LinefinderHF finder,
 			final ArrayList<Indexedlength> PrevFrameparamstart, final ArrayList<Indexedlength> PrevFrameparamend,
 			final double[] psf, final int framenumber, final UserChoiceModel model, final boolean DoMask,
-			final HashMap<Integer, Whichend> Trackstart, final JProgressBar jpb, final int thirdDimsize, final int startframe, final int numgaussians) {
+			final HashMap<Integer, Whichend> Trackstart, final JProgressBar jpb, final int startframe,  final int thirdDimsize, final int numgaussians) {
 		finder.checkInput();
 		finder.process();
 		imgs = finder.getResult();
@@ -189,7 +189,7 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 		final_paramlistend = new ArrayList<Indexedlength>();
 		startinframe = new ArrayList<Trackproperties>();
 		endinframe = new ArrayList<Trackproperties>();
-
+System.out.println(thirdDimsize);
 		for (int index = 0; index < PrevFrameparamstart.size(); ++index) {
 
 			final int oldframenumber = PrevFrameparamstart.get(PrevFrameparamstart.size() - 1).framenumber;

@@ -36,6 +36,7 @@ import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.img.display.imagej.ImageJFunctions;
 import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.util.Pair;
+import net.imglib2.view.Views;
 import trackerType.KFsearch;
 import trackerType.TrackModel;
 import velocityanalyser.Trackend;
@@ -66,7 +67,7 @@ public  class SingleTrack {
 			parent.isStarted = true;
 			parent.CurrentPreprocessedView = util.CopyUtils.getCurrentPreView(parent.originalPreprocessedimg, parent.thirdDimension,
 					parent.thirdDimensionSize);
-			parent.CurrentView = util.CopyUtils.getCurrentView(parent.originalimg, parent.thirdDimension, parent.thirdDimensionSize);
+			parent.CurrentView = util.CopyUtils.getCurrentView(parent.originalimg, parent.thirdDimension, parent.endtime);
 			parent.updatePreview(ValueChange.THIRDDIMTrack);
 
 		
@@ -76,17 +77,7 @@ public  class SingleTrack {
 
 			if (parent.FindLinesViaMSER) {
 				
-				if (index == next) {
-
-					IJ.log("MSER parameters:" + " " + " thirdDimension: " + " " + parent.thirdDimension);
-					IJ.log("Delta " + " " + parent.delta + " " + "minSize " + " " + parent.minSize + " " + "maxSize " + " " + parent.maxSize
-							+ " " + " Unstability_Score " + " " + parent.Unstability_Score + " " + "minDIversity " + " " + parent.minDiversity);
-
-					IJ.log("Optimization Parameters: " + "R" + parent.Intensityratio + " G"
-							+ parent.Inispacing / Math.min(parent.psf[0], parent.psf[1]));
-
-				}
-
+			
 				
 
 				parent.updatePreview(ValueChange.SHOWMSER);
@@ -95,14 +86,14 @@ public  class SingleTrack {
 						parent.newtree,  parent.thirdDimension);
 					parent.returnVector = SingleFindlinesVia.LinefindingMethodHF(groundframe, groundframepre, parent.PrevFrameparam,
 							 parent.thirdDimension, parent.psf, newlineMser, parent.userChoiceModel, parent.Domask, parent.Intensityratio,
-							parent.Inispacing, parent.seedmap, parent.jpb, parent.starttime, parent.thirdDimensionSize, parent.numgaussians);
+							parent.Inispacing, parent.seedmap, parent.jpb, parent.starttime, parent.endtime, parent.maxdist, parent.numgaussians);
 					parent.Accountedframes.add(FindlinesVia.getAccountedframes());
 					
 					
 					if(parent.Userframe.size() > 0){
 						
 						parent.returnVectorUser = FindlinesVia.LinefindingMethodHFUser(groundframe, groundframepre, parent.Userframe, parent.thirdDimension,
-								parent.psf, newlineMser, parent.userChoiceModel, parent.Domask, parent.Intensityratio, parent.Inispacing, parent.jpb, parent.thirdDimensionSize, 0, parent.thirdDimension);
+								parent.psf, newlineMser, parent.userChoiceModel, parent.Domask, parent.Intensityratio, parent.Inispacing, parent.jpb, parent.endtime, 0, parent.thirdDimension);
 						
 						
 					}
@@ -113,15 +104,6 @@ public  class SingleTrack {
 
 			if (parent.FindLinesViaHOUGH) {
 
-				if (index == next) {
-
-					IJ.log("Hough parameters:" + " " + " thirdDimension: " + " " + parent.thirdDimension);
-					IJ.log("thetaPerPixel " + " " + parent.thetaPerPixel + " " + "rhoPerPixel " + " " + parent.rhoPerPixel);
-					IJ.log("Optimization Parameters: " + "R" + parent.Intensityratio + " G"
-							+ parent.Inispacing / Math.min(parent.psf[0], parent.psf[1]));
-
-				}
-
 				
 
 				parent.updatePreview(ValueChange.SHOWHOUGH);
@@ -131,14 +113,14 @@ public  class SingleTrack {
 				
 					parent.returnVector = SingleFindlinesVia.LinefindingMethodHF(groundframe, groundframepre, parent.PrevFrameparam,
 							 parent.thirdDimension, parent.psf, newlineHough, parent.userChoiceModel,parent.Domask, parent.Intensityratio,
-							parent.Inispacing, parent.seedmap, parent.jpb, parent.starttime, parent.thirdDimensionSize, parent.numgaussians);
+							parent.Inispacing, parent.seedmap, parent.jpb, parent.starttime, parent.endtime, parent.maxdist, parent.numgaussians);
 
 					parent.Accountedframes.add(FindlinesVia.getAccountedframes());
 					
 	                          if(parent.Userframe.size() > 0){
 						
 						parent.returnVectorUser = FindlinesVia.LinefindingMethodHFUser(groundframe, groundframepre, parent.Userframe, parent.thirdDimension,
-								parent.psf, newlineHough, parent.userChoiceModel, parent.Domask, parent.Intensityratio, parent.Inispacing, parent.jpb, parent.thirdDimensionSize, 0, parent.thirdDimension);
+								parent.psf, newlineHough, parent.userChoiceModel, parent.Domask, parent.Intensityratio, parent.Inispacing, parent.jpb, parent.endtime, 0, parent.thirdDimension);
 						
 						
 					}
@@ -150,31 +132,21 @@ public  class SingleTrack {
 			if (parent.FindLinesViaMSERwHOUGH) {
 				
 				
-				if (index == next) {
-
-					IJ.log("MSER parameters:" + " " + " thirdDimension: " + " " + parent.thirdDimension);
-					IJ.log("Delta " + " " + parent.delta + " " + "minSize " + " " + parent.minSize + " " + "maxSize " + " " + parent.maxSize
-							+ " " + " Unstability_Score " + " " + parent.Unstability_Score + " " + "minDIversity " + " " + parent.minDiversity);
-					IJ.log("Hough parameters:" + " " + " thirdDimension: " + " " + parent.thirdDimension);
-					IJ.log("thetaPerPixel " + " " + parent.thetaPerPixel + " " + "rhoPerPixel " + " " + parent.rhoPerPixel);
-					IJ.log("Optimization Parameters: " + "R" + parent.Intensityratio + " G"
-							+ parent.Inispacing / Math.min(parent.psf[0], parent.psf[1]));
-
-				} 
+			
 				
 				parent.updatePreview(ValueChange.SHOWMSER);
 				LinefinderInteractiveHFMSERwHough newlineMserwHough = new LinefinderInteractiveHFMSERwHough(groundframe,
 						groundframepre, parent.newtree, parent.thirdDimension, parent.thetaPerPixel, parent.rhoPerPixel);
 					parent.returnVector = SingleFindlinesVia.LinefindingMethodHF(groundframe, groundframepre, parent.PrevFrameparam,
 							 parent.thirdDimension, parent.psf, newlineMserwHough, parent.userChoiceModel, parent.Domask, parent.Intensityratio,
-							parent.Inispacing, parent.seedmap, parent.jpb, parent.starttime, parent.thirdDimensionSize, parent.numgaussians);
+							parent.Inispacing, parent.seedmap, parent.jpb, parent.starttime, parent.endtime, parent.maxdist, parent.numgaussians);
 
 					parent.Accountedframes.add(FindlinesVia.getAccountedframes());
 					
                        if(parent.Userframe.size() > 0){
 						
 						parent.returnVectorUser = FindlinesVia.LinefindingMethodHFUser(groundframe, groundframepre, parent.Userframe, parent.thirdDimension,
-								parent.psf, newlineMserwHough, parent.userChoiceModel, parent.Domask, parent.Intensityratio, parent.Inispacing, parent.jpb, parent.thirdDimensionSize,0, parent.thirdDimension);
+								parent.psf, newlineMserwHough, parent.userChoiceModel, parent.Domask, parent.Intensityratio, parent.Inispacing, parent.jpb, parent.endtime, 0, parent.thirdDimension);
 						
 						
 					}
@@ -235,7 +207,7 @@ public  class SingleTrack {
 			
 			if (parent.returnVectorUser != null  && parent.AllUser.get(0).size() > 0) {
 				ImagePlus impstartsec = ImageJFunctions.show(parent.originalimg);
-				final Trackstart trackerstart = new Trackstart(parent.AllUser, parent.thirdDimensionSize - next);
+				final Trackstart trackerstart = new Trackstart(parent.AllUser, parent.endtime - next);
 				trackerstart.process();
 				SimpleWeightedGraph<double[], DefaultWeightedEdge> graphstart = trackerstart.getResult();
 				DisplayGraph displaygraphtrackstart = new DisplayGraph(impstartsec, graphstart);
@@ -961,7 +933,7 @@ public  class SingleTrack {
 			parent.prestack.deleteLastSlice();
 			new ImagePlus("Overlays", parent.prestack).show();
 		}
-
+		DisplayID.displayseeds(Views.hyperSlice(parent.originalimg, 2, 0), parent.IDALL);
 	}
 
 

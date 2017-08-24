@@ -75,18 +75,7 @@ public  class Track {
 			RandomAccessibleInterval<FloatType> groundframepre = parent.currentPreprocessedimg;
 
 			if (parent.FindLinesViaMSER) {
-		/*		
-				if (index == next) {
 
-					IJ.log("MSER parameters:" + " " + " thirdDimension: " + " " + parent.thirdDimension);
-					IJ.log("Delta " + " " + parent.delta + " " + "minSize " + " " + parent.minSize + " " + "maxSize " + " " + parent.maxSize
-							+ " " + " Unstability_Score " + " " + parent.Unstability_Score + " " + "minDIversity " + " " + parent.minDiversity);
-
-					IJ.log("Optimization Parameters: " + "R" + parent.Intensityratio + " G"
-							+ parent.Inispacing / Math.min(parent.psf[0], parent.psf[1]));
-
-				}
-*/
 				
 
 				parent.updatePreview(ValueChange.SHOWMSER);
@@ -112,17 +101,7 @@ public  class Track {
 			}
 
 			if (parent.FindLinesViaHOUGH) {
-/*
-				if (index == next) {
-
-					IJ.log("Hough parameters:" + " " + " thirdDimension: " + " " + parent.thirdDimension);
-					IJ.log("thetaPerPixel " + " " + parent.thetaPerPixel + " " + "rhoPerPixel " + " " + parent.rhoPerPixel);
-					IJ.log("Optimization Parameters: " + "R" + parent.Intensityratio + " G"
-							+ parent.Inispacing / Math.min(parent.psf[0], parent.psf[1]));
-
-				}
-*/
-				
+			
 
 				parent.updatePreview(ValueChange.SHOWHOUGH);
 				parent.updatePreview(ValueChange.SHOWMSERinHough);
@@ -149,19 +128,7 @@ public  class Track {
 
 			if (parent.FindLinesViaMSERwHOUGH) {
 				
-			/*	
-				if (index == next) {
-
-					IJ.log("MSER parameters:" + " " + " thirdDimension: " + " " + parent.thirdDimension);
-					IJ.log("Delta " + " " + parent.delta + " " + "minSize " + " " + parent.minSize + " " + "maxSize " + " " + parent.maxSize
-							+ " " + " Unstability_Score " + " " + parent.Unstability_Score + " " + "minDIversity " + " " + parent.minDiversity);
-					IJ.log("Hough parameters:" + " " + " thirdDimension: " + " " + parent.thirdDimension);
-					IJ.log("thetaPerPixel " + " " + parent.thetaPerPixel + " " + "rhoPerPixel " + " " + parent.rhoPerPixel);
-					IJ.log("Optimization Parameters: " + "R" + parent.Intensityratio + " G"
-							+ parent.Inispacing / Math.min(parent.psf[0], parent.psf[1]));
-
-				} 
-			*/	
+			
 				parent.updatePreview(ValueChange.SHOWMSER);
 				LinefinderInteractiveHFMSERwHough newlineMserwHough = new LinefinderInteractiveHFMSERwHough(groundframe,
 						groundframepre, parent.newtree, parent.thirdDimension, parent.thetaPerPixel, parent.rhoPerPixel);

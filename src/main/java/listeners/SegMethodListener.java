@@ -117,7 +117,7 @@ public class SegMethodListener implements ActionListener {
 		
 		
 		
-		
+		parent.controlprevious.removeAll();
 		parent.controlnext.removeAll();
 		parent.controlnext.add(new JButton(new AbstractAction("\u22b2Prev") {
 
@@ -153,7 +153,7 @@ public class SegMethodListener implements ActionListener {
 				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 	
 		parent.panelThird.validate();
-		
+		parent.Cardframe.pack();
 		
 		
 		

@@ -198,6 +198,7 @@ final Interactive_MTDoubleChannelBasic child;
 			
 			
 				parent.controlnext.removeAll();
+				parent.controlprevious.removeAll();
 				parent.controlnext.add(new JButton(new AbstractAction("\u22b2Prev") {
 
 					/**

@@ -1,9 +1,16 @@
 package swingClasses;
 
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.GridBagConstraints;
+import java.awt.Insets;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
+import javax.swing.AbstractAction;
+import javax.swing.JButton;
 import javax.swing.SwingWorker;
 
 import LineModels.UseLineModel.UserChoiceModel;
@@ -13,26 +20,37 @@ import ij.gui.Overlay;
 import ij.gui.Roi;
 import interactiveMT.Interactive_MTDoubleChannel;
 import interactiveMT.Interactive_MTSingleChannel;
+import interactiveMT.Interactive_MTSingleChannelBasic;
 import labeledObjects.KalmanIndexedlength;
 import lineFinder.FindlinesVia;
 import lineFinder.LinefinderInteractiveHough;
 import lineFinder.LinefinderInteractiveMSER;
 import lineFinder.LinefinderInteractiveMSERwHough;
+import listeners.SecondPanel;
+import listeners.ThirdPanel;
 import mpicbg.imglib.util.Util;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.util.Pair;
 import net.imglib2.util.ValuePair;
+import singleListeners.SingleThirdPanel;
 
 public class SingleProgressSeeds extends SwingWorker<Void, Void> {
 
 	
 final Interactive_MTSingleChannel parent;
-	
+final Interactive_MTSingleChannelBasic child;
 	
 	public SingleProgressSeeds(final Interactive_MTSingleChannel parent){
 	
 		this.parent = parent;
+		this.child = null;
+	}
+
+	public SingleProgressSeeds(final Interactive_MTSingleChannel parent, final Interactive_MTSingleChannelBasic child){
+		
+		this.parent = parent;
+		this.child = child;
 	}
 	
 	
@@ -142,16 +160,84 @@ final Interactive_MTSingleChannel parent;
 		try {
 			parent.jpb.setIndeterminate(false);
 			get();
+			
+
+			parent.Cardframe.add(parent.controlnext, BorderLayout.PAGE_END);
+			parent.Cardframe.validate();
+			parent.Cardframe.pack();
+			if (child!=null){
+				/*
+					
+					child.CardframeSimple.add(child.controlnext, BorderLayout.PAGE_END);
+					child.CardframeSimple.validate();
+					SecondPanel paintsecond = new SecondPanel(parent, child);
+					paintsecond.Paint();
+					
+					*/
+			}
+			if (child==null){
+			
+			
+				parent.controlnext.removeAll();
+				parent.controlprevious.removeAll();
+				parent.controlnext.add(new JButton(new AbstractAction("\u22b2Prev") {
+
+					/**
+					 * 
+					 */
+					private static final long serialVersionUID = 1L;
+
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						CardLayout cl = (CardLayout) parent.panelCont.getLayout();
+
+						cl.previous(parent.panelCont);
+					}
+				}));
+			 
+				parent.controlnext.add(new JButton(new AbstractAction("Next\u22b3") {
+
+					/**
+					 * 
+					 */
+					private static final long serialVersionUID = 1L;
+
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						CardLayout cl = (CardLayout) parent.panelCont.getLayout();
+						cl.next(parent.panelCont);
+					}
+				}));
+
+				parent.panelNext.add(parent.controlnext,  new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+			
+				parent.controlnext.setVisible(true);
+				
+				parent.panelSecond.add(parent.panelNext,  new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+			
+				parent.panelSecond.validate();
+				
+			
+			SingleThirdPanel paintthird = new SingleThirdPanel(parent);
+			paintthird.Paint();
+			
+			
 			parent.frame.dispose();
+			
+			}
+		}
 			// JOptionPane.showMessageDialog(jpb.getParent(), "End Points
 			// found and overlayed", "Success",
 			// JOptionPane.INFORMATION_MESSAGE);
-		} catch (ExecutionException | InterruptedException e) {
+		 catch (ExecutionException | InterruptedException e) {
 			e.printStackTrace();
 		}
 
 	}
-
-
-
 }
+
+
+
+

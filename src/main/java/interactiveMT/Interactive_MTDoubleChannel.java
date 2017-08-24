@@ -220,8 +220,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	private TextField Maxdmicro;
 
 	public File userfile;
-	public int starttimetrack;
-	public int endtimetrack;
+	
 	public int minDiversityInit = 1;
 
 	public int radius = 1;
@@ -644,8 +643,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		 newends = new Markends(this);
 		SaveTxt = true;
 
-		starttime = 2;
-		endtime = thirdDimensionSize;
+		
 		AllSeedrois = new ArrayList<OvalRoi>();
 		jpb = new JProgressBar();
 		newHoughtree = new HashMap<Integer, MserTree<UnsignedByteType>>();
@@ -691,6 +689,9 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 			Kymoimp = ImageJFunctions.show(Kymoimg);
 
 		}
+		
+		starttime = 2;
+		endtime = thirdDimensionSize;
 		prestack = new ImageStack((int) originalimg.dimension(0), (int) originalimg.dimension(1),
 				java.awt.image.ColorModel.getRGBdefault());
 
@@ -1115,6 +1116,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 	public JPanel panelCont = new JPanel();
 	public JPanel panelNext = new JPanel();
+	public JPanel panelPrevious = new JPanel();
 	public JPanel panelFirst = new JPanel();
 	public JPanel panelSecond = new JPanel();
 	public JPanel panelThird = new JPanel();
@@ -1486,7 +1488,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		 
 		 
 			controlnext.removeAll();
-			controlnext.add(new JButton(new AbstractAction("\u22b2Prev") {
+			controlprevious.add(new JButton(new AbstractAction("\u22b2Prev") {
 
 			
 				private static final long serialVersionUID = 1L;
@@ -1501,12 +1503,12 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		 
 		
 
-			panelNext.add(controlnext,  new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER,
+			panelPrevious.add(controlprevious,  new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER,
 					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 		
-			controlnext.setVisible(true);
+			controlprevious.setVisible(true);
 			
-			panelFourth.add(panelNext,  new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+			panelFourth.add(panelPrevious,  new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 		
 			
@@ -1656,9 +1658,9 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		
 		 
 		 controlnext.removeAll();
-			controlnext.add(new JButton(new AbstractAction("\u22b2Prev") {
+			controlprevious.add(new JButton(new AbstractAction("\u22b2Prev") {
 
-				
+			
 				private static final long serialVersionUID = 1L;
 
 				@Override
@@ -1671,15 +1673,16 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		 
 		
 
-			panelNext.add(controlnext,  new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER,
+			panelPrevious.add(controlprevious,  new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER,
 					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 		
-			controlnext.setVisible(true);
+			controlprevious.setVisible(true);
 			
-			panelFourth.add(panelNext,  new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+			panelFourth.add(panelPrevious,  new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 		
 			
+		 
 		 
 			deltaS.addAdjustmentListener(new DeltaListener(this, deltaText, deltaMin, deltaMax,scrollbarSize, deltaS));
 
@@ -1805,46 +1808,8 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 	}
 
-	public boolean DialogueAnalysis() {
+	
 
-		GenericDialog gd = new GenericDialog("Analyze");
-
-		gd.addNumericField("Start time of event", starttime, 0);
-		gd.addNumericField("Enfd time of event", endtime, 0);
-
-		gd.addCheckbox("Compute Velocity from Kymograph", numberKymo);
-
-		gd.addCheckbox("Compute Velocity by Tracker", numberTracker);
-
-		gd.showDialog();
-
-		starttime = (int) gd.getNextNumber();
-		endtime = (int) gd.getNextNumber();
-		numberKymo = gd.getNextBoolean();
-		numberTracker = gd.getNextBoolean();
-
-		if (starttime < 0)
-			starttime = 0;
-		if (endtime > thirdDimensionSize)
-			endtime = thirdDimensionSize;
-
-		return !gd.wasCanceled();
-
-	}
-
-	protected class SaveasXLS implements ItemListener {
-
-		@Override
-		public void itemStateChanged(ItemEvent arg0) {
-			if (arg0.getStateChange() == ItemEvent.DESELECTED)
-				SaveXLS = false;
-
-			else if (arg0.getStateChange() == ItemEvent.SELECTED)
-				SaveXLS = true;
-
-		}
-
-	}
 
 	public Comparator<Indexedlength> Seedcompare = new Comparator<Indexedlength>() {
 

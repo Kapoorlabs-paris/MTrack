@@ -33,7 +33,7 @@ public class SingleFindlinesVia {
 			final RandomAccessibleInterval<FloatType> Preprocessedsource,Pair<ArrayList<Indexedlength>,ArrayList<Indexedlength>> PrevFrameparam,
 			 final int framenumber, final double[] psf,  final LinefinderHF linefinder, final UserChoiceModel model,
 			final boolean DoMask, final double intensityratio, final double Inispacing, final HashMap<Integer, Whichend> Trackstart, final JProgressBar jpb, final int starttime,
-			final int thirdDimsize, final int numgaussians) {
+			final int thirdDimsize, final double maxdist, final int numgaussians) {
 
 		Pair<Pair<ArrayList<Trackproperties>, ArrayList<Trackproperties>>,Pair<ArrayList<Indexedlength>,ArrayList<Indexedlength>>> returnVector = null;
 		
@@ -43,7 +43,7 @@ public class SingleFindlinesVia {
 					PrevFrameparam.getA(), PrevFrameparam.getB(), psf, framenumber, model, DoMask, Trackstart,jpb, starttime,  thirdDimsize, numgaussians);
 			growthtracker.setIntensityratio(intensityratio);
 			growthtracker.setInispacing(Inispacing);
-			//growthtracker.setSlopetolerance(slopetolerance);
+			growthtracker.setMaxdist(maxdist);
 			growthtracker.checkInput();
 			growthtracker.process();
 			
@@ -71,7 +71,7 @@ public class SingleFindlinesVia {
 			final RandomAccessibleInterval<FloatType> Preprocessedsource,ArrayList<Indexedlength> PrevFrameparam,
 			 final int framenumber, final double[] psf,  final LinefinderHF linefinder, final UserChoiceModel model,
 			final boolean DoMask, final double intensityratio, final double Inispacing, final JProgressBar jpb,
-			final int thirdDimsize, int starttime) {
+			final int thirdDimsize, final double maxdist, int starttime) {
 
 		Pair<ArrayList<Trackproperties>,ArrayList<Indexedlength>> returnVector = null;
 		
@@ -81,6 +81,7 @@ public class SingleFindlinesVia {
 					PrevFrameparam, psf, framenumber, model, DoMask,jpb, thirdDimsize, starttime);
 			growthtracker.setIntensityratio(intensityratio);
 			growthtracker.setInispacing(Inispacing);
+			growthtracker.setMaxdist(maxdist);
 			growthtracker.checkInput();
 			growthtracker.process();
 			
