@@ -2,6 +2,7 @@ package peakFitter;
 
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import javax.swing.JProgressBar;
 
@@ -211,7 +212,11 @@ implements OutputAlgorithm<Pair<ArrayList<Indexedlength>, ArrayList<Indexedlengt
 		Inispacing = getInispacing();
 		startlist = new ArrayList<Indexedlength>();
 		endlist = new ArrayList<Indexedlength>();
-		for (int index = 0; index < imgs.size() ; ++index) {
+		
+	
+		
+		
+		for (int index = 0; index < imgs.size() ; index++) {
 			
 			
 			percent = (Math.round(100 * (index + 1) / (imgs.size())));
@@ -223,12 +228,15 @@ implements OutputAlgorithm<Pair<ArrayList<Indexedlength>, ArrayList<Indexedlengt
 			final double intercept = imgs.get(index).lineparam[1];
 			final double Curvature = imgs.get(index).lineparam[2];
 			final double Inflection = imgs.get(index).lineparam[3];
-			if ( slope!= Double.MAX_VALUE && intercept!= Double.MAX_VALUE){
+			if ( slope!= Double.MAX_VALUE && intercept!= Double.MAX_VALUE ){
 			final Pair<Indexedlength, Indexedlength> returnparam = Getfinallineparam(Label, slope, intercept, Curvature, Inflection, psf);
 			if (returnparam!= null ){
+				
 			startlist.add(returnparam.getA());
 			endlist.add(returnparam.getB());
 			}
+			
+			
 			}
 		}
 		
@@ -342,7 +350,7 @@ public ArrayList<Indexedlength> getEndPoints(){
 	
 	// Get line parameters for fitting line to a line in a label
 
-		public Pair<Indexedlength, Indexedlength> Getfinallineparam(final int label, final double slope, final double intercept, final double Curvature, final double Inflection, final double[] psf)  {
+		public Pair<Indexedlength, Indexedlength> Getfinallineparam(int label, final double slope, final double intercept, final double Curvature, final double Inflection, final double[] psf)  {
 
 			PointSampleList<FloatType> datalist = FitterUtils.gatherfullDataSeed(imgs, label, ndims);
 
@@ -364,8 +372,12 @@ public ArrayList<Indexedlength> getEndPoints(){
 			}
 
 			final double[] start_param = MakeimprovedLineguess(slope, intercept, Curvature, Inflection, psf, label);
-			if (start_param == null)
+			if (start_param == null){
+			
+				
 				return null;
+				
+			}
 
 			else {
 
@@ -681,8 +693,10 @@ public ArrayList<Indexedlength> getEndPoints(){
 			
 			}
 			
-			else 
+			else {
 				return null;
+				
+			}
 		}
 		public int Getlabel(final Point linepoint) {
 

@@ -974,8 +974,13 @@ public class Interactive_MTSingleChannel implements PlugIn {
 			interval = new FinalInterval(min, max);
 
 			currentimg = util.CopyUtils.extractImage(CurrentView, interval);
+			
+			
 			currentPreprocessedimg = util.CopyUtils.extractImage(CurrentPreprocessedView, interval);
+			
+			final long Cannyradius = (long) (radiusfactor * Math.ceil(Math.sqrt(psf[0] * psf[0] + psf[1] * psf[1])));
 
+			
 			newimg = util.CopyUtils.copytoByteImage(Kernels.CannyEdgeandMean(currentPreprocessedimg, Cannyradius),
 					standardRectangle);
 

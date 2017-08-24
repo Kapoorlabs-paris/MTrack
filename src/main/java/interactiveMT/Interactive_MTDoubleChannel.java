@@ -748,7 +748,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public void updatePreview(final ValueChange change) {
 
 		boolean roiChanged = false;
-
+		radiusfactor = Double.parseDouble(inputFieldradi.getText());
 		overlay = preprocessedimp.getOverlay();
 
 		if (overlay == null) {
@@ -985,7 +985,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 			GetLocalmaxmin.ThresholdingBit(currentPreprocessedimg, bitimg, thresholdHough);
 			GetLocalmaxmin.Thresholding(currentPreprocessedimg, bitimgFloat, thresholdHough, IntensityType.Gaussian,
-					new double[] { 0.5, 0.5 });
+					new double[]{0.5, 0.5});
 
 			if (displayBitimg)
 				ImageJFunctions.show(bitimg);
@@ -1429,8 +1429,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		DefaultModelHF loaddefault = new DefaultModelHF(this);
 		loaddefault.LoadDefault();
 		
-		panelFourth.add(Cannychoice, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
-				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+	
 		
 		
 		HoughparamHF.add(thresholdText,  new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,

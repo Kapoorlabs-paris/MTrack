@@ -84,23 +84,13 @@ public class LinefinderInteractiveHFHough implements LinefinderHF {
 	}
 
 	
-	Comparator<CommonOutputHF> Seedcomparison = new Comparator<CommonOutputHF>() {
-
-		@Override
-		public int compare(final CommonOutputHF A, final CommonOutputHF B) {
-
-			return A.roilabel - B.roilabel;
-
-		}
-
-	};
+	
 	
 	@Override
 	public boolean process() {
 		outputcurr = new ArrayList<CommonOutputHF>();
 		Allrois = new ArrayList<EllipseRoi>();
 		output = new ArrayList<CommonOutputHF>();
-		
 		
 		for (int label = 1; label < Maxlabel - 1; ++label){
 		
@@ -123,8 +113,8 @@ public class LinefinderInteractiveHFHough implements LinefinderHF {
 						outputcurr.get(i).Roi, outputcurr.get(i).Actualroi,parent.intimg,
 						outputcurr.get(i).interval,outputcurr.get(i).Allrois);
 				output.add(currentOutput);
-				
 				}
+			
 
 			
 		

@@ -18,13 +18,7 @@ final Interactive_MTDoubleChannel parent;
 	public RadiusListener(final Interactive_MTDoubleChannel parent){
 		
 		this.parent = parent;
-		 
-			 if(parent.FindLinesViaMSER)
-				    parent.updatePreview(ValueChange.SHOWMSER);
-				    if(parent.FindLinesViaHOUGH){
-				    	parent.updatePreview(ValueChange.SHOWHOUGH);
-				    	parent.updatePreview(ValueChange.SHOWMSERinHough );	
-				    }
+		
 	}
 	
 	
@@ -53,14 +47,9 @@ final Interactive_MTDoubleChannel parent;
 						 {
 							
 				    		parent.radiusfactor = (int)Float.parseFloat(s);
-						 
-				   				parent.radiusfactor = Double.parseDouble(parent.inputFieldradi.getText());
-				   		    if(parent.FindLinesViaMSER)
-				   		    parent.updatePreview(ValueChange.SHOWMSER);
-				   		    if(parent.FindLinesViaHOUGH){
-				   		    	parent.updatePreview(ValueChange.SHOWHOUGH);
-				   		    	parent.updatePreview(ValueChange.SHOWMSERinHough );	
-				   		    }
+				    	
+				   				
+				   		  
 				    		
 						 }
 

@@ -814,9 +814,9 @@ public class GetLocalmaxmin {
 
 		return SubpixelMinlist;
 	}
-	public static  void ThresholdingBit( final RandomAccessibleInterval< FloatType > in, final RandomAccessibleInterval< BitType > out, final Float threshold )
+	public static  void ThresholdingBit( final RandomAccessibleInterval<FloatType> currentPreprocessedimg, final RandomAccessibleInterval< BitType > out, final Float threshold )
 	{
-		final Cursor< FloatType > cIn = Views.iterable( in ).localizingCursor();
+		final Cursor< FloatType > cIn = Views.iterable( currentPreprocessedimg ).localizingCursor();
 		final RandomAccess< BitType > rOut = out.randomAccess();
 
 		final double[] position = new double[out.numDimensions()];

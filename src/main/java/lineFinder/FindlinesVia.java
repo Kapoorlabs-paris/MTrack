@@ -46,7 +46,7 @@ public  class FindlinesVia {
 			final boolean DoMask, final double Intensityratio, final double Inispacing, JProgressBar jpb ) {
 
 		
-		Pair<ArrayList<Indexedlength>,ArrayList<Indexedlength>>	PrevFrameparam = null;
+			
 		
 
 			
@@ -57,7 +57,7 @@ public  class FindlinesVia {
 			
 			MTline.checkInput();
 			MTline.process();
-			PrevFrameparam = MTline.getResult();
+			Pair<ArrayList<Indexedlength>,ArrayList<Indexedlength>>	PrevFrameparam = MTline.getResult();
 			
 		
 		return PrevFrameparam;
@@ -73,7 +73,7 @@ public  class FindlinesVia {
 			final boolean DoMask, final double intensityratio, final double Inispacing, final HashMap<Integer, Whichend> Trackstart, final JProgressBar jpb,
 			final int thirdDimsize, final double maxdist, final int startframe, final int numgaussians) {
 
-		Pair<Pair<ArrayList<Trackproperties>, ArrayList<Trackproperties>>,Pair<ArrayList<Indexedlength>,ArrayList<Indexedlength>>> returnVector = null;
+	
 		
 		
 
@@ -91,7 +91,7 @@ public  class FindlinesVia {
 			ArrayList<Trackproperties> startStateVectors = growthtracker.getstartStateVectors();
 			ArrayList<Trackproperties> endStateVectors = growthtracker.getendStateVectors();
 			Pair<ArrayList<Trackproperties>, ArrayList<Trackproperties>> Statevectors = new ValuePair<ArrayList<Trackproperties>, ArrayList<Trackproperties>>(startStateVectors, endStateVectors); 
-			returnVector = 
+			Pair<Pair<ArrayList<Trackproperties>, ArrayList<Trackproperties>>,Pair<ArrayList<Indexedlength>,ArrayList<Indexedlength>>> 	returnVector = 
 					new ValuePair<Pair<ArrayList<Trackproperties>, ArrayList<Trackproperties>>,Pair<ArrayList<Indexedlength>,ArrayList<Indexedlength>>>(Statevectors, NewFrameparam);
 			
 			
@@ -113,7 +113,6 @@ public  class FindlinesVia {
 			final boolean DoMask, final double intensityratio, final double Inispacing, final JProgressBar jpb,
 			final int thirdDimsize, final double maxdist, final int startframe) {
 
-		Pair<ArrayList<Trackproperties>,ArrayList<Indexedlength>> returnVector = null;
 		
 		
 
@@ -128,7 +127,7 @@ public  class FindlinesVia {
 			
 			ArrayList<Indexedlength> NewFrameparam = growthtracker.getResult();
 			ArrayList<Trackproperties> startStateVectors = growthtracker.getstartStateVectors();
-			returnVector = 
+			Pair<ArrayList<Trackproperties>,ArrayList<Indexedlength>>	returnVector = 
 					new ValuePair<ArrayList<Trackproperties>,ArrayList<Indexedlength>>(startStateVectors, NewFrameparam);
 			
 			
