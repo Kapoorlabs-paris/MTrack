@@ -70,15 +70,28 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 	int iterations = 200;
 	private final boolean DoMask;
 	public double cutoffdistance = 15;
+	public double maxdist = 20;
 	public boolean halfgaussian = false;
 	public double Intensityratio;
 	private final HashMap<Integer, Whichend> Trackstart;
 	public double Inispacing;
 	final int thirdDimsize;
+	final int startframe;
 	double percent = 0;
 	int maxghost = 5;
 
 	public final int numgaussians;
+	
+    public void setMaxdist (double maxdist) {
+		
+		this.maxdist = maxdist;
+	}
+	
+	public double getMaxdist(){
+		
+		return maxdist;
+	}
+	
 	public void setInispacing(double Inispacing) {
 
 		this.Inispacing = Inispacing;
@@ -137,7 +150,7 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 	public SubpixelVelocityCline(final RandomAccessibleInterval<FloatType> source, final LinefinderHF finder,
 			final ArrayList<Indexedlength> PrevFrameparamstart, final ArrayList<Indexedlength> PrevFrameparamend,
 			final double[] psf, final int framenumber, final UserChoiceModel model, final boolean DoMask,
-			final HashMap<Integer, Whichend> Trackstart, final JProgressBar jpb, final int thirdDimsize, final int numgaussians) {
+			final HashMap<Integer, Whichend> Trackstart, final JProgressBar jpb, final int thirdDimsize, final int startframe, final int numgaussians) {
 		finder.checkInput();
 		finder.process();
 		imgs = finder.getResult();
@@ -152,6 +165,7 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 		this.ndims = source.numDimensions();
 		this.Trackstart = Trackstart;
 		this.thirdDimsize = thirdDimsize;
+		this.startframe = startframe;
 		this.numgaussians = numgaussians;
 
 	}
@@ -216,25 +230,25 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 					paramnextframe = Getfinaltrackparam(PrevFrameparamstart.get(index), labelstart.get(0),
 							psf, framenumber, StartorEnd.Start);
 
-					double min = Double.MAX_VALUE;
-					double distmin = Double.MAX_VALUE;
+					double[] currentposini = paramnextframe.currentpos;
+					double[] previousposini = PrevFrameparamstart.get(index).currentpos;
+			
+					double distmin = Distance(currentposini, previousposini);
 					if (labelstart.size() > 1) {
 						for (int j = 0; j < labelstart.size(); ++j) {
 							System.out.println("Fitting multiple Labels");
 							Indexedlength test = Getfinaltrackparam(PrevFrameparamstart.get(index), labelstart.get(j),
 									psf, framenumber, StartorEnd.Start);
 							double[] currentpos = test.currentpos;
-							double[] fixedpos = test.fixedpos;
-							double pointonline = fixedpos[1] - test.originalslope * fixedpos[0]
-									- test.originalintercept;
-							double dist = Distance(currentpos, fixedpos);
-							if (Math.abs(pointonline) < min) {
-								min = Math.abs(pointonline);
+						
+							
+							double dist = Distance(currentpos, previousposini);
+						
 								if (dist < distmin) {
 									distmin = dist;
 									labelindex = j;
 									paramnextframe = test;
-								}
+								
 							}
 						}
 					}
@@ -251,11 +265,28 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 				if (paramnextframe == null)
 					paramnextframe = PrevFrameparamstart.get(index);
 
+				
+				//TCASM
+				double oldslope = PrevFrameparamstart.get(index).slope;
+				double newslope = paramnextframe.slope;
+				double dist = Math.toDegrees(Math.atan(Math.toRadians((newslope - oldslope)/(1 + newslope * oldslope))));
+				System.out.println(dist);
+				double[] oldstartpoint = PrevFrameparamstart.get(index).currentpos;
+				double[] newstartpoint = paramnextframe.currentpos;
+				// TCASM
+				if (Math.abs(dist) > maxdist && framenumber > startframe + 1){
+					paramnextframe = PrevFrameparamstart.get(index);
+					newstartpoint = oldstartpoint;
+					
+				}
+				
+				
+				
+				
 				final_paramliststart.add(paramnextframe);
 
-				final double[] oldstartpoint = PrevFrameparamstart.get(index).currentpos;
+		
 
-				final double[] newstartpoint = paramnextframe.currentpos;
 
 				final double newstartslope = paramnextframe.slope;
 				final double newstartintercept = paramnextframe.intercept;
@@ -272,7 +303,6 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 
 		for (int index = 0; index < PrevFrameparamend.size(); ++index) {
 			final int oldframenumber = PrevFrameparamend.get(PrevFrameparamend.size() - 1).framenumber;
-			final int framediff = framenumber - oldframenumber;
 
 			if (Trackstart.get(PrevFrameparamend.get(index).seedLabel) == Whichend.end
 					|| Trackstart.get(PrevFrameparamend.get(index).seedLabel) == Whichend.both) {
@@ -305,8 +335,12 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 					paramnextframeend = Getfinaltrackparam(PrevFrameparamend.get(index), labelend.get(0), psf,
 							framenumber, StartorEnd.End);
 
-					double min = Double.MAX_VALUE;
-					double distmin = Double.MAX_VALUE;
+					double[] currentposini = paramnextframeend.currentpos;
+					double[] previousposini = PrevFrameparamstart.get(index).currentpos;
+					
+					
+					double distmin = Distance(currentposini, previousposini);
+					
 					if (labelend.size() > 1) {
 						for (int j = 0; j < labelend.size(); ++j) {
 							System.out.println("Fitting multiple Labels");
@@ -314,17 +348,12 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 							Indexedlength test = Getfinaltrackparam(PrevFrameparamend.get(index), labelend.get(j), psf,
 									framenumber, StartorEnd.End);
 							double[] currentpos = test.currentpos;
-							double[] fixedpos = test.fixedpos;
-							double pointonline = fixedpos[1] - test.originalslope * fixedpos[0]
-									- test.originalintercept;
-							double dist = Distance(currentpos, fixedpos);
-							if (Math.abs(pointonline) < min) {
-								min = Math.abs(pointonline);
+							
+							double dist = Distance(currentpos, previousposini);
 								if (dist < distmin) {
 									distmin = dist;
 									labelindex = j;
 									paramnextframeend = test;
-								}
 							}
 						}
 					}
@@ -335,11 +364,27 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 				if (paramnextframeend == null)
 					paramnextframeend = PrevFrameparamend.get(index);
 
-				final_paramlistend.add(paramnextframeend);
-
+				
+				//TCASM
+				double oldslope = PrevFrameparamstart.get(index).slope;
+				double newslope = paramnextframeend.slope;
+				double dist = Math.toDegrees(Math.atan(Math.toRadians((newslope - oldslope)/(1 + newslope * oldslope))));
+				System.out.println(dist);
 				final double[] oldendpoint = PrevFrameparamend.get(index).currentpos;
 
-				double[] newendpoint = paramnextframeend.currentpos;
+				  double[] newendpoint = paramnextframeend.currentpos;
+				// TCASM
+				if (Math.abs(dist) > maxdist && framenumber > startframe + 1){
+					paramnextframeend = PrevFrameparamstart.get(index);
+					newendpoint = oldendpoint;
+					
+				}
+				
+				
+				
+				final_paramlistend.add(paramnextframeend);
+
+			
 
 				final double newendslope = paramnextframeend.slope;
 				final double newendintercept = paramnextframeend.intercept;
@@ -380,126 +425,12 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 
 	}
 
-	private final double[] MakerepeatedLineguess(Indexedlength iniparam, int label) {
-
-		double[] minVal = new double[ndims];
-		double[] maxVal = new double[ndims];
-
-		int labelindex = FitterUtils.getlabelindex(imgs, label);
-
-		if (labelindex != -1) {
-
-			RandomAccessibleInterval<FloatType> currentimg = imgs.get(labelindex).Roi;
-			FinalInterval interval = imgs.get(labelindex).interval;
-
-			currentimg = Views.interval(currentimg, interval);
-
-			final double maxintensityline = GetLocalmaxmin.computeMaxIntensity(currentimg);
-			final double minintensityline = 0;
-			Pair<double[], double[]> minmaxpair = FitterUtils.MakeinitialEndpointguess(imgs, maxintensityline,
-					Intensityratio, ndims, labelindex, iniparam.originalslope, iniparam.originalintercept,
-					iniparam.Curvature, iniparam.Inflection);
-			for (int d = 0; d < ndims; ++d) {
-
-				minVal[d] = minmaxpair.getA()[d];
-				maxVal[d] = minmaxpair.getB()[d];
-
-			}
-
-			if (model == UserChoiceModel.Line) {
-
-				final double[] MinandMax = new double[2 * ndims + 3];
-
-				for (int d = 0; d < ndims; ++d) {
-
-					MinandMax[d] = minVal[d];
-					MinandMax[d + ndims] = maxVal[d];
-				}
-
-				MinandMax[2 * ndims] = Inispacing;
-				MinandMax[2 * ndims + 1] = maxintensityline;
-				MinandMax[2 * ndims + 2] = minintensityline;
-				for (int d = 0; d < ndims; ++d) {
-
-					if (MinandMax[d] == Double.MAX_VALUE || MinandMax[d + ndims] == -Double.MIN_VALUE)
-						return null;
-					if (MinandMax[d] >= source.dimension(d) || MinandMax[d + ndims] >= source.dimension(d))
-						return null;
-					if (MinandMax[d] <= 0 || MinandMax[d + ndims] <= 0)
-						return null;
-
-				}
-				return MinandMax;
-			}
-
-			if (model == UserChoiceModel.Splineordersec) {
-
-				final double[] MinandMax = new double[2 * ndims + 4];
-
-				for (int d = 0; d < ndims; ++d) {
-
-					MinandMax[d] = minVal[d];
-					MinandMax[d + ndims] = maxVal[d];
-				}
-
-				MinandMax[2 * ndims + 2] = maxintensityline;
-				MinandMax[2 * ndims + 3] = minintensityline;
-				MinandMax[2 * ndims + 1] = iniparam.Curvature;
-				MinandMax[2 * ndims] = Inispacing;
-
-				for (int d = 0; d < ndims; ++d) {
-
-					if (MinandMax[d] == Double.MAX_VALUE || MinandMax[d + ndims] == -Double.MIN_VALUE)
-						return null;
-					if (MinandMax[d] >= source.dimension(d) || MinandMax[d + ndims] >= source.dimension(d))
-						return null;
-					if (MinandMax[d] <= 0 || MinandMax[d + ndims] <= 0)
-						return null;
-
-				}
-				return MinandMax;
-			}
-			if (model == UserChoiceModel.Splineorderthird) {
-
-				final double[] MinandMax = new double[2 * ndims + 5];
-
-				for (int d = 0; d < ndims; ++d) {
-
-					MinandMax[d] = minVal[d];
-					MinandMax[d + ndims] = maxVal[d];
-				}
-
-				MinandMax[2 * ndims + 2] = iniparam.Inflection;
-				MinandMax[2 * ndims + 3] = maxintensityline;
-				MinandMax[2 * ndims + 4] = minintensityline;
-				MinandMax[2 * ndims + 1] = iniparam.Curvature;
-				MinandMax[2 * ndims] = Inispacing;
-
-				for (int d = 0; d < ndims; ++d) {
-
-					if (MinandMax[d] == Double.MAX_VALUE || MinandMax[d + ndims] == -Double.MIN_VALUE)
-						return null;
-					if (MinandMax[d] >= source.dimension(d) || MinandMax[d + ndims] >= source.dimension(d))
-						return null;
-					if (MinandMax[d] <= 0 || MinandMax[d + ndims] <= 0)
-						return null;
-
-				}
-				return MinandMax;
-			}
-
-			else
-				return null;
-		}
-
-		else
-			return null;
-	}
+	
 
 	public Indexedlength Getfinaltrackparam(final Indexedlength iniparam, final int label, final double[] psf,
 			final int rate, final StartorEnd startorend) {
 
-		final double[] LMparam = MakerepeatedLineguess(iniparam, label);
+		final double[] LMparam = FitterUtils.MakerepeatedLineguess(imgs, iniparam, model, Intensityratio, Inispacing, label, ndims);
 		if (LMparam == null)
 			return iniparam;
 
@@ -1119,12 +1050,8 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 							+ 3 * Inflection * startpos[0] * startpos[0]) * dxstart;
 					double[] dxvectorstart = { dxstart, dystart };
 
-					double sigmas = 0;
 
-					for (int d = 0; d < ndims; ++d) {
-
-						sigmas += psf[d] * psf[d];
-					}
+					
 
 
 					
@@ -1204,28 +1131,7 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 
 	}
 
-	private PointSampleList<FloatType> gatherfullData(final int label) {
-		final PointSampleList<FloatType> datalist = new PointSampleList<FloatType>(ndims);
-
-		RandomAccessibleInterval<FloatType> currentimg = imgs.get(label).Actualroi;
-
-		FinalInterval interval = imgs.get(label).interval;
-
-		currentimg = Views.interval(currentimg, interval);
-
-		Cursor<FloatType> localcursor = Views.iterable(currentimg).localizingCursor();
-
-		while (localcursor.hasNext()) {
-			localcursor.fwd();
-
-			Point newpoint = new Point(localcursor);
-			datalist.add(newpoint, localcursor.get().copy());
-
-		}
-
-		return datalist;
-	}
-
+	
 	public ArrayList<Integer> Getlabel(final Point linepoint) {
 
 		ArrayList<Integer> currentlabel = new ArrayList<Integer>();

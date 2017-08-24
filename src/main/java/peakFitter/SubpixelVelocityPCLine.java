@@ -76,7 +76,6 @@ public class SubpixelVelocityPCLine extends BenchmarkAlgorithm
 	public int iterations = 200;
 	public double cutoffdistance = 15;
 	public boolean halfgaussian = false;
-	// public double slopetolerance = 10; // in degrees
 	public double Intensityratio;
 	final JProgressBar jpb;
 	final int thirdDimsize;
@@ -298,6 +297,8 @@ public void setMaxdist (double maxdist) {
 				double newslope = paramnextframestart.slope;
 				double dist = Math.toDegrees(Math.atan(Math.toRadians((newslope - oldslope)/(1 + newslope * oldslope))));
 				System.out.println(dist);
+				
+				// TCASM
 				if (Math.abs(dist) > maxdist && framenumber > startframe + 1){
 					paramnextframestart = PrevFrameparamstart.get(index);
 					newstartpoint = oldstartpoint;
@@ -435,132 +436,17 @@ public void setMaxdist (double maxdist) {
 		return Accountedframes;
 	}
 
-	private final double[] MakerepeatedLineguess(Indexedlength iniparam, int label) {
-
-		double[] minVal = new double[ndims];
-		double[] maxVal = new double[ndims];
-
-		int labelindex = FitterUtils.getlabelindex(imgs, label);
-		
-		if (labelindex != -1) {
-
-			RandomAccessibleInterval<FloatType> currentimg = imgs.get(labelindex).Roi;
-			FinalInterval interval = imgs.get(labelindex).interval;
-
-			currentimg = Views.interval(currentimg, interval);
-
-			final double maxintensityline = GetLocalmaxmin.computeMaxIntensity(currentimg);
-			final double minintensityline = 0;
-			Pair<double[], double[]> minmaxpair = FitterUtils.MakeinitialEndpointguess(imgs, maxintensityline,
-					Intensityratio, ndims, labelindex, iniparam.originalslope, iniparam.originalintercept,
-					iniparam.Curvature, iniparam.Inflection);
-			for (int d = 0; d < ndims; ++d) {
-
-				minVal[d] = minmaxpair.getA()[d];
-				maxVal[d] = minmaxpair.getB()[d];
-
-			}
-
-			if (model == UserChoiceModel.Line) {
-
-				final double[] MinandMax = new double[2 * ndims + 3];
-
-				for (int d = 0; d < ndims; ++d) {
-
-					MinandMax[d] = minVal[d];
-					MinandMax[d + ndims] = maxVal[d];
-				}
-
-				MinandMax[2 * ndims] = Inispacing;
-				MinandMax[2 * ndims + 1] = maxintensityline;
-				MinandMax[2 * ndims + 2] = minintensityline;
-				for (int d = 0; d < ndims; ++d) {
-
-					if (MinandMax[d] == Double.MAX_VALUE || MinandMax[d + ndims] == -Double.MIN_VALUE)
-						return null;
-					if (MinandMax[d] >= source.dimension(d) || MinandMax[d + ndims] >= source.dimension(d))
-						return null;
-					if (MinandMax[d] <= 0 || MinandMax[d + ndims] <= 0)
-						return null;
-
-				}
-				return MinandMax;
-			}
-
-			if (model == UserChoiceModel.Splineordersec) {
-
-				final double[] MinandMax = new double[2 * ndims + 4];
-
-				for (int d = 0; d < ndims; ++d) {
-
-					MinandMax[d] = minVal[d];
-					MinandMax[d + ndims] = maxVal[d];
-				}
-
-				MinandMax[2 * ndims + 2] = maxintensityline;
-				MinandMax[2 * ndims + 3] = minintensityline;
-				MinandMax[2 * ndims + 1] = iniparam.Curvature;
-				MinandMax[2 * ndims] = Inispacing;
-
-				for (int d = 0; d < ndims; ++d) {
-
-					if (MinandMax[d] == Double.MAX_VALUE || MinandMax[d + ndims] == -Double.MIN_VALUE)
-						return null;
-					if (MinandMax[d] >= source.dimension(d) || MinandMax[d + ndims] >= source.dimension(d))
-						return null;
-					if (MinandMax[d] <= 0 || MinandMax[d + ndims] <= 0)
-						return null;
-
-				}
-				return MinandMax;
-			}
-			if (model == UserChoiceModel.Splineorderthird) {
-
-				final double[] MinandMax = new double[2 * ndims + 5];
-
-				for (int d = 0; d < ndims; ++d) {
-
-					MinandMax[d] = minVal[d];
-					MinandMax[d + ndims] = maxVal[d];
-				}
-
-				MinandMax[2 * ndims + 2] = iniparam.Inflection;
-				MinandMax[2 * ndims + 3] = maxintensityline;
-				MinandMax[2 * ndims + 4] = minintensityline;
-				MinandMax[2 * ndims + 1] = iniparam.Curvature;
-				MinandMax[2 * ndims] = Inispacing;
-
-				for (int d = 0; d < ndims; ++d) {
-
-					if (MinandMax[d] == Double.MAX_VALUE || MinandMax[d + ndims] == -Double.MIN_VALUE)
-						return null;
-					if (MinandMax[d] >= source.dimension(d) || MinandMax[d + ndims] >= source.dimension(d))
-						return null;
-					if (MinandMax[d] <= 0 || MinandMax[d + ndims] <= 0)
-						return null;
-
-				}
-				return MinandMax;
-			}
-
-			else
-				return null;
-		}
-
-		else
-			return null;
-	}
+	
 
 	public Indexedlength Getfinaltrackparam(final Indexedlength iniparam, final int label, final double[] psf,
 			final int rate, final StartorEnd startorend) {
 
-		final double[] LMparam = MakerepeatedLineguess(iniparam, label);
+		final double[] LMparam = FitterUtils.MakerepeatedLineguess(imgs, iniparam, model, Intensityratio, Inispacing, label, ndims);
 		if (LMparam == null)
 			return iniparam;
 
 		else {
 
-			final double[] inipos = iniparam.currentpos;
 
 			int labelindex = FitterUtils.getlabelindex(imgs, label);
 

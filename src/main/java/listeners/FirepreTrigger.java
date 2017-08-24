@@ -24,6 +24,8 @@ import ij.ImagePlus;
 import ij.io.Opener;
 import interactiveMT.Interactive_MTDoubleChannel;
 import interactiveMT.Interactive_MTDoubleChannelBasic;
+import interactiveMT.Interactive_MTSingleChannel;
+import interactiveMT.Interactive_MTSingleChannelBasic;
 import interactiveMT.MainFileChooser;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.algorithm.stats.Normalize;
@@ -160,10 +162,10 @@ public class FirepreTrigger implements ActionListener {
 			ImageJFunctions.show(parent.originalPreprocessedimg).setTitle("Preprocessed Movie");
 
 			if (parent.Simplemode)
-				new Interactive_MTDoubleChannelBasic(new Interactive_MTDoubleChannel(parent.originalimg, parent.originalPreprocessedimg,
+				new Interactive_MTSingleChannelBasic(new Interactive_MTSingleChannel(parent.originalimg, parent.originalPreprocessedimg,
 						parent.psf, parent.calibration, parent.chooserB.getSelectedFile())).run(null);
 			else
-				new Interactive_MTDoubleChannel(parent.originalimg, parent.originalPreprocessedimg, parent.psf, parent.calibration,
+				new Interactive_MTSingleChannel(parent.originalimg, parent.originalPreprocessedimg, parent.psf, parent.calibration,
 						parent.chooserB.getSelectedFile()).run(null);
 			
 			

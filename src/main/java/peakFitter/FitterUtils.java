@@ -40,6 +40,205 @@ public class FitterUtils {
 		return Math.sqrt(distance);
 	}
 
+	
+	
+	public static double[] MakerepeatedLineguess(ArrayList<CommonOutputHF> imgs, Indexedlength iniparam, UserChoiceModel model,  double Intensityratio, double Inispacing, int label, int ndims) {
+
+		double[] minVal = new double[ndims];
+		double[] maxVal = new double[ndims];
+
+		int labelindex = FitterUtils.getlabelindex(imgs, label);
+		
+		if (labelindex != -1) {
+
+			RandomAccessibleInterval<FloatType> currentimg = imgs.get(labelindex).Roi;
+			FinalInterval interval = imgs.get(labelindex).interval;
+
+			currentimg = Views.interval(currentimg, interval);
+
+			final double maxintensityline = GetLocalmaxmin.computeMaxIntensity(currentimg);
+			final double minintensityline = 0;
+			Pair<double[], double[]> minmaxpair = FitterUtils.MakeinitialEndpointguess(imgs, maxintensityline,
+					Intensityratio, ndims, labelindex, iniparam.originalslope, iniparam.originalintercept,
+					iniparam.Curvature, iniparam.Inflection);
+			for (int d = 0; d < ndims; ++d) {
+
+				minVal[d] = minmaxpair.getA()[d];
+				maxVal[d] = minmaxpair.getB()[d];
+
+			}
+
+			if (model == UserChoiceModel.Line) {
+
+				final double[] MinandMax = new double[2 * ndims + 3];
+
+				for (int d = 0; d < ndims; ++d) {
+
+					MinandMax[d] = minVal[d];
+					MinandMax[d + ndims] = maxVal[d];
+				}
+
+				MinandMax[2 * ndims] = Inispacing;
+				MinandMax[2 * ndims + 1] = maxintensityline;
+				MinandMax[2 * ndims + 2] = minintensityline;
+				for (int d = 0; d < ndims; ++d) {
+
+					if (MinandMax[d] == Double.MAX_VALUE || MinandMax[d + ndims] == -Double.MIN_VALUE)
+						return null;
+					if (MinandMax[d] >= currentimg.dimension(d) || MinandMax[d + ndims] >= currentimg.dimension(d))
+						return null;
+					if (MinandMax[d] <= 0 || MinandMax[d + ndims] <= 0)
+						return null;
+
+				}
+				return MinandMax;
+			}
+
+			if (model == UserChoiceModel.Splineordersec) {
+
+				final double[] MinandMax = new double[2 * ndims + 4];
+
+				for (int d = 0; d < ndims; ++d) {
+
+					MinandMax[d] = minVal[d];
+					MinandMax[d + ndims] = maxVal[d];
+				}
+
+				MinandMax[2 * ndims + 2] = maxintensityline;
+				MinandMax[2 * ndims + 3] = minintensityline;
+				MinandMax[2 * ndims + 1] = iniparam.Curvature;
+				MinandMax[2 * ndims] = Inispacing;
+
+				for (int d = 0; d < ndims; ++d) {
+
+					if (MinandMax[d] == Double.MAX_VALUE || MinandMax[d + ndims] == -Double.MIN_VALUE)
+						return null;
+					if (MinandMax[d] >= currentimg.dimension(d) || MinandMax[d + ndims] >= currentimg.dimension(d))
+						return null;
+					if (MinandMax[d] <= 0 || MinandMax[d + ndims] <= 0)
+						return null;
+
+				}
+				return MinandMax;
+			}
+			if (model == UserChoiceModel.Splineorderthird) {
+
+				final double[] MinandMax = new double[2 * ndims + 5];
+
+				for (int d = 0; d < ndims; ++d) {
+
+					MinandMax[d] = minVal[d];
+					MinandMax[d + ndims] = maxVal[d];
+				}
+
+				MinandMax[2 * ndims + 2] = iniparam.Inflection;
+				MinandMax[2 * ndims + 3] = maxintensityline;
+				MinandMax[2 * ndims + 4] = minintensityline;
+				MinandMax[2 * ndims + 1] = iniparam.Curvature;
+				MinandMax[2 * ndims] = Inispacing;
+
+				for (int d = 0; d < ndims; ++d) {
+
+					if (MinandMax[d] == Double.MAX_VALUE || MinandMax[d + ndims] == -Double.MIN_VALUE)
+						return null;
+					
+					if (MinandMax[d] <= 0 || MinandMax[d + ndims] <= 0)
+						return null;
+
+				}
+				return MinandMax;
+			}
+
+			else
+				return null;
+		}
+
+		else
+			return null;
+	}
+	
+	public static double[] MakeimprovedLineguess(ArrayList<CommonOutput> imgs, double slope, double intercept, double Curvature, double Inflection, double Intensityratio, double Inispacing,
+			double[] psf, int label)  {
+		
+		
+		int ndims = psf.length;
+		long[] newposition = new long[ndims];
+		double[] minVal = { Double.MAX_VALUE, Double.MAX_VALUE };
+		double[] maxVal = { -Double.MIN_VALUE, -Double.MIN_VALUE };
+
+		RandomAccessibleInterval<FloatType> currentimg = imgs.get(label).Actualroi;
+
+		FinalInterval interval = imgs.get(label).interval;
+		
+		currentimg = Views.interval(currentimg, interval);
+
+		final Cursor<FloatType> inputcursor = Views.iterable(currentimg).localizingCursor();
+
+		final double maxintensityline = GetLocalmaxmin.computeMaxIntensity(currentimg);
+
+           
+
+           
+          
+        	   
+        	   while(inputcursor.hasNext()){
+       			
+       			inputcursor.fwd();
+       			
+       			long pointonline = (long)Math.round(inputcursor.getDoublePosition(1) - slope * inputcursor.getDoublePosition(0) -
+       					intercept );
+       				inputcursor.localize(newposition);
+       				if (inputcursor.getDoublePosition(0) <= minVal[0]
+    						&& inputcursor.get().get() / maxintensityline > Intensityratio) {
+    					minVal[0] = inputcursor.getDoublePosition(0);
+    					minVal[1] = inputcursor.getDoublePosition(1);
+    				}
+
+    				if (inputcursor.getDoublePosition(0) >= maxVal[0]
+    						&& inputcursor.get().get() / maxintensityline > Intensityratio) {
+    					maxVal[0] = inputcursor.getDoublePosition(0);
+    					maxVal[1] = inputcursor.getDoublePosition(1);
+    				}
+
+       			
+        	   }
+		final double[] MinandMax = new double[2 * ndims + 3];
+
+		
+			for (int d = 0; d < ndims; ++d) {
+
+				MinandMax[d] = minVal[d];
+				MinandMax[d + ndims] = maxVal[d];
+			}
+
+		
+
+		// This parameter is guess estimate for spacing between the Gaussians
+		MinandMax[2 * ndims] =   Inispacing;
+		MinandMax[2 * ndims + 1] = maxintensityline; 
+		// This parameter guess estimates the background noise level
+		MinandMax[2 * ndims + 2] = 0.0; 
+		
+		
+		System.out.println("Label: " + label + " " + "Detection: " + " StartX: " + MinandMax[0] + " StartY: "
+				+ MinandMax[1] + " EndX: " + MinandMax[2] + " EndY: " + MinandMax[3]);
+
+		
+		
+			for (int d = 0; d < ndims; ++d) {
+
+				if (MinandMax[d] == Double.MAX_VALUE || MinandMax[d + ndims] == -Double.MIN_VALUE)
+					return null;
+				
+				if (MinandMax[d] <= 0 || MinandMax[d + ndims] <= 0)
+					return null;
+
+			}
+		
+
+		return MinandMax;
+           }
+       
 	public static ArrayList<Integer> Getlabel(final ArrayList<CommonOutputHF> imgs, final Point fixedpoint,
 			final double originalslope, final double originalintercept) {
 

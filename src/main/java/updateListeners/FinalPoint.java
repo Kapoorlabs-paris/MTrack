@@ -93,8 +93,7 @@ public class FinalPoint implements ActionListener {
 		Collections.sort(parent.PrevFrameparam.getA(), parent.Seedcompare);
 		Collections.sort(parent.PrevFrameparam.getB(), parent.Seedcompare);
 
-		int minSeed = parent.PrevFrameparam.getA().get(0).seedLabel;
-		int maxSeed = parent.PrevFrameparam.getA().get(parent.PrevFrameparam.getA().size() - 1).seedLabel;
+	
 
 		Set<Integer> Actualseed = new HashSet<Integer>();
 		

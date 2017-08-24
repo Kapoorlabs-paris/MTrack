@@ -118,7 +118,7 @@ public class SingleLinefinderInteractiveHFHough implements LinefinderHF {
 			newlineMser.process();
 			outputcurr = newlineMser.getResult();
 			
-			
+			if (outputcurr.size() > 0){
 			for (int i = 0; i < outputcurr.size(); ++i){
 				count++;
 				
@@ -130,6 +130,7 @@ public class SingleLinefinderInteractiveHFHough implements LinefinderHF {
 				
 				
 
+			}
 			}
 			
 		

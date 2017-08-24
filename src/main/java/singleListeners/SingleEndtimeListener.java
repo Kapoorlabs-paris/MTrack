@@ -5,6 +5,8 @@ import java.awt.Scrollbar;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 
+import javax.swing.JScrollBar;
+
 import interactiveMT.Interactive_MTDoubleChannel;
 import interactiveMT.Interactive_MTSingleChannel;
 
@@ -14,17 +16,17 @@ public class SingleEndtimeListener implements AdjustmentListener {
 	final Label label;
 	final float min, max;
 	final int scrollbarSize;
+	final String string;
+	final JScrollBar deltaScrollbar;
 
-	final Scrollbar deltaScrollbar;
-
-	public SingleEndtimeListener(final Interactive_MTSingleChannel parent,final Label label, final float min, final float max, final int scrollbarSize,
-			final Scrollbar deltaScrollbar) {
+	public SingleEndtimeListener(final Interactive_MTSingleChannel parent,final Label label,final String string, final float min, final float max, final int scrollbarSize,
+			final JScrollBar deltaScrollbar) {
 		this.label = label;
 		this.min = min;
 		this.max = max;
 		this.parent = parent;
 		this.scrollbarSize = scrollbarSize;
-
+        this.string = string;
 		this.deltaScrollbar = deltaScrollbar;
 
 	}
@@ -35,7 +37,7 @@ public class SingleEndtimeListener implements AdjustmentListener {
 
 		deltaScrollbar.setValue(parent.computeScrollbarPositionFromValue(parent.endtime, min, max, scrollbarSize));
 
-		label.setText("endFrame = " + parent.endtime);
+		label.setText(string +  " = "  + parent.endtime);
 
 	}
 }

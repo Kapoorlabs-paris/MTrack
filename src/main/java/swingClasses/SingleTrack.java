@@ -95,7 +95,7 @@ public  class SingleTrack {
 						parent.newtree,  parent.thirdDimension);
 					parent.returnVector = SingleFindlinesVia.LinefindingMethodHF(groundframe, groundframepre, parent.PrevFrameparam,
 							 parent.thirdDimension, parent.psf, newlineMser, parent.userChoiceModel, parent.Domask, parent.Intensityratio,
-							parent.Inispacing, parent.seedmap, parent.jpb, parent.thirdDimensionSize, parent.numgaussians);
+							parent.Inispacing, parent.seedmap, parent.jpb, parent.starttime, parent.thirdDimensionSize, parent.numgaussians);
 					parent.Accountedframes.add(FindlinesVia.getAccountedframes());
 					
 					
@@ -131,7 +131,7 @@ public  class SingleTrack {
 				
 					parent.returnVector = SingleFindlinesVia.LinefindingMethodHF(groundframe, groundframepre, parent.PrevFrameparam,
 							 parent.thirdDimension, parent.psf, newlineHough, parent.userChoiceModel,parent.Domask, parent.Intensityratio,
-							parent.Inispacing, parent.seedmap, parent.jpb, parent.thirdDimensionSize, parent.numgaussians);
+							parent.Inispacing, parent.seedmap, parent.jpb, parent.starttime, parent.thirdDimensionSize, parent.numgaussians);
 
 					parent.Accountedframes.add(FindlinesVia.getAccountedframes());
 					
@@ -167,7 +167,7 @@ public  class SingleTrack {
 						groundframepre, parent.newtree, parent.thirdDimension, parent.thetaPerPixel, parent.rhoPerPixel);
 					parent.returnVector = SingleFindlinesVia.LinefindingMethodHF(groundframe, groundframepre, parent.PrevFrameparam,
 							 parent.thirdDimension, parent.psf, newlineMserwHough, parent.userChoiceModel, parent.Domask, parent.Intensityratio,
-							parent.Inispacing, parent.seedmap, parent.jpb, parent.thirdDimensionSize, parent.numgaussians);
+							parent.Inispacing, parent.seedmap, parent.jpb, parent.starttime, parent.thirdDimensionSize, parent.numgaussians);
 
 					parent.Accountedframes.add(FindlinesVia.getAccountedframes());
 					

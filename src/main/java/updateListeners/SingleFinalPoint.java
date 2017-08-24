@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import ij.IJ;
@@ -15,11 +16,13 @@ import interactiveMT.BatchMode;
 import interactiveMT.Interactive_MTSingleChannel;
 import interactiveMT.Interactive_MTSingleChannel.ValueChange;
 import interactiveMT.Interactive_MTSingleChannel.Whichend;
+import listeners.SkipFramesandTrackendsListener;
 import interactiveMT.Interactive_MTSingleChannelBasic;
 import interactiveMT.SingleBatchMode;
 
 import net.imglib2.util.Pair;
 import net.imglib2.util.ValuePair;
+import singleListeners.SingleSkipFramesandTrackendsListener;
 
 public class SingleFinalPoint implements ItemListener {
 
@@ -100,24 +103,31 @@ public class SingleFinalPoint implements ItemListener {
 
 		Collections.sort(parent.PrevFrameparam.getA(), parent.Seedcompare);
 		Collections.sort(parent.PrevFrameparam.getB(), parent.Seedcompare);
-
-		int minSeed = parent.PrevFrameparam.getA().get(0).seedLabel;
-		int maxSeed = parent.PrevFrameparam.getA().get(parent.PrevFrameparam.getA().size() - 1).seedLabel;
+		Set<Integer> Actualseed = new HashSet<Integer>();
 
 		for (int i = 0; i < parent.PrevFrameparam.getA().size(); ++i) {
 
+			
+			if (parent.PrevFrameparam.getA().get(i).fixedpos!=null){
 			endAmap.put(parent.PrevFrameparam.getA().get(i).seedLabel, parent.PrevFrameparam.getA().get(i).fixedpos);
+			Actualseed.add(parent.PrevFrameparam.getA().get(i).seedLabel);
+			}
 
 		}
 
 		for (int i = 0; i < parent.PrevFrameparam.getB().size(); ++i) {
-
+			if (parent.PrevFrameparam.getB().get(i).fixedpos!=null){
 			endBmap.put(parent.PrevFrameparam.getB().get(i).seedLabel, parent.PrevFrameparam.getB().get(i).fixedpos);
+			Actualseed.add(parent.PrevFrameparam.getB().get(i).seedLabel);
+			}
 
 		}
 
-		for (int i = minSeed; i < maxSeed + 1; ++i) {
-
+		Iterator<Integer> iter = Actualseed.iterator();
+		int count = 0;
+		while(iter.hasNext()){
+			
+			int i = iter.next();
 			
 			for (int index = 0; index < parent.ClickedPoints.size(); ++index) {
 
@@ -132,7 +142,7 @@ public class SingleFinalPoint implements ItemListener {
 					parent.seedmap.put(i, Whichend.start);
 
 					int seedid = i;
-					double[] seedpos = parent.ClickedPoints.get(index).getA();
+					double[] seedpos = parent.PrevFrameparam.getA().get(count).fixedpos;
 					Pair<Integer, double[]> seedpair = new ValuePair<Integer, double[]>(seedid, seedpos);
 					parent.IDALL.add(seedpair);
 				}
@@ -142,7 +152,7 @@ public class SingleFinalPoint implements ItemListener {
 					parent.seedmap.put(i, Whichend.end);
 
 					int seedid = i;
-					double[] seedpos = parent.ClickedPoints.get(index).getA();
+					double[] seedpos = parent.PrevFrameparam.getB().get(count).fixedpos;
 					Pair<Integer, double[]> seedpair = new ValuePair<Integer, double[]>(seedid, seedpos);
 					parent.IDALL.add(seedpair);
 
@@ -162,6 +172,7 @@ public class SingleFinalPoint implements ItemListener {
 				}
 
 			}
+			count++;
 
 		}
 
@@ -179,8 +190,13 @@ public class SingleFinalPoint implements ItemListener {
 
 		parent.updatePreview(ValueChange.SHOWMSER);
 
-		if (child != null)
-			child.DeterministicSimple();
+		if (child != null){
+			
+			SingleSkipFramesandTrackendsListener track =  new SingleSkipFramesandTrackendsListener(parent, parent.starttime, parent.endtime);
+			track.goSkip();
+		
+		}
+			
 
 	}
 	

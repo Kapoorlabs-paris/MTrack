@@ -262,89 +262,7 @@ public ArrayList<Indexedlength> getEndPoints(){
 		return endlist;
 	}
 	
-	private final double[] MakeimprovedLineguess(double slope, double intercept, double Curvature, double Inflection, double[] psf, int label)  {
-		long[] newposition = new long[ndims];
-		double[] minVal = { Double.MAX_VALUE, Double.MAX_VALUE };
-		double[] maxVal = { -Double.MIN_VALUE, -Double.MIN_VALUE };
-
-		RandomAccessibleInterval<FloatType> currentimg = imgs.get(label).Actualroi;
-
-		FinalInterval interval = imgs.get(label).interval;
-		
-		currentimg = Views.interval(currentimg, interval);
-
-		final Cursor<FloatType> inputcursor = Views.iterable(currentimg).localizingCursor();
-
-		final double maxintensityline = GetLocalmaxmin.computeMaxIntensity(currentimg);
-
-           
-
-           
-          
-        	   
-        	   while(inputcursor.hasNext()){
-       			
-       			inputcursor.fwd();
-       			
-       			long pointonline = (long)Math.round(inputcursor.getDoublePosition(1) - slope * inputcursor.getDoublePosition(0) -
-       					intercept );
-       				inputcursor.localize(newposition);
-               if (Math.abs(pointonline)<= 50){
-       				if (inputcursor.getDoublePosition(0) <= minVal[0]
-    						&& inputcursor.get().get() / maxintensityline > Intensityratio) {
-    					minVal[0] = inputcursor.getDoublePosition(0);
-    					minVal[1] = inputcursor.getDoublePosition(1);
-    				}
-
-    				if (inputcursor.getDoublePosition(0) >= maxVal[0]
-    						&& inputcursor.get().get() / maxintensityline > Intensityratio) {
-    					maxVal[0] = inputcursor.getDoublePosition(0);
-    					maxVal[1] = inputcursor.getDoublePosition(1);
-    				}
-
-       			
-                  }
-        	   }
-		final double[] MinandMax = new double[2 * ndims + 3];
-
-		
-			for (int d = 0; d < ndims; ++d) {
-
-				MinandMax[d] = minVal[d];
-				MinandMax[d + ndims] = maxVal[d];
-			}
-
-		
-
-		// This parameter is guess estimate for spacing between the Gaussians
-		MinandMax[2 * ndims] =   Inispacing;
-		MinandMax[2 * ndims + 1] = maxintensityline; 
-		// This parameter guess estimates the background noise level
-		MinandMax[2 * ndims + 2] = 0.0; 
-		
-		
-		System.out.println("Label: " + label + " " + "Detection: " + " StartX: " + MinandMax[0] + " StartY: "
-				+ MinandMax[1] + " EndX: " + MinandMax[2] + " EndY: " + MinandMax[3]);
-
-		
-		
-			for (int d = 0; d < ndims; ++d) {
-
-				if (MinandMax[d] == Double.MAX_VALUE || MinandMax[d + ndims] == -Double.MIN_VALUE)
-					return null;
-				if (MinandMax[d] >= source.dimension(d) || MinandMax[d + ndims] >= source.dimension(d))
-					return null;
-				if (MinandMax[d] <= 0 || MinandMax[d + ndims] <= 0)
-					return null;
-
-			}
-		
-
-		return MinandMax;
-           }
-       
-           
-          
+	
            
 	
 	
@@ -371,7 +289,9 @@ public ArrayList<Indexedlength> getEndPoints(){
 				index++;
 			}
 
-			final double[] start_param = MakeimprovedLineguess(slope, intercept, Curvature, Inflection, psf, label);
+			final double[] start_param = FitterUtils.MakeimprovedLineguess(imgs, slope, intercept, Curvature, Inflection, Intensityratio, Inispacing, psf, label);
+		
+			
 			if (start_param == null){
 			
 				

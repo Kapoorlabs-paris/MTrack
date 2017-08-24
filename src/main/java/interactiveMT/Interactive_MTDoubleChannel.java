@@ -719,8 +719,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 			IJ.log("Only rectangular rois are supported...");
 			return;
 		}
-		starttime = 2;
-		endtime = thirdDimensionSize;
+		
 		// copy the ImagePlus into an ArrayImage<FloatType> for faster access
 		// displaySliders();
 		Card();
@@ -991,7 +990,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 				ImageJFunctions.show(bitimg);
 
 			WatershedDistimg<FloatType> WaterafterDisttransform = new WatershedDistimg<FloatType>(
-					Kernels.CannyEdgeandMean(currentPreprocessedimg, Cannyradius), bitimg);
+					currentPreprocessedimg, bitimg);
 			WaterafterDisttransform.checkInput();
 			WaterafterDisttransform.process();
 			intimg = WaterafterDisttransform.getResult();
@@ -1158,23 +1157,20 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		inputFieldradi = new TextField();
 		inputFieldradi.setColumns(10);
 		inputFieldradi.setText(String.valueOf(radiusfactor));
-		CheckboxGroup Finders = new CheckboxGroup();
+		
 		final Scrollbar thirdDimensionslider = new Scrollbar(Scrollbar.HORIZONTAL, thirdDimensionsliderInit, 0, 0,
 				thirdDimensionSize);
 		thirdDimensionslider.setBlockIncrement(1);
 		this.thirdDimensionslider = (int) computeIntValueFromScrollbarPosition(thirdDimensionsliderInit, timeMin,
 				thirdDimensionSize, thirdDimensionSize);
-		final Label timeText = new Label("Time index = " + this.thirdDimensionslider, Label.CENTER);
-		final Button JumpinTime = new Button("Jump in time :");
+	
 		final JButton ChooseDirectory = new JButton("Choose Directory");
 		TextField inputField = new TextField();
 		inputField.setColumns(20);
 		inputField.setText(userfile.getName().replaceFirst("[.][^.]+$", ""));
 
 		addToName = inputField.getText();
-		final Checkbox mser = new Checkbox("MSER", Finders, FindLinesViaMSER);
-		final Checkbox hough = new Checkbox("HOUGH", Finders, FindLinesViaHOUGH);
-		final Checkbox mserwhough = new Checkbox("MSERwHOUGH", Finders, FindLinesViaMSERwHOUGH);
+		
 
 		String[] Method = { "MSER", "HOUGH","MSERwHOUGH" };
 		JComboBox<String> ChooseMethod = new JComboBox<String>(Method);
@@ -1241,14 +1237,9 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		panelFirst.setVisible(true);
 		cl.show(panelCont, "1");
 
-		// MedFiltercur.addItemListener(new MediancurrListener() );
-
-		// ChoiceofTracker.addActionListener(new
-		// TrackerButtonListener(Cardframe));
+		
 		inputFieldradi.addTextListener(new RadiusListener(this));
-	//	mser.addItemListener(new MserListener(this));
-	//	hough.addItemListener(new HoughListener(this));
-	//	mserwhough.addItemListener(new MserwHoughListener(this));
+
 		ChooseDirectory.addActionListener(new ChooseDirectoryListener(this, inputField, userfile));
         ChooseMethod.addActionListener(new MethodListener(this, ChooseMethod));
 		
@@ -1398,8 +1389,6 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		Border optborder = new CompoundBorder(new TitledBorder("Tracker options"), new EmptyBorder(c.insets));
 		
 		
-		final Label exthresholdText = new Label("threshold = threshold to create Bitimg for watershedding.",
-				Label.CENTER);
 
 		final Label thresholdText = new Label("thresholdValue = " + thresholdHough, Label.CENTER);
 
@@ -1429,8 +1418,10 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		DefaultModelHF loaddefault = new DefaultModelHF(this);
 		loaddefault.LoadDefault();
 		
-	
 		
+	
+		panelFourth.add(Cannychoice, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 		
 		HoughparamHF.add(thresholdText,  new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
@@ -2213,11 +2204,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 				Inispacing / Math.min(psf[0], psf[1]), 2);
 		gd.addNumericField("Maximum direction change per frame (in degrees)", maxdist, 2);
 
-		if (analyzekymo && Kymoimg != null) {
-			gd.addNumericField(
-					"On an average, maximum difference in pixels between Kymograph and Program generated curve = ",
-					deltadcutoff, 2);
-		}
+		
 
 		gd.showDialog();
 		indexmodel = gd.getNextChoiceIndex();
@@ -2233,8 +2220,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		Inispacing = gd.getNextNumber() * Math.min(psf[0], psf[1]);
 		maxdist = gd.getNextNumber();
 
-		if (analyzekymo && Kymoimg != null)
-			deltadcutoff = (float) gd.getNextNumber();
+		
 
 		return !gd.wasCanceled();
 	}

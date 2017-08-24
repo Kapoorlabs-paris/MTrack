@@ -207,8 +207,6 @@ public class SingleBatchMode implements PlugIn, Runnable {
 	public double rhoPerPixel = Prefs.getDouble(".rhoPerPixel.double", 1.0);
 
 	public String userfile;
-	public int starttimetrack;
-	public int endtimetrack;
 
 	public int radius = 1;
 	public long Size = 1;
