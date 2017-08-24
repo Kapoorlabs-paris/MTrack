@@ -190,7 +190,7 @@ public class Interactive_MTSingleChannel implements PlugIn {
 	boolean Simplemode = false;
 	boolean Advancedmode = false;
 	boolean Kymomode = false;
-	public double maxdist = 20;
+	public double maxdist = 10;
 	public JLabel inputradi;
 	public TextField inputFieldradi;
 	// steps per octave

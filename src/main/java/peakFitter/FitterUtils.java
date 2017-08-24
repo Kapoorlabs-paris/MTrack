@@ -199,7 +199,6 @@ public class FitterUtils {
     					maxVal[0] = inputcursor.getDoublePosition(0);
     					maxVal[1] = inputcursor.getDoublePosition(1);
     				}
-
        			
         	   }
 		final double[] MinandMax = new double[2 * ndims + 3];

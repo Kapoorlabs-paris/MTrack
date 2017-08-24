@@ -267,8 +267,11 @@ System.out.println(thirdDimsize);
 
 				
 				//TCASM
-				double oldslope = PrevFrameparamstart.get(index).slope;
-				double newslope = paramnextframe.slope;
+				double oldslope = (PrevFrameparamstart.get(index).currentpos[1] - PrevFrameparamstart.get(index).currentpos[0]) 
+						/(PrevFrameparamstart.get(index).fixedpos[1] - PrevFrameparamstart.get(index).fixedpos[0]) ;
+				double newslope = (paramnextframe.currentpos[1] - paramnextframe.currentpos[0]) 
+						/(paramnextframe.fixedpos[1] - paramnextframe.fixedpos[0]) ;
+				
 				double dist = Math.toDegrees(Math.atan(Math.toRadians((newslope - oldslope)/(1 + newslope * oldslope))));
 				System.out.println(dist);
 				double[] oldstartpoint = PrevFrameparamstart.get(index).currentpos;
@@ -366,8 +369,12 @@ System.out.println(thirdDimsize);
 
 				
 				//TCASM
-				double oldslope = PrevFrameparamstart.get(index).slope;
-				double newslope = paramnextframeend.slope;
+				double oldslope = (PrevFrameparamend.get(index).currentpos[1] - PrevFrameparamend.get(index).currentpos[0]) 
+						/(PrevFrameparamend.get(index).fixedpos[1] - PrevFrameparamend.get(index).fixedpos[0]) ;
+				double newslope = (paramnextframeend.currentpos[1] - paramnextframeend.currentpos[0]) 
+						/(paramnextframeend.fixedpos[1] - paramnextframeend.fixedpos[0]) ;
+				
+				
 				double dist = Math.toDegrees(Math.atan(Math.toRadians((newslope - oldslope)/(1 + newslope * oldslope))));
 				System.out.println(dist);
 				final double[] oldendpoint = PrevFrameparamend.get(index).currentpos;
