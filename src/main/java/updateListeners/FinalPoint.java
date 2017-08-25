@@ -29,16 +29,14 @@ public class FinalPoint implements ActionListener {
 	final Interactive_MTDoubleChannelBasic child;
 
 	final BatchMode batch;
-	 int starttime;
-    int endtime;
 	
-	public FinalPoint(final Interactive_MTDoubleChannel parent, final Interactive_MTDoubleChannelBasic child, final int starttime, final int endtime) {
+	
+	public FinalPoint(final Interactive_MTDoubleChannel parent, final Interactive_MTDoubleChannelBasic child) {
 
 		this.parent = parent;
 		this.child = child;
 		this.batch = null;
-		this.starttime = starttime;
-		this.endtime = endtime;
+	
 	}
 
 	public FinalPoint(final Interactive_MTDoubleChannel parent) {
@@ -188,13 +186,10 @@ public class FinalPoint implements ActionListener {
 
 		}
 
-		parent.ShowMser = true;
-
-		parent.updatePreview(ValueChange.SHOWMSER);
+	
 
 		if (child != null){
-			
-			SkipFramesandTrackendsListener track =  new SkipFramesandTrackendsListener(parent, starttime, endtime);
+			SkipFramesandTrackendsListener track =  new SkipFramesandTrackendsListener(parent, parent.starttime, parent.endtime);
 			track.goSkip();
 			
 		}

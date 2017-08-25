@@ -2225,7 +2225,7 @@ panelFourth.removeAll();
 		gd.addNumericField(
 				"Initial Spacing between Gaussians along the Polynomial curve = G * Min(Psf), G (enter positive number) = ",
 				Inispacing / Math.min(psf[0], psf[1]), 2);
-		gd.addNumericField("Maximum direction change per frame (in degrees)", maxdist, 2);
+		gd.addNumericField("Maximum direction change per frame (in pixels)", maxdist, 2);
 
 		if (analyzekymo && Kymoimg != null) {
 			gd.addNumericField(
@@ -2271,7 +2271,7 @@ panelFourth.removeAll();
 				"Initial Spacing between Gaussians along the Polynomial curve = G * Min(Psf), G (enter positive number ) = ",
 				Inispacing / Math.min(psf[0], psf[1]), 2);
 
-		gd.addNumericField("Maximum direction change per frame (in degrees)", maxdist, 2);
+		gd.addNumericField("Maximum direction change per frame (in pixels)", maxdist, 2);
 		gd.addNumericField("Number of Gaussians for mask fits ", numgaussians, 2);
 		
 		gd.showDialog();

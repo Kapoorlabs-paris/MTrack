@@ -7,6 +7,7 @@ import java.awt.event.AdjustmentListener;
 
 import javax.swing.JScrollBar;
 
+import ij.IJ;
 import interactiveMT.Interactive_MTDoubleChannel;
 
 public class StarttimeListener implements AdjustmentListener {
@@ -37,5 +38,33 @@ public class StarttimeListener implements AdjustmentListener {
 
 		label.setText(string +  " = " + parent.starttime);
 
+		parent.thirdDimension = parent.starttime;
+	
+	}
+	
+	public void shownew() {
+
+		parent.thirdDimension = parent.starttime;
+		
+		if (parent.thirdDimension > parent.thirdDimensionSize) {
+			IJ.log("Max frame number exceeded, moving to last frame instead");
+			parent.thirdDimension = parent.thirdDimensionSize;
+			parent.CurrentView = util.CopyUtils.getCurrentView(parent.originalimg, parent.thirdDimension,
+					parent.thirdDimensionSize);
+			parent.CurrentPreprocessedView = util.CopyUtils.getCurrentPreView(parent.originalPreprocessedimg,
+					parent.thirdDimension, parent.thirdDimensionSize);
+		} else {
+
+			parent.CurrentView = util.CopyUtils.getCurrentView(parent.originalimg, parent.thirdDimension,
+					parent.thirdDimensionSize);
+			parent.CurrentPreprocessedView = util.CopyUtils.getCurrentPreView(parent.originalPreprocessedimg,
+					parent.thirdDimension, parent.thirdDimensionSize);
+		}
+
+		
+		
+	
+
+		
 	}
 }

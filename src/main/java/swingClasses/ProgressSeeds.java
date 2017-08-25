@@ -233,10 +233,38 @@ final Interactive_MTDoubleChannelBasic child;
 			
 				parent.controlnext.setVisible(true);
 				
+				
 				parent.panelSecond.add(parent.panelNext,  new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 			
 				parent.panelSecond.validate();
+				
+				
+				JPanel controlprevpanel = new JPanel();
+				JPanel prevpanel = new JPanel();
+				controlprevpanel.add(new JButton(new AbstractAction("Next\u22b3") {
+
+					/**
+					 * 
+					 */
+					private static final long serialVersionUID = 1L;
+
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						CardLayout cl = (CardLayout) parent.panelCont.getLayout();
+						cl.next(parent.panelCont);
+					}
+				}));
+				
+				prevpanel.add(controlprevpanel,  new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+			
+				controlprevpanel.setVisible(true);
+				
+				parent.panelFirst.add(prevpanel,  new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+				parent.panelFirst.validate();
+			
 				
 			
 			ThirdPanel paintthird = new ThirdPanel(parent);

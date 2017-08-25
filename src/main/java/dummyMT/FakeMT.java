@@ -156,8 +156,8 @@ public class FakeMT {
 
 		
 		final int n = outimg.numDimensions();
-		final Random rnd = new Random(-20);
-		final Random rndsec = new Random(-8);
+		final Random rnd = new Random(430);
+		final Random rndsec = new Random(-14);
 		
 		
 		
@@ -167,14 +167,14 @@ public class FakeMT {
 			double endpos[] = new double[n];
 			double[] startline = new double[n];
 			double[] endline = new double[n];
-			double MaxLength = 50;
+			double MaxLength = 100;
 
 			for (int d = 0; d < range.numDimensions(); ++d) {
-				startpos[d] = 150 +  (rnd.nextDouble() * (range.max(d) - range.min(d)) + range.min(d));
+				startpos[d] = 20 +  (rnd.nextDouble() * (range.max(d) - range.min(d)) + range.min(d));
 				
 			}
 			
-			double randomslope =  -rndsec.nextDouble();
+			double randomslope = -0.5; //-rndsec.nextDouble();
 			
 			
 			
@@ -261,7 +261,7 @@ public static double[] Growseeds (RandomAccessibleInterval<FloatType> outimg, do
 		
 		final int n = outimg.numDimensions();
 		
-        double growrate =  0.2 * Math.sin(0.01 * frame) ;
+        double growrate =  0.02 * Math.sin(0.01 * frame) ;
         
      
         
@@ -287,7 +287,7 @@ public static double[] Growseeds (RandomAccessibleInterval<FloatType> outimg, do
 				double[] endpos = new double[n];
 				
 				endpos[0] = oldpos[0] + motion* growrate;
-				
+				//endpos[1] = oldpos[0] + motion*growrate;
 				while (true) {
 					
 					
@@ -299,9 +299,8 @@ public static double[] Growseeds (RandomAccessibleInterval<FloatType> outimg, do
 						break;
 					
 					
-				   dy += -0.01*dx*dx;
+				   dy += 0.01*dx*dx;
 					
-				   
 					
 					steppos[0] += dx ;
 					steppos[1] += dy;
@@ -344,7 +343,7 @@ public static double[] Growseeds (RandomAccessibleInterval<FloatType> outimg, do
 			
 			final FinalInterval range = new FinalInterval(512, 512);
 			
-			final FinalInterval smallrange = new FinalInterval(124, 124);
+			final FinalInterval smallrange = new FinalInterval(248, 248);
 			
 			final int ndims = range.numDimensions();
 			final double [] sigma = {2,2};
@@ -384,7 +383,7 @@ public static double[] Growseeds (RandomAccessibleInterval<FloatType> outimg, do
 	       
 	       FileWriter fw;
 	       String usefolder = "/Volumes/Varun_disk/DummyAnalysis/";
-			File fichierKy = new File(usefolder + "//" +"DummyendCurved3" + ".txt");
+			File fichierKy = new File(usefolder + "//" +"DummyendCurved17" + ".txt");
 			fw = new FileWriter(fichierKy);
 			BufferedWriter bw = new BufferedWriter(fw);
 			bw.write("\tFramenumber\tDeltaL\n");

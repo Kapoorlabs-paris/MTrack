@@ -46,11 +46,12 @@ public class LinefinderInteractiveHFMSER implements LinefinderHF{
 	private final int framenumber;
 	private ArrayList<CommonOutputHF> output;
 	private ArrayList<EllipseRoi> Allrois;
-	
+	private ArrayList<Mser<UnsignedByteType>> mserchildren;
 	public boolean darktoBright = false;
 	private int Roiindex;
 	private final int ndims;
 	private EllipseRoi ellipseroi;
+	private EllipseRoi subellipseroi;
 	public LinefinderInteractiveHFMSER (final RandomAccessibleInterval<FloatType> source, 
 			final RandomAccessibleInterval<FloatType> Preprocessedsource,
 			MserTree<UnsignedByteType> newtree,  final int framenumber){
@@ -79,6 +80,7 @@ public class LinefinderInteractiveHFMSER implements LinefinderHF{
 
 		output = new ArrayList<CommonOutputHF>();
 		Allrois = new ArrayList<EllipseRoi>();
+		mserchildren = new ArrayList<Mser<UnsignedByteType>>();
         final FloatType type = source.randomAccess().get().createVariable();
 		
 
@@ -100,7 +102,10 @@ public class LinefinderInteractiveHFMSER implements LinefinderHF{
 			Mser<UnsignedByteType> rootmser = rootsetiterator.next();
 
 			if (rootmser.size() > 0) {
-
+                
+				
+				
+				
 				final double[] meanandcov = { rootmser.mean()[0], rootmser.mean()[1], rootmser.cov()[0],
 						rootmser.cov()[1], rootmser.cov()[2] };
 				meanandcovlist.add(meanandcov);
@@ -126,7 +131,9 @@ public class LinefinderInteractiveHFMSER implements LinefinderHF{
 				
 	    		final double perimeter = ellipseroi.getLength();
 	    		final double smalleigenvalue = SmallerEigenvalue(mean, covar);
-	    	//	if (perimeter > 2 * Math.PI * minlength && smalleigenvalue < 30){
+	    		final double largeeigenvalue = LargeEigenvalue(mean, covar);
+	    	//	if (perimeter > 2 * Math.PI * 20 && smalleigenvalue/largeeigenvalue > 0.8){
+	    
 	    			
 	    			Roiindex = count;
 	    			count++;
@@ -174,6 +181,8 @@ public class LinefinderInteractiveHFMSER implements LinefinderHF{
 
 				}
 				Allrois.add(ellipseroi);
+				if (subellipseroi!=null)
+				Allrois.add(subellipseroi);
 				
 				CommonOutputHF currentOutput = new CommonOutputHF(framenumber, Roiindex, Roiimg, ActualRoiimg, interval, Allrois);
 				
@@ -269,6 +278,25 @@ public class LinefinderInteractiveHFMSER implements LinefinderHF{
         
         	
         	return smalleigenvalue;
+        	
+        	 
+       
+		
+	}
+public double LargeEigenvalue( final double[] mean, final double[] cov){
+		
+		// For inifinite slope lines support is provided
+		final double a = cov[0];
+		final double b = cov[1];
+		final double c = cov[2];
+		final double d = Math.sqrt(a * a + 4 * b * b - 2 * a * c + c * c);
+
+		
+        final double largeeigenvalue = (a + c + d) / 2;
+       
+        
+        	
+        	return largeeigenvalue;
         	
         	 
        

@@ -261,22 +261,32 @@ System.out.println(paramnextframestart.currentLabel);
 			final double[] oldstartpoint = Userframe.get(index).currentpos;
 
 			double[] newstartpoint = paramnextframestart.currentpos;
-	
+			double newstartslope = paramnextframestart.slope;
+			double newstartintercept = paramnextframestart.intercept;
+			if (framenumber > startframe + 1){
 			double oldslope = (Userframe.get(index).currentpos[1] -  Userframe.get(index).currentpos[0])
 					/(Userframe.get(index).fixedpos[1] -  Userframe.get(index).fixedpos[0]);
-			double newslope = (paramnextframestart.currentpos[1] - paramnextframestart.currentpos[0])
-					/ (paramnextframestart.fixedpos[1] - paramnextframestart.fixedpos[0]);
-			double dist = Math.toDegrees(Math.atan(Math.toRadians((newslope - oldslope) / (1 + newslope * oldslope))));
+			
+			double oldintercept = Userframe.get(index).currentpos[1] - oldslope * Userframe.get(index).currentpos[0];
+			double dist = (paramnextframestart.currentpos[1] - oldslope * paramnextframestart.currentpos[0] -oldintercept)/Math.sqrt(1 + oldslope *oldslope);
+					
+					//Math.toDegrees(Math.atan(Math.toRadians((newslope - oldslope) / (1 + newslope * oldslope))));
 
 			System.out.println("User " + dist);
-			if (Math.abs(dist) > maxdist && framenumber > startframe + 1) {
+		
+			
+			if (Math.abs(dist) > maxdist) {
 				paramnextframestart = Userframe.get(index);
 				newstartpoint = oldstartpoint;
+				newstartslope = Userframe.get(index).slope;
+				newstartintercept = Userframe.get(index).intercept;
 			}
+			
+			}
+			
 			final_paramlistuser.add(paramnextframestart);
 
-			final double newstartslope = paramnextframestart.slope;
-			final double newstartintercept = paramnextframestart.intercept;
+			
 
 			final Trackproperties startedge = new Trackproperties(framenumber, labelindex, oldstartpoint, newstartpoint,
 					newstartslope, newstartintercept, originalslope, originalintercept, Userframe.get(index).seedLabel,

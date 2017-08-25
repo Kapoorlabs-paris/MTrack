@@ -187,6 +187,7 @@ public class FitterUtils {
        			
        			long pointonline = (long)Math.round(inputcursor.getDoublePosition(1) - slope * inputcursor.getDoublePosition(0) -
        					intercept );
+       			if (Math.abs(pointonline) < 50){
        				inputcursor.localize(newposition);
        				if (inputcursor.getDoublePosition(0) <= minVal[0]
     						&& inputcursor.get().get() / maxintensityline > Intensityratio) {
@@ -199,6 +200,7 @@ public class FitterUtils {
     					maxVal[0] = inputcursor.getDoublePosition(0);
     					maxVal[1] = inputcursor.getDoublePosition(1);
     				}
+       			}
        			
         	   }
 		final double[] MinandMax = new double[2 * ndims + 3];

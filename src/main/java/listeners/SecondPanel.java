@@ -205,7 +205,7 @@ public class SecondPanel {
 
 				child.inputFieldX.addTextListener(new BeginTrackListener(parent));
 				child.inputFieldY.addTextListener(new EndTrackListener(parent));
-				Finalize.addActionListener(new FinalPoint(parent, child, parent.starttime, parent.endtime));
+				Finalize.addActionListener(new FinalPoint(parent, child));
 				
 				child.CardframeSimple.pack();
 	

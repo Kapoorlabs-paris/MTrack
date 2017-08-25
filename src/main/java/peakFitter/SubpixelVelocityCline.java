@@ -264,26 +264,31 @@ System.out.println(thirdDimsize);
 					paramnextframe = PrevFrameparamstart.get(index);
 				if (paramnextframe == null)
 					paramnextframe = PrevFrameparamstart.get(index);
-
-				
-				//TCASM
-				double oldslope = (PrevFrameparamstart.get(index).currentpos[1] - PrevFrameparamstart.get(index).currentpos[0]) 
-						/(PrevFrameparamstart.get(index).fixedpos[1] - PrevFrameparamstart.get(index).fixedpos[0]) ;
-				double newslope = (paramnextframe.currentpos[1] - paramnextframe.currentpos[0]) 
-						/(paramnextframe.fixedpos[1] - paramnextframe.fixedpos[0]) ;
-				
-				double dist = Math.toDegrees(Math.atan(Math.toRadians((newslope - oldslope)/(1 + newslope * oldslope))));
-				System.out.println(dist);
 				double[] oldstartpoint = PrevFrameparamstart.get(index).currentpos;
 				double[] newstartpoint = paramnextframe.currentpos;
+				double newstartslope = paramnextframe.slope;
+				double newstartintercept = paramnextframe.intercept;
+				
+				if (framenumber > startframe + 1){
+				//TCASM
+				double oldslope = (PrevFrameparamstart.get(index).currentpos[1] - PrevFrameparamstart.get(index).fixedpos[1]  ) 
+						/(PrevFrameparamstart.get(index).currentpos[0] - PrevFrameparamstart.get(index).fixedpos[0]) ;
+			
+				double oldintercept = PrevFrameparamstart.get(index).currentpos[1] - oldslope * PrevFrameparamstart.get(index).currentpos[0];
+				double dist = (paramnextframe.currentpos[1] - oldslope * paramnextframe.currentpos[0] -oldintercept)/Math.sqrt(1 + oldslope *oldslope);
+						 
+						//Math.toDegrees(Math.atan(Math.toRadians((newslope - oldslope)/(1 + newslope * oldslope))));
+				System.out.println(dist);
+		
 				// TCASM
-				if (Math.abs(dist) > maxdist && framenumber > startframe + 1){
+				if (Math.abs(dist) > maxdist){
 					paramnextframe = PrevFrameparamstart.get(index);
 					newstartpoint = oldstartpoint;
-					
+					newstartslope = PrevFrameparamstart.get(index).slope;
+					newstartintercept = PrevFrameparamstart.get(index).intercept;
 				}
 				
-				
+				}
 				
 				
 				final_paramliststart.add(paramnextframe);
@@ -291,8 +296,7 @@ System.out.println(thirdDimsize);
 		
 
 
-				final double newstartslope = paramnextframe.slope;
-				final double newstartintercept = paramnextframe.intercept;
+			
 
 				final Trackproperties startedge = new Trackproperties(framenumber, labelindex, oldstartpoint,
 						newstartpoint, newstartslope, newstartintercept, originalslope, originalintercept,
@@ -366,35 +370,40 @@ System.out.println(thirdDimsize);
 					paramnextframeend = PrevFrameparamend.get(index);
 				if (paramnextframeend == null)
 					paramnextframeend = PrevFrameparamend.get(index);
-
-				
-				//TCASM
-				double oldslope = (PrevFrameparamend.get(index).currentpos[1] - PrevFrameparamend.get(index).currentpos[0]) 
-						/(PrevFrameparamend.get(index).fixedpos[1] - PrevFrameparamend.get(index).fixedpos[0]) ;
-				double newslope = (paramnextframeend.currentpos[1] - paramnextframeend.currentpos[0]) 
-						/(paramnextframeend.fixedpos[1] - paramnextframeend.fixedpos[0]) ;
-				
-				
-				double dist = Math.toDegrees(Math.atan(Math.toRadians((newslope - oldslope)/(1 + newslope * oldslope))));
-				System.out.println(dist);
 				final double[] oldendpoint = PrevFrameparamend.get(index).currentpos;
 
 				  double[] newendpoint = paramnextframeend.currentpos;
+					double newendslope = paramnextframeend.slope;
+					double newendintercept = paramnextframeend.intercept;
+				if (framenumber > startframe + 1){
+				
+				//TCASM
+				double oldslope = (PrevFrameparamend.get(index).currentpos[1] - PrevFrameparamend.get(index).fixedpos[1] ) 
+						/(PrevFrameparamend.get(index).currentpos[0] - PrevFrameparamend.get(index).fixedpos[0]) ;
+		
+				
+				double oldintercept = PrevFrameparamend.get(index).currentpos[1] - oldslope * PrevFrameparamend.get(index).currentpos[0];
+				double dist = (paramnextframeend.currentpos[1] - oldslope * paramnextframeend.currentpos[0] -oldintercept)/Math.sqrt(1 + oldslope *oldslope);
+						
+						//Math.toDegrees(Math.atan(Math.toRadians((newslope - oldslope)/(1 + newslope * oldslope))));
+				System.out.println(dist);
+				
 				// TCASM
-				if (Math.abs(dist) > maxdist && framenumber > startframe + 1){
-					paramnextframeend = PrevFrameparamstart.get(index);
+				if (Math.abs(dist) > maxdist ){
+					paramnextframeend = PrevFrameparamend.get(index);
 					newendpoint = oldendpoint;
+					 newendslope = PrevFrameparamend.get(index).slope;
+					 newendintercept = PrevFrameparamend.get(index).intercept;
 					
 				}
 				
-				
+				}
 				
 				final_paramlistend.add(paramnextframeend);
 
 			
 
-				final double newendslope = paramnextframeend.slope;
-				final double newendintercept = paramnextframeend.intercept;
+			
 
 				final Trackproperties endedge = new Trackproperties(framenumber, labelindex, oldendpoint, newendpoint,
 						newendslope, newendintercept, originalslopeend, originalinterceptend,
