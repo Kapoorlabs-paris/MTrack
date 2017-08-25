@@ -513,7 +513,7 @@ public class MethodListener implements ActionListener {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				CardLayout cl = (CardLayout) parent.panelCont.getLayout();
-				cl.next(parent.panelCont);
+				cl.previous(parent.panelCont);
 			}
 		}));
 		
@@ -522,8 +522,8 @@ public class MethodListener implements ActionListener {
 	
 		parent.controlprevious.setVisible(true);
 		
-	//	parent.panelSecond.add(parent.panelPrevious,  new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
-	//			GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+		parent.panelSecond.add(parent.panelPrevious,  new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 		
 		
 		

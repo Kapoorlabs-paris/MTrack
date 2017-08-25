@@ -467,7 +467,7 @@ public void setMaxdist (double maxdist) {
 	public Indexedlength Getfinaltrackparam(final Indexedlength iniparam, final int label, final double[] psf,
 			final int rate, final StartorEnd startorend) {
 
-		final double[] LMparam = FitterUtils.MakerepeatedLineguess(imgs, iniparam, model, Intensityratio, Inispacing, label, ndims);
+		final double[] LMparam = FitterUtils.MakerepeatedLineguess(imgs, iniparam, model, Intensityratio, Inispacing, label, ndims, startframe, framenumber);
 		if (LMparam == null)
 			return iniparam;
 

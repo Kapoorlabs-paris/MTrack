@@ -332,8 +332,10 @@ System.out.println(paramnextframestart.currentLabel);
 
 			final double maxintensityline = GetLocalmaxmin.computeMaxIntensity(currentimg);
 			final double minintensityline = 0;
+			final double axisslope = (iniparam.currentpos[1] - iniparam.fixedpos[1]) / (iniparam.currentpos[0] - iniparam.fixedpos[0]);
+			final double axisintercept = iniparam.currentpos[1] - axisslope * iniparam.currentpos[0] ;
 			Pair<double[], double[]> minmaxpair = FitterUtils.MakeinitialEndpointguessUser(imgs, maxintensityline,
-					Intensityratio, ndims, labelindex, iniparam.slope, iniparam.intercept, iniparam.Curvature,
+					Intensityratio, ndims, labelindex, axisslope, axisintercept, iniparam.Curvature,
 					iniparam.Inflection, rate, framenumber);
 
 			for (int d = 0; d < ndims; ++d) {

@@ -256,7 +256,7 @@ implements OutputAlgorithm<ArrayList<Indexedlength>> {
 				index++;
 			}
 
-			final double[] start_param = FitterUtils.MakeimprovedLineguess(imgs, slope, intercept, Curvature, Inflection, Intensityratio, Inispacing, psf, label);
+			final double[] start_param = FitterUtils.MakeimprovedLineguess(imgs, slope, intercept, Curvature, Inflection, Intensityratio, Inispacing, psf, label, framenumber, framenumber);
 			if (start_param == null)
 				return null;
 

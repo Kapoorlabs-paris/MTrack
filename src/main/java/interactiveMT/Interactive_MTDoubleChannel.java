@@ -1244,18 +1244,18 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		ChooseDirectory.addActionListener(new ChooseDirectoryListener(this, inputField, userfile));
         ChooseMethod.addActionListener(new MethodListener(this, ChooseMethod));
 		
+	
+
 		
-		
-
-
-
 	
 		
 		Cardframe.add(panelCont, BorderLayout.CENTER);
-
+     
 		Cardframe.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		Cardframe.pack();
 		Cardframe.setVisible(true);
+		
+		
 
 	}
 
@@ -1492,7 +1492,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		
 		 
 		 
-			controlnext.removeAll();
+			JPanel controlprevious = new JPanel();
 			controlprevious.add(new JButton(new AbstractAction("\u22b2Prev") {
 
 			
@@ -1667,8 +1667,8 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		 panelFourth.add(Optimize, new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 		
-		 
-		 controlnext.removeAll();
+			JPanel controlprevious = new JPanel();
+
 			controlprevious.add(new JButton(new AbstractAction("\u22b2Prev") {
 
 			

@@ -182,10 +182,7 @@ final Interactive_MTDoubleChannelBasic child;
 	protected void done() {
 		try {
 			
-			
-			parent.Cardframe.add(parent.controlnext, BorderLayout.PAGE_END);
-			parent.Cardframe.validate();
-			parent.Cardframe.pack();
+		
 			if (child!=null){
 				
 					
