@@ -41,7 +41,7 @@ public class FitterUtils {
 	}
 
 	
-	
+	static int cutoff = 2;
 	public static double[] MakerepeatedLineguess(ArrayList<CommonOutputHF> imgs, Indexedlength iniparam, UserChoiceModel model,  double Intensityratio, double Inispacing, int label, int ndims, 
 			int startframe, int currentframe) {
 
@@ -191,7 +191,7 @@ public class FitterUtils {
        			double distline = Math.abs(inputcursor.getDoublePosition(1) - slope * inputcursor.getDoublePosition(0) - intercept) / Math.sqrt(1 + slope * slope);
        					
        			if (currentframe > startframe + 1){
-       			if (distline < 5){
+       			if (distline < cutoff){
        				
        				if (inputcursor.getDoublePosition(0) <= minVal[0]
     						&& inputcursor.get().get() / maxintensityline > Intensityratio) {
@@ -431,7 +431,7 @@ public class FitterUtils {
 			double distline = Math.abs(outcursor.getDoublePosition(1) - slope * outcursor.getDoublePosition(0) - intercept) / Math.sqrt(1 + slope * slope);
 				
 		if (currentframe > startframe + 1){
-                if (distline < 5){			
+                if (distline < cutoff){			
 				if (outcursor.getDoublePosition(0) <= minVal[0]
 						&& outcursor.get().get() / maxintensityline > Intensityratio) {
 					minVal[0] = outcursor.getDoublePosition(0);
@@ -497,7 +497,7 @@ public class FitterUtils {
 			double distline = Math.abs(outcursor.getDoublePosition(1) - slope * outcursor.getDoublePosition(0) - intercept) / Math.sqrt(1 + slope * slope);
 			
 			if (framenumber > startframe + 1){
-            if (distline < 5){	
+            if (distline < cutoff){	
 			
 					if (outcursor.getDoublePosition(0) <= minVal[0]
 							&& outcursor.get().get() / maxintensityline > Intensityratio) {
