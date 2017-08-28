@@ -185,9 +185,63 @@ final Interactive_MTDoubleChannelBasic child;
 		
 			if (child!=null){
 				
-					
-					child.CardframeSimple.add(child.controlnext, BorderLayout.PAGE_END);
-					child.CardframeSimple.validate();
+				child.controlnext.removeAll();
+				child.controlprevious.removeAll();
+				child.controlnext.add(new JButton(new AbstractAction("\u22b2Prev") {
+
+					/**
+					 * 
+					 */
+					private static final long serialVersionUID = 1L;
+
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						CardLayout cl = (CardLayout) child.panelCont.getLayout();
+
+						cl.previous(child.panelCont);
+					}
+				}));
+			 
+				
+
+				child.panelNext.add(child.controlnext,  new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+			
+				child.controlnext.setVisible(true);
+				
+				
+				child.panelSecond.add(child.panelNext,  new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+			
+				child.panelSecond.validate();
+				
+				
+				JPanel controlprevpanel = new JPanel();
+				JPanel prevpanel = new JPanel();
+				controlprevpanel.add(new JButton(new AbstractAction("Next\u22b3") {
+
+					/**
+					 * 
+					 */
+					private static final long serialVersionUID = 1L;
+
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						CardLayout cl = (CardLayout) child.panelCont.getLayout();
+						cl.next(child.panelCont);
+					}
+				}));
+				
+				prevpanel.add(controlprevpanel,  new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+			
+				controlprevpanel.setVisible(true);
+				
+				child.panelFirst.add(prevpanel,  new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+				child.panelFirst.validate();
+			
+				
 					SecondPanel paintsecond = new SecondPanel(parent, child);
 					paintsecond.Paint();
 			}

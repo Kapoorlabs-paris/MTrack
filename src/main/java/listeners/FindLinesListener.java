@@ -60,6 +60,8 @@ public FindLinesListener (final Interactive_MTDoubleChannel parent, final Intera
 		
 		
 		
+		
+		
 		parent.displayBitimg = false;
 		parent.displayWatershedimg = false;
 

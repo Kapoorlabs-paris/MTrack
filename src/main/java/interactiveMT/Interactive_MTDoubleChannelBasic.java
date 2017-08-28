@@ -201,6 +201,7 @@ public class Interactive_MTDoubleChannelBasic implements PlugIn {
 	public JPanel panelCont = new JPanel();
 	public JPanel panelFirst = new JPanel();
 	public JPanel panelSecond = new JPanel();
+	public JPanel panelNext = new JPanel();
 	public JPanel panelThird = new JPanel();
 	private JPanel Directoryoptions = new JPanel();
 	public JPanel Mserparam = new JPanel();
@@ -218,7 +219,7 @@ public class Interactive_MTDoubleChannelBasic implements PlugIn {
 
 		panelCont.add(panelFirst, "1");
 		panelCont.add(panelSecond, "2");
-
+		panelNext.setLayout(layout);
 		panelFirst.setName("Choose parameters to find Seeds");
 
 		final Checkbox Analyzekymo = new Checkbox("Analyze Kymograph");
