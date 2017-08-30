@@ -1,5 +1,7 @@
 package updateListeners;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
@@ -24,7 +26,7 @@ import net.imglib2.util.Pair;
 import net.imglib2.util.ValuePair;
 import singleListeners.SingleSkipFramesandTrackendsListener;
 
-public class SingleFinalPoint implements ItemListener {
+public class SingleFinalPoint implements ActionListener {
 
 	final Interactive_MTSingleChannel parent;
 
@@ -55,38 +57,17 @@ public class SingleFinalPoint implements ItemListener {
 	
 
 	@Override
-	public void itemStateChanged(ItemEvent arg0) {
-		if (arg0.getStateChange() == ItemEvent.DESELECTED)
-			parent.finalpoint = false;
-
-		else if (arg0.getStateChange() == ItemEvent.SELECTED) {
-			parent.finalpoint = true;
-
+	public void actionPerformed(ActionEvent arg0)  {
+	
 			FinalizeEnds();
 
 
-			if (parent.thirdDimension > parent.thirdDimensionSize) {
-				IJ.log("Max frame number exceeded, moving to last frame instead");
-				parent.thirdDimension = parent.thirdDimensionSize;
-				parent.CurrentView = util.CopyUtils.getCurrentView(parent.originalimg, parent.thirdDimension, parent.thirdDimensionSize);
-				parent.CurrentPreprocessedView = util.CopyUtils.getCurrentPreView(parent.originalPreprocessedimg, parent.thirdDimension,
-						parent.thirdDimensionSize);
-			} else {
-
-				parent.thirdDimension = parent.thirdDimensionsliderInit + 1;
-				parent.CurrentView = util.CopyUtils.getCurrentView(parent.originalimg, parent.thirdDimension, parent.thirdDimensionSize);
-				parent.CurrentPreprocessedView = util.CopyUtils.getCurrentPreView(parent.originalPreprocessedimg, parent.thirdDimension,
-						parent.thirdDimensionSize);
-
-			}
-
-			parent.updatePreview(ValueChange.THIRDDIM);
-
 			
 			
 			
 			
-		}
+			
+		
 
 	}
 
@@ -192,7 +173,7 @@ public class SingleFinalPoint implements ItemListener {
 
 		if (child != null){
 			
-			SingleSkipFramesandTrackendsListener track =  new SingleSkipFramesandTrackendsListener(parent, parent.starttime, parent.endtime);
+			SingleSkipFramesandTrackendsListener track =  new SingleSkipFramesandTrackendsListener(parent, child, parent.starttime, parent.endtime);
 			track.goSkip();
 		
 		}

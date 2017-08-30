@@ -304,6 +304,9 @@ public void setMaxdist (double maxdist) {
 						
 						//newslope - oldslope; 
 						//Math.toDegrees(Math.atan(Math.toRadians((newslope - oldslope)/(1 + newslope * oldslope))));
+				
+				
+				if (dist!=Double.NaN){
 				System.out.println(dist);
 				
 				// TCASM
@@ -315,7 +318,7 @@ public void setMaxdist (double maxdist) {
 					
 				}
 				
-				
+				}
 				}
 				
 				
@@ -411,7 +414,7 @@ public void setMaxdist (double maxdist) {
 						//Math.toDegrees(Math.atan(Math.toRadians((newslope - oldslope)/(1 + newslope * oldslope))));
 				System.out.println(dist);
 			
-				
+				if (dist!=Double.NaN){
 				if (Math.abs(dist) > maxdist ){
 					paramnextframeend = PrevFrameparamend.get(index);
 				    newendpoint = oldendpoint;	
@@ -419,6 +422,7 @@ public void setMaxdist (double maxdist) {
 				    newendintercept = PrevFrameparamend.get(index).intercept;
 				}
 				
+				}
 				}
 				
 				final_paramlistend.add(paramnextframeend);

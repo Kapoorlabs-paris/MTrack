@@ -26,6 +26,7 @@ import ij.measure.ResultsTable;
 import ij.plugin.frame.RoiManager;
 import interactiveMT.Interactive_MTSingleChannel;
 import interactiveMT.Interactive_MTSingleChannel.ValueChange;
+import labeledObjects.PlusMinusSeed;
 import lineFinder.FindlinesVia;
 import lineFinder.LinefinderInteractiveHFHough;
 import lineFinder.LinefinderInteractiveHFMSER;
@@ -45,7 +46,8 @@ import velocityanalyser.Trackstart;
 public  class SingleTrack {
 	
         final Interactive_MTSingleChannel parent;
-	
+        ArrayList<PlusMinusSeed> plusminusstartlist = new ArrayList<PlusMinusSeed>();
+    	ArrayList<PlusMinusSeed> plusminusendlist = new ArrayList<PlusMinusSeed>();
 	
 	public SingleTrack(final Interactive_MTSingleChannel parent){
 	
@@ -54,11 +56,11 @@ public  class SingleTrack {
 	
 	
 	
-	public  void Trackobject(final int next, final int endtime) {
+	public  void Trackobject(final int next) {
 
-		parent.thirdDimensionSize = endtime;
+		parent.thirdDimensionSize = parent.endtime;
 
-		for (int index = next; index <= endtime; ++index) {
+		for (int index = next; index <= parent.endtime; ++index) {
 
 
 			parent.displayBitimg = false;
@@ -222,14 +224,32 @@ public  class SingleTrack {
 			
 
 			ResultsTable rtAll = new ResultsTable();
+			int MaxSeedLabel, MinSeedLabel;
+			if (parent.Allstart.get(0).size() > 0) {
+			 MaxSeedLabel = parent.Allstart.get(0).get(parent.Allstart.get(0).size() - 1).seedlabel;
+			 MinSeedLabel = parent.Allstart.get(0).get(0).seedlabel;
+			}
+			
+			else{
+				MaxSeedLabel = parent.Allend.get(0).get(parent.Allend.get(0).size() - 1).seedlabel;
+				MinSeedLabel = parent.Allend.get(0).get(0).seedlabel;
+				
+				
+			}
+			
 			if (parent.Allstart.get(0).size() > 0) {
 				final ArrayList<Trackproperties> first = parent.Allstart.get(0);
 
 				Collections.sort(first, parent.Seedcomparetrack);
 
-				int MaxSeedLabel = first.get(first.size() - 1).seedlabel;
-				int MinSeedLabel = first.get(0).seedlabel;
+				
 				for (int currentseed = MinSeedLabel; currentseed < MaxSeedLabel + 1; ++currentseed) {
+
+					double growratestart = 0;
+					double growrateend = 0;
+					int startgrowcount = 0;
+					int endgrowcount = 0;
+
 					double startlengthreal = 0;
 					double startlengthpixel = 0;
 					for (int index = 0; index < parent.Allstart.size(); ++index) {
@@ -271,6 +291,8 @@ public  class SingleTrack {
 									// MT grew
 									startlengthreal += lengthrealperframe;
 									startlengthpixel += lengthpixelperframe;
+									growratestart += lengthpixelperframe;
+									startgrowcount++;
 
 								}
 
@@ -286,19 +308,227 @@ public  class SingleTrack {
 								currentlocationreal = new double[] { currentlocationpixel[0] * parent.calibration[0],
 										currentlocationpixel[1] * parent.calibration[1] };
 
-								ResultsMT startMT = new ResultsMT(framenumber, startlengthpixel, startlengthreal,
-										seedID, currentlocationpixel, currentlocationreal, lengthpixelperframe,
-										lengthrealperframe);
+								ResultsMT startMT = new ResultsMT(framenumber, startlengthpixel, startlengthreal, seedID,
+										currentlocationpixel, currentlocationreal, lengthpixelperframe, lengthrealperframe);
 
 								parent.startlengthlist.add(startMT);
 
 							}
 						}
 					}
+					
+					
+
+					if (parent.Allend.get(0).size() > 0) {
+
+						double endlengthreal = 0;
+						double endlengthpixel = 0;
+						for (int index = 0; index < parent.Allend.size(); ++index) {
+
+							final ArrayList<Trackproperties> thirdDimension = parent.Allend.get(index);
+
+							for (int frameindex = 0; frameindex < thirdDimension.size(); ++frameindex) {
+								final int framenumber = thirdDimension.get(frameindex).Framenumber;
+								final Integer seedID = thirdDimension.get(frameindex).seedlabel;
+
+								if (seedID == currentseed) {
+									final Integer[] FrameID = { framenumber, seedID };
+									final double[] originalpoint = thirdDimension.get(frameindex).originalpoint;
+									final double[] newpoint = thirdDimension.get(frameindex).newpoint;
+									final double[] oldpoint = thirdDimension.get(frameindex).oldpoint;
+
+									final double[] newpointCal = new double[] {
+											thirdDimension.get(frameindex).newpoint[0] * parent.calibration[0],
+											thirdDimension.get(frameindex).newpoint[1] * parent.calibration[1] };
+									final double[] oldpointCal = new double[] {
+											thirdDimension.get(frameindex).oldpoint[0] * parent.calibration[0],
+											thirdDimension.get(frameindex).oldpoint[1] * parent.calibration[1] };
+
+									final double lengthrealperframe = util.Boundingboxes.Distance(newpointCal, oldpointCal);
+									final double lengthpixelperframe = util.Boundingboxes.Distance(newpoint, oldpoint);
+									final double seedtocurrent = util.Boundingboxes.Distancesq(originalpoint, newpoint);
+									final double seedtoold = util.Boundingboxes.Distancesq(originalpoint, oldpoint);
+									final boolean shrink = seedtoold > seedtocurrent ? true : false;
+									final boolean growth = seedtoold > seedtocurrent ? false : true;
+
+									if (shrink) {
+
+										// MT shrank
+
+										endlengthreal -= lengthrealperframe;
+										endlengthpixel -= lengthpixelperframe;
+
+									}
+
+									if (growth) {
+
+										// MT grew
+
+										endlengthreal += lengthrealperframe;
+										endlengthpixel += lengthpixelperframe;
+										
+										growrateend += lengthpixelperframe;
+										endgrowcount++;
+
+									}
+
+									double[] currentlocationpixel = new double[parent.ndims];
+
+									if (framenumber == parent.thirdDimensionsliderInit)
+										currentlocationpixel = originalpoint;
+									else
+										currentlocationpixel = newpoint;
+
+									double[] currentlocationreal = new double[parent.ndims];
+
+									currentlocationreal = new double[] { currentlocationpixel[0] * parent.calibration[0],
+											currentlocationpixel[1] * parent.calibration[1] };
+
+									ResultsMT endMT = new ResultsMT(framenumber, endlengthpixel, endlengthreal, seedID,
+											currentlocationpixel, currentlocationreal, lengthpixelperframe,
+											lengthrealperframe);
+
+									parent.endlengthlist.add(endMT);
+
+									
+
+								}
+							}
+						}
+
+					}
+					
+					
+					String plusorminusstart = (growratestart > growrateend) ? "Plus" : "Minus" ;
+					String plusorminusend = (growratestart > growrateend) ? "Minus" : "Plus" ;
+					
+					PlusMinusSeed pmseedEndA = new PlusMinusSeed(currentseed, plusorminusstart);
+					PlusMinusSeed pmseedEndB = new PlusMinusSeed(currentseed, plusorminusend);
+					plusminusstartlist.add(pmseedEndA);
+					plusminusendlist.add(pmseedEndB);
+					
 				}
+
 				
 				for (int seedID = MinSeedLabel; seedID <= MaxSeedLabel; ++seedID) {
-					double count = 0;
+
+					
+                     double count = 0;
+					
+					for (int index = 0; index < parent.startlengthlist.size(); ++index) {
+						
+						
+						if (parent.startlengthlist.get(index).seedid == seedID) {
+							if (index > 0 && parent.startlengthlist.get(index).currentpointpixel[0] != parent.startlengthlist.get(index - 1).currentpointpixel[0]
+									&& parent.startlengthlist.get(index).currentpointpixel[1] != parent.startlengthlist.get(index - 1).currentpointpixel[1])
+								count++;
+							
+						}
+					
+					}
+
+					if ( count > parent.thirdDimensionSize / 5.0) {
+					for (int j = 0; j < plusminusstartlist.size(); ++j){
+						
+						if (plusminusstartlist.get(j).seedid == seedID){
+
+							try {
+								File fichier = new File(parent.usefolder + "//" + parent.addToName + "SeedLabel" + seedID
+										+ plusminusstartlist.get(j).plusorminus + ".txt");
+
+								FileWriter fw = new FileWriter(fichier);
+								BufferedWriter bw = new BufferedWriter(fw);
+
+								bw.write(
+										"\tFrame\tLength (px)\tLength (real)\tiD\tCurrentPosX (px)\tCurrentPosY (px)\tCurrentPosX (real)\tCurrentPosY (real)"
+												+ "\tdeltaL (px)" + "\tdeltaL (real)\n");
+
+								for (int index = 0; index < parent.startlengthlist.size(); ++index) {
+
+									if (parent.startlengthlist.get(index).seedid == seedID) {
+
+										if (index > 0
+												&& parent.startlengthlist
+														.get(index).currentpointpixel[0] != parent.startlengthlist
+																.get(index - 1).currentpointpixel[0]
+												&& parent.startlengthlist
+														.get(index).currentpointpixel[1] != parent.startlengthlist
+																.get(index - 1).currentpointpixel[1])
+
+											bw.write(
+													"\t" + parent.startlengthlist.get(index).framenumber + "\t" + "\t"
+															+ parent.nf.format(
+																	parent.startlengthlist.get(index).totallengthpixel)
+															+ "\t" + "\t"
+															+ parent.nf.format(
+																	parent.startlengthlist.get(index).totallengthreal)
+															+ "\t" + "\t"
+															+ parent.nf.format(parent.startlengthlist.get(index).seedid)
+															+ "\t" + "\t"
+															+ parent.nf.format(
+																	parent.startlengthlist.get(index).currentpointpixel[0])
+															+ "\t" + "\t"
+															+ parent.nf.format(
+																	parent.startlengthlist.get(index).currentpointpixel[1])
+															+ "\t" + "\t"
+															+ parent.nf.format(
+																	parent.startlengthlist.get(index).currentpointreal[0])
+															+ "\t" + "\t"
+															+ parent.nf.format(
+																	parent.startlengthlist.get(index).currentpointreal[1])
+															+ "\t" + "\t"
+															+ parent.nf.format(
+																	parent.startlengthlist.get(index).lengthpixelperframe)
+															+ "\t" + "\t"
+															+ parent.nf.format(
+																	parent.startlengthlist.get(index).lengthrealperframe)
+															+ "\n");
+
+									}
+
+								}
+							
+								bw.close();
+								fw.close();
+
+							} catch (IOException e) {
+							}
+						}
+				}
+				}
+				}
+					for (int index = 0; index < parent.startlengthlist.size(); ++index) {
+
+						double[] landt = { parent.startlengthlist.get(index).totallengthpixel,
+								parent.startlengthlist.get(index).framenumber, parent.startlengthlist.get(index).seedid };
+						parent.lengthtimestart.add(landt);
+
+						rtAll.incrementCounter();
+						rtAll.addValue("FrameNumber", parent.startlengthlist.get(index).framenumber);
+						rtAll.addValue("Total Length (pixel)", parent.startlengthlist.get(index).totallengthpixel);
+						rtAll.addValue("Total Length (real)", parent.startlengthlist.get(index).totallengthreal);
+						rtAll.addValue("Track iD", parent.startlengthlist.get(index).seedid);
+						rtAll.addValue("CurrentPosition X (px units)",
+								parent.startlengthlist.get(index).currentpointpixel[0]);
+						rtAll.addValue("CurrentPosition Y (px units)",
+								parent.startlengthlist.get(index).currentpointpixel[1]);
+						rtAll.addValue("CurrentPosition X (real units)",
+								parent.startlengthlist.get(index).currentpointreal[0]);
+						rtAll.addValue("CurrentPosition Y (real units)",
+								parent.startlengthlist.get(index).currentpointreal[1]);
+						rtAll.addValue("Length per frame (px units)",
+								parent.startlengthlist.get(index).lengthpixelperframe);
+						rtAll.addValue("Length per frame (real units)",
+								parent.startlengthlist.get(index).lengthrealperframe);
+
+					}
+
+				}
+
+				for (int seedID = MinSeedLabel; seedID <= MaxSeedLabel; ++seedID) {
+					
+					
+                    double count = 0;
 					
 					for (int index = 0; index < parent.startlengthlist.size(); ++index) {
 						
@@ -312,183 +542,15 @@ public  class SingleTrack {
 					
 					}
 					
-				
-					if ( count > parent.thirdDimensionSize / 5.0) {
-						
-						
-						try {
-							File fichier = new File(
-									parent.usefolder + "//" + parent.addToName + "SeedLabel" + seedID + "-endA" + ".txt");
-
-							FileWriter fw = new FileWriter(fichier);
-							BufferedWriter bw = new BufferedWriter(fw);
-
-
-							bw.write(
-									"\tFrame\tLength (px)\tLength (real)\tiD\tCurrentPosX (px)\tCurrentPosY (px)\tCurrentPosX (real)\tCurrentPosY (real)"
-											+ "\tdeltaL (px)" + "\tdeltaL (real)\n");
-
-							for (int index = 0; index < parent.startlengthlist.size(); ++index) {
-								
-								
-								if (parent.startlengthlist.get(index).seedid == seedID) {
-
-									
-									if (index > 0 && parent.startlengthlist.get(index).currentpointpixel[0] != parent.startlengthlist.get(index - 1).currentpointpixel[0]
-											&& parent.startlengthlist.get(index).currentpointpixel[1] != parent.startlengthlist.get(index - 1).currentpointpixel[1])
-									
-									bw.write("\t" + parent.startlengthlist.get(index).framenumber + "\t" + "\t"
-											+ parent.nf.format(parent.startlengthlist.get(index).totallengthpixel) + "\t" + "\t"
-											+ parent.nf.format(parent.startlengthlist.get(index).totallengthreal) + "\t" + "\t"
-											+ parent.nf.format(parent.startlengthlist.get(index).seedid) + "\t" + "\t"
-											+ parent.nf.format(parent.startlengthlist.get(index).currentpointpixel[0]) + "\t" + "\t"
-											+ parent.nf.format(parent.startlengthlist.get(index).currentpointpixel[1]) + "\t" + "\t"
-											+ parent.nf.format(parent.startlengthlist.get(index).currentpointreal[0]) + "\t" + "\t"
-											+ parent.nf.format(parent.startlengthlist.get(index).currentpointreal[1]) + "\t" + "\t"
-											+ parent.nf.format(parent.startlengthlist.get(index).lengthpixelperframe) + "\t" + "\t"
-											+ parent.nf.format(parent.startlengthlist.get(index).lengthrealperframe) + "\n");
-								
-									
-
-								}
-
-							}
-							
-							
-							bw.close();
-							fw.close();
-
-						} catch (IOException e) {
-						}
-					}
-				}
-				for (int index = 0; index < parent.startlengthlist.size(); ++index) {
-
-					double[] landt = { parent.startlengthlist.get(index).totallengthpixel,
-							parent.startlengthlist.get(index).framenumber, parent.startlengthlist.get(index).seedid };
-					parent.lengthtimestart.add(landt);
-
-					rtAll.incrementCounter();
-					rtAll.addValue("FrameNumber", parent.startlengthlist.get(index).framenumber);
-					rtAll.addValue("Total Length (pixel)", parent.startlengthlist.get(index).totallengthpixel);
-					rtAll.addValue("Total Length (real)", parent.startlengthlist.get(index).totallengthreal);
-					rtAll.addValue("Track iD", parent.startlengthlist.get(index).seedid);
-					rtAll.addValue("CurrentPosition X (px units)", parent.startlengthlist.get(index).currentpointpixel[0]);
-					rtAll.addValue("CurrentPosition Y (px units)", parent.startlengthlist.get(index).currentpointpixel[1]);
-					rtAll.addValue("CurrentPosition X (real units)", parent.startlengthlist.get(index).currentpointreal[0]);
-					rtAll.addValue("CurrentPosition Y (real units)", parent.startlengthlist.get(index).currentpointreal[1]);
-					rtAll.addValue("Length per frame (px units)", parent.startlengthlist.get(index).lengthpixelperframe);
-					rtAll.addValue("Length per frame (real units)", parent.startlengthlist.get(index).lengthrealperframe);
-
-				}
-
-			}
-
-			
-			
-			
-			
-			
-			
-			if (parent.Allend.get(0).size() > 0) {
-				final ArrayList<Trackproperties> first = parent.Allend.get(0);
-				Collections.sort(first, parent.Seedcomparetrack);
-				int MaxSeedLabel = first.get(first.size() - 1).seedlabel;
-				int MinSeedLabel = first.get(0).seedlabel;
-				for (int currentseed = MinSeedLabel; currentseed < MaxSeedLabel + 1; ++currentseed) {
-					System.out.println(currentseed);
-					double endlengthreal = 0;
-					double endlengthpixel = 0;
-					for (int index = 0; index < parent.Allend.size(); ++index) {
-
-						final ArrayList<Trackproperties> thirdDimension = parent.Allend.get(index);
-
-						for (int frameindex = 0; frameindex < thirdDimension.size(); ++frameindex) {
-							final int framenumber = thirdDimension.get(frameindex).Framenumber;
-							final Integer seedID = thirdDimension.get(frameindex).seedlabel;
-
-							if (seedID == currentseed) {
-								final Integer[] FrameID = { framenumber, seedID };
-								final double[] originalpoint = thirdDimension.get(frameindex).originalpoint;
-								final double[] newpoint = thirdDimension.get(frameindex).newpoint;
-								final double[] oldpoint = thirdDimension.get(frameindex).oldpoint;
-
-								final double[] newpointCal = new double[] {
-										thirdDimension.get(frameindex).newpoint[0] * parent.calibration[0],
-										thirdDimension.get(frameindex).newpoint[1] * parent.calibration[1] };
-								final double[] oldpointCal = new double[] {
-										thirdDimension.get(frameindex).oldpoint[0] * parent.calibration[0],
-										thirdDimension.get(frameindex).oldpoint[1] * parent.calibration[1] };
-
-								final double lengthrealperframe = util.Boundingboxes.Distance(newpointCal, oldpointCal);
-								final double lengthpixelperframe = util.Boundingboxes.Distance(newpoint, oldpoint);
-								final double seedtocurrent = util.Boundingboxes.Distancesq(originalpoint, newpoint);
-								final double seedtoold = util.Boundingboxes.Distancesq(originalpoint, oldpoint);
-								final boolean shrink = seedtoold > seedtocurrent ? true : false;
-								final boolean growth = seedtoold > seedtocurrent ? false : true;
-
-								if (shrink) {
-
-									// MT shrank
-
-									endlengthreal -= lengthrealperframe;
-									endlengthpixel -= lengthpixelperframe;
-
-								}
-
-								if (growth) {
-
-									// MT grew
-
-									endlengthreal += lengthrealperframe;
-									endlengthpixel += lengthpixelperframe;
-
-								}
-
-								double[] currentlocationpixel = new double[parent.ndims];
-
-								if (framenumber == parent.thirdDimensionsliderInit)
-									currentlocationpixel = originalpoint;
-								else
-									currentlocationpixel = newpoint;
-
-								double[] currentlocationreal = new double[parent.ndims];
-
-								currentlocationreal = new double[] { currentlocationpixel[0] * parent.calibration[0],
-										currentlocationpixel[1] * parent.calibration[1] };
-
-								ResultsMT endMT = new ResultsMT(framenumber, endlengthpixel, endlengthreal, seedID,
-										currentlocationpixel, currentlocationreal, lengthpixelperframe,
-										lengthrealperframe);
-
-								parent.endlengthlist.add(endMT);
-
-							}
-						}
-					}
-
-				}
-				
-				
-				for (int seedID = MinSeedLabel; seedID <= MaxSeedLabel; ++seedID) {
-					double count = 0;
-					for (int index = 0; index < parent.endlengthlist.size(); ++index) {
-
-						
-						
-						if (parent.endlengthlist.get(index).seedid == seedID ) {
-							if (index > 0 && parent.endlengthlist.get(index).currentpointpixel[0] != parent.endlengthlist.get(index - 1).currentpointpixel[0]
-									&& parent.endlengthlist.get(index).currentpointpixel[1] != parent.endlengthlist.get(index - 1).currentpointpixel[1])
-								count++;
-							
-						}
-					}
 					
-				
-					if ( count > parent.thirdDimensionSize/5.0) {
+					if ( count > parent.thirdDimensionSize / 5.0) {	
+		for (int j = 0; j < plusminusstartlist.size(); ++j){
+						
+						if (plusminusendlist.get(j).seedid == seedID){
+					
 						try {
 							File fichier = new File(
-									parent.usefolder + "//" + parent.addToName + "SeedLabel" + seedID + "-endB" + ".txt");
+									parent.usefolder + "//" + parent.addToName + "SeedLabel" + seedID + plusminusendlist.get(j).plusorminus + ".txt");
 
 							FileWriter fw = new FileWriter(fichier);
 							BufferedWriter bw = new BufferedWriter(fw);
@@ -499,25 +561,30 @@ public  class SingleTrack {
 
 							for (int index = 0; index < parent.endlengthlist.size(); ++index) {
 
-								
-								
-								if (parent.endlengthlist.get(index).seedid == seedID ) {
-									if (index > 0 && parent.endlengthlist.get(index).currentpointpixel[0] != parent.endlengthlist.get(index - 1).currentpointpixel[0]
-											&& parent.endlengthlist.get(index).currentpointpixel[1] != parent.endlengthlist.get(index - 1).currentpointpixel[1])
-									bw.write("\t" + parent.endlengthlist.get(index).framenumber + "\t" + "\t"
-											+ parent.nf.format(parent.endlengthlist.get(index).totallengthpixel) + "\t" + "\t"
-											+ parent.nf.format(parent.endlengthlist.get(index).totallengthreal) + "\t" + "\t"
-											+ parent.nf.format(parent.endlengthlist.get(index).seedid) + "\t" + "\t"
-											+ parent.nf.format(parent.endlengthlist.get(index).currentpointpixel[0]) + "\t" + "\t"
-											+ parent.nf.format(parent.endlengthlist.get(index).currentpointpixel[1]) + "\t" + "\t"
-											+ parent.nf.format(parent.endlengthlist.get(index).currentpointreal[0]) + "\t" + "\t"
-											+ parent.nf.format(parent.endlengthlist.get(index).currentpointreal[1]) + "\t" + "\t"
-											+ parent.nf.format(parent.endlengthlist.get(index).lengthpixelperframe) + "\t" + "\t"
-											+ parent.nf.format(parent.endlengthlist.get(index).lengthrealperframe) + "\n");
-								
-										
-										
-									
+								if (parent.endlengthlist.get(index).seedid == seedID) {
+									if (index > 0
+											&& parent.endlengthlist.get(index).currentpointpixel[0] != parent.endlengthlist
+													.get(index - 1).currentpointpixel[0]
+											&& parent.endlengthlist.get(index).currentpointpixel[1] != parent.endlengthlist
+													.get(index - 1).currentpointpixel[1])
+
+										bw.write("\t" + parent.endlengthlist.get(index).framenumber + "\t" + "\t"
+												+ parent.nf.format(parent.endlengthlist.get(index).totallengthpixel) + "\t"
+												+ "\t" + parent.nf.format(parent.endlengthlist.get(index).totallengthreal)
+												+ "\t" + "\t" + parent.nf.format(parent.endlengthlist.get(index).seedid)
+												+ "\t" + "\t"
+												+ parent.nf.format(parent.endlengthlist.get(index).currentpointpixel[0])
+												+ "\t" + "\t"
+												+ parent.nf.format(parent.endlengthlist.get(index).currentpointpixel[1])
+												+ "\t" + "\t"
+												+ parent.nf.format(parent.endlengthlist.get(index).currentpointreal[0])
+												+ "\t" + "\t"
+												+ parent.nf.format(parent.endlengthlist.get(index).currentpointreal[1])
+												+ "\t" + "\t"
+												+ parent.nf.format(parent.endlengthlist.get(index).lengthpixelperframe)
+												+ "\t" + "\t"
+												+ parent.nf.format(parent.endlengthlist.get(index).lengthrealperframe)
+												+ "\n");
 
 								}
 
@@ -527,12 +594,15 @@ public  class SingleTrack {
 
 						} catch (IOException e) {
 						}
+						}
+		}
+		}
 					}
-				}
+				
 				for (int index = 0; index < parent.endlengthlist.size(); ++index) {
 
-					double[] landt = { parent.endlengthlist.get(index).totallengthpixel, parent.endlengthlist.get(index).framenumber,
-							parent.endlengthlist.get(index).seedid };
+					double[] landt = { parent.endlengthlist.get(index).totallengthpixel,
+							parent.endlengthlist.get(index).framenumber, parent.endlengthlist.get(index).seedid };
 					parent.lengthtimestart.add(landt);
 
 					rtAll.incrementCounter();
@@ -549,16 +619,14 @@ public  class SingleTrack {
 
 				}
 
-			}
-
 			
-			if (parent.returnVectorUser != null &&parent.AllUser.get(0).size() > 0) {
+
+			if (parent.returnVectorUser != null && parent.AllUser.get(0).size() > 0) {
 				final ArrayList<Trackproperties> first = parent.AllUser.get(0);
 
 				Collections.sort(first, parent.Seedcomparetrack);
 
-				int MaxSeedLabel = first.get(first.size() - 1).seedlabel;
-				int MinSeedLabel = first.get(0).seedlabel;
+			
 				for (int currentseed = MinSeedLabel; currentseed < MaxSeedLabel + 1; ++currentseed) {
 					double startlengthreal = 0;
 					double startlengthpixel = 0;
@@ -616,9 +684,8 @@ public  class SingleTrack {
 								currentlocationreal = new double[] { currentlocationpixel[0] * parent.calibration[0],
 										currentlocationpixel[1] * parent.calibration[1] };
 
-								ResultsMT startMT = new ResultsMT(framenumber, startlengthpixel, startlengthreal,
-										seedID, currentlocationpixel, currentlocationreal, lengthpixelperframe,
-										lengthrealperframe);
+								ResultsMT startMT = new ResultsMT(framenumber, startlengthpixel, startlengthreal, seedID,
+										currentlocationpixel, currentlocationreal, lengthpixelperframe, lengthrealperframe);
 
 								parent.userlengthlist.add(startMT);
 
@@ -626,32 +693,31 @@ public  class SingleTrack {
 						}
 					}
 				}
-				
-				
-				
+
 				for (int seedID = MinSeedLabel; seedID <= MaxSeedLabel; ++seedID) {
 					double count = 0;
 					for (int index = 0; index < parent.userlengthlist.size(); ++index) {
 						if (parent.userlengthlist.get(index).seedid == seedID) {
-							
-							if (index > 0 && parent.userlengthlist.get(index).currentpointpixel[0] != parent.userlengthlist.get(index - 1).currentpointpixel[0]
-									&& parent.userlengthlist.get(index).currentpointpixel[1] != parent.userlengthlist.get(index - 1).currentpointpixel[1])
+
+							if (index > 0
+									&& parent.userlengthlist.get(index).currentpointpixel[0] != parent.userlengthlist
+											.get(index - 1).currentpointpixel[0]
+									&& parent.userlengthlist.get(index).currentpointpixel[1] != parent.userlengthlist
+											.get(index - 1).currentpointpixel[1])
 								count++;
-							
+
 						}
-						
-						}
-					
-			
-					if ( count > parent.thirdDimensionSize / 5.0) {
-						
+
+					}
+
+					if (count > parent.thirdDimensionSize / 5.0) {
+
 						try {
-							File fichier = new File(
-									parent.usefolder + "//" + parent.addToName + "SeedLabel" + seedID + "-Usermarked" + ".txt");
+							File fichier = new File(parent.usefolder + "//" + parent.addToName + "SeedLabel" + seedID
+									+ "-Usermarked" + ".txt");
 
 							FileWriter fw = new FileWriter(fichier);
 							BufferedWriter bw = new BufferedWriter(fw);
-
 
 							bw.write(
 									"\tFrame\tLength (px)\tLength (real)\tiD\tCurrentPosX (px)\tCurrentPosY (px)\tCurrentPosX (real)\tCurrentPosY (real)"
@@ -659,20 +725,32 @@ public  class SingleTrack {
 
 							for (int index = 0; index < parent.userlengthlist.size(); ++index) {
 								if (parent.userlengthlist.get(index).seedid == seedID) {
-									
-									if (index > 0 && parent.userlengthlist.get(index).currentpointpixel[0] != parent.userlengthlist.get(index - 1).currentpointpixel[0]
-											&& parent.userlengthlist.get(index).currentpointpixel[1] != parent.userlengthlist.get(index - 1).currentpointpixel[1])
 
-									bw.write("\t" + parent.userlengthlist.get(index).framenumber + "\t" + "\t"
-											+ parent.nf.format(parent.userlengthlist.get(index).totallengthpixel) + "\t" + "\t"
-											+ parent.nf.format(parent.userlengthlist.get(index).totallengthreal) + "\t" + "\t"
-											+ parent.nf.format(parent.userlengthlist.get(index).seedid) + "\t" + "\t"
-											+ parent.nf.format(parent.userlengthlist.get(index).currentpointpixel[0]) + "\t" + "\t"
-											+ parent.nf.format(parent.userlengthlist.get(index).currentpointpixel[1]) + "\t" + "\t"
-											+ parent.nf.format(parent.userlengthlist.get(index).currentpointreal[0]) + "\t" + "\t"
-											+ parent.nf.format(parent.userlengthlist.get(index).currentpointreal[1]) + "\t" + "\t"
-											+ parent.nf.format(parent.userlengthlist.get(index).lengthpixelperframe) + "\t" + "\t"
-											+ parent.nf.format(parent.userlengthlist.get(index).lengthrealperframe) + "\n");
+									if (index > 0
+											&& parent.userlengthlist
+													.get(index).currentpointpixel[0] != parent.userlengthlist
+															.get(index - 1).currentpointpixel[0]
+											&& parent.userlengthlist
+													.get(index).currentpointpixel[1] != parent.userlengthlist
+															.get(index - 1).currentpointpixel[1])
+
+										bw.write("\t" + parent.userlengthlist.get(index).framenumber + "\t" + "\t"
+												+ parent.nf.format(parent.userlengthlist.get(index).totallengthpixel) + "\t"
+												+ "\t" + parent.nf.format(parent.userlengthlist.get(index).totallengthreal)
+												+ "\t" + "\t" + parent.nf.format(parent.userlengthlist.get(index).seedid)
+												+ "\t" + "\t"
+												+ parent.nf.format(parent.userlengthlist.get(index).currentpointpixel[0])
+												+ "\t" + "\t"
+												+ parent.nf.format(parent.userlengthlist.get(index).currentpointpixel[1])
+												+ "\t" + "\t"
+												+ parent.nf.format(parent.userlengthlist.get(index).currentpointreal[0])
+												+ "\t" + "\t"
+												+ parent.nf.format(parent.userlengthlist.get(index).currentpointreal[1])
+												+ "\t" + "\t"
+												+ parent.nf.format(parent.userlengthlist.get(index).lengthpixelperframe)
+												+ "\t" + "\t"
+												+ parent.nf.format(parent.userlengthlist.get(index).lengthrealperframe)
+												+ "\n");
 
 								}
 
@@ -706,7 +784,6 @@ public  class SingleTrack {
 
 			}
 
-			
 			
 			
 			rtAll.show("Start and End of MT");

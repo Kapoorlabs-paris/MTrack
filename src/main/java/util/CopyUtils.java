@@ -2,6 +2,8 @@ package util;
 
 import java.awt.Rectangle;
 
+import javax.swing.JProgressBar;
+
 import ij.IJ;
 import net.imglib2.Cursor;
 import net.imglib2.FinalInterval;

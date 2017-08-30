@@ -642,6 +642,7 @@ public class Interactive_MTSingleChannel implements PlugIn {
 		imp = ImageJFunctions.show(originalimg);
 		impcopy = imp.duplicate();
 
+		imp.setTitle("Original movie");
 		this.userfile = userfile;
 		calibration = imgCal;
 		System.out.println(calibration[0] + " " + calibration[1]);
@@ -660,7 +661,7 @@ public class Interactive_MTSingleChannel implements PlugIn {
 				(int) originalimg.dimension(1) - 2 * iniy);
 		imp = ImageJFunctions.show(originalimg);
 		impcopy = imp.duplicate();
-
+		imp.setTitle("Original movie");
 		this.userfile = userfile;
 		calibration = imgCal;
 		System.out.println(calibration[0] + " " + calibration[1]);
@@ -734,7 +735,7 @@ public class Interactive_MTSingleChannel implements PlugIn {
 		endStack = thirdDimensionSize;
 		thirdDimensionSizeOriginal = thirdDimensionSize;
 		preprocessedimp = ImageJFunctions.show(CurrentView);
-
+        preprocessedimp.setTitle("Preprocessed movie");
 		Roi roi = preprocessedimp.getRoi();
 
 		if (roi == null) {

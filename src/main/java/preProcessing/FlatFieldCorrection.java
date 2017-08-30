@@ -112,7 +112,9 @@ public class FlatFieldCorrection extends BenchmarkAlgorithm implements OutputAlg
 				final IntervalView< FloatType > slice = Views.hyperSlice( source, 2, z );
 				final IntervalView< FloatType > outputSlice = Views.hyperSlice( output, 2, z );
 			   
+				if(jpb!=null)
 				FitterUtils.SetProgressBar(jpb, 100 * percent/nz, "PreProcessing, please wait..");
+				
 				processSlice( slice, outputSlice );
 				
 				

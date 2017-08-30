@@ -12,6 +12,7 @@ import javax.swing.SwingUtilities;
 
 import interactiveMT.Interactive_MTDoubleChannel;
 import interactiveMT.Interactive_MTSingleChannel;
+import interactiveMT.Interactive_MTSingleChannelBasic;
 import swingClasses.ProgressSkip;
 import swingClasses.SingleProgressSkip;
 
@@ -20,12 +21,22 @@ public class SingleSkipFramesandTrackendsListener implements ActionListener {
 	
 	
       final Interactive_MTSingleChannel parent;
+      final Interactive_MTSingleChannelBasic child;
       final int starttime;
       final int endtime;
 	
-	public SingleSkipFramesandTrackendsListener(final Interactive_MTSingleChannel parent, final int starttime, final int endtime){
+      public SingleSkipFramesandTrackendsListener(final Interactive_MTSingleChannel parent, final int starttime, final int endtime){
+    		
+  		this.parent = parent;
+  		this.child = null;
+  		this.starttime = starttime;
+  		this.endtime = endtime;
+  	}
+      
+	public SingleSkipFramesandTrackendsListener(final Interactive_MTSingleChannel parent, final Interactive_MTSingleChannelBasic child, final int starttime, final int endtime){
 	
 		this.parent = parent;
+		this.child = child;
 		this.starttime = starttime;
 		this.endtime = endtime;
 	}
@@ -54,7 +65,10 @@ public class SingleSkipFramesandTrackendsListener implements ActionListener {
 		parent.frame.add(parent.panel);
 		parent.frame.pack();
 		parent.frame.setSize(200, 100);
+		if (child == null)
 		parent.frame.setLocationRelativeTo(parent.panelCont);
+		else
+			parent.frame.setLocationRelativeTo(child.panelCont);	
 		parent.frame.setVisible(true);
 
         parent.Cardframe.remove(parent.controlnext);

@@ -13,6 +13,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import interactiveMT.Interactive_MTDoubleChannel;
+import interactiveMT.Interactive_MTDoubleChannelBasic;
 import swingClasses.ProgressSkip;
 
 public class SkipFramesandTrackendsListener implements ActionListener {
@@ -20,13 +21,22 @@ public class SkipFramesandTrackendsListener implements ActionListener {
 	
 	
       final Interactive_MTDoubleChannel parent;
+      final Interactive_MTDoubleChannelBasic child;
       final int starttime;
       final int endtime;
 	
-	public SkipFramesandTrackendsListener(final Interactive_MTDoubleChannel parent, final int starttime, final int endtime){
+	public SkipFramesandTrackendsListener(final Interactive_MTDoubleChannel parent, final Interactive_MTDoubleChannelBasic child, final int starttime, final int endtime){
 	
 		this.parent = parent;
 		this.starttime = starttime;
+		this.child = child;
+		this.endtime = endtime;
+	}
+public SkipFramesandTrackendsListener(final Interactive_MTDoubleChannel parent, final int starttime, final int endtime){
+		
+		this.parent = parent;
+		this.starttime = starttime;
+		this.child = null;
 		this.endtime = endtime;
 	}
 	
@@ -54,7 +64,10 @@ public class SkipFramesandTrackendsListener implements ActionListener {
 		parent.frame.add(parent.panel);
 		parent.frame.pack();
 		parent.frame.setSize(200, 100);
+		if (child == null)
 		parent.frame.setLocationRelativeTo(parent.panelCont);
+		else
+		parent.frame.setLocationRelativeTo(child.panelCont);	
 		parent.frame.setVisible(true);
 
 		

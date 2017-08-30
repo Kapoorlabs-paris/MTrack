@@ -5,6 +5,7 @@ import java.awt.Button;
 import java.awt.CardLayout;
 import java.awt.Checkbox;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -30,6 +31,10 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
 
 import fiji.tool.SliceObserver;
 import ij.IJ;
@@ -81,6 +86,7 @@ import updateListeners.BatchModeListener;
 import updateListeners.DefaultModel;
 import updateListeners.DefaultModelHF;
 import updateListeners.FinalPoint;
+import updateListeners.Markends;
 import updateListeners.MoveNextListener;
 import updateListeners.MoveToFrameListener;
 import updateListeners.SingleDefaultModel;
@@ -92,8 +98,12 @@ import updateListeners.SingleMoveToFrameListener;
 public class Interactive_MTSingleChannelBasic implements PlugIn {
 
 	final Interactive_MTSingleChannel parent;
-	private JLabel inputLabelX, inputLabelY, inputLabelT;
-	private TextField inputFieldX, inputFieldY, inputFieldT;
+	public JLabel inputLabelX;
+	public JLabel inputLabelY;
+	public JLabel inputLabelT;
+	public TextField inputFieldX;
+	public TextField inputFieldY;
+	public TextField inputFieldT;
 
 	public Interactive_MTSingleChannelBasic() {
 		this.parent = null;
@@ -112,7 +122,7 @@ public class Interactive_MTSingleChannelBasic implements PlugIn {
 
 		parent.FindLinesViaMSER = true;
 		parent.doMserSegmentation = true;
-
+		parent.newends = new SingleMarkends(parent);
 		parent.AllSeedrois = new ArrayList<OvalRoi>();
 		parent.jpb = new JProgressBar();
 		parent.newHoughtree = new HashMap<Integer, MserTree<UnsignedByteType>>();
@@ -158,6 +168,9 @@ public class Interactive_MTSingleChannelBasic implements PlugIn {
 			parent.Kymoimp = ImageJFunctions.show(parent.Kymoimg);
 
 		}
+		
+		
+		
 		parent.prestack = new ImageStack((int) parent.originalimg.dimension(0), (int) parent.originalimg.dimension(1),
 				java.awt.image.ColorModel.getRGBdefault());
 
@@ -170,7 +183,9 @@ public class Interactive_MTSingleChannelBasic implements PlugIn {
 		parent.endStack = parent.thirdDimensionSize;
 		parent.thirdDimensionSizeOriginal = parent.thirdDimensionSize;
 		parent.preprocessedimp = ImageJFunctions.show(parent.CurrentPreprocessedView);
-
+		parent.preprocessedimp.setTitle("Active image time point" + " " + parent.thirdDimension); 
+		parent.starttime = 2;
+		parent.endtime = parent.thirdDimensionSize;
 		Roi roi = parent.preprocessedimp.getRoi();
 
 		if (roi == null) {
@@ -195,41 +210,44 @@ public class Interactive_MTSingleChannelBasic implements PlugIn {
 		// check whenever roi is modified to update accordingly
 		parent.preprocessedimp.getCanvas().addMouseListener(parent.roiListener);
 
-		IJ.log(" Third Dimension Size " + parent.thirdDimensionSize);
 
 	}
 
 	public JFrame CardframeSimple = new JFrame("MicroTubule Velocity Tracker (Simple Mode)");
-
+	public JPanel controlnext = new JPanel();
+	public JPanel controlprevious = new JPanel();
 	public JPanel panelCont = new JPanel();
 	public JPanel panelFirst = new JPanel();
 	public JPanel panelSecond = new JPanel();
+	public JPanel panelNext = new JPanel();
 	public JPanel panelThird = new JPanel();
+	private JPanel Directoryoptions = new JPanel();
+	public JPanel Mserparam = new JPanel();
+	public final GridBagLayout layout = new GridBagLayout();
+	public final GridBagConstraints c = new GridBagConstraints();
 
 	public void CardSmall() {
 
 		CardLayout cl = new CardLayout();
 
-		parent.Cardframe.setSize(CardframeSimple.getSize());
+		
+		CardframeSimple.setMinimumSize(new Dimension(400,400));
 
 		panelCont.setLayout(cl);
 
 		panelCont.add(panelFirst, "1");
 		panelCont.add(panelSecond, "2");
-		panelCont.add(panelThird, "3");
-
+		panelNext.setLayout(layout);
 		panelFirst.setName("Choose parameters to find Seeds");
 
-		final Label Step = new Label("Step 1", Label.CENTER);
 		final Checkbox Analyzekymo = new Checkbox("Analyze Kymograph");
 		final JButton ChooseDirectory = new JButton("Choose Directory");
-		final JLabel outputfilename = new JLabel("Enter output filename: ");
 		TextField inputField = new TextField();
-		inputField.setColumns(10);
+		inputField.setColumns(20);
 		inputField.setText(parent.userfile.getName().replaceFirst("[.][^.]+$", ""));
-		final Label deltaText = new Label("Grey Level Seperation between Components = " + parent.delta, Label.CENTER);
+		final Label deltaText = new Label("Threshold difference = " + parent.delta, Label.CENTER);
 		final Label Unstability_ScoreText = new Label("Unstability Score = " + parent.Unstability_Score, Label.CENTER);
-		final Label minSizeText = new Label("Min # of pixels inside MSER Ellipses = " + parent.minSize, Label.CENTER);
+		final Label minSizeText = new Label("Min size of red ellipses = " + parent.minSize, Label.CENTER);
 		final Scrollbar deltaS = new Scrollbar(Scrollbar.HORIZONTAL, parent.deltaInit, 10, 0,
 				10 + parent.scrollbarSize);
 		final Scrollbar Unstability_ScoreS = new Scrollbar(Scrollbar.HORIZONTAL, parent.Unstability_ScoreInit, 10, 0,
@@ -237,7 +255,6 @@ public class Interactive_MTSingleChannelBasic implements PlugIn {
 		final Scrollbar minSizeS = new Scrollbar(Scrollbar.HORIZONTAL, parent.minSizeInit, 10, 0,
 				10 + parent.scrollbarSize);
 
-		final Button ComputeTree = new Button("Show MSER Ellipses");
 		final Button FindLinesListener = new Button("Find endpoints");
 
 		parent.Unstability_Score = parent.computeValueFromScrollbarPosition(parent.Unstability_ScoreInit,
@@ -249,73 +266,73 @@ public class Interactive_MTSingleChannelBasic implements PlugIn {
 		SingleDefaultModel loaddefault = new SingleDefaultModel(parent);
 		loaddefault.LoadDefault();
 
-		final Label MSparam = new Label("Determine MSER parameters");
-		MSparam.setBackground(new Color(1, 0, 1));
-		MSparam.setForeground(new Color(255, 255, 255));
+		
 
-		final GridBagLayout layout = new GridBagLayout();
-		final GridBagConstraints c = new GridBagConstraints();
-
+		
+		parent.addToName = inputField.getText();
+		
+		
 		panelFirst.setLayout(layout);
-		panelFirst.add(Step, c);
+		panelSecond.setLayout(layout);
+		
+		Mserparam.setLayout(layout);
+		Directoryoptions.setLayout(layout);
+		
+		
+		Border msborder = new CompoundBorder(new TitledBorder("MSER parameters"), new EmptyBorder(c.insets));
+		Directoryoptions.setLayout(layout);
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridx = 0;
 		c.gridy = 0;
 		c.weightx = 1;
 
-		final Label Kymo = new Label("Analyze Kymo");
+		Border dirborder = new CompoundBorder(new TitledBorder("File name"),
+				new EmptyBorder(c.insets));
+		
+		
+	
+	   
+	   Mserparam.add(deltaText,  new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+	 
+	   Mserparam.add(deltaS,  new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 
-		if (parent.Kymoimg != null) {
-			c.insets = new Insets(10, 10, 0, 0);
-			panelFirst.add(Kymo, c);
-			++c.gridy;
-			c.insets = new Insets(10, 10, 0, 0);
-			panelFirst.add(Analyzekymo, c);
-		}
+	   Mserparam.add(Unstability_ScoreText,  new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 
-		++c.gridy;
-		c.insets = new Insets(10, 10, 10, 0);
-		panelFirst.add(outputfilename, c);
+	   Mserparam.add(Unstability_ScoreS,  new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+	   
+	   Mserparam.add(minSizeText,  new GridBagConstraints(0, 4, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 
-		++c.gridy;
-		c.insets = new Insets(10, 10, 10, 0);
-		panelFirst.add(inputField, c);
+	   Mserparam.add(minSizeS,  new GridBagConstraints(0, 5, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+	  
+	   Mserparam.add(FindLinesListener, new GridBagConstraints(0, 6, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 0);
-		panelFirst.add(ChooseDirectory, c);
+	   Mserparam.setBorder(msborder);
+	  
+	  panelFirst.add(Mserparam, new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 
-		++c.gridy;
+	  
+		Directoryoptions.add(inputField,  new GridBagConstraints(0, 4, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
+				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0) );
+		Directoryoptions.add(ChooseDirectory,  new GridBagConstraints(0, 5, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
+				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0) );
+	
+		Directoryoptions.setBorder(dirborder);
+		
+	   panelFirst.add(Directoryoptions, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));	
+	  
+	  
 
-		panelFirst.add(MSparam, c);
 
-		++c.gridy;
-
-		panelFirst.add(deltaText, c);
-
-		++c.gridy;
-		panelFirst.add(deltaS, c);
-
-		++c.gridy;
-
-		panelFirst.add(Unstability_ScoreText, c);
-
-		++c.gridy;
-		panelFirst.add(Unstability_ScoreS, c);
-		++c.gridy;
-
-		panelFirst.add(minSizeText, c);
-
-		++c.gridy;
-		panelFirst.add(minSizeS, c);
-
-		++c.gridy;
-		c.insets = new Insets(10, 175, 0, 175);
-		panelFirst.add(AdvancedOptions, c);
-
-		++c.gridy;
-		c.insets = new Insets(10, 180, 0, 180);
-		panelFirst.add(FindLinesListener, c);
+	
 		panelFirst.setVisible(true);
 		cl.show(panelCont, "1");
 
@@ -328,11 +345,10 @@ public class Interactive_MTSingleChannelBasic implements PlugIn {
 				parent.Unstability_ScoreMin, parent.Unstability_ScoreMax, parent.scrollbarSize, Unstability_ScoreS));
 
 		AdvancedOptions.addItemListener(new SingleAdvancedSeedListener(parent));
-		ComputeTree.addActionListener(new SingleComputeTreeListener(parent));
-		FindLinesListener.addActionListener(new SingleFindLinesListener(parent));
-		JPanel control = new JPanel();
+		FindLinesListener.addActionListener(new SingleFindLinesListener(parent, this));
+		
 		parent.updatePreview(ValueChange.SHOWMSER);
-		control.add(new JButton(new AbstractAction("\u22b2Prev") {
+		controlnext.add(new JButton(new AbstractAction("\u22b2Prev") {
 
 			/**
 			 * 
@@ -346,7 +362,7 @@ public class Interactive_MTSingleChannelBasic implements PlugIn {
 				cl.previous(panelCont);
 			}
 		}));
-		control.add(new JButton(new AbstractAction("Next\u22b3") {
+		controlnext.add(new JButton(new AbstractAction("Next\u22b3") {
 
 			/**
 			 * 
@@ -360,80 +376,9 @@ public class Interactive_MTSingleChannelBasic implements PlugIn {
 			}
 		}));
 
-		// Panel Second
-		final Button MoveNext = new Button("Deseelct ends");
-		final Button JumptoFrame = new Button("Choose a later time point in the dynamic channel to mark ends to track");
-
-		final Label ORText = new Label("If the dynamic ends are not visible", Label.CENTER);
-
-		ORText.setBackground(new Color(1, 0, 1));
-		ORText.setForeground(new Color(255, 255, 255));
-		inputLabelX = new JLabel("Enter start time point for tracking");
-		inputFieldX = new TextField();
-		inputFieldX.setColumns(5);
-
-		inputLabelY = new JLabel("Enter end time point for tracking");
-		inputFieldY = new TextField();
-		inputFieldY.setColumns(5);
-		inputFieldX.setText(String.valueOf(2));
-		inputFieldY.setText(String.valueOf(parent.thirdDimensionSize));
-		final Label LeftClick = new Label(
-				"Left click deselects an end, Shift + left click selects a deselected end, Shift + Alt + left click marks a user defined seed.");
-
-		LeftClick.setBackground(new Color(1, 0, 1));
-		LeftClick.setForeground(new Color(255, 255, 255));
-		final Checkbox Finalize = new Checkbox("Confirm the dynamic seed end(s)");
-
-		final Label MTTextHF = new Label("Select ends for tracking", Label.CENTER);
-		final Label Step2 = new Label("Step 2", Label.CENTER);
-
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.gridx = 0;
-		c.gridy = 0;
-		c.weightx = 0.5;
-
-		panelSecond.setLayout(layout);
-		panelSecond.add(Step2, c);
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 0);
-		panelSecond.add(LeftClick, c);
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 0);
-		panelSecond.add(MTTextHF, c);
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 150);
-		panelSecond.add(MoveNext, c);
-		++c.gridy;
-		c.insets = new Insets(10, 10, 10, 0);
-		panelSecond.add(inputLabelX, c);
-
-		++c.gridy;
-		c.insets = new Insets(10, 10, 10, 0);
-		panelSecond.add(inputFieldX, c);
-
-		++c.gridy;
-		c.insets = new Insets(10, 10, 10, 0);
-		panelSecond.add(inputLabelY, c);
-
-		++c.gridy;
-		c.insets = new Insets(10, 10, 10, 0);
-		panelSecond.add(inputFieldY, c);
-
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 0);
-		panelSecond.add(Finalize, c);
 		
-		MoveNext.addActionListener(new SingleMoveNextListener(parent));
-		JumptoFrame.addActionListener(new SingleMoveToFrameListener(parent));
-
-		CardframeSimple.addWindowListener(new FrameListener(CardframeSimple));
-
-		inputFieldX.addTextListener(new SingleBeginTrackListener(parent));
-		inputFieldY.addTextListener(new SingleEndTrackListener(parent));
-		Finalize.addItemListener(new SingleFinalPoint(parent, this));
-
+		
 		CardframeSimple.add(panelCont, BorderLayout.CENTER);
-		CardframeSimple.add(control, BorderLayout.SOUTH);
 		CardframeSimple.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		CardframeSimple.pack();
 		CardframeSimple.setVisible(true);
@@ -535,7 +480,7 @@ public class Interactive_MTSingleChannelBasic implements PlugIn {
 
 		Record.addActionListener(new SingleBatchModeListener(parent));
 		SkipframeandTrackEndPoints.addActionListener(
-				new SingleSkipFramesandTrackendsListener(parent, parent.thirdDimension, parent.thirdDimensionSize));
+				new SingleSkipFramesandTrackendsListener(parent, this, parent.thirdDimension, parent.thirdDimensionSize));
 
 		AdvancedOptions.addItemListener(new SingleAdvancedTrackerListener(parent));
 		cbtrack.addActionListener(new SingleSeedDisplayListener(cbtrack, Views.hyperSlice(parent.originalimg, 2, 0), parent));

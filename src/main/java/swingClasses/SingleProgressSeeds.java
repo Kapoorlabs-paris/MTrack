@@ -11,6 +11,7 @@ import java.util.concurrent.ExecutionException;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
+import javax.swing.JPanel;
 import javax.swing.SwingWorker;
 
 import LineModels.UseLineModel.UserChoiceModel;
@@ -33,6 +34,7 @@ import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.util.Pair;
 import net.imglib2.util.ValuePair;
+import singleListeners.SingleSecondPanel;
 import singleListeners.SingleThirdPanel;
 
 public class SingleProgressSeeds extends SwingWorker<Void, Void> {
@@ -162,18 +164,67 @@ final Interactive_MTSingleChannelBasic child;
 			get();
 			
 
-			parent.Cardframe.add(parent.controlnext, BorderLayout.PAGE_END);
-			parent.Cardframe.validate();
-			parent.Cardframe.pack();
+			
 			if (child!=null){
-				/*
-					
-					child.CardframeSimple.add(child.controlnext, BorderLayout.PAGE_END);
-					child.CardframeSimple.validate();
-					SecondPanel paintsecond = new SecondPanel(parent, child);
+				child.controlnext.removeAll();
+				child.controlprevious.removeAll();
+				child.controlnext.add(new JButton(new AbstractAction("\u22b2Prev") {
+
+					/**
+					 * 
+					 */
+					private static final long serialVersionUID = 1L;
+
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						CardLayout cl = (CardLayout) child.panelCont.getLayout();
+
+						cl.previous(child.panelCont);
+					}
+				}));
+			 
+				
+
+				child.panelNext.add(child.controlnext,  new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+			
+				child.controlnext.setVisible(true);
+				
+				
+				child.panelSecond.add(child.panelNext,  new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+			
+				child.panelSecond.validate();
+				
+				
+				JPanel controlprevpanel = new JPanel();
+				JPanel prevpanel = new JPanel();
+				controlprevpanel.add(new JButton(new AbstractAction("Next\u22b3") {
+
+					/**
+					 * 
+					 */
+					private static final long serialVersionUID = 1L;
+
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						CardLayout cl = (CardLayout) child.panelCont.getLayout();
+						cl.previous(child.panelCont);
+					}
+				}));
+				
+				prevpanel.add(controlprevpanel,  new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+			
+				controlprevpanel.setVisible(true);
+				
+				child.panelFirst.add(prevpanel,  new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+				child.panelFirst.validate();
+			
+				
+					SingleSecondPanel paintsecond = new SingleSecondPanel(parent, child);
 					paintsecond.Paint();
-					
-					*/
 			}
 			if (child==null){
 			
@@ -219,15 +270,40 @@ final Interactive_MTSingleChannelBasic child;
 			
 				parent.panelSecond.validate();
 				
+				JPanel controlprevpanel = new JPanel();
+				JPanel prevpanel = new JPanel();
+				controlprevpanel.add(new JButton(new AbstractAction("Next\u22b3") {
+
+					/**
+					 * 
+					 */
+					private static final long serialVersionUID = 1L;
+
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						CardLayout cl = (CardLayout) parent.panelCont.getLayout();
+						cl.next(parent.panelCont);
+					}
+				}));
+				
+				prevpanel.add(controlprevpanel,  new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 			
+				controlprevpanel.setVisible(true);
+				
+				parent.panelFirst.add(prevpanel,  new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+				parent.panelFirst.validate();
 			SingleThirdPanel paintthird = new SingleThirdPanel(parent);
 			paintthird.Paint();
 			
 			
-			parent.frame.dispose();
+			
 			
 			}
+			parent.frame.dispose();
 		}
+		
 			// JOptionPane.showMessageDialog(jpb.getParent(), "End Points
 			// found and overlayed", "Success",
 			// JOptionPane.INFORMATION_MESSAGE);

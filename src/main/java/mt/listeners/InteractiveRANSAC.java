@@ -17,6 +17,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.text.NumberFormat;
@@ -44,6 +45,7 @@ import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+import org.jfree.graphics2d.svg.SVGGraphics2D;
 import org.jfree.util.ShapeUtilities;
 
 import fit.AbstractFunction2D;
@@ -106,6 +108,7 @@ public class InteractiveRANSAC implements PlugIn {
 
 	final XYSeriesCollection dataset;
 	final JFreeChart chart;
+	final SVGGraphics2D svgchart;
 	int updateCount = 0;
 	public ArrayList<Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>>> segments;
 	public ArrayList<LinearFunction> linearsegments;
@@ -170,8 +173,9 @@ public class InteractiveRANSAC implements PlugIn {
 		this.maxSlope = computeValueFromDoubleExpScrollbarPosition(this.maxSlopeInt, MAX_SLIDER, MAX_ABS_SLOPE);
 		this.dataset = new XYSeriesCollection();
 		this.chart = Tracking.makeChart(dataset, "Microtubule Length Plot", "Timepoint", "MT Length");
-		this.jFreeChartFrame = Tracking.display(chart, new Dimension(500, 400));
-
+		this.svgchart = new SVGGraphics2D(500, 500);
+		this.jFreeChartFrame = Tracking.display(chart, new Dimension(500, 500));
+		this.chart.draw(svgchart, new Rectangle2D.Double(0, 0, 500, 500), null);
 	};
 
 	public InteractiveRANSAC(final int minTP, final int maxTP,
@@ -205,8 +209,9 @@ public class InteractiveRANSAC implements PlugIn {
 		this.maxSlope = computeValueFromDoubleExpScrollbarPosition(this.maxSlopeInt, MAX_SLIDER, MAX_ABS_SLOPE);
 		this.dataset = new XYSeriesCollection();
 		this.chart = Tracking.makeChart(dataset, "Microtubule Length Plot", "Timepoint", "MT Length");
+		this.svgchart = new SVGGraphics2D(500, 500);
 		this.jFreeChartFrame = Tracking.display(chart, new Dimension(500, 500));
-
+		this.chart.draw(svgchart, new Rectangle2D.Double(0, 0, 500, 500), null);
 	};
 	
 	

@@ -274,7 +274,7 @@ System.out.println(paramnextframestart.currentLabel);
 
 			System.out.println("User " + dist);
 		
-			
+			if (dist!=Double.NaN){
 			if (Math.abs(dist) > maxdist) {
 				paramnextframestart = Userframe.get(index);
 				newstartpoint = oldstartpoint;
@@ -282,6 +282,7 @@ System.out.println(paramnextframestart.currentLabel);
 				newstartintercept = Userframe.get(index).intercept;
 			}
 			
+			}
 			}
 			
 			final_paramlistuser.add(paramnextframestart);

@@ -189,7 +189,7 @@ public class FinalPoint implements ActionListener {
 	
 
 		if (child != null){
-			SkipFramesandTrackendsListener track =  new SkipFramesandTrackendsListener(parent, parent.starttime, parent.endtime);
+			SkipFramesandTrackendsListener track =  new SkipFramesandTrackendsListener(parent, child,  parent.starttime, parent.endtime);
 			track.goSkip();
 			
 		}

@@ -278,6 +278,9 @@ System.out.println(thirdDimsize);
 				double dist = (paramnextframe.currentpos[1] - oldslope * paramnextframe.currentpos[0] -oldintercept)/Math.sqrt(1 + oldslope *oldslope);
 						 
 						//Math.toDegrees(Math.atan(Math.toRadians((newslope - oldslope)/(1 + newslope * oldslope))));
+				
+				
+				if (dist!=Double.NaN){
 				System.out.println(dist);
 		
 				// TCASM
@@ -288,6 +291,7 @@ System.out.println(thirdDimsize);
 					newstartintercept = PrevFrameparamstart.get(index).intercept;
 				}
 				
+				}
 				}
 				
 				
@@ -386,6 +390,8 @@ System.out.println(thirdDimsize);
 				double dist = (paramnextframeend.currentpos[1] - oldslope * paramnextframeend.currentpos[0] -oldintercept)/Math.sqrt(1 + oldslope *oldslope);
 						
 						//Math.toDegrees(Math.atan(Math.toRadians((newslope - oldslope)/(1 + newslope * oldslope))));
+				
+				if (dist!=Double.NaN){
 				System.out.println(dist);
 				
 				// TCASM
@@ -395,6 +401,7 @@ System.out.println(thirdDimsize);
 					 newendslope = PrevFrameparamend.get(index).slope;
 					 newendintercept = PrevFrameparamend.get(index).intercept;
 					
+				}
 				}
 				
 				}

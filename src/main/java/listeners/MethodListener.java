@@ -44,7 +44,8 @@ public class MethodListener implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		int selectedindex = choice.getSelectedIndex();
 		
-		
+		parent.controlnext.removeAll();
+		parent.controlprevious.removeAll();
 		parent.controlnext.add(new JButton(new AbstractAction("Next\u22b3") {
 
 			/**
@@ -321,6 +322,8 @@ public class MethodListener implements ActionListener {
 			parent.panelSecond.validate();
 			parent.panelSecond.repaint();
             parent.Cardframe.pack();
+            parent.updatePreview(ValueChange.SHOWHOUGH);
+            
 		}
 		
 		if (selectedindex == 2){
@@ -501,31 +504,31 @@ public class MethodListener implements ActionListener {
 			parent.Cardframe.pack();
 			parent.updatePreview(ValueChange.SHOWMSER);
 		}
+
 		// Previous button for the second panel
 		
-		parent.controlprevious.add(new JButton(new AbstractAction("\u22b2Prev") {
+				parent.controlprevious.add(new JButton(new AbstractAction("\u22b2Prev") {
 
-			/**
-			 * 
-			 */
-			private static final long serialVersionUID = 1L;
+					/**
+					 * 
+					 */
+					private static final long serialVersionUID = 1L;
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				CardLayout cl = (CardLayout) parent.panelCont.getLayout();
-				cl.previous(parent.panelCont);
-			}
-		}));
-		
-		parent.panelPrevious.add(parent.controlprevious,  new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER,
-				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
-	
-		parent.controlprevious.setVisible(true);
-		
-		parent.panelSecond.add(parent.panelPrevious,  new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
-				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
-		
-		
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						CardLayout cl = (CardLayout) parent.panelCont.getLayout();
+						cl.previous(parent.panelCont);
+					}
+				}));
+				
+				parent.panelPrevious.add(parent.controlprevious,  new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+			
+				parent.controlprevious.setVisible(true);
+				
+				parent.panelSecond.add(parent.panelPrevious,  new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+				
 		
 		parent.panelSecond.validate();
 		parent.Cardframe.pack();

@@ -163,6 +163,7 @@ public class BatchMode implements PlugIn, Runnable {
 	public TextField inputFieldT;
 
 	public JProgressBar jpb;
+	public JProgressBar jpbpre;
 	public int numgaussians = Prefs.getInt(".Numg.int", 2);
     public double maxdist = Prefs.getDouble(".Maxdist.double", 20);
 	public JLabel label = new JLabel("Progress..");
@@ -369,12 +370,15 @@ public class BatchMode implements PlugIn, Runnable {
 	}
 	@Override
 	public void run(String arg) {
+		jpbpre = new JProgressBar();
+		jpb = new JProgressBar();
 		run();
 		
 	}
 	@Override
 	public void run() {
-
+		jpbpre = new JProgressBar();
+		jpb = new JProgressBar();
 		goTrack();
 
 	}
@@ -938,7 +942,7 @@ public class BatchMode implements PlugIn, Runnable {
 		new ImageJ();
 
 		JFrame frame = new JFrame("");
-		FileChooser panel = new FileChooser();
+		MainFileChooser panel = new MainFileChooser();
 
 		frame.getContentPane().add(panel, "Center");
 		frame.setSize(panel.getPreferredSize());

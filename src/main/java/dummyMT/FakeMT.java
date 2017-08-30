@@ -167,14 +167,14 @@ public class FakeMT {
 			double endpos[] = new double[n];
 			double[] startline = new double[n];
 			double[] endline = new double[n];
-			double MaxLength = 20;
+			double MaxLength = 40;
 
 			for (int d = 0; d < range.numDimensions(); ++d) {
-				startpos[d] = 180 +  (rnd.nextDouble() * (range.max(d) - range.min(d)) + range.min(d));
+				startpos[d] = 100 +  (rnd.nextDouble() * (range.max(d) - range.min(d)) + range.min(d));
 				
 			}
 			
-			double randomslope = 0.8; //-rndsec.nextDouble();
+			double randomslope = 0.2; //-rndsec.nextDouble();
 			
 			
 			
@@ -261,7 +261,7 @@ public static double[] Growseeds (RandomAccessibleInterval<FloatType> outimg, do
 		
 		final int n = outimg.numDimensions();
 		
-        double growrate =  0.01 * Math.sin(0.01 * frame) ;
+        double growrate =  2 * Math.sin(0.006 * frame) ;
         
      
         
@@ -280,14 +280,14 @@ public static double[] Growseeds (RandomAccessibleInterval<FloatType> outimg, do
 				
 				final double stepsize =  1 ;
 				double steppos[] = {original[0], original[1]};
-				double dx = stepsize / Math.sqrt(1 + (slope + 2 * curvature * oldpos[0]) * (slope + 2 * curvature * oldpos[0]) );
-				double dy = (slope + 2 * curvature * oldpos[0])  * dx ;
+				double dx = stepsize / Math.sqrt(1 + (slope ) * (slope) );
+				double dy = (slope )  * dx ;
 				
 				
 				double[] endpos = new double[n];
 				
 				endpos[0] = oldpos[0] + motion* growrate;
-				endpos[1] = oldpos[0] - motion*growrate;
+				endpos[1] = oldpos[1] + motion*growrate;
 				while (true) {
 					
 					
@@ -299,7 +299,7 @@ public static double[] Growseeds (RandomAccessibleInterval<FloatType> outimg, do
 						break;
 					
 					
-				   dy += 0.01*dx*dx;
+				  
 					
 					
 					steppos[0] += dx ;
@@ -311,7 +311,7 @@ public static double[] Growseeds (RandomAccessibleInterval<FloatType> outimg, do
 						
 				}
 			
-				
+				curvature = ((steppos[1] - oldpos[1])/ (steppos[0] - oldpos[0]) - slope )/ (steppos[0] + oldpos[0]);
 				
 				double[] returnelement = {steppos[0], steppos[1], slope, intercept, curvature };
 				
@@ -343,7 +343,7 @@ public static double[] Growseeds (RandomAccessibleInterval<FloatType> outimg, do
 			
 			final FinalInterval range = new FinalInterval(512, 512);
 			
-			final FinalInterval smallrange = new FinalInterval(248, 248);
+			final FinalInterval smallrange = new FinalInterval(312, 212);
 			
 			final int ndims = range.numDimensions();
 			final double [] sigma = {2,2};
@@ -382,8 +382,8 @@ public static double[] Growseeds (RandomAccessibleInterval<FloatType> outimg, do
 	       ArrayList<double[]> Allseedgrow = new ArrayList<double[]>();
 	       
 	       FileWriter fw;
-	       String usefolder = "/Volumes/Varun_disk/DummyAnalysis/";
-			File fichierKy = new File(usefolder + "//" +"DummyendCurved25" + ".txt");
+	       String usefolder = "/Volumes/Varun_disk/DummyAnalysisStraight/";
+			File fichierKy = new File(usefolder + "//" +"DummyendStraight25" + ".txt");
 			fw = new FileWriter(fichierKy);
 			BufferedWriter bw = new BufferedWriter(fw);
 			bw.write("\tFramenumber\tDeltaL\n");

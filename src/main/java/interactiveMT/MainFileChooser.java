@@ -6,6 +6,7 @@ import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import ij.ImagePlus;
 import ij.io.Opener;
@@ -32,6 +33,7 @@ import preProcessing.FlatFieldCorrection;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.awt.*;
 
@@ -319,7 +321,7 @@ public class MainFileChooser extends JPanel {
 			panelIntro.repaint();
 			frame.addWindowListener(new FrameListener(frame));
 			frame.add(panelCont, BorderLayout.CENTER);
-
+			
 			frame.setSize(getPreferredSizeSmall());
 			frame.setVisible(true);
 
@@ -347,11 +349,20 @@ public class MainFileChooser extends JPanel {
 				chooserB.setCurrentDirectory(new java.io.File("."));
 			chooserB.setDialogTitle(choosertitleB);
 			chooserB.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+			chooserB.setAcceptAllFileFilterUsed(false);
+			FileNameExtensionFilter filter = new FileNameExtensionFilter("Image Files", "tif", "nd2");
 
+			chooserB.setFileFilter(filter);
 			chooserB.showOpenDialog(parent);
 
-			AllMovies = chooserB.getSelectedFile().listFiles();
-
+			AllMovies = chooserB.getSelectedFile().listFiles(new FilenameFilter() {
+				
+				@Override
+				public boolean accept(File pathname, String filename) {
+					
+					return filename.endsWith(".tif");
+				}
+			});
 			new BatchMode(AllMovies, new Interactive_MTDoubleChannel(), AllMovies[0]).run(null);
 		}
 

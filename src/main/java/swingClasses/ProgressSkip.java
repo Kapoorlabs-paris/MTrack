@@ -36,7 +36,7 @@ final int endtime;
 		
 		
 		Track newtrack = new Track(parent);
-		newtrack.Trackobject(next, endtime);
+		newtrack.Trackobject(next);
 		
 
 		return null;

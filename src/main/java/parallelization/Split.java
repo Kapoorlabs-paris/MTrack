@@ -1,5 +1,6 @@
 package parallelization;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Rectangle;
 import java.io.File;
@@ -82,7 +83,7 @@ public class Split implements Runnable  {
 		parent.panel.add(fileprogress);
 		parent.frame.add(parent.panel);
 		parent.frame.pack();
-		parent.frame.setSize(200, 200);
+		parent.frame.setSize(500, 200);
 		parent.frame.setVisible(true);
 
 		
@@ -94,7 +95,7 @@ public class Split implements Runnable  {
 			System.out.println(parent.parent.addToName);
 			double percent = Math.round(100 * (fileindex + 1) / (parent.AllImages.length - 1));
 
-			FitterUtils.SetProgressBarTime(fileprogress, percent, (fileindex + 1), (parent.AllImages.length), "Processing File");
+			FitterUtils.SetProgressBarTime(fileprogress, percent, (fileindex + 1), (parent.AllImages.length), "Processing File (please wait)");
 
 			if (parent.modelnumber == 1)
 				parent.parent.userChoiceModel = UserChoiceModel.Line;
