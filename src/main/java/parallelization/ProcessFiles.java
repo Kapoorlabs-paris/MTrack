@@ -33,16 +33,11 @@ public class ProcessFiles  {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		taskexecutor.shutdown();
 		
 		
 		
-		try {
-			taskexecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		
+	
 		
 
 		}
@@ -67,15 +62,10 @@ public class ProcessFiles  {
 			e1.printStackTrace();
 		}
 		
-		taskexecutor.shutdown();
 		
 		
-		try {
-			taskexecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		
+		
 		
 
 		}

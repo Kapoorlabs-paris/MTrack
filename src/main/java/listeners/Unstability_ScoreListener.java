@@ -25,6 +25,13 @@ public class Unstability_ScoreListener implements AdjustmentListener {
 		this.parent = parent;
 		this.scrollbarSize = scrollbarSize;
 		this.Unstability_ScoreScrollbar = Unstability_ScoreScrollbar;
+		if (parent.FindLinesViaHOUGH){
+			
+			Unstability_ScoreScrollbar.addMouseListener( new StandardMouseListener( parent,ValueChange.SHOWHOUGH ) );
+			Unstability_ScoreScrollbar.addMouseListener( new StandardMouseListener( parent,ValueChange.SHOWMSERinHough ) );
+				
+			}
+		else
 		Unstability_ScoreScrollbar.addMouseListener( new StandardMouseListener( parent, ValueChange.SHOWMSER ) );
 	}
 	

@@ -14,7 +14,7 @@ public class Microtubule_Tracker implements PlugIn {
 			
 
 			    JFrame frame = new JFrame("");
-			    FileChooser panel = new FileChooser();
+			    MainFileChooser panel = new MainFileChooser();
 			  
 			    frame.getContentPane().add(panel,"Center");
 			    frame.setSize(panel.getPreferredSize());

@@ -26,10 +26,10 @@ import preProcessing.MedianFilter2D;
 
 public class CopyUtils {
 
-	public static RandomAccessibleInterval<FloatType> Preprocess(RandomAccessibleInterval<FloatType> originalimg) {
+	public static RandomAccessibleInterval<FloatType> Preprocess(RandomAccessibleInterval<FloatType> originalimg, final double[] psf) {
 
 
-		final FlatFieldCorrection flatfilter = new FlatFieldCorrection(originalimg, 1);
+		final FlatFieldCorrection flatfilter = new FlatFieldCorrection(originalimg, 1, psf);
 		flatfilter.process();
 		RandomAccessibleInterval<FloatType> ProgramPreprocessedimg = flatfilter.getResult();
 		return ProgramPreprocessedimg;

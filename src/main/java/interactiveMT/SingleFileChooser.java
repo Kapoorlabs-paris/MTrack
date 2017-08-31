@@ -335,7 +335,7 @@ public class SingleFileChooser extends JPanel {
 
 	
 
-		final FlatFieldCorrection flatfilter = new FlatFieldCorrection(originalimg, 1);
+		final FlatFieldCorrection flatfilter = new FlatFieldCorrection(originalimg, 1, psf);
 		flatfilter.process();
 		RandomAccessibleInterval<FloatType> ProgramPreprocessedimg = flatfilter.getResult();
 		return ProgramPreprocessedimg;

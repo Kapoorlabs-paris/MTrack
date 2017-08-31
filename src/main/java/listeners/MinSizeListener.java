@@ -24,6 +24,14 @@ public class MinSizeListener implements AdjustmentListener {
 		this.scrollbarSize = scrollbarSize;
         this.parent = parent;
 		this.minsizeScrollbar = minsizeScrollbar;
+		
+		if (parent.FindLinesViaHOUGH){
+			
+			minsizeScrollbar.addMouseListener( new StandardMouseListener( parent,ValueChange.SHOWHOUGH ) );
+			minsizeScrollbar.addMouseListener( new StandardMouseListener( parent,ValueChange.SHOWMSERinHough ) );
+						
+					}
+		else
 		minsizeScrollbar.addMouseListener( new StandardMouseListener( parent,ValueChange.SHOWMSER ) );
 
 	}
@@ -34,7 +42,7 @@ public class MinSizeListener implements AdjustmentListener {
 
 		minsizeScrollbar.setValue(parent.computeScrollbarPositionFromValue(parent.minSize, min, max, scrollbarSize));
 
-		label.setText("Min size of red Ellipses = " + parent.minSize);
+		label.setText("Min size of Ellipses = " + parent.minSize);
 
 		
 	}

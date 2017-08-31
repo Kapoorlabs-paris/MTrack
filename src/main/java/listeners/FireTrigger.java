@@ -63,21 +63,21 @@ public class FireTrigger implements ActionListener {
 			try {
 			    img = ImageIO.read(new File("images/smallseed.png"));
 			} catch (IOException eee) {
-			    eee.printStackTrace();
+			   
 			}
 			
 			BufferedImage imgsec = null;
 			try {
 			    imgsec = ImageIO.read(new File("images/smallseedmoves.png"));
 			} catch (IOException ee) {
-			    ee.printStackTrace();
+			   
 			}
 			
 			BufferedImage imgthird = null;
 			try {
 			    imgthird = ImageIO.read(new File("images/smallseedmove2.png"));
 			} catch (IOException ee) {
-			    ee.printStackTrace();
+			    
 			}
 			
 			int scale = 100;

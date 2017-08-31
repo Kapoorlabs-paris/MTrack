@@ -162,7 +162,7 @@ public class SplitSingleChannel implements Runnable  {
 
 			parent.originalimg = ImageJFunctions.convertFloat(impB);
 
-			parent.originalPreprocessedimg = util.CopyUtils.Preprocess(parent.originalimg);
+			parent.originalPreprocessedimg = util.CopyUtils.Preprocess(parent.originalimg, parent.psf);
 
 			parent.standardRectangle = new Rectangle(parent.inix, parent.iniy,
 					(int) parent.originalimg.dimension(0) - 2 * parent.inix,

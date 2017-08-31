@@ -384,7 +384,7 @@ public class MainFileChooser extends JPanel {
 
 	public RandomAccessibleInterval<FloatType> Preprocess(RandomAccessibleInterval<FloatType> originalimg) {
 
-		final FlatFieldCorrection flatfilter = new FlatFieldCorrection(originalimg, 1);
+		final FlatFieldCorrection flatfilter = new FlatFieldCorrection(originalimg, 1, psf);
 		flatfilter.process();
 		RandomAccessibleInterval<FloatType> ProgramPreprocessedimg = flatfilter.getResult();
 		return ProgramPreprocessedimg;
@@ -393,7 +393,7 @@ public class MainFileChooser extends JPanel {
 
 	public RandomAccessibleInterval<FloatType> Preprocess(IntervalView<FloatType> originalimg) {
 
-		final FlatFieldCorrection flatfilter = new FlatFieldCorrection(originalimg, 1);
+		final FlatFieldCorrection flatfilter = new FlatFieldCorrection(originalimg, 1, psf);
 		flatfilter.process();
 		RandomAccessibleInterval<FloatType> ProgramPreprocessedimg = flatfilter.getResult();
 		return ProgramPreprocessedimg;

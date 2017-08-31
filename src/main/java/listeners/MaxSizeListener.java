@@ -24,6 +24,13 @@ public class MaxSizeListener implements AdjustmentListener {
 		this.scrollbarSize = scrollbarSize;
         this.parent = parent;
 		this.maxsizeScrollbar = maxsizeScrollbar;
+if (parent.FindLinesViaHOUGH){
+			
+	maxsizeScrollbar.addMouseListener( new StandardMouseListener( parent,ValueChange.SHOWHOUGH ) );
+	maxsizeScrollbar.addMouseListener( new StandardMouseListener( parent,ValueChange.SHOWMSERinHough ) );
+						
+					}
+else
 		maxsizeScrollbar.addMouseListener( new StandardMouseListener( parent, ValueChange.SHOWMSER ) );
 	}
 
@@ -33,7 +40,7 @@ public class MaxSizeListener implements AdjustmentListener {
 
 		maxsizeScrollbar.setValue(parent.computeScrollbarPositionFromValue(parent.maxSize, min, max, scrollbarSize));
 
-		label.setText("Max size of red Ellipses = "+ parent.maxSize);
+		label.setText("Max size of Ellipses = "+ parent.maxSize);
 
 	}
 }

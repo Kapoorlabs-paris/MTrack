@@ -937,7 +937,7 @@ public class SingleBatchMode implements PlugIn, Runnable {
 		new ImageJ();
 
 		JFrame frame = new JFrame("");
-		FileChooser panel = new FileChooser();
+		MainFileChooser panel = new MainFileChooser();
 
 		frame.getContentPane().add(panel, "Center");
 		frame.setSize(panel.getPreferredSize());

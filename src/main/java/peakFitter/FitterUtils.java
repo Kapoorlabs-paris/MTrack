@@ -61,9 +61,15 @@ public class FitterUtils {
 			final double minintensityline = 0;
 			final double axisslope = (iniparam.currentpos[1] - iniparam.fixedpos[1]) / (iniparam.currentpos[0] - iniparam.fixedpos[0]);
 			final double axisintercept = iniparam.currentpos[1] - axisslope * iniparam.currentpos[0] ;
+			
+			
 			Pair<double[], double[]> minmaxpair = FitterUtils.MakeinitialEndpointguess(imgs, maxintensityline,
 					Intensityratio, ndims, labelindex, axisslope, axisintercept,
 					iniparam.Curvature, iniparam.Inflection, startframe, currentframe);
+			
+			
+			
+			
 			for (int d = 0; d < ndims; ++d) {
 
 				minVal[d] = minmaxpair.getA()[d];
@@ -429,7 +435,6 @@ public class FitterUtils {
 			outcursor.localize(newposition);
 
 			double distline = Math.abs(outcursor.getDoublePosition(1) - slope * outcursor.getDoublePosition(0) - intercept) / Math.sqrt(1 + slope * slope);
-				
 		if (currentframe > startframe + 1){
                 if (distline < cutoff){			
 				if (outcursor.getDoublePosition(0) <= minVal[0]

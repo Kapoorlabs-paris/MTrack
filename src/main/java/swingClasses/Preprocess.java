@@ -11,6 +11,7 @@ import interactiveMT.Interactive_MTDoubleChannelBasic;
 import interactiveMT.MainFileChooser;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.algorithm.stats.Normalize;
+import net.imglib2.img.display.imagej.ImageJFunctions;
 import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.view.Views;
 import peakFitter.FitterUtils;
@@ -33,7 +34,7 @@ public class Preprocess extends SwingWorker<Void, Void> {
 		
 		
 		
-		final FlatFieldCorrection flatfilter = new FlatFieldCorrection(parent.originalimg, 1, parent.jpb);
+		final FlatFieldCorrection flatfilter = new FlatFieldCorrection(parent.originalimg, 2, parent.jpb, parent.psf);
 		flatfilter.process();
 		parent.originalPreprocessedimg = flatfilter.getResult();
 		
@@ -58,7 +59,7 @@ public class Preprocess extends SwingWorker<Void, Void> {
 			
 			// Normalize image intnesity
 			Normalize.normalize(Views.iterable(parent.originalPreprocessedimg), parent.minval, parent.maxval);
-			
+			ImageJFunctions.show(parent.originalPreprocessedimg).setTitle("Preprocessed Movie");
 			
 							if (parent.Simplemode)
 								new Interactive_MTDoubleChannelBasic(new Interactive_MTDoubleChannel(parent.originalimg, parent.originalPreprocessedimg,

@@ -47,6 +47,8 @@ public class FlatFieldCorrection extends BenchmarkAlgorithm implements OutputAlg
 
 	private final int radius;
 	
+	private final double[] psf;
+	
 	private  JProgressBar jpb;
 
 	/**
@@ -59,17 +61,19 @@ public class FlatFieldCorrection extends BenchmarkAlgorithm implements OutputAlg
 	 *            determines the size of the neighborhood. In 2D or 3D, a radius
 	 *            of 1 will generate a 3x3 neighborhood.
 	 */
-	public FlatFieldCorrection( final RandomAccessibleInterval<FloatType> source, final int radius )
+	public FlatFieldCorrection( final RandomAccessibleInterval<FloatType> source, final int radius, final double[] psf )
 	{
 		this.source = source;
 		this.radius = radius;
+		this.psf = psf;
 	}
 	
 	
-	public FlatFieldCorrection( final RandomAccessibleInterval<FloatType> source, final int radius, final JProgressBar jpb )
+	public FlatFieldCorrection( final RandomAccessibleInterval<FloatType> source, final int radius, final JProgressBar jpb, final double[] psf  )
 	{
 		this.source = source;
 		this.radius = radius;
+		this.psf = psf;
 		this.jpb = jpb;
 	}
 
@@ -144,7 +148,7 @@ public class FlatFieldCorrection extends BenchmarkAlgorithm implements OutputAlg
 			Gaussran.setPosition(cursor);
 			
 			value = cursor.get().get() - Gaussran.get().get();
-			cursor.get().setReal(value);
+			cursor.get().setReal(Math.max(value,0));
 			
 			
 		}
@@ -191,10 +195,9 @@ public class FlatFieldCorrection extends BenchmarkAlgorithm implements OutputAlg
 		// Subtract the darkfield from the image
 		subtract(correctedgaussimg, gaussimg);
 		
-		
-		
 		correctedgaussimg = Kernels.Meanfilterandsupress(correctedgaussimg, 2 *radius);
-	//	correctedgaussimg = Kernels.SupressLowthresh(correctedgaussimg);
+		
+		
 		final Cursor< FloatType > cursor = out.localizingCursor();
 
 		final RectangleShape shape = new RectangleShape( radius, false );

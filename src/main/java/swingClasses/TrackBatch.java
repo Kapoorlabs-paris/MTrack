@@ -899,6 +899,7 @@ public class TrackBatch {
 			new ImagePlus(parent.parent.addToName, parent.prestack).show();
 		}
 
+		parent.frame.dispose();
 		DisplayID.displayseeds(Views.hyperSlice(parent.originalimg, 2, 0), parent.IDALL);
 	}
 
