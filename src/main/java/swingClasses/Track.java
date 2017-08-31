@@ -596,12 +596,11 @@ public class Track {
 			}
 
 		
-
 		if (parent.returnVectorUser != null && parent.AllUser.get(0).size() > 0) {
 			final ArrayList<Trackproperties> first = parent.AllUser.get(0);
-
+			MaxSeedLabel = first.get(first.size() - 1).seedlabel;
+			MinSeedLabel = first.get(0).seedlabel;
 			Collections.sort(first, parent.Seedcomparetrack);
-
 		
 			for (int currentseed = MinSeedLabel; currentseed < MaxSeedLabel + 1; ++currentseed) {
 				double startlengthreal = 0;
@@ -615,6 +614,7 @@ public class Track {
 						final Integer seedID = thirdDimension.get(frameindex).seedlabel;
 						final int framenumber = thirdDimension.get(frameindex).Framenumber;
 						if (seedID == currentseed) {
+							
 							final Integer[] FrameID = { framenumber, seedID };
 							final double[] originalpoint = thirdDimension.get(frameindex).originalpoint;
 							final double[] newpoint = thirdDimension.get(frameindex).newpoint;
@@ -683,8 +683,9 @@ public class Track {
 							count++;
 
 					}
-
+System.out.println(count);
 				}
+				
 
 				if (count > parent.thirdDimensionSize / 5.0) {
 
@@ -983,10 +984,10 @@ public class Track {
 		parent.displaystack();
 		if (parent.displayoverlay) {
 			parent.prestack.deleteLastSlice();
-			new ImagePlus("Overlays", parent.prestack).show();
+			new ImagePlus(parent.addToName + "Overlays", parent.prestack).show();
 		}
 
-		DisplayID.displayseeds(Views.hyperSlice(parent.originalimg, 2, 0), parent.IDALL);
+		DisplayID.displayseeds(parent.addToName,Views.hyperSlice(parent.originalimg, 2, 0), parent.IDALL);
 	}
 
 }

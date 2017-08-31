@@ -193,7 +193,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public double Intensityratio = 0.5;
 	public double slopetolerance = 5;
 	public double Inispacing = 0.5;
-	public double maxdist = 20;
+	public double maxdist = 15;
 	public int numgaussians = 2;
 	public int thirdDimensionslider = 1;
 	public int thirdDimensionsliderInit = 1;

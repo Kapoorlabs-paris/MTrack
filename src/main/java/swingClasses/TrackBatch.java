@@ -509,10 +509,10 @@ public class TrackBatch {
 			rtAll.addValue("Length per frame (real units)", parent.endlengthlist.get(index).lengthrealperframe);
 
 		}
-
 		if (parent.returnVectorUser != null && parent.AllUser.get(0).size() > 0) {
 			final ArrayList<Trackproperties> first = parent.AllUser.get(0);
-
+			MaxSeedLabel = first.get(first.size() - 1).seedlabel;
+			MinSeedLabel = first.get(0).seedlabel;
 			Collections.sort(first, parent.Seedcomparetrack);
 
 			for (int currentseed = MinSeedLabel; currentseed < MaxSeedLabel + 1; ++currentseed) {
@@ -581,6 +581,7 @@ public class TrackBatch {
 					}
 				}
 			}
+		
 
 			for (int seedID = MinSeedLabel; seedID <= MaxSeedLabel; ++seedID) {
 				double count = 0;
@@ -900,7 +901,7 @@ public class TrackBatch {
 		}
 
 		parent.frame.dispose();
-		DisplayID.displayseeds(Views.hyperSlice(parent.originalimg, 2, 0), parent.IDALL);
+		DisplayID.displayseeds(parent.parent.addToName,Views.hyperSlice(parent.originalimg, 2, 0), parent.IDALL);
 	}
 
 }

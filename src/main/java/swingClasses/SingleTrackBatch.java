@@ -908,7 +908,7 @@ public  class SingleTrackBatch {
 			new ImagePlus(parent.parent.addToName, parent.prestack).show();
 		}
 		parent.frame.dispose();
-		DisplayID.displayseeds(Views.hyperSlice(parent.originalimg, 2, 0), parent.IDALL);
+		DisplayID.displayseeds(parent.parent.addToName,Views.hyperSlice(parent.originalimg, 2, 0), parent.IDALL);
 	}
 
 

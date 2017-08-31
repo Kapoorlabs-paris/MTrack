@@ -623,7 +623,8 @@ public  class SingleTrack {
 
 			if (parent.returnVectorUser != null && parent.AllUser.get(0).size() > 0) {
 				final ArrayList<Trackproperties> first = parent.AllUser.get(0);
-
+				MaxSeedLabel = first.get(first.size() - 1).seedlabel;
+				MinSeedLabel = first.get(0).seedlabel;
 				Collections.sort(first, parent.Seedcomparetrack);
 
 			
@@ -1008,9 +1009,9 @@ public  class SingleTrack {
 		parent.displaystack();
 		if (parent.displayoverlay) {
 			parent.prestack.deleteLastSlice();
-			new ImagePlus("Overlays", parent.prestack).show();
+			new ImagePlus(parent.addToName + "Overlays", parent.prestack).show();
 		}
-		DisplayID.displayseeds(Views.hyperSlice(parent.originalimg, 2, 0), parent.IDALL);
+		DisplayID.displayseeds(parent.addToName,Views.hyperSlice(parent.originalimg, 2, 0), parent.IDALL);
 	}
 
 

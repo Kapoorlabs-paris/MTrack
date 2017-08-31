@@ -17,13 +17,13 @@ public class DisplayID {
 
 	
 	
-	public static void displayseeds(IntervalView<FloatType> seedimg, ArrayList<Pair<Integer, double[]>> IDALL){
+	public static void displayseeds(String name, IntervalView<FloatType> seedimg, ArrayList<Pair<Integer, double[]>> IDALL){
 		
 
 		ImagePlus displayimp;
 
 		displayimp = ImageJFunctions.show(seedimg);
-		displayimp.setTitle("Display Tracks");
+		displayimp.setTitle(name + "Display Tracks");
 
 		Overlay o = displayimp.getOverlay();
 
