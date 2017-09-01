@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import fit.AbstractFunction2D;
 import fit.PointFunctionMatch;
@@ -78,7 +79,6 @@ public class WriteRatesListener implements ActionListener {
 
 		}
 
-		System.out.println(minstartY);
 		return minstartY;
 
 	}
@@ -104,133 +104,47 @@ public class WriteRatesListener implements ActionListener {
 			bw.write("\tStartTime (px)\tEndTime(px)\tLinearRateSlope(px)\n");
 			bwfrequ.write(
 					"\tAverageGrowthrate(px)\tAverageShrinkrate(px)\tCatastropheFrequency(px)\tRescueFrequency(px)\n");
-			ResultsTable rt = new ResultsTable();
-			int count = 0;
-			int negcount = 0;
-			int rescount = 0;
-			double timediff = 0;
-			double restimediff = 0;
-			double negtimediff = 0;
-			double averagegrowth = 0;
-			double averageshrink = 0;
+			
 
-			double minstartY = leastStart();
+			
+                          for (int index =  0; index < parent.allrates.size(); ++index){
+                        	  
+                        	  int startX = parent.allrates.get(index).starttime;
+                        	  int endX = parent.allrates.get(index).endtime;
+                        	  double linearrate =  parent.allrates.get(index).rate;
+                        	  
+                        	  
+							bw.write("\t" + parent.nf.format(startX) + "\t" + "\t" + parent.nf.format(endX) + "\t"
+									+ "\t" + parent.nf.format(linearrate) + "\t" + "\t" + "\t" + "\t" + "\n");
+							
 
-			double minstartX = Double.MAX_VALUE;
-			double minendX = Double.MAX_VALUE;
-			double catfrequ = 0;
-			double resfrequ = 0;
-			ArrayList<Double> previousendX = new ArrayList<Double>();
-
-			for (final Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>> result : parent.segments) {
-
-				final Pair<Double, Double> minMax = Tracking.fromTo(result.getB());
-
-				double startX = minMax.getA();
-				double endX = minMax.getB();
-
-				if (startX < minstartX) {
-
-					minstartX = startX;
-					minendX = endX;
-				}
-
-				Polynomial<?, Point> polynomial = (Polynomial) result.getA();
-
-				parent.sortPoints(parent.points);
-
-				if (parent.points.get(parent.points.size() - 1).getW()[0] - endX >= parent.tptolerance) {
-
-					LinearFunction linear = new LinearFunction();
-					boolean lineartrue = LinearFunction.slopeFits(result.getB(), linear, parent.minSlope,
-							parent.maxSlope);
-					double startY = polynomial.predict(startX);
-					double linearrate = linear.getCoefficient(1);
-					if (linearrate > 0 && startY - minstartY > parent.restolerance && startX > parent.tptolerance
-							&& previousendX.size() > 0 && lineartrue) {
-						System.out.println(startY + " " + previousendX.size());
-						rescount++;
-						restimediff += -previousendX.get(previousendX.size() - 1) + startX;
-
-					}
-
-					if (linearrate > 0 && startX > parent.tptolerance && lineartrue) {
-
-						count++;
-						timediff += endX - startX;
-						lifetime = endX - startX;
-						averagegrowth += linearrate;
-						parent.lifecount.add(new ValuePair<Integer, Double>(count, lifetime));
-						rt.incrementCounter();
-						rt.addValue("Start time", startX);
-						rt.addValue("End time", endX);
-						rt.addValue("Growth Rate", linearrate);
-
-					}
-
-					if (linearrate < 0) {
-
-						negcount++;
-						negtimediff += endX - startX;
-
-						averageshrink += linearrate;
-
-						rt.incrementCounter();
-						rt.addValue("Start time", startX);
-						rt.addValue("End time", endX);
-						rt.addValue("Growth Rate", linearrate);
-					}
+						}
 
 				
 
-					bw.write("\t" + parent.nf.format(startX) + "\t" + "\t" + parent.nf.format(endX) + "\t" + "\t"
-							+ parent.nf.format(linearrate) + "\t" + "\t" + "\t" + "\t" + "\n");
-					if (linearrate > 0 && lineartrue)
-						previousendX.add(endX);
+				
+			for (int index = 0; index < parent.averagerates.size(); ++index){
 
-				}
-
-			}
-			if (count > 0)
-				averagegrowth /= count;
-			if (negcount > 0)
-				averageshrink /= negcount;
-
-			if (count > 0) {
-
-				catfrequ = count / timediff;
-
-			}
-
-			if (rescount > 0) {
-
-				resfrequ = rescount / restimediff;
-			}
-		
-			System.out.println(count + " " + rescount);
-			rt.show("Rates(pixel units)");
-
-			parent.rtAll.incrementCounter();
-			parent.rtAll.addValue("Average Growth", averagegrowth);
-			parent.rtAll.addValue("Average Shrink", averageshrink);
-			parent.rtAll.addValue("Catastrophe Frequency", catfrequ);
-			parent.rtAll.addValue("Rescue Frequency", resfrequ);
-
-			parent.rtAll.show("Average Rates and Frequencies (pixel units)");
+				double averagegrowth = parent.averagerates.get(index).averagegrowth;
+				double averageshrink = parent.averagerates.get(index).averageshrink;
+				double catfrequ = parent.averagerates.get(index).catfrequ;
+				double resfrequ = parent.averagerates.get(index).resfrequ;
+			
 
 			bwfrequ.write("\t" + parent.nf.format(averagegrowth) + "\t" + "\t" + "\t" + "\t"
 					+ parent.nf.format(averageshrink) + "\t" + "\t" + "\t" + parent.nf.format(catfrequ) + "\t" + "\t"
 					+ "\t" + parent.nf.format(resfrequ)
 
 					+ "\n" + "\n");
-
+			}
 			bw.close();
 			fw.close();
 
 			bwfrequ.close();
 			fwfrequ.close();
+		}
 
-		} catch (IOException e) {
+		catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

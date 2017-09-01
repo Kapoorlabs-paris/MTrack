@@ -1435,7 +1435,9 @@ private static final Insets insets = new Insets(10, 0, 0, 0);
 	public void UpdateHough() {
 
 panelFourth.removeAll();
-		
+FindLinesViaMSERwHOUGH = false;
+panelNext.removeAll();
+panelPrevious.removeAll();
 		FindLinesViaMSER = false;
 		FindLinesViaHOUGH = true;
 		FindLinesViaMSERwHOUGH = false;
@@ -1616,6 +1618,9 @@ panelFourth.removeAll();
 	public void UpdateMser() {
 		
 		panelFourth.removeAll();
+		FindLinesViaMSERwHOUGH = false;
+		panelNext.removeAll();
+		panelPrevious.removeAll();
 		FindLinesViaMSER = true;
 		FindLinesViaHOUGH = false;
 		FindLinesViaMSERwHOUGH = false;

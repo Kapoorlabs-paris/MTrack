@@ -205,7 +205,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public UserChoiceModel userChoiceModel;
 	public float delta = 1f;
 
-	public int deltaInit = 20;
+	public int deltaInit = 10;
 	public int Unstability_ScoreInit = 1;
 
 	public int minSizeInit = 10;
@@ -1374,6 +1374,9 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		
 		
 		panelFourth.removeAll();
+		panelNext.removeAll();
+		panelPrevious.removeAll();
+		
 		
 		FindLinesViaMSER = false;
 		FindLinesViaHOUGH = true;
@@ -1564,7 +1567,8 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		FindLinesViaMSER = true;
 		FindLinesViaHOUGH = false;
 		FindLinesViaMSERwHOUGH = false;
-		
+		panelNext.removeAll();
+		panelPrevious.removeAll();
 		final Button Record = new Button("Save program parameters for batch mode");
 		final JButton Finalize = new JButton("Start tracking");
 		panelFourth.setLayout(layout);

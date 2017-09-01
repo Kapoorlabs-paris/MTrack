@@ -468,7 +468,7 @@ public class Tracking
 
 		return new ValuePair< LinearFunction, ArrayList< PointFunctionMatch > >( function, inliers );
 	}
-	public static < P extends AbstractFunction2D< P > > Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>> findFunction(
+	public static < P extends AbstractFunction2D< P > > Pair<P, ArrayList<PointFunctionMatch>> findFunction(
 			final ArrayList< Point > mts,
 			final P function,
 			final double maxError,
@@ -506,7 +506,7 @@ public class Tracking
 			return null;
 		}
 
-		return (Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>>) new ValuePair< P, ArrayList< PointFunctionMatch > >( function, inliers );
+		return new ValuePair< P, ArrayList< PointFunctionMatch > >( function, inliers );
 	}
 
 	public static Pair< Double, Double > fromTo( final ArrayList< PointFunctionMatch > points )

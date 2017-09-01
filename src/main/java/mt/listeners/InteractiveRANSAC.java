@@ -61,11 +61,13 @@ import ij.gui.Overlay;
 import ij.measure.ResultsTable;
 import ij.plugin.PlugIn;
 import mpicbg.models.Point;
+import mt.Averagerate;
 import mt.DisplayPoints;
 import mt.FLSobject;
 import mt.LengthCounter;
 import mt.LengthDistribution;
 import mt.RansacFileChooser;
+import mt.Rateobject;
 import mt.Tracking;
 import net.imglib2.img.display.imagej.ImageJFunctions;
 import net.imglib2.util.Pair;
@@ -84,7 +86,7 @@ public class InteractiveRANSAC implements PlugIn {
 	public static double MAX_RES = 30.0;
 
 	public static double MAX_ABS_SLOPE = 100.0;
-	ResultsTable rtAll;
+	
 	public static double MIN_CAT = 0.0;
 	public static double MAX_CAT = 100.0;
 	public File inputfile;
@@ -111,7 +113,11 @@ public class InteractiveRANSAC implements PlugIn {
 	final SVGGraphics2D svgchart;
 	int updateCount = 0;
 	public ArrayList<Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>>> segments;
-	public ArrayList<LinearFunction> linearsegments;
+	public HashMap<Integer, Pair<Double, Double>> indexedsegments;
+	public HashMap<Integer, LinearFunction> linearsegments;
+	public ArrayList<Rateobject> allrates;
+	public ArrayList<Averagerate> averagerates;
+	
 	public
 	// for scrollbars
 	int maxErrorInt, lambdaInt, minSlopeInt, maxSlopeInt, minDistCatInt, restoleranceInt;
@@ -219,11 +225,15 @@ public class InteractiveRANSAC implements PlugIn {
 	@Override
 	public void run(String arg) {
 		/* JFreeChart */
-		
-	rtAll = new ResultsTable();
+		allrates = new ArrayList<Rateobject>();
+		averagerates = new ArrayList<Averagerate>();
 	 lifecount = new ArrayList<Pair<Integer, Double>>();
 	 countfile = 0;
 	 AllMovies = new ArrayList<File>();
+	 
+	 segments = new ArrayList<Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>>>();
+	 indexedsegments = new HashMap <Integer,   Pair<Double, Double>>(); 
+	 linearsegments = new HashMap<Integer, LinearFunction>();
 		if (!serial){
 			
 			
@@ -720,150 +730,302 @@ public class InteractiveRANSAC implements PlugIn {
 		}
 	}
 
-	public void updateRANSAC() {
+	public void updateRANSAC()
+	{
 		++updateCount;
 
-		for (int i = dataset.getSeriesCount() - 1; i > 0; --i)
-			dataset.removeSeries(i);
+		linearsegments.clear();
+		indexedsegments.clear();
+		allrates.clear();
+		averagerates.clear();
+		for ( int i = dataset.getSeriesCount() - 1; i > 0; --i )
+			dataset.removeSeries( i );
 
-		segments = Tracking.findAllFunctions(points, function, maxError, minInliers, maxDist);
+		segments =
+				Tracking.findAllFunctions( points, function, maxError, minInliers, maxDist );
 
-		sort(segments);
-		if (segments == null || segments.size() == 0) {
+		if ( segments == null || segments.size() == 0 )
+		{
 			--updateCount;
 			return;
 		}
 
-		LinearFunction linear = new LinearFunction();
-		int i = 1, segment = 1;
+		// sort the segments according to time relative to each other and the PointFunctionMatches internally
+		sort( segments );
 
-		for (final Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>> result : segments) {
+		final LinearFunction linear = new LinearFunction();
+		int i = 1, segment = 1, linearcount = 1;
+		int count = 0;
+		int negcount = 0;
+		int rescount = 0;
+		double timediff = 0;
+		double restimediff = 0;
+		double negtimediff = 0;
+		double averagegrowth = 0;
+		double averageshrink = 0;
+		double growthrate = 0;
+		double shrinkrate = 0;
 
-			if (LinearFunction.slopeFits(result.getB(), linear, minSlope, maxSlope)) {
+		double minstartY = leastStart();
 
-				final Pair<Double, Double> minMax = Tracking.fromTo(result.getB());
+		double minstartX = Double.MAX_VALUE;
+		double minendX = Double.MAX_VALUE;
+		double catfrequ = 0;
+		double resfrequ = 0;
+		double lifetime = 0;
+	
+		ArrayList<Double> previousendX = new ArrayList<Double>();
+		ResultsTable rt = new ResultsTable();
+		ResultsTable rtAll = new ResultsTable();
+		for ( final Pair< AbstractFunction2D, ArrayList< PointFunctionMatch > > result : segments )
+		{
+			if ( LinearFunction.slopeFits( result.getB(), linear, minSlope, maxSlope ) || i > 0 )
+			{
+				
+				
+				
+				final Pair< Double, Double > minMax = Tracking.fromTo( result.getB() );
+		
+				double startX = minMax.getA();
+				double endX = minMax.getB();
+				
 
-				dataset.addSeries(Tracking.drawFunction((Polynomial) result.getA(), minMax.getA(), minMax.getB(), 0.5,
-						"Segment " + segment));
-                
-				if (functionChoice > 0) {
-					Tracking.setColor(chart, i, new Color(255, 0, 0));
-					Tracking.setStroke(chart, i, 1f);
-				} else {
-					Tracking.setColor(chart, i, new Color(0, 128, 0));
-					Tracking.setStroke(chart, i, 0.5f);
+				if (startX < minstartX) {
+
+					minstartX = startX;
+					minendX = endX;
+				}
+				Polynomial<?, Point> polynomial = (Polynomial) result.getA();
+				
+				sortPoints(points);
+				
+				dataset.addSeries( Tracking.drawFunction( polynomial, minMax.getA(), minMax.getB(), 0.5, "Segment " + segment ) );
+
+				
+				
+				
+				
+				if ( functionChoice > 0 )
+				{
+					Tracking.setColor( chart, i, new Color( 255, 0, 0 ) );
+					Tracking.setDisplayType( chart, i, true, false );
+					Tracking.setStroke( chart, i, 0.5f );
+				}
+				else
+				{
+					Tracking.setColor( chart, i, new Color( 0, 128, 0 ) );
+					Tracking.setDisplayType( chart, i, true, false );
+					Tracking.setStroke( chart, i, 2f );
 				}
 
 				++i;
 
-				if (functionChoice > 0) {
-
-					dataset.addSeries(Tracking.drawFunction(linear, minMax.getA(), minMax.getB(), 0.5,
-							"Linear Segment " + segment));
-
-					Tracking.setColor(chart, i, new Color(0, 128, 0));
-					Tracking.setStroke(chart, i, 0.5f);
-
+				
+				if (points.get(points.size() - 1).getW()[0] - endX >= tptolerance) {
+					double startY = polynomial.predict(startX);
+					double linearrate = linear.getCoefficient(1);
+				if ( functionChoice > 0 )
+				{
+					
+					dataset.addSeries( Tracking.drawFunction( linear, minMax.getA(), minMax.getB(), 0.5, "Linear Segment " + segment ) );
+					
+					
+					Tracking.setColor( chart, i, new Color( 0, 128, 0 ) );
+					Tracking.setDisplayType( chart, i, true, false );
+					Tracking.setStroke( chart, i, 2f );
+	
 					++i;
+					
+					
+				
+				}
+				
+				if (linearrate > 0 && startY - minstartY > restolerance 
+						&& previousendX.size() > 0 ) {
+					rescount++;
+					restimediff += -previousendX.get(previousendX.size() - 1) + startX;
 
+				}
+
+				
+				
+				if (linearrate > 0  ) {
+
+					count++;
+					growthrate = linearrate;
+					timediff += endX - startX;
+					lifetime = endX - startX;
+					averagegrowth += linearrate;
+					lifecount.add(new ValuePair<Integer, Double>(count, lifetime));
+					
+					
+					Rateobject rate = new Rateobject(linearrate, (int)startX, (int)endX);
+					allrates.add(rate);
+					rt.incrementCounter();
+					rt.addValue("Start time", startX);
+					rt.addValue("End time", endX);
+					rt.addValue("Growth Rate", linearrate);
+
+				}
+
+				if(linearrate > 0){
+				previousendX.add(endX);
+				
+				
 				}
 				
 				
+				
+				dataset.addSeries( Tracking.drawPoints( Tracking.toPairList( result.getB() ), "Inliers " + segment ) );
 
-				dataset.addSeries(Tracking.drawPoints(Tracking.toPairList(result.getB()), "Inliers " + segment));
-
-				Tracking.setColor(chart, i, new Color(255, 0, 0));
-				Tracking.setDisplayType(chart, i, false, true);
-				Tracking.setSmallUpTriangleShape(chart, i);
+				Tracking.setColor( chart, i, new Color( 255, 0, 0 ) );
+				Tracking.setDisplayType( chart, i, false, true );
+				Tracking.setSmallUpTriangleShape( chart, i );
 
 				++i;
 				++segment;
-			} else {
-				System.out.println("Removed segment because slope is wrong.");
+				}
 			}
-
+			else
+			{
+				System.out.println( "Removed segment because slope is wrong." );
+			}
 		}
 
-		if (this.detectCatastrophe) {
-			if (segments.size() < 2) {
-				System.out.println(
-						"We have only " + segments.size() + " segments, need at least two to detect catastrophies.");
-			} else {
-				for (int catastrophy = 0; catastrophy < segments.size() - 1; ++catastrophy) {
-					final Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>> start = segments.get(catastrophy);
-					final Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>> end = segments.get(catastrophy + 1);
+		if ( this.detectCatastrophe )
+		{
+			if ( segments.size() < 2 )
+			{
+				System.out.println( "We have only " + segments.size() + " segments, need at least two to detect catastrophies." );
+			}
+			else
+			{
+				for ( int catastrophy = 0; catastrophy < segments.size() - 1; ++catastrophy )
+				{
+					final Pair< AbstractFunction2D, ArrayList< PointFunctionMatch > > start = segments.get( catastrophy );
+					final Pair< AbstractFunction2D, ArrayList< PointFunctionMatch > > end = segments.get( catastrophy + 1 );
 
-					final double tStart = start.getB().get(start.getB().size() - 1).getP1().getL()[0];
-					final double tEnd = end.getB().get(0).getP1().getL()[0];
+					final double tStart = start.getB().get( start.getB().size() -1 ).getP1().getL()[ 0 ];
+					final double tEnd = end.getB().get( 0 ).getP1().getL()[ 0 ];
 
-					final double lStart = start.getB().get(start.getB().size() - 1).getP1().getL()[1];
-					final double lEnd = end.getB().get(0).getP1().getL()[1];
+					final double lStart = start.getB().get( start.getB().size() -1 ).getP1().getL()[ 1 ];
+					final double lEnd = end.getB().get( 0 ).getP1().getL()[ 1 ];
 
-					final ArrayList<Point> catastropyPoints = new ArrayList<Point>();
+					final ArrayList< Point > catastropyPoints = new ArrayList< Point >();
 
-					for (final Point p : points)
-						if (p.getL()[0] >= tStart && p.getL()[0] <= tEnd)
-							catastropyPoints.add(p);
+					for ( final Point p : points )
+						if ( p.getL()[ 0 ] >= tStart && p.getL()[ 0 ] <= tEnd )
+							catastropyPoints.add( p );
 
 					/*
-					 * System.out.println( "\ncatastropy" ); for ( final Point p
-					 * : catastropyPoints) System.out.println( p.getL()[ 0 ] +
-					 * ", " + p.getL()[ 1 ] );
-					 */
+					System.out.println( "\ncatastropy" );
+					for ( final Point p : catastropyPoints)
+						System.out.println( p.getL()[ 0 ] + ", " + p.getL()[ 1 ] );
+					*/
 
-					if (catastropyPoints.size() > 2) {
-						if (Math.abs(lStart - lEnd) >= this.minDistanceCatastrophe) {
+					if ( catastropyPoints.size() > 2 )
+					{
+						if ( Math.abs( lStart - lEnd ) >= this.minDistanceCatastrophe )
+						{
 							// maximally 1.1 timepoints between points on a line
-							final Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>> fit = Tracking
-									.findFunction(catastropyPoints, new LinearFunction(), 0.75, 3, 1.1);
+							final Pair< LinearFunction, ArrayList< PointFunctionMatch > > fit = Tracking.findFunction( catastropyPoints, new LinearFunction(), 0.75, 3, 1.1 );
+	
+							if ( fit != null )
+							{
+								if ( fit.getA().getM() < 0 )
+								{
+									sort( fit );
 
-							if (fit != null) {
-								if (((LinearFunction) fit.getA()).getM() < 0) {
-									sort(fit);
 
-									segments.add(fit);
+									double minY = Math.min( fit.getB().get( 0 ).getP1().getL()[ 1 ], fit.getB().get( fit.getB().size() -1 ).getP1().getL()[ 1 ] );
+									double maxY = Math.max( fit.getB().get( 0 ).getP1().getL()[ 1 ], fit.getB().get( fit.getB().size() -1 ).getP1().getL()[ 1 ] );
 
-									double minY = Math.min(fit.getB().get(0).getP1().getL()[1],
-											fit.getB().get(fit.getB().size() - 1).getP1().getL()[1]);
-									double maxY = Math.max(fit.getB().get(0).getP1().getL()[1],
-											fit.getB().get(fit.getB().size() - 1).getP1().getL()[1]);
+									final Pair< Double, Double > minMax = Tracking.fromTo( fit.getB() );
 
-									final Pair<Double, Double> minMax = Tracking.fromTo(fit.getB());
+									dataset.addSeries( Tracking.drawFunction( (Polynomial)fit.getA(), minMax.getA()-1, minMax.getB()+1, 0.1, minY - 2.5, maxY + 2.5, "C " + catastrophy ) );
+									double startX = minMax.getA();
+									double endX = minMax.getB();
+								
+							double	linearrate = fit.getA().getCoefficient(1);
+							if (linearrate < 0) {
 
-									dataset.addSeries(Tracking.drawFunction((Polynomial) fit.getA(), minMax.getA() - 1,
-											minMax.getB() + 1, 0.1, minY - 2.5, maxY + 2.5, "C " + catastrophy));
+								negcount++;
+								negtimediff += endX - startX;
 
-									Tracking.setColor(chart, i, new Color(0, 0, 255));
-									Tracking.setDisplayType(chart, i, true, false);
-									Tracking.setStroke(chart, i, 2f);
+								shrinkrate = linearrate;
+								averageshrink += linearrate;
 
-									++i;
-
-									dataset.addSeries(Tracking.drawPoints(Tracking.toPairList(fit.getB()),
-											"C(inl) " + catastrophy));
-
-									Tracking.setColor(chart, i, new Color(0, 0, 255));
-									Tracking.setDisplayType(chart, i, false, true);
-									Tracking.setShape(chart, i, ShapeUtilities.createDownTriangle(4f));
-
-									++i;
-								} else {
-									System.out.println("Slope not negative: " + fit.getA());
-								}
-							} else {
-								System.out.println("No function found.");
+								rt.incrementCounter();
+								rt.addValue("Start time", startX);
+								rt.addValue("End time", endX);
+								rt.addValue("Growth Rate", linearrate);
 							}
-						} else {
-							System.out.println("Catastrophy height not sufficient " + Math.abs(lStart - lEnd) + " < "
-									+ this.minDistanceCatastrophe);
+							
+							Rateobject rate = new Rateobject(linearrate, (int)startX, (int)endX);
+							allrates.add(rate);
+									Tracking.setColor( chart, i, new Color( 0, 0, 255 ) );
+									Tracking.setDisplayType( chart, i, true, false );
+									Tracking.setStroke( chart, i, 2f );
+
+									++i;
+
+									dataset.addSeries( Tracking.drawPoints( Tracking.toPairList( fit.getB() ), "C(inl) " + catastrophy ) );
+
+									Tracking.setColor( chart, i, new Color( 0, 0, 255 ) );
+									Tracking.setDisplayType( chart, i, false, true );
+									Tracking.setShape( chart, i, ShapeUtilities.createDownTriangle( 4f ) );
+
+									++i;
+									++segment;
+								}
+								else
+								{
+									System.out.println( "Slope not negative: " + fit.getA() );
+								}
+							}
+							else
+							{
+								System.out.println( "No function found." );
+							}
 						}
-					} else {
-						System.out.println("We have only " + catastropyPoints.size()
-								+ " points, need at least three to detect this catastrophy.");
+						else
+						{
+							System.out.println( "Catastrophy height not sufficient " + Math.abs( lStart - lEnd ) + " < " + this.minDistanceCatastrophe );
+						}
+					}
+					else
+					{
+						System.out.println( "We have only " + catastropyPoints.size() + " points, need at least three to detect this catastrophy." );
 					}
 				}
 			}
 		}
+		if (count > 0)
+			averagegrowth /= count;
+
+		if (count > 0) 
+
+			catfrequ = count / timediff;
+		
+		if (rescount > 0)
+
+			resfrequ = rescount / restimediff;
+		
+		if (negcount > 0)
+			averageshrink /= negcount;
+		
+		rt.show("Rates(pixel units)");
+
+		rtAll.incrementCounter();
+		rtAll.addValue("Average Growth", averagegrowth);
+		rtAll.addValue("Average Shrink", averageshrink);
+		rtAll.addValue("Catastrophe Frequency", catfrequ);
+		rtAll.addValue("Rescue Frequency", resfrequ);
+
+		rtAll.show("Average Rates and Frequencies (pixel units)");
+
+		Averagerate avrate = new Averagerate(averagegrowth, averageshrink, catfrequ, resfrequ);
+		averagerates.add(avrate);
 
 		--updateCount;
 	}
@@ -885,7 +1047,55 @@ public class InteractiveRANSAC implements PlugIn {
 			}
 		});
 	}
-	
+	public double leastX() {
+
+		// Ignore the event starting from zero time
+		double minstartX = Double.MAX_VALUE;
+
+		for (final Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>> result : segments) {
+
+			final Pair<Double, Double> minMax = Tracking.fromTo(result.getB());
+
+			double startX = minMax.getB();
+
+			if (startX <= minstartX) {
+
+				minstartX = startX;
+
+			}
+
+		}
+
+		return minstartX;
+
+	}
+
+	public double leastStart() {
+
+		double minstartY = Double.MAX_VALUE;
+
+		double minstartX = leastX();
+
+		for (final Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>> result : segments) {
+
+			final Pair<Double, Double> minMax = Tracking.fromTo(result.getB());
+
+			double startX = minMax.getA();
+			Polynomial<?, Point> polynomial = (Polynomial) result.getA();
+			double startY = polynomial.predict(startX);
+
+			if (startY <= minstartY && startX != 0) {
+
+				minstartY = startY;
+
+			}
+
+		}
+
+		System.out.println(minstartY);
+		return minstartY;
+
+	}
 	protected void sortPoints(final ArrayList<Point> points) {
 		Collections.sort(points, new Comparator<Point>() {
 

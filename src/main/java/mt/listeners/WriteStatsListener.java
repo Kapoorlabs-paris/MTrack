@@ -44,12 +44,12 @@ public class WriteStatsListener implements ActionListener {
 	}
 	
 	
-	public double leastX(){
+	public double leastX(ArrayList< Pair< AbstractFunction2D, ArrayList< PointFunctionMatch > > > segments){
 		
 // Ignore the event starting from zero time
 		double minstartX = Double.MAX_VALUE;
 	
-		for (final Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>> result : parent.segments) {
+		for (final Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>> result : segments) {
 
 			final Pair<Double, Double> minMax = Tracking.fromTo(result.getB());
 
@@ -71,14 +71,14 @@ public class WriteStatsListener implements ActionListener {
 		
 	}
 	
-	public double leastStart(){
+	public double leastStart(ArrayList< Pair< AbstractFunction2D, ArrayList< PointFunctionMatch > > > segments){
 		
 		
 		double minstartY = Double.MAX_VALUE;
 	
-		double minstartX =  leastX();
+		double minstartX =  leastX(segments);
 		
-		for (final Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>> result : parent.segments) {
+		for (final Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>> result : segments) {
 
 			final Pair<Double, Double> minMax = Tracking.fromTo(result.getB());
 

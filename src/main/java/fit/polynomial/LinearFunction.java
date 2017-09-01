@@ -340,6 +340,8 @@ A:		while ( i < iterations )
 
 		return false;
 	}
+	
+	
 
 	@SuppressWarnings("deprecation")
 	public static void main( String[] args ) throws NotEnoughDataPointsException, IllDefinedDataPointsException
