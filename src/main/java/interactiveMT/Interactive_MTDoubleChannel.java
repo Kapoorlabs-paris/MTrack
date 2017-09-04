@@ -190,10 +190,10 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public int selectedSeed = 0;
 	public int displayselectedSeed;
 	public double netdeltad = 0;
-	public double Intensityratio = 0.5;
+	public double Intensityratio = 0.35;
 	public double slopetolerance = 5;
 	public double Inispacing = 0.5;
-	public double maxdist = 15;
+	public double maxdist = 10;
 	public int numgaussians = 2;
 	public int thirdDimensionslider = 1;
 	public int thirdDimensionsliderInit = 1;

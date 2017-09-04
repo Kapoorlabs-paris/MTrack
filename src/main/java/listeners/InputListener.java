@@ -9,25 +9,24 @@ import java.awt.event.TextListener;
 import interactiveMT.MainFileChooser;
 import interactiveMT.Interactive_MTDoubleChannel.ValueChange;
 
-public class CalTListener implements TextListener {
+public class InputListener implements TextListener {
 
 	
-	final MainFileChooser parent;
+	final FireTrigger parent;
+	final MainFileChooser mainparent;
 	
-	public CalTListener(final MainFileChooser parent){
+	public InputListener(final FireTrigger parent, final MainFileChooser mainparent){
 		
 		this.parent = parent;
+		this.mainparent = mainparent;
 		
 	}
 	
 	@Override
 	public void textValueChanged(TextEvent e) {
 		final TextComponent tc = (TextComponent)e.getSource();
-	    String s = tc.getText();
-	   
-	
-	    if (s.length() > 0)
-		parent.calibration[2] = Float.parseFloat(s);
+	  
+		parent.LoadtrackText.setText("Image read: " + mainparent.chooserB.getSelectedFile());
 		
 	}
 

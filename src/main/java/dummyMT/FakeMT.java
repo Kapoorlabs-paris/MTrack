@@ -167,14 +167,14 @@ public class FakeMT {
 			double endpos[] = new double[n];
 			double[] startline = new double[n];
 			double[] endline = new double[n];
-			double MaxLength = 40;
+			double MaxLength = 50;
 
 			for (int d = 0; d < range.numDimensions(); ++d) {
-				startpos[d] = 100 +  (rnd.nextDouble() * (range.max(d) - range.min(d)) + range.min(d));
+				startpos[d] = 80 +  (rnd.nextDouble() * (range.max(d) - range.min(d)) + range.min(d));
 				
 			}
 			
-			double randomslope = 0.2; //-rndsec.nextDouble();
+			double randomslope = 2.8; //-rndsec.nextDouble();
 			
 			
 			
@@ -298,7 +298,7 @@ public static double[] Growseeds (RandomAccessibleInterval<FloatType> outimg, do
 					if (steppos[0] > endpos[0] || steppos[1] < endpos[1] && slope < 0)
 						break;
 					
-					
+					dy+=-0.025*dx*dx;
 				  
 					
 					
@@ -311,7 +311,7 @@ public static double[] Growseeds (RandomAccessibleInterval<FloatType> outimg, do
 						
 				}
 			
-				curvature = ((steppos[1] - oldpos[1])/ (steppos[0] - oldpos[0]) - slope )/ (steppos[0] + oldpos[0]);
+				
 				
 				double[] returnelement = {steppos[0], steppos[1], slope, intercept, curvature };
 				
@@ -343,7 +343,7 @@ public static double[] Growseeds (RandomAccessibleInterval<FloatType> outimg, do
 			
 			final FinalInterval range = new FinalInterval(512, 512);
 			
-			final FinalInterval smallrange = new FinalInterval(312, 212);
+			final FinalInterval smallrange = new FinalInterval(312, 412);
 			
 			final int ndims = range.numDimensions();
 			final double [] sigma = {2,2};
@@ -382,8 +382,8 @@ public static double[] Growseeds (RandomAccessibleInterval<FloatType> outimg, do
 	       ArrayList<double[]> Allseedgrow = new ArrayList<double[]>();
 	       
 	       FileWriter fw;
-	       String usefolder = "/Volumes/Varun_disk/DummyAnalysisStraight/";
-			File fichierKy = new File(usefolder + "//" +"DummyendStraight25" + ".txt");
+	       String usefolder = "/Users/varunkapoor/Documents/DummyCurvedSame/";
+			File fichierKy = new File(usefolder + "//" +"DummyendCurved17" + ".txt");
 			fw = new FileWriter(fichierKy);
 			BufferedWriter bw = new BufferedWriter(fw);
 			bw.write("\tFramenumber\tDeltaL\n");

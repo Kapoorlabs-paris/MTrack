@@ -22,10 +22,10 @@ public class MinSlopeListener implements AdjustmentListener
 	@Override
 	public void adjustmentValueChanged( final AdjustmentEvent event )
 	{
-		parent.minSlope = InteractiveRANSAC.computeValueFromDoubleExpScrollbarPosition(
+		parent.minSlope = Math.round(InteractiveRANSAC.computeValueFromDoubleExpScrollbarPosition(
 				event.getValue(),
 				InteractiveRANSAC.MAX_SLIDER,
-				InteractiveRANSAC.MAX_ABS_SLOPE );
+				InteractiveRANSAC.MAX_ABS_SLOPE ));
 
 		if ( parent.minSlope > parent.maxSlope )
 		{

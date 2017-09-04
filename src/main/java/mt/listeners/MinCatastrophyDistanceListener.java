@@ -21,11 +21,11 @@ public class MinCatastrophyDistanceListener implements AdjustmentListener
 	@Override
 	public void adjustmentValueChanged( final AdjustmentEvent event )
 	{
-		parent.minDistanceCatastrophe = InteractiveRANSAC.computeValueFromScrollbarPosition(
+		parent.minDistanceCatastrophe = Math.round(InteractiveRANSAC.computeValueFromScrollbarPosition(
 				event.getValue(),
 				InteractiveRANSAC.MAX_SLIDER,
 				InteractiveRANSAC.MIN_CAT,
-				InteractiveRANSAC.MAX_CAT );
+				InteractiveRANSAC.MAX_CAT ));
 
 		label.setText( "Min. Catatastrophy height (tp) = " + parent.minDistanceCatastrophe );
 	}

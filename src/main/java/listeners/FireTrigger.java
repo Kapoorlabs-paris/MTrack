@@ -41,7 +41,7 @@ public class FireTrigger implements ActionListener {
 		this.parent = parent;
 		this.choice = choice;
 	}
-	
+	TextField LoadtrackText ;
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		
@@ -157,10 +157,9 @@ public class FireTrigger implements ActionListener {
 		parent.inputFieldY.setText(String.valueOf(parent.psf[1]));
 	
 		
-		final TextField LoadtrackText = new TextField(
+		TextField LoadtrackText = new TextField(
 				"Image read: " + parent.chooserB.getSelectedFile());
 		LoadtrackText.setColumns(30);
-		
 		new Normalize();
 		
 		parent.panelIntro.add(LoadtrackText, new GridBagConstraints(0, 4, 20, 1, 0.0, 0.0, GridBagConstraints.CENTER,
@@ -174,7 +173,7 @@ public class FireTrigger implements ActionListener {
 		parent.originalPreprocessedimg = factory.create(parent.originalimg, type);
 		// Normalize image intnesity
 		Normalize.normalize(Views.iterable(parent.originalimg), parent.minval, parent.maxval);
-		
+		LoadtrackText.addTextListener(new InputListener(this, parent));
 		if (selectedindex == 0)
 		{
 			// Open Hyperstack images
@@ -200,7 +199,7 @@ public class FireTrigger implements ActionListener {
 				parent.processSlice(slice, outputSlice);
 			}
 			Normalize.normalize(Views.iterable(totalimg), parent.minval, parent.maxval);
-			ImageJFunctions.show(totalimg).setTitle("Original Movie");
+		//	ImageJFunctions.show(totalimg).setTitle("Original Movie");
 			
 			parent.originalimg = totalimg;
 			

@@ -114,17 +114,15 @@ public class MainFileChooser extends JPanel {
 		final Checkbox Simple = new Checkbox("Simple mode ", mode, Simplemode);
 		final Checkbox Advanced = new Checkbox("Advanced mode ", mode, Advancedmode);
 
-		final Label LoadtrackText = new Label(
-				"Load Preprocessed movie or generate here");
-		final Label LoadMeasureText = new Label("Choose image format and load : ");
-
-		String[] preimage ={"Load Preprocessed movie and begin tracking module","Generate Preprocessed movie and begin tracking module" };
 		
 
-		Border border = new CompoundBorder(new TitledBorder("Choose Mode"), new EmptyBorder(c.insets));
-		Border microborder = new CompoundBorder(new TitledBorder("Microscope Parameters"), new EmptyBorder(c.insets));
-		Border runborder = new CompoundBorder(new TitledBorder("Preprocessing Options"), new EmptyBorder(c.insets));
-		Border origborder = new CompoundBorder(new TitledBorder("Input movie"), new EmptyBorder(c.insets));
+		String[] preimage ={"Load preprocessed movie and begin tracking","Generate preprocessed movie and begin tracking " };
+		
+
+		Border border = new CompoundBorder(new TitledBorder("1.1 Choose Mode"), new EmptyBorder(c.insets));
+		Border microborder = new CompoundBorder(new TitledBorder("1.3 Microscope Parameters"), new EmptyBorder(c.insets));
+		Border runborder = new CompoundBorder(new TitledBorder("1.4 Preprocessing Options"), new EmptyBorder(c.insets));
+		Border origborder = new CompoundBorder(new TitledBorder("1.2 Open movie"), new EmptyBorder(c.insets));
 
 		
 
@@ -142,7 +140,7 @@ public class MainFileChooser extends JPanel {
 		inputFieldY.setText("2");
 		
 		
-		inputLabelcalX = new Label("Enter pixel calibration in X, Y");
+		inputLabelcalX = new Label("Enter pixel calibration in X, Y (micrometers)");
 		inputFieldcalX = new TextField(5);
 		inputFieldcalX.setText("1");
 		
@@ -157,7 +155,7 @@ public class MainFileChooser extends JPanel {
 		psf[0] = Float.parseFloat(inputFieldX.getText());
 		psf[1] = Float.parseFloat(inputFieldY.getText());
 
-		String[] Imagetype = { "Two channel image as hyperstack", "Concated seed image followed by time-lapse images",
+		String[] Imagetype = { "Two channel image as hyperstack", "Concatenated seed image followed by time-lapse images",
 				"Single channel time-lapse images" };
 		JComboBox<String> ChooseImage = new JComboBox<String>(Imagetype);
 		JComboBox<String> ChoosepreImage = new JComboBox<String>(preimage);
@@ -196,28 +194,28 @@ public class MainFileChooser extends JPanel {
 		panelIntro.add(Original,new GridBagConstraints(3, 0, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 				GridBagConstraints.HORIZONTAL, new Insets(0, 10, 0, 10), 0, 0));
 
-		Microscope.add(inputLabelX, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
+		Microscope.add(inputLabelX, new GridBagConstraints(0, 4, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
 				GridBagConstraints.RELATIVE, insets, 0, 0));
 		
-		Microscope.add(inputFieldX, new GridBagConstraints(3, 0, 3, 1, 0.1, 0.0, GridBagConstraints.WEST,
+		Microscope.add(inputFieldX, new GridBagConstraints(3, 4, 3, 1, 0.1, 0.0, GridBagConstraints.WEST,
 				GridBagConstraints.RELATIVE, insets, 0, 0));
 
-		Microscope.add(inputFieldY, new GridBagConstraints(3, 0, 3, 1, 0.1, 0.0, GridBagConstraints.CENTER,
+		Microscope.add(inputFieldY, new GridBagConstraints(3, 4, 3, 1, 0.1, 0.0, GridBagConstraints.CENTER,
 				GridBagConstraints.RELATIVE, insets, 0, 0));
 		
-		Microscope.add(inputLabelcalX, new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
+		Microscope.add(inputLabelcalX, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 				GridBagConstraints.RELATIVE, insets, 0, 0));
 		
-		Microscope.add(inputFieldcalX, new GridBagConstraints(3, 2, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
+		Microscope.add(inputFieldcalX, new GridBagConstraints(3, 0, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
 				GridBagConstraints.RELATIVE, insets, 0, 0));
 
-		Microscope.add(inputFieldcalY, new GridBagConstraints(3, 2, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER,
+		Microscope.add(inputFieldcalY, new GridBagConstraints(3, 0, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER,
 				GridBagConstraints.RELATIVE, insets, 0, 0));
 		
-		Microscope.add(inputLabelT, new GridBagConstraints(0, 4, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
-				GridBagConstraints.RELATIVE, insets, 0, 0));
+		Microscope.add(inputLabelT, new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+				GridBagConstraints.HORIZONTAL, insets, 0, 0));
 		
-		Microscope.add(inputFieldT, new GridBagConstraints(3, 4, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
+		Microscope.add(inputFieldT, new GridBagConstraints(3, 2, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
 				GridBagConstraints.RELATIVE, insets, 0, 0));
 
 		Microscope.setBorder(microborder);
@@ -227,9 +225,8 @@ public class MainFileChooser extends JPanel {
 
 	
 
-		Start.add(LoadtrackText , new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
-					GridBagConstraints.RELATIVE, new Insets(10, 10, 0, 10), 0, 0));
-		Start.add(ChoosepreImage, new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
+		
+		Start.add(ChoosepreImage, new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
 				GridBagConstraints.RELATIVE, new Insets(10, 10, 0, 10), 0, 0));
 	
 

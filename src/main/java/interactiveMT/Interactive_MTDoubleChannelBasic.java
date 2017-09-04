@@ -261,14 +261,14 @@ public class Interactive_MTDoubleChannelBasic implements PlugIn {
 		Directoryoptions.setLayout(layout);
 		
 		
-		Border msborder = new CompoundBorder(new TitledBorder("MSER parameters"), new EmptyBorder(c.insets));
+		Border msborder = new CompoundBorder(new TitledBorder("1.6 MSER parameters"), new EmptyBorder(c.insets));
 		Directoryoptions.setLayout(layout);
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridx = 0;
 		c.gridy = 0;
 		c.weightx = 1;
 
-		Border dirborder = new CompoundBorder(new TitledBorder("File name"),
+		Border dirborder = new CompoundBorder(new TitledBorder("1.5 File name"),
 				new EmptyBorder(c.insets));
 		
 		
