@@ -13,6 +13,8 @@ import ij.io.Opener;
 import listeners.CalTListener;
 import listeners.CalXListener;
 import listeners.CalYListener;
+import listeners.ChooseDirectoryListener;
+import listeners.FileChooserDirectory;
 import listeners.FireTrigger;
 import listeners.FirepreTrigger;
 import listeners.PsfXListener;
@@ -61,6 +63,7 @@ public class MainFileChooser extends JPanel {
 	public double[] calibration = new double[3];
 	float frametosec;
 	public JProgressBar jpb;
+	public String addToName = "MTTrack";
 	JFileChooser chooserC;
 	String choosertitleC;
 	public double[] psf = new double[2];
@@ -70,7 +73,7 @@ public class MainFileChooser extends JPanel {
 	public TextField inputFieldT;
 	JPanel panelCont = new JPanel();
 	public JPanel panelIntro = new JPanel();
-
+	public File userfile;
 	boolean loadpre = true;
 	public boolean Simplemode = true;
 	boolean Advancedmode = false;
@@ -78,15 +81,15 @@ public class MainFileChooser extends JPanel {
 	boolean Loadpreimage = false;
 	boolean Generatepre = false;
 	boolean Batchmoderun = false;
-
+	public TextField inputField = new TextField();
 	public FloatType minval = new FloatType(0);
 	public FloatType maxval = new FloatType(1);
 	private static final Insets insets = new Insets(0, 0, 0, 0);
 
-	private JPanel Modechoice = new JPanel();
-	private JPanel Microscope = new JPanel();
-	private JPanel Original = new JPanel();
-	private JPanel Start = new JPanel();
+	public JPanel Modechoice = new JPanel();
+	public JPanel Microscope = new JPanel();
+	public JPanel Original = new JPanel();
+	public JPanel Start = new JPanel();
 	public JFrame frame = new JFrame("Welcome to MTV Tracker ");
 
 	/* Instantiation */
@@ -97,7 +100,9 @@ public class MainFileChooser extends JPanel {
 
 		
 		jpb = new JProgressBar();
-		
+		 
+			
+		 inputField.setColumns(20);
 		panelCont.add(panelIntro, "1");
 
 		c.insets = new Insets(5, 5, 5, 5);
@@ -160,8 +165,8 @@ public class MainFileChooser extends JPanel {
 		JComboBox<String> ChooseImage = new JComboBox<String>(Imagetype);
 		JComboBox<String> ChoosepreImage = new JComboBox<String>(preimage);
 		
-		
-		
+		final JButton ChooseDirectory = new JButton("Choose Directory");
+	   
 		
 		
 
@@ -188,7 +193,11 @@ public class MainFileChooser extends JPanel {
 		
 		Original.add(ChooseImage, new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
 				GridBagConstraints.RELATIVE, new Insets(10, 10, 0, 10), 0, 0));
-
+		Original.add(inputField,  new GridBagConstraints(0, 4, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
+				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0) );
+		Original.add(ChooseDirectory,  new GridBagConstraints(0, 5, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
+				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0) );
+	
 		Original.setBorder(origborder);
 		
 		panelIntro.add(Original,new GridBagConstraints(3, 0, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
@@ -240,7 +249,7 @@ public class MainFileChooser extends JPanel {
 
 
 		panelIntro.setVisible(true);
-
+		ChooseDirectory.addActionListener(new FileChooserDirectory(this));
 		Batchmode.addItemListener(new RuninBatchListener(frame));
 		Simple.addItemListener(new RunSimpleListener());
 		Advanced.addItemListener(new RunAdvancedListener());

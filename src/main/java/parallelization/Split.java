@@ -187,7 +187,7 @@ public class Split implements Runnable  {
 			parent.parent.showDeterministic = Prefs.getBoolean(".showDeterministic.boolean", true);
 			parent.parent.RoisViaMSER = Prefs.getBoolean(".RoiViaMSER.boolean", false);
 			parent.parent.RoisViaWatershed = Prefs.getBoolean(".RoiViaWatershed.boolean", false);
-			parent.parent.SaveTxt = Prefs.getBoolean(".SaveTxt.boolean", true);
+			
 			parent.calibration = new double[parent.originalimg.numDimensions() - 1];
 			parent.calibration[0] = Prefs.getDouble(".CalibrationX.double", 1);
 			parent.calibration[1] = Prefs.getDouble(".CalibrationY.double", 1);

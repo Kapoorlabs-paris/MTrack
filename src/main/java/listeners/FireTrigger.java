@@ -114,6 +114,7 @@ public class FireTrigger implements ActionListener {
 					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 			
 			parent.panelIntro.validate();
+			
 			parent.frame.pack();
 			}
 		}
@@ -141,6 +142,7 @@ public class FireTrigger implements ActionListener {
 		if (parent.chooserB.showOpenDialog(parent) == JFileChooser.APPROVE_OPTION) {
 			System.out.println("getCurrentDirectory(): " + parent.chooserB.getCurrentDirectory());
 			System.out.println("getSelectedFile() : " + parent.chooserB.getSelectedFile());
+			System.out.println(parent.chooserB.getSelectedFile().getName());
 		} else {
 			System.out.println("No Selection ");
 			parent.chooserB = null;
@@ -173,6 +175,11 @@ public class FireTrigger implements ActionListener {
 		parent.originalPreprocessedimg = factory.create(parent.originalimg, type);
 		// Normalize image intnesity
 		Normalize.normalize(Views.iterable(parent.originalimg), parent.minval, parent.maxval);
+		parent.inputField.setText(parent.chooserB.getSelectedFile().getName().replaceFirst("[.][^.]+$", ""));
+
+		parent.addToName = parent.inputField.getText();
+		parent.panelIntro.validate();
+		
 		LoadtrackText.addTextListener(new InputListener(this, parent));
 		if (selectedindex == 0)
 		{
@@ -199,7 +206,6 @@ public class FireTrigger implements ActionListener {
 				parent.processSlice(slice, outputSlice);
 			}
 			Normalize.normalize(Views.iterable(totalimg), parent.minval, parent.maxval);
-		//	ImageJFunctions.show(totalimg).setTitle("Original Movie");
 			
 			parent.originalimg = totalimg;
 			

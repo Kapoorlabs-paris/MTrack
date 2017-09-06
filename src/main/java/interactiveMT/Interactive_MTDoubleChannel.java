@@ -128,7 +128,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 	public String usefolder = IJ.getDirectory("imagej");
 	public ColorProcessor cp = null;
-	public String addToName = "MTTrack";
+	public String addToName = "MTrack";
 	public ArrayList<float[]> deltadstart = new ArrayList<>();
 	public ArrayList<float[]> deltadend = new ArrayList<>();
 	public ArrayList<float[]> deltad = new ArrayList<>();
@@ -194,7 +194,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public double Intensityratio = 0.35;
 	public double slopetolerance = 5;
 	public double Inispacing = 0.5;
-	public double maxdist = 5;
+	public double maxdist = 10;
 	public int numgaussians = 2;
 	public int thirdDimensionslider = 1;
 	public int thirdDimensionsliderInit = 1;
@@ -271,7 +271,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public boolean AutoDelta = false;
 	public boolean Domask = false;
 	public boolean DoRloop = false;
-	public boolean SaveTxt = true;
+	
 	public boolean SaveXLS = false;
 	public boolean finalpoint = false;
 	public boolean Trackstart;
@@ -643,8 +643,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 		usefolder = userfile.getParentFile().getAbsolutePath();
 		 newends = new Markendsnew(this);
-		SaveTxt = true;
-
+		
 		
 		AllSeedrois = new ArrayList<OvalRoi>();
 		jpb = new JProgressBar();
@@ -1811,19 +1810,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		}
 	}
 
-	protected class SaveasTXT implements ItemListener {
 
-		@Override
-		public void itemStateChanged(ItemEvent arg0) {
-			if (arg0.getStateChange() == ItemEvent.DESELECTED)
-				SaveTxt = false;
-
-			else if (arg0.getStateChange() == ItemEvent.SELECTED)
-				SaveTxt = true;
-
-		}
-
-	}
 
 	
 

@@ -8,11 +8,13 @@ import java.io.File;
 import javax.swing.JFileChooser;
 
 import interactiveMT.Interactive_MTDoubleChannel;
+import interactiveMT.MainFileChooser;
 
 
 	public class ChooseDirectoryListener implements ActionListener {
 		final TextField filename;
         Interactive_MTDoubleChannel parent;
+      
         final File userfile;
         
 		public ChooseDirectoryListener(Interactive_MTDoubleChannel parent, TextField filename, final File userfile) {
@@ -37,7 +39,6 @@ import interactiveMT.Interactive_MTDoubleChannel;
 
 			parent.addToName = filename.getText();
 
-			parent.SaveTxt = true;
 		}
 
 	

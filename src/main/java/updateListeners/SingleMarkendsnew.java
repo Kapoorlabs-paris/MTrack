@@ -75,7 +75,16 @@ public void mouseClicked(MouseEvent e) {
 						
 						
 					}
-					
+						for (int index = 0; index < parent.ClickedPoints.size(); ++index){
+							
+							if (parent.ClickedPoints.get(index).getB() == nearestRoiCurr){
+								parent.ClickedPoints.remove(index);
+							--index;
+							}
+							
+						}
+						
+						parent.AllSeedrois.remove(nearestRoiCurr);
 						
 					
 					

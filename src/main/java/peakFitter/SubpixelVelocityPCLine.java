@@ -71,17 +71,17 @@ public class SubpixelVelocityPCLine extends BenchmarkAlgorithm
 	// LM solver iteration params
 	public int maxiter = 200;
 	public double lambda = 1e-2;
-	public double termepsilon = 1e-3;
+	public double termepsilon = 1e-2;
 	// Mask fits iteration param
 	public int iterations = 200;
-	public double cutoffdistance = 15;
+	public double cutoffdistance = 25;
 	public boolean halfgaussian = false;
 	public double Intensityratio;
 	final JProgressBar jpb;
 	final int thirdDimsize;
 	private final UserChoiceModel model;
 	public double Inispacing;
-	public double maxdist = 20;
+	public double maxdist;
 
 	public final int numgaussians;
 	public final int startframe;
@@ -218,8 +218,6 @@ public void setMaxdist (double maxdist) {
 
 		for (int index = 0; index < PrevFrameparamstart.size(); ++index) {
 
-			final int oldframenumber = PrevFrameparamstart.get(PrevFrameparamstart.size() - 1).framenumber;
-			final int framediff = framenumber - oldframenumber;
 
 			if (Trackstart.get(PrevFrameparamstart.get(index).seedLabel) == Whichend.start
 					|| Trackstart.get(PrevFrameparamstart.get(index).seedLabel) == Whichend.both) {

@@ -65,12 +65,12 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 	// LM solver iteration params
 	public int maxiter = 200;
 	public double lambda = 1e-3;
-	public double termepsilon = 1e-1;
+	public double termepsilon = 1e-2;
 	// Mask fits iteration param
 	int iterations = 200;
 	private final boolean DoMask;
-	public double cutoffdistance = 15;
-	public double maxdist = 20;
+	public double cutoffdistance = 25;
+	public double maxdist;
 	public boolean halfgaussian = false;
 	public double Intensityratio;
 	private final HashMap<Integer, Whichend> Trackstart;
