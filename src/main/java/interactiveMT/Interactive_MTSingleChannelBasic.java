@@ -93,6 +93,7 @@ import updateListeners.SingleDefaultModel;
 import updateListeners.SingleDefaultModelHF;
 import updateListeners.SingleFinalPoint;
 import updateListeners.SingleMarkends;
+import updateListeners.SingleMarkendsnew;
 import updateListeners.SingleMoveToFrameListener;
 
 public class Interactive_MTSingleChannelBasic implements PlugIn {
@@ -122,7 +123,7 @@ public class Interactive_MTSingleChannelBasic implements PlugIn {
 
 		parent.FindLinesViaMSER = true;
 		parent.doMserSegmentation = true;
-		parent.newends = new SingleMarkends(parent);
+		parent.newends = new SingleMarkendsnew(parent);
 		parent.AllSeedrois = new ArrayList<OvalRoi>();
 		parent.jpb = new JProgressBar();
 		parent.newHoughtree = new HashMap<Integer, MserTree<UnsignedByteType>>();

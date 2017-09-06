@@ -66,6 +66,8 @@ public SingleFindLinesListener (final Interactive_MTSingleChannel parent, final 
 		SingleProgressSeeds trackMT = new SingleProgressSeeds(parent, child);
 		trackMT.execute();
 		
+		
+		
 		parent.displayBitimg = false;
 		parent.displayWatershedimg = false;
 

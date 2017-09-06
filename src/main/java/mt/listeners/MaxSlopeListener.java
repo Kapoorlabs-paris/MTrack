@@ -4,6 +4,7 @@ import java.awt.Label;
 import java.awt.Scrollbar;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
+import java.text.DecimalFormat;
 
 public class MaxSlopeListener implements AdjustmentListener
 {
@@ -33,6 +34,6 @@ public class MaxSlopeListener implements AdjustmentListener
 			maxSlopeSB.setValue( InteractiveRANSAC.computeScrollbarPositionValueFromDoubleExp( InteractiveRANSAC.MAX_SLIDER, parent.maxSlope, InteractiveRANSAC.MAX_ABS_SLOPE ) );
 		}
 
-		label.setText( "Max. Segment Slope (px/tp) = " + parent.maxSlope );
+		label.setText( "Max. Segment Slope (px/tp) = " + new DecimalFormat("#.##").format(parent.maxSlope) );
 	}
 }

@@ -4,6 +4,7 @@ import java.awt.Label;
 import java.awt.Scrollbar;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
+import java.text.DecimalFormat;
 
 public class LambdaListener implements AdjustmentListener
 {
@@ -26,7 +27,7 @@ public class LambdaListener implements AdjustmentListener
 				0.0,
 				1.0 );
 
-		label.setText( "Linearity (fraction) = " + parent.lambda );
+		label.setText( "Linearity (fraction) = " + new DecimalFormat("#.##").format(parent.lambda) );
 		parent.setFunction();
 	}
 }

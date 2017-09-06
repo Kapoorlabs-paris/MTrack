@@ -396,6 +396,18 @@ public class DrawingUtils {
 
 		return KDtreeroi;
 	}
+	public static double Distance(final double[] cordone, final double[] cordtwo) {
+
+		double distance = 0;
+
+		int ndims = cordone.length;
+		for (int d = 0; d < ndims; ++d) {
+
+			distance += Math.pow((cordone[d] - cordtwo[d]), 2);
+
+		}
+		return Math.sqrt(distance);
+	}
 
 	public static ArrayList<EllipseRoi> getcurrentRois(MserTree<UnsignedByteType> newtree,
 			ArrayList<double[]> AllmeanCovar) {

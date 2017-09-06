@@ -77,7 +77,8 @@ final int endtime;
 			parent.jpb.setIndeterminate(false);
 			get();
 			parent.frame.dispose();
-			JOptionPane.showMessageDialog(parent.jpb.getParent(), "Success", "Success", JOptionPane.INFORMATION_MESSAGE);
+			IJ.log("Tracking Done and track files written in the chosen folder");
+
 		} catch (ExecutionException | InterruptedException e) {
 			e.printStackTrace();
 		}

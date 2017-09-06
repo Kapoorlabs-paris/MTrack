@@ -36,99 +36,99 @@ import net.imglib2.util.ValuePair;
 
 public class ProgressSeeds extends SwingWorker<Void, Void> {
 
-	
-final Interactive_MTDoubleChannel parent;
-final Interactive_MTDoubleChannelBasic child;	
-	
-	public ProgressSeeds(final Interactive_MTDoubleChannel parent ){
-	
+	final Interactive_MTDoubleChannel parent;
+	final Interactive_MTDoubleChannelBasic child;
+
+	public ProgressSeeds(final Interactive_MTDoubleChannel parent) {
+
 		this.parent = parent;
 		this.child = null;
 	}
-	
 
-	public ProgressSeeds(final Interactive_MTDoubleChannel parent, final Interactive_MTDoubleChannelBasic child ){
-	
+	public ProgressSeeds(final Interactive_MTDoubleChannel parent, final Interactive_MTDoubleChannelBasic child) {
+
 		this.parent = parent;
 		this.child = child;
 	}
-	
+
 	@Override
 	protected Void doInBackground() throws Exception {
 
 		// add listener to the imageplus slice slider
-		//IJ.log("Starting Chosen Line finder from the seed image (first frame should be seeds)");
-		//IJ.log("Current frame: " + parent.thirdDimension);
+		// IJ.log("Starting Chosen Line finder from the seed image (first frame
+		// should be seeds)");
+		// IJ.log("Current frame: " + parent.thirdDimension);
 		RandomAccessibleInterval<FloatType> groundframe = parent.currentimg;
 		RandomAccessibleInterval<FloatType> groundframepre = parent.currentPreprocessedimg;
 
 		if (parent.FindLinesViaMSER) {
 
-		
-				LinefinderInteractiveMSER newlineMser = new LinefinderInteractiveMSER(groundframe, groundframepre,
-						parent.newtree, parent.thirdDimension);
+			LinefinderInteractiveMSER newlineMser = new LinefinderInteractiveMSER(groundframe, groundframepre,
+					parent.newtree, parent.thirdDimension);
 
-				parent.PrevFrameparam = FindlinesVia.LinefindingMethod(groundframe, groundframepre,
-						parent.thirdDimension, parent.psf, newlineMser, UserChoiceModel.Line, parent.Domask, parent.Intensityratio, parent.Inispacing,
-						parent.jpb);
+			parent.PrevFrameparam = FindlinesVia.LinefindingMethod(groundframe, groundframepre, parent.thirdDimension,
+					parent.psf, newlineMser, UserChoiceModel.Line, parent.Domask, parent.Intensityratio,
+					parent.Inispacing, parent.jpb);
 
-/*				
-				IJ.log("MSER parameters:" + " " + " thirdDimension: " + " " + parent.thirdDimension);
-				IJ.log("Delta " + " " + parent.delta + " " + "minSize " + " " + parent.minSize + " " + "maxSize " + " " + parent.maxSize
-						+ " " + " Unstability_Score " + " " + parent.Unstability_Score + " " + "minDIversity " + " " + parent.minDiversity);
-				IJ.log("Optimization Parameters: " + "R" + parent.Intensityratio + " G"
-						+ parent.Inispacing / Math.min(parent.psf[0], parent.psf[1]));
-*/
-			
+			/*
+			 * IJ.log("MSER parameters:" + " " + " thirdDimension: " + " " +
+			 * parent.thirdDimension); IJ.log("Delta " + " " + parent.delta +
+			 * " " + "minSize " + " " + parent.minSize + " " + "maxSize " + " "
+			 * + parent.maxSize + " " + " Unstability_Score " + " " +
+			 * parent.Unstability_Score + " " + "minDIversity " + " " +
+			 * parent.minDiversity); IJ.log("Optimization Parameters: " + "R" +
+			 * parent.Intensityratio + " G" + parent.Inispacing /
+			 * Math.min(parent.psf[0], parent.psf[1]));
+			 */
 
 		}
 
 		if (parent.FindLinesViaHOUGH) {
 
-			
-				LinefinderInteractiveHough newlineHough = new LinefinderInteractiveHough(groundframe,
-						groundframepre, parent.intimg, parent.Maxlabel, parent.thetaPerPixel, parent.rhoPerPixel, parent.thirdDimension, parent.jpb);
+			LinefinderInteractiveHough newlineHough = new LinefinderInteractiveHough(groundframe, groundframepre,
+					parent.intimg, parent.Maxlabel, parent.thetaPerPixel, parent.rhoPerPixel, parent.thirdDimension,
+					parent.jpb);
 
-				parent.PrevFrameparam = FindlinesVia.LinefindingMethod(groundframe, groundframepre,
-						parent.thirdDimension, parent.psf, newlineHough, UserChoiceModel.Line, parent.Domask, parent.Intensityratio, parent.Inispacing,
-						parent.jpb);
-				
-/*				
-				IJ.log("Hough parameters:" + " " + " thirdDimension: " + " " + parent.thirdDimension);
-				IJ.log("thetaPerPixel " + " " + parent.thetaPerPixel + " " + "rhoPerPixel " + " " +parent.rhoPerPixel);
-				IJ.log("Optimization Parameters: " + "R" + parent.Intensityratio + " G"
-						+ parent.Inispacing / Math.min(parent.psf[0], parent.psf[1]));
+			parent.PrevFrameparam = FindlinesVia.LinefindingMethod(groundframe, groundframepre, parent.thirdDimension,
+					parent.psf, newlineHough, UserChoiceModel.Line, parent.Domask, parent.Intensityratio,
+					parent.Inispacing, parent.jpb);
 
-*/			
+			/*
+			 * IJ.log("Hough parameters:" + " " + " thirdDimension: " + " " +
+			 * parent.thirdDimension); IJ.log("thetaPerPixel " + " " +
+			 * parent.thetaPerPixel + " " + "rhoPerPixel " + " "
+			 * +parent.rhoPerPixel); IJ.log("Optimization Parameters: " + "R" +
+			 * parent.Intensityratio + " G" + parent.Inispacing /
+			 * Math.min(parent.psf[0], parent.psf[1]));
+			 * 
+			 */
 		}
 
 		if (parent.FindLinesViaMSERwHOUGH) {
-			
-				LinefinderInteractiveMSERwHough newlineMserwHough = new LinefinderInteractiveMSERwHough(groundframe,
-						groundframepre, parent.newtree, parent.thirdDimension, parent.thetaPerPixel, parent.rhoPerPixel, parent.jpb);
-				
-/*				
-				IJ.log("MSER parameters:" + " " + " thirdDimension: " + " " + parent.thirdDimension);
-				IJ.log("Delta " + " " + parent.delta + " " + "minSize " + " " + parent.minSize + " " + "maxSize " + " " + parent.maxSize
-						+ " " + " Unstability_Score " + " " + parent.Unstability_Score + " " + "minDIversity " + " " + parent.minDiversity);
-				IJ.log("Hough parameters:" + " " + " thirdDimension: " + " " + parent.thirdDimension);
-				IJ.log("thetaPerPixel " + " " + parent.thetaPerPixel + " " + "rhoPerPixel " + " " + parent.rhoPerPixel);
-				IJ.log("Optimization Parameters: " + "R" + parent.Intensityratio + " G"
-						+ parent.Inispacing / Math.min(parent.psf[0], parent.psf[1]));
-						
-*/						
-				parent.PrevFrameparam = FindlinesVia.LinefindingMethod(groundframe, groundframepre,
-						parent.thirdDimension, parent.psf, newlineMserwHough, UserChoiceModel.Line, parent.Domask, parent.Intensityratio,
-						parent.Inispacing, parent.jpb);
 
-				
-			
+			LinefinderInteractiveMSERwHough newlineMserwHough = new LinefinderInteractiveMSERwHough(groundframe,
+					groundframepre, parent.newtree, parent.thirdDimension, parent.thetaPerPixel, parent.rhoPerPixel,
+					parent.jpb);
+
+			/*
+			 * IJ.log("MSER parameters:" + " " + " thirdDimension: " + " " +
+			 * parent.thirdDimension); IJ.log("Delta " + " " + parent.delta +
+			 * " " + "minSize " + " " + parent.minSize + " " + "maxSize " + " "
+			 * + parent.maxSize + " " + " Unstability_Score " + " " +
+			 * parent.Unstability_Score + " " + "minDIversity " + " " +
+			 * parent.minDiversity); IJ.log("Hough parameters:" + " " +
+			 * " thirdDimension: " + " " + parent.thirdDimension); IJ.log(
+			 * "thetaPerPixel " + " " + parent.thetaPerPixel + " " +
+			 * "rhoPerPixel " + " " + parent.rhoPerPixel); IJ.log(
+			 * "Optimization Parameters: " + "R" + parent.Intensityratio + " G"
+			 * + parent.Inispacing / Math.min(parent.psf[0], parent.psf[1]));
+			 * 
+			 */
+			parent.PrevFrameparam = FindlinesVia.LinefindingMethod(groundframe, groundframepre, parent.thirdDimension,
+					parent.psf, newlineMserwHough, UserChoiceModel.Line, parent.Domask, parent.Intensityratio,
+					parent.Inispacing, parent.jpb);
 
 		}
-
-	
-
-	
 
 		Overlay o = parent.preprocessedimp.getOverlay();
 
@@ -139,37 +139,52 @@ final Interactive_MTDoubleChannelBasic child;
 		o.clear();
 		for (int index = 0; index < parent.PrevFrameparam.getA().size(); ++index) {
 
-			parent.Seedroi = new OvalRoi(Util.round(parent.PrevFrameparam.getA().get(index).currentpos[0] - parent.radiusseed),
-					Util.round(parent.PrevFrameparam.getA().get(index).currentpos[1] - parent.radiusseed), Util.round(2 * parent.radiusseed), Util.round(2 * parent.radiusseed));
-			parent.Seedroi.setStrokeColor(parent.colorConfirm);
-			parent.Seedroi.setStrokeWidth(0.8);
+			if (parent.PrevFrameparam.getB() != null) {
 
-			
-			
-			parent.AllSeedrois.add(parent.Seedroi);
-			o.add(parent.Seedroi);
+				if (Math.abs(Math.round(parent.PrevFrameparam.getA().get(index).currentpos[0]
+						- parent.PrevFrameparam.getB().get(index).currentpos[0])) > 0
+						&& Math.abs(Math.round(parent.PrevFrameparam.getA().get(index).currentpos[1]
+								- parent.PrevFrameparam.getB().get(index).currentpos[1])) > 0) {
+					parent.Seedroi = new OvalRoi(
+							Util.round(parent.PrevFrameparam.getA().get(index).currentpos[0] - parent.radiusseed),
+							Util.round(parent.PrevFrameparam.getA().get(index).currentpos[1] - parent.radiusseed),
+							Util.round(2 * parent.radiusseed), Util.round(2 * parent.radiusseed));
+					parent.Seedroi.setStrokeColor(parent.colorConfirm);
+					parent.Seedroi.setStrokeWidth(0.8);
+
+					parent.AllSeedrois.add(parent.Seedroi);
+					o.add(parent.Seedroi);
+				}
+			}
 
 		}
 
 		for (int index = 0; index < parent.PrevFrameparam.getB().size(); ++index) {
+			if (parent.PrevFrameparam.getA() != null) {
 
-			parent.Seedroi = new OvalRoi(Util.round(parent.PrevFrameparam.getB().get(index).currentpos[0] - parent.radiusseed),
-					Util.round(parent.PrevFrameparam.getB().get(index).currentpos[1] - parent.radiusseed), Util.round(2 * parent.radiusseed), Util.round(2 * parent.radiusseed));
-			parent.Seedroi.setStrokeColor(parent.colorConfirm);
-			parent.Seedroi.setStrokeWidth(0.8);
-			
-			
-			
-			parent.AllSeedrois.add(parent.Seedroi);
-			o.add(parent.Seedroi);
+				if (Math.abs(Math.round(parent.PrevFrameparam.getA().get(index).currentpos[0]
+						- parent.PrevFrameparam.getB().get(index).currentpos[0])) > 0
+						&& Math.abs(Math.round(parent.PrevFrameparam.getA().get(index).currentpos[1]
+								- parent.PrevFrameparam.getB().get(index).currentpos[1])) > 0) {
+					parent.Seedroi = new OvalRoi(
+							Util.round(parent.PrevFrameparam.getB().get(index).currentpos[0] - parent.radiusseed),
+							Util.round(parent.PrevFrameparam.getB().get(index).currentpos[1] - parent.radiusseed),
+							Util.round(2 * parent.radiusseed), Util.round(2 * parent.radiusseed));
+					parent.Seedroi.setStrokeColor(parent.colorConfirm);
+					parent.Seedroi.setStrokeWidth(0.8);
 
+					parent.AllSeedrois.add(parent.Seedroi);
+					o.add(parent.Seedroi);
+				}
+			}
 		}
-		for(int index = 0; index < parent.AllSeedrois.size(); ++index){
-			
+		for (int index = 0; index < parent.AllSeedrois.size(); ++index) {
+
 			Rectangle rect = parent.AllSeedrois.get(index).getBounds();
 			double newx = rect.x + rect.width / 2.0;
 			double newy = rect.y + rect.height / 2.0;
-			Pair<double[], OvalRoi> newpoint = new ValuePair<double[], OvalRoi>(new double[]{newx, newy}, parent.AllSeedrois.get(index));
+			Pair<double[], OvalRoi> newpoint = new ValuePair<double[], OvalRoi>(new double[] { newx, newy },
+					parent.AllSeedrois.get(index));
 
 			parent.ClickedPoints.add(newpoint);
 		}
@@ -181,10 +196,9 @@ final Interactive_MTDoubleChannelBasic child;
 	@Override
 	protected void done() {
 		try {
-			
-		
-			if (child!=null){
-				
+
+			if (child != null) {
+
 				child.controlnext.removeAll();
 				child.controlprevious.removeAll();
 				child.controlnext.add(new JButton(new AbstractAction("\u22b2Prev") {
@@ -201,21 +215,17 @@ final Interactive_MTDoubleChannelBasic child;
 						cl.previous(child.panelCont);
 					}
 				}));
-			 
-				
 
-				child.panelNext.add(child.controlnext,  new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER,
-						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
-			
+				child.panelNext.add(child.controlnext, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+
 				child.controlnext.setVisible(true);
-				
-				
-				child.panelSecond.add(child.panelNext,  new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
-						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
-			
+
+				child.panelSecond.add(child.panelNext, new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0,
+						GridBagConstraints.EAST, GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+
 				child.panelSecond.validate();
-				
-				
+
 				JPanel controlprevpanel = new JPanel();
 				JPanel prevpanel = new JPanel();
 				controlprevpanel.add(new JButton(new AbstractAction("Next\u22b3") {
@@ -231,23 +241,21 @@ final Interactive_MTDoubleChannelBasic child;
 						cl.next(child.panelCont);
 					}
 				}));
-				
-				prevpanel.add(controlprevpanel,  new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER,
+
+				prevpanel.add(controlprevpanel, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER,
 						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
-			
+
 				controlprevpanel.setVisible(true);
-				
-				child.panelFirst.add(prevpanel,  new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+
+				child.panelFirst.add(prevpanel, new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 				child.panelFirst.validate();
-			
-				
-					SecondPanel paintsecond = new SecondPanel(parent, child);
-					paintsecond.Paint();
+
+				SecondPanel paintsecond = new SecondPanel(parent, child);
+				paintsecond.Paint();
 			}
-			if (child==null){
-			
-			
+			if (child == null) {
+
 				parent.controlnext.removeAll();
 				parent.controlprevious.removeAll();
 				parent.controlnext.add(new JButton(new AbstractAction("\u22b2Prev") {
@@ -264,7 +272,7 @@ final Interactive_MTDoubleChannelBasic child;
 						cl.previous(parent.panelCont);
 					}
 				}));
-			 
+
 				parent.controlnext.add(new JButton(new AbstractAction("Next\u22b3") {
 
 					/**
@@ -279,18 +287,16 @@ final Interactive_MTDoubleChannelBasic child;
 					}
 				}));
 
-				parent.panelNext.add(parent.controlnext,  new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER,
-						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
-			
+				parent.panelNext.add(parent.controlnext, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+
 				parent.controlnext.setVisible(true);
-				
-				
-				parent.panelSecond.add(parent.panelNext,  new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
-						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
-			
+
+				parent.panelSecond.add(parent.panelNext, new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0,
+						GridBagConstraints.EAST, GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+
 				parent.panelSecond.validate();
-				
-				
+
 				JPanel controlprevpanel = new JPanel();
 				JPanel prevpanel = new JPanel();
 				controlprevpanel.add(new JButton(new AbstractAction("Next\u22b3") {
@@ -306,26 +312,26 @@ final Interactive_MTDoubleChannelBasic child;
 						cl.next(parent.panelCont);
 					}
 				}));
-				
-				prevpanel.add(controlprevpanel,  new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER,
+
+				prevpanel.add(controlprevpanel, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER,
 						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
-			
+
 				controlprevpanel.setVisible(true);
-				
-				parent.panelFirst.add(prevpanel,  new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+
+				parent.panelFirst.add(prevpanel, new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 				parent.panelFirst.validate();
-			
-				
-			
-			ThirdPanel paintthird = new ThirdPanel(parent);
-			paintthird.Paint();
-			
-			
+
+				ThirdPanel paintthird = new ThirdPanel(parent);
+				paintthird.Paint();
+
 			}
-			
+
 			parent.jpb.setIndeterminate(false);
 			get();
+
+			parent.preprocessedimp.getCanvas().removeMouseListener(parent.ml);
+			parent.newends.markendnew();
 			parent.frame.dispose();
 			// JOptionPane.showMessageDialog(jpb.getParent(), "End Points
 			// found and overlayed", "Success",
@@ -335,9 +341,5 @@ final Interactive_MTDoubleChannelBasic child;
 		}
 
 	}
-	
-	
-
-
 
 }

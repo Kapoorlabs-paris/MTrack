@@ -4,6 +4,7 @@ import java.awt.Label;
 import java.awt.Scrollbar;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
+import java.text.DecimalFormat;
 
 public class MaxErrorListener implements AdjustmentListener
 {
@@ -26,6 +27,6 @@ public class MaxErrorListener implements AdjustmentListener
 				InteractiveRANSAC.MIN_ERROR,
 				InteractiveRANSAC.MAX_ERROR );
 
-		label.setText( "Max. Error (px) = " + parent.maxError );
+		label.setText( "Max. Error (px) = " + new DecimalFormat("#.##").format(parent.maxError) );
 	}
 }

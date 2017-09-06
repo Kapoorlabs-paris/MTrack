@@ -77,6 +77,7 @@ import updateListeners.DefaultModel;
 import updateListeners.DefaultModelHF;
 import updateListeners.FinalPoint;
 import updateListeners.Markends;
+import updateListeners.Markendsnew;
 import updateListeners.MoveNextListener;
 import updateListeners.MoveToFrameListener;
 
@@ -108,7 +109,7 @@ public class Interactive_MTDoubleChannelBasic implements PlugIn {
 		parent.doMserSegmentation = true;
 
 		
-		parent.newends = new Markends(parent);
+		parent.newends = new Markendsnew(parent);
 		parent.AllSeedrois = new ArrayList<OvalRoi>();
 		parent.jpb = new JProgressBar();
 		parent.newHoughtree = new HashMap<Integer, MserTree<UnsignedByteType>>();

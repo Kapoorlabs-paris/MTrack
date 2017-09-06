@@ -100,30 +100,26 @@ public class SingleSecondPanel {
 				new EmptyBorder(child.c.insets));
 		
 		
-		
 		final Label LeftClick = new Label(
-				"Left click deselects an end");
-		final Label SLeftClick = new Label( "Shift +  left click reselects a deselected end");
-		final Label SALeftClick = new Label( "Shift + Alt + left click marks a user defined seed.");
+				"Left click deselects/selects an end");
+		final Label SLeftClick = new Label( "Shift +  left click marks a user defined seed");
 		
 		final Label Batchsave = new Label(
 				"Save parameters for batch mode");
 		
-		
-		Deselect.add(LeftClick,new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
+		Deselect.add(timeText,new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
 				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 		
-		Deselect.add(SLeftClick,new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
+
+		Deselect.add(timeslider,new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
 				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 		
-		Deselect.add(SALeftClick,new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
+		Deselect.add(LeftClick,new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
 				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 		
+		Deselect.add(SLeftClick,new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
+				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 		
-		Deselect.add(timeText,new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
-				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
-		Deselect.add(timeslider,new GridBagConstraints(0, 4, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
-				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 		
 		Deselect.setBorder(selectborder);
 		

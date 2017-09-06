@@ -224,11 +224,9 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 
 				labelindex = labelstart.get(0);
 
-			System.out.println(labelindex);
 			
 			if (labelindex != Integer.MIN_VALUE) {
 				paramnextframestart = Getfinaltrackparam(Userframe.get(index), labelstart.get(0), psf, startframe);
-System.out.println(paramnextframestart.currentLabel);
 				double[] currentposini = paramnextframestart.currentpos;
 				double[] previouspos = Userframe.get(index).currentpos;
 				double distmin = Distance(currentposini, previouspos);
@@ -268,7 +266,10 @@ System.out.println(paramnextframestart.currentLabel);
 					/(Userframe.get(index).fixedpos[1] -  Userframe.get(index).fixedpos[0]);
 			
 			double oldintercept = Userframe.get(index).currentpos[1] - oldslope * Userframe.get(index).currentpos[0];
-			double dist = (paramnextframestart.currentpos[1] - oldslope * paramnextframestart.currentpos[0] -oldintercept)/Math.sqrt(1 + oldslope *oldslope);
+			double newslope = (paramnextframestart.currentpos[1] - paramnextframestart.fixedpos[1] ) 
+					/(paramnextframestart.currentpos[0] - paramnextframestart.fixedpos[0]) ;
+			
+			double dist = Math.toDegrees(Math.atan(Math.toRadians((newslope - oldslope)/(1 + newslope * oldslope)))); 
 					
 					//Math.toDegrees(Math.atan(Math.toRadians((newslope - oldslope) / (1 + newslope * oldslope))));
 

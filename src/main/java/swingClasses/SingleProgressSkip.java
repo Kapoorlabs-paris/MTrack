@@ -5,6 +5,7 @@ import java.util.concurrent.ExecutionException;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 
+import ij.IJ;
 import interactiveMT.Interactive_MTSingleChannel;
 import updateListeners.FinalPoint;
 
@@ -49,7 +50,8 @@ final int endtime;
 			parent.jpb.setIndeterminate(false);
 			get();
 			parent.frame.dispose();
-			JOptionPane.showMessageDialog(parent.jpb.getParent(), "Success", "Success", JOptionPane.INFORMATION_MESSAGE);
+			IJ.log("Tracking Done and track files written in the chosen folder");
+
 		} catch (ExecutionException | InterruptedException e) {
 			e.printStackTrace();
 		}

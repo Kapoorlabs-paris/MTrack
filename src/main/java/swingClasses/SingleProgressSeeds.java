@@ -118,6 +118,12 @@ final Interactive_MTSingleChannelBasic child;
 		o.clear();
 		for (int index = 0; index < parent.PrevFrameparam.getA().size(); ++index) {
 
+			if (parent.PrevFrameparam.getB() != null) {
+
+				if (Math.abs(Math.round(parent.PrevFrameparam.getA().get(index).currentpos[0]
+						- parent.PrevFrameparam.getB().get(index).currentpos[0])) > 0
+						&& Math.abs(Math.round(parent.PrevFrameparam.getA().get(index).currentpos[1]
+								- parent.PrevFrameparam.getB().get(index).currentpos[1])) > 0) {
 			parent.Seedroi = new OvalRoi(Util.round(parent.PrevFrameparam.getA().get(index).currentpos[0] - parent.radiusseed),
 					Util.round(parent.PrevFrameparam.getA().get(index).currentpos[1] - parent.radiusseed), Util.round(2 * parent.radiusseed), Util.round(2 * parent.radiusseed));
 			parent.Seedroi.setStrokeColor(parent.colorConfirm);
@@ -128,10 +134,17 @@ final Interactive_MTSingleChannelBasic child;
 			parent.AllSeedrois.add(parent.Seedroi);
 			o.add(parent.Seedroi);
 
+				}
+			}
 		}
 
 		for (int index = 0; index < parent.PrevFrameparam.getB().size(); ++index) {
+			if (parent.PrevFrameparam.getA() != null) {
 
+				if (Math.abs(Math.round(parent.PrevFrameparam.getA().get(index).currentpos[0]
+						- parent.PrevFrameparam.getB().get(index).currentpos[0])) > 0
+						&& Math.abs(Math.round(parent.PrevFrameparam.getA().get(index).currentpos[1]
+								- parent.PrevFrameparam.getB().get(index).currentpos[1])) > 0) {
 			parent.Seedroi = new OvalRoi(Util.round(parent.PrevFrameparam.getB().get(index).currentpos[0] - parent.radiusseed),
 					Util.round(parent.PrevFrameparam.getB().get(index).currentpos[1] - parent.radiusseed), Util.round(2 * parent.radiusseed), Util.round(2 * parent.radiusseed));
 			parent.Seedroi.setStrokeColor(parent.colorConfirm);
@@ -142,6 +155,9 @@ final Interactive_MTSingleChannelBasic child;
 			parent.AllSeedrois.add(parent.Seedroi);
 			o.add(parent.Seedroi);
 
+				}
+				
+			}
 		}
 		for(int index = 0; index < parent.AllSeedrois.size(); ++index){
 			
@@ -301,6 +317,9 @@ final Interactive_MTSingleChannelBasic child;
 			
 			
 			}
+			
+			parent.preprocessedimp.getCanvas().removeMouseListener(parent.ml);
+			parent.newends.markendnew();
 			parent.frame.dispose();
 		}
 		

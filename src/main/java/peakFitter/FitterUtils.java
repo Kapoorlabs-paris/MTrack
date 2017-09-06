@@ -41,7 +41,7 @@ public class FitterUtils {
 	}
 
 	
-	static int cutoff = 2;
+	static int cutoff = 1;
 	public static double[] MakerepeatedLineguess(ArrayList<CommonOutputHF> imgs, Indexedlength iniparam, UserChoiceModel model,  double Intensityratio, double Inispacing, int label, int ndims, 
 			int startframe, int currentframe) {
 

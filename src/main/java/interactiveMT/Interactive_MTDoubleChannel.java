@@ -113,6 +113,7 @@ import updateListeners.DefaultModelHF;
 import updateListeners.FinalPoint;
 import updateListeners.FinalizechoicesListener;
 import updateListeners.Markends;
+import updateListeners.Markendsnew;
 import updateListeners.MoveNextListener;
 import updateListeners.MoveToFrameListener;
 import util.Boundingboxes;
@@ -193,7 +194,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public double Intensityratio = 0.35;
 	public double slopetolerance = 5;
 	public double Inispacing = 0.5;
-	public double maxdist = 10;
+	public double maxdist = 5;
 	public int numgaussians = 2;
 	public int thirdDimensionslider = 1;
 	public int thirdDimensionsliderInit = 1;
@@ -238,6 +239,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public Color colorTrack = Color.yellow;
 	public Color colorLineTrack = Color.GRAY;
 	public Color colorUnselect = Color.MAGENTA;
+	public Color colorUnselectUser = Color.RED;
 	public Color colorConfirm = Color.GREEN;
 	public Color colorUser = Color.ORANGE;
 	public FloatType minval = new FloatType(0);
@@ -302,7 +304,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public int maxSearchradiusInit = 200;
 	public float maxSearchradiusMin = 10;
 	public float maxSearchradiusMax = 500;
-	public Markends newends;
+	public Markendsnew newends;
 	public int missedframesInit = missedframes;
 	public float missedframesMin = 0;
 	public float missedframesMax = 100;
@@ -640,7 +642,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public void run(String arg) {
 
 		usefolder = userfile.getParentFile().getAbsolutePath();
-		 newends = new Markends(this);
+		 newends = new Markendsnew(this);
 		SaveTxt = true;
 
 		
@@ -798,7 +800,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 			preprocessedimp.setTitle("Active image" + " " + "time point : " + thirdDimension);
 			
 			preprocessedimp.getCanvas().removeMouseListener(ml);
-			newends.markend();
+			newends.markendnew();
 			
 			}
 
@@ -2182,7 +2184,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		gd.addNumericField(
 				"Initial Spacing between Gaussians along the Polynomial curve = G * Min(Psf), G (enter positive number) = ",
 				Inispacing / Math.min(psf[0], psf[1]), 2);
-		gd.addNumericField("Maximum direction change per frame (in pixels)", maxdist, 2);
+		gd.addNumericField("Maximum direction change per frame (in degrees)", maxdist, 2);
 
 		
 
@@ -2223,7 +2225,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 				"Initial Spacing between Gaussians along the Polynomial curve = G * Min(Psf), G (enter positive number ) = ",
 				Inispacing / Math.min(psf[0], psf[1]), 2);
 
-		gd.addNumericField("Maximum direction change per frame (in pixels)", maxdist, 2);
+		gd.addNumericField("Maximum direction change per frame (in degrees)", maxdist, 2);
 		gd.addNumericField("Number of Gaussians for mask fits ", numgaussians, 2);
 		
 		gd.showDialog();

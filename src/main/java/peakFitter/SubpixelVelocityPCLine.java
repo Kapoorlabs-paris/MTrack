@@ -300,7 +300,12 @@ public void setMaxdist (double maxdist) {
 						/(PrevFrameparamstart.get(index).currentpos[0] - PrevFrameparamstart.get(index).fixedpos[0]) ;
 			
 				double oldintercept = PrevFrameparamstart.get(index).currentpos[1] - oldslope * PrevFrameparamstart.get(index).currentpos[0];
-				double dist = (paramnextframestart.currentpos[1] - oldslope * paramnextframestart.currentpos[0] -oldintercept)/Math.sqrt(1 + oldslope *oldslope);
+				
+				double newslope = (paramnextframestart.currentpos[1] - paramnextframestart.fixedpos[1] ) 
+						/(paramnextframestart.currentpos[0] - paramnextframestart.fixedpos[0]) ;
+				
+				double dist = Math.toDegrees(Math.atan(Math.toRadians((newslope - oldslope)/(1 + newslope * oldslope)))); 
+						//(paramnextframestart.currentpos[1] - oldslope * paramnextframestart.currentpos[0] -oldintercept)/Math.sqrt(1 + oldslope *oldslope);
 						
 						//newslope - oldslope; 
 						//Math.toDegrees(Math.atan(Math.toRadians((newslope - oldslope)/(1 + newslope * oldslope))));
@@ -409,7 +414,10 @@ public void setMaxdist (double maxdist) {
 						/(PrevFrameparamend.get(index).currentpos[0] - PrevFrameparamend.get(index).fixedpos[0]) ;
 				
 				double oldintercept = PrevFrameparamend.get(index).currentpos[1] - oldslope * PrevFrameparamend.get(index).currentpos[0];
-				double dist = (paramnextframeend.currentpos[1] - oldslope * paramnextframeend.currentpos[0] -oldintercept)/Math.sqrt(1 + oldslope *oldslope);
+				double newslope = (paramnextframeend.currentpos[1] - paramnextframeend.fixedpos[1] ) 
+						/(paramnextframeend.currentpos[0] - paramnextframeend.fixedpos[0]) ;
+				
+				double dist = Math.toDegrees(Math.atan(Math.toRadians((newslope - oldslope)/(1 + newslope * oldslope)))); 
 						
 						//Math.toDegrees(Math.atan(Math.toRadians((newslope - oldslope)/(1 + newslope * oldslope))));
 				System.out.println(dist);

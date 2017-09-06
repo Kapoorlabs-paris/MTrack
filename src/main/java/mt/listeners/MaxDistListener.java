@@ -4,6 +4,7 @@ import java.awt.Label;
 import java.awt.Scrollbar;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
+import java.text.DecimalFormat;
 
 public class MaxDistListener implements AdjustmentListener
 {
@@ -22,6 +23,6 @@ public class MaxDistListener implements AdjustmentListener
 	{
 		parent.maxDist = event.getValue();
 
-		label.setText( "Max. Gap (tp) = " + parent.maxDist );
+		label.setText( "Max. Gap (tp) = " + new DecimalFormat("#.##").format(parent.maxDist) );
 	}
 }

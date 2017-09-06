@@ -61,8 +61,7 @@ public FindLinesListener (final Interactive_MTDoubleChannel parent, final Intera
 		ProgressSeeds trackMT = new ProgressSeeds(parent, child);
 		trackMT.execute();
 		
-		
-		
+	
 		
 		
 		parent.displayBitimg = false;

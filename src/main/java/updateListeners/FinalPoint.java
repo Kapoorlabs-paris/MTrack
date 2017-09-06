@@ -160,10 +160,10 @@ public class FinalPoint implements ActionListener {
 					parent.seedmap.put(i, Whichend.both);
 				}
 
-				else if (parent.seedmap.get(i) == null) {
+				else if (parent.seedmap.get(i) == null) 
 					parent.seedmap.put(i, Whichend.none);
                   
-				}
+				
 			
 			
 		}

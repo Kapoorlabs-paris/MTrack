@@ -99,7 +99,7 @@ public class WriteRatesListener implements ActionListener {
 			FileWriter fwfrequ = new FileWriter(frequfile);
 
 			BufferedWriter bwfrequ = new BufferedWriter(fwfrequ);
-			parent.AllMovies.add(parent.inputfile);
+			parent.AllMoviesB.add(parent.inputfile);
 
 			bw.write("\tStartTime (px)\tEndTime(px)\tLinearRateSlope(px)\n");
 			bwfrequ.write(

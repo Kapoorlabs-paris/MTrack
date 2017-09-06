@@ -1,43 +1,23 @@
 package mt.listeners;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Map;
 
-import fit.AbstractFunction2D;
-import fit.PointFunctionMatch;
-import fit.polynomial.LinearFunction;
-import fit.polynomial.Polynomial;
-import ij.measure.ResultsTable;
-import mpicbg.models.Point;
 import mt.Averagerate;
 import mt.Rateobject;
-import mt.Tracking;
-import net.imglib2.util.Pair;
-import net.imglib2.util.ValuePair;
 
-public class CompileResultsListener implements ActionListener {
+public class CompileRes {
+
 
 	final InteractiveRANSAC parent;
 
-	public CompileResultsListener(final InteractiveRANSAC parent) {
+	public CompileRes(final InteractiveRANSAC parent) {
 		this.parent = parent;
 	}
-
-	@Override
-	public void actionPerformed(final ActionEvent arg0) {
-
-		compileresults();
-
-	}
-
-	
 	public void compileresults() {
 
 
@@ -127,5 +107,5 @@ public class CompileResultsListener implements ActionListener {
 		}
 
 	}
-
+	
 }

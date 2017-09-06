@@ -164,6 +164,7 @@ import updateListeners.SingleDefaultModelHF;
 import updateListeners.SingleFinalPoint;
 import updateListeners.SingleFinalizechoicesListener;
 import updateListeners.SingleMarkends;
+import updateListeners.SingleMarkendsnew;
 import updateListeners.SingleMoveToFrameListener;
 import util.Boundingboxes;
 
@@ -190,7 +191,7 @@ public class Interactive_MTSingleChannel implements PlugIn {
 	boolean Simplemode = false;
 	boolean Advancedmode = false;
 	boolean Kymomode = false;
-	public double maxdist = 20;
+	public double maxdist = 10;
 	public JLabel inputradi;
 	public TextField inputFieldradi;
 	// steps per octave
@@ -201,6 +202,7 @@ public class Interactive_MTSingleChannel implements PlugIn {
 	public float rhoPerPixelMin = new Float(0.2);
 	public MouseListener ml;
 	public MouseListener removeml;
+	public Color colorUnselectUser = Color.RED;
 	public OvalRoi Seedroi;
 	public ArrayList<OvalRoi> AllSeedrois;
 	public float thresholdHoughMin = 0;
@@ -208,7 +210,7 @@ public class Interactive_MTSingleChannel implements PlugIn {
 	public float deltaMax = 400f;
 	public float Unstability_ScoreMin = 0;
 	public float Unstability_ScoreMax = 1;
-	public SingleMarkends newends;
+	public SingleMarkendsnew newends;
 	public int radiusseed = 5;
 	public JLabel inputLabelX;
 	public JLabel inputLabelY;
@@ -673,7 +675,7 @@ public class Interactive_MTSingleChannel implements PlugIn {
 		
 	
 		usefolder  = userfile.getParentFile().getAbsolutePath();
-		 newends = new SingleMarkends(this);
+		 newends = new SingleMarkendsnew(this);
 		SaveTxt = true;
 		
 		
@@ -830,7 +832,7 @@ public class Interactive_MTSingleChannel implements PlugIn {
 			preprocessedimp.setTitle("Active image" + " " + "time point : " + thirdDimension);
 			
 			preprocessedimp.getCanvas().removeMouseListener(ml);
-			newends.markend();
+			newends.markendnew();
 			
 			}
 		if (change == ValueChange.THIRDDIMTrack) {
@@ -2231,7 +2233,7 @@ panelPrevious.removeAll();
 		gd.addNumericField(
 				"Initial Spacing between Gaussians along the Polynomial curve = G * Min(Psf), G (enter positive number) = ",
 				Inispacing / Math.min(psf[0], psf[1]), 2);
-		gd.addNumericField("Maximum direction change per frame (in pixels)", maxdist, 2);
+		gd.addNumericField("Maximum direction change per frame (in degrees)", maxdist, 2);
 
 		if (analyzekymo && Kymoimg != null) {
 			gd.addNumericField(
@@ -2277,7 +2279,7 @@ panelPrevious.removeAll();
 				"Initial Spacing between Gaussians along the Polynomial curve = G * Min(Psf), G (enter positive number ) = ",
 				Inispacing / Math.min(psf[0], psf[1]), 2);
 
-		gd.addNumericField("Maximum direction change per frame (in pixels)", maxdist, 2);
+		gd.addNumericField("Maximum direction change per frame (in degrees)", maxdist, 2);
 		gd.addNumericField("Number of Gaussians for mask fits ", numgaussians, 2);
 		
 		gd.showDialog();

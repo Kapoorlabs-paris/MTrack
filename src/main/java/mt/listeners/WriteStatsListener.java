@@ -139,7 +139,7 @@ public class WriteStatsListener implements ActionListener {
 					  DisplayPoints.display(chart, new Dimension(800, 500));
 	
 
-			LengthDistribution.GetLengthDistributionArray(parent.AllMovies);
+			LengthDistribution.GetLengthDistributionArray(parent.AllMoviesB);
 			
 		
 	}

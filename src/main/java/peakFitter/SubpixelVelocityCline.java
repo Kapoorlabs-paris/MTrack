@@ -275,7 +275,10 @@ System.out.println(thirdDimsize);
 						/(PrevFrameparamstart.get(index).currentpos[0] - PrevFrameparamstart.get(index).fixedpos[0]) ;
 			
 				double oldintercept = PrevFrameparamstart.get(index).currentpos[1] - oldslope * PrevFrameparamstart.get(index).currentpos[0];
-				double dist = (paramnextframe.currentpos[1] - oldslope * paramnextframe.currentpos[0] -oldintercept)/Math.sqrt(1 + oldslope *oldslope);
+				double newslope = (paramnextframe.currentpos[1] - paramnextframe.fixedpos[1] ) 
+						/(paramnextframe.currentpos[0] - paramnextframe.fixedpos[0]) ;
+				
+				double dist = Math.toDegrees(Math.atan(Math.toRadians((newslope - oldslope)/(1 + newslope * oldslope)))); 
 						 
 						//Math.toDegrees(Math.atan(Math.toRadians((newslope - oldslope)/(1 + newslope * oldslope))));
 				
@@ -387,7 +390,10 @@ System.out.println(thirdDimsize);
 		
 				
 				double oldintercept = PrevFrameparamend.get(index).currentpos[1] - oldslope * PrevFrameparamend.get(index).currentpos[0];
-				double dist = (paramnextframeend.currentpos[1] - oldslope * paramnextframeend.currentpos[0] -oldintercept)/Math.sqrt(1 + oldslope *oldslope);
+				double newslope = (paramnextframeend.currentpos[1] - paramnextframeend.fixedpos[1] ) 
+						/(paramnextframeend.currentpos[0] - paramnextframeend.fixedpos[0]) ;
+				
+				double dist = Math.toDegrees(Math.atan(Math.toRadians((newslope - oldslope)/(1 + newslope * oldslope)))); 
 						
 						//Math.toDegrees(Math.atan(Math.toRadians((newslope - oldslope)/(1 + newslope * oldslope))));
 				

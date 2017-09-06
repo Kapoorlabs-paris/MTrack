@@ -20,6 +20,7 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.FilenameFilter;
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -97,7 +98,6 @@ public class InteractiveRANSAC implements PlugIn {
 	public File[] inputfiles;
 	public String inputdirectory;
 	public NumberFormat nf = NumberFormat.getInstance(Locale.ENGLISH);
-
 	public ArrayList<Pair<LinearFunction, ArrayList<PointFunctionMatch>>> linearlist;
 	final Frame  jFreeChartFrame;
 	public int functionChoice = 1; // 0 == Linear, 1 == Quadratic interpolated, 2 ==
@@ -108,6 +108,7 @@ public class InteractiveRANSAC implements PlugIn {
 	ArrayList<Point> points;
 	public final int numTimepoints, minTP, maxTP;
 
+	public int previousrow = 0;
 	public int countfile;
 	Scrollbar lambdaSB;
 	Label lambdaLabel;
@@ -135,7 +136,7 @@ public class InteractiveRANSAC implements PlugIn {
 	public double maxError = 3.0;
 	public double minSlope = 0.1;
 	public double maxSlope = 100;
-	public double restolerance = 10;
+	public double restolerance = 5;
 	public double tptolerance = 2;
 	public int maxDist = 300;
 	public int minInliers = 50;
@@ -143,7 +144,9 @@ public class InteractiveRANSAC implements PlugIn {
 	ArrayList<Pair<Integer, Double>> lifecount  ;
 	public double minDistanceCatastrophe = 2;
 	public final boolean serial;
-	ArrayList<File> AllMovies;
+	File[] AllMovies;
+	
+	ArrayList<File> AllMoviesB;
 	protected boolean wasCanceled = false;
 
 	public InteractiveRANSAC(final ArrayList<Pair<Integer, Double>> mts, File file) {
@@ -244,7 +247,7 @@ public class InteractiveRANSAC implements PlugIn {
 		
 	 lifecount = new ArrayList<Pair<Integer, Double>>();
 	 countfile = 0;
-	 AllMovies = new ArrayList<File>();
+	 AllMoviesB = new ArrayList<File>();
 	 
 	 segments = new ArrayList<Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>>>();
 	 indexedsegments = new HashMap <Integer,   Pair<Double, Double>>(); 
@@ -269,7 +272,8 @@ public class InteractiveRANSAC implements PlugIn {
 	public JPanel panelCont = new JPanel();
 	public JPanel panelFirst = new JPanel();
 	public JPanel panelSecond = new JPanel();
-	private JPanel PanelSelectFile = new JPanel();
+	JPanel PanelSelectFile = new JPanel();
+	JPanel PanelDirectory = new JPanel();
 	private JPanel PanelParameteroptions = new JPanel();
 	private JPanel PanelSavetoFile = new JPanel();
 	private JPanel Panelfunction = new JPanel();
@@ -278,17 +282,33 @@ public class InteractiveRANSAC implements PlugIn {
 	public JTable table;
 	JFileChooser chooserA;
 	String choosertitleA;
+	DefaultTableModel userTableModel; 
 	public int row;
-
-	private static final Insets insets = new Insets(10, 0, 0, 0);
+	 public JScrollPane scrollPane ;
+	static final Insets insets = new Insets(10, 0, 0, 0);
 	
 	public final GridBagLayout layout = new GridBagLayout();
 	public final GridBagConstraints c = new GridBagConstraints();
+	Border selectfile = new CompoundBorder(new TitledBorder("Select file"),
+			new EmptyBorder(c.insets));
+	Border selectparam = new CompoundBorder(new TitledBorder("Select Ransac parameters"),
+			new EmptyBorder(c.insets));
+	Border selectslope = new CompoundBorder(new TitledBorder("Slope constraints"),
+			new EmptyBorder(c.insets));
+	
+	Border selectfunction = new CompoundBorder(new TitledBorder("Function for inlier detection"),
+			new EmptyBorder(c.insets));
+
+	Border compileres = new CompoundBorder(new TitledBorder("Compile results"),
+			new EmptyBorder(c.insets));
+	
+	Border selectdirectory = new CompoundBorder(new TitledBorder("Load directory"),
+			new EmptyBorder(c.insets));
 	
          public void CardTable() {
 		
 		CardLayout cl = new CardLayout();
-		DefaultTableModel userTableModel = new DefaultTableModel(new Object[]{"Track File"}, 0) {
+		userTableModel = new DefaultTableModel(new Object[]{"Track File"}, 0) {
 		    @Override
 		    public boolean isCellEditable(int row, int column) {
 		        return false;
@@ -307,7 +327,7 @@ public class InteractiveRANSAC implements PlugIn {
 		
 		  table = new JTable(userTableModel);
 		
-		 JScrollPane scrollPane = new JScrollPane(table);
+		 scrollPane = new JScrollPane(table);
 		 scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 		 scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		 scrollPane.setPreferredSize(new Dimension(300, 200));
@@ -320,6 +340,7 @@ public class InteractiveRANSAC implements PlugIn {
 			Panelfunction.setLayout(layout);
 			Panelslope.setLayout(layout);
 			PanelCompileRes.setLayout(layout);
+			PanelDirectory.setLayout(layout);
 		
 		panelCont.setLayout(cl);
 		
@@ -335,19 +356,7 @@ public class InteractiveRANSAC implements PlugIn {
 		c.gridheight = 10;
 		c.gridy = 1;
 		c.gridx = 0;
-		Border selectfile = new CompoundBorder(new TitledBorder("Select file"),
-				new EmptyBorder(c.insets));
-		Border selectparam = new CompoundBorder(new TitledBorder("Select Ransac parameters"),
-				new EmptyBorder(c.insets));
-		Border selectslope = new CompoundBorder(new TitledBorder("Slope constraints"),
-				new EmptyBorder(c.insets));
-		
-		Border selectfunction = new CompoundBorder(new TitledBorder("Function for inlier detection"),
-				new EmptyBorder(c.insets));
-
-		Border compileres = new CompoundBorder(new TitledBorder("Compile results"),
-				new EmptyBorder(c.insets));
-		
+	
 		final Scrollbar maxErrorSB = new Scrollbar(Scrollbar.HORIZONTAL, this.maxErrorInt, 1, MIN_SLIDER,
 				MAX_SLIDER + 1);
 		final Scrollbar minInliersSB = new Scrollbar(Scrollbar.HORIZONTAL, this.minInliers, 1, 2, numTimepoints + 1);
@@ -359,17 +368,17 @@ public class InteractiveRANSAC implements PlugIn {
 
 		final Choice choice = new Choice();
 		choice.add("Linear Function only");
-		choice.add("Quadratic function regularized with Linear Function");
-		choice.add("Cubic Function regularized with Linear Function");
+		choice.add("Linearized Quadratic function");
+		choice.add("Linearized Cubic function");
 
 		this.lambdaSB = new Scrollbar(Scrollbar.HORIZONTAL, this.lambdaInt, 1, MIN_SLIDER, MAX_SLIDER + 1);
 
-		final Label maxErrorLabel = new Label("Max. Error (pixels) (px)) = " + this.maxError, Label.CENTER);
-		final Label minInliersLabel = new Label("Min. #Points (timepoints (tp) = " + this.minInliers, Label.CENTER);
-		final Label maxDistLabel = new Label("Max. Gap (tp) = " + this.maxDist, Label.CENTER);
-		this.lambdaLabel = new Label("Linearity (fraction) = " + this.lambda, Label.CENTER);
-		final Label minSlopeLabel = new Label("Min. Segment Slope (px/tp) = " + Math.round(this.minSlope), Label.CENTER);
-		final Label maxSlopeLabel = new Label("Max. Segment Slope (px/tp) = " + Math.round(this.maxSlope), Label.CENTER);
+		final Label maxErrorLabel = new Label("Max. Error (pixels) (px)) = " + new DecimalFormat("#.##").format(this.maxError), Label.CENTER);
+		final Label minInliersLabel = new Label("Min. #Points (timepoints (tp) = " + new DecimalFormat("#.##").format(this.minInliers), Label.CENTER);
+		final Label maxDistLabel = new Label("Max. Gap (tp) = " + new DecimalFormat("#.##").format(this.maxDist), Label.CENTER);
+		this.lambdaLabel = new Label("Linearity (fraction) = " + new DecimalFormat("#.##").format(this.lambda), Label.CENTER);
+		final Label minSlopeLabel = new Label("Min. Segment Slope (px/tp) = " + new DecimalFormat("#.##").format(this.minSlope), Label.CENTER);
+		final Label maxSlopeLabel = new Label("Max. Segment Slope (px/tp) = " + new DecimalFormat("#.##").format(this.maxSlope), Label.CENTER);
 		final Label maxResLabel = new Label(
 				"MT is rescued if the start of event# i + 1 > start of event# i by px =  " + this.restolerance,
 				Label.CENTER);
@@ -385,21 +394,28 @@ public class InteractiveRANSAC implements PlugIn {
 		final Button batch = new Button("Save Parameters for Batch run");
 		final Button cancel = new Button("Cancel");
 		final Button Compile = new Button("Compile results till current file");
+		final Button AutoCompile = new Button("Auto Fit and compile results");
+		final Button Measureserial = new Button("Select directory of MTV tracker generated files");
 		
 		final Button WriteStats = new Button("Compute Length and Lifetime distribution");
 		final Button WriteAgain = new Button("Save Rates and Frequencies to File");
 		choice.select(functionChoice);
 		setFunction();
 
-		
+		PanelDirectory.add(Measureserial,  new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST,
+				GridBagConstraints.HORIZONTAL, insets, 0, 0));
 	
+		PanelDirectory.setBorder(selectdirectory);
+		panelFirst.add(PanelDirectory,  new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
+				GridBagConstraints.RELATIVE, new Insets(10, 10, 0, 10), 0, 0));
+		
 		
 		PanelSelectFile.add(scrollPane,  new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST,
 				GridBagConstraints.HORIZONTAL, insets, 0, 0));
 		
 		PanelSelectFile.setBorder(selectfile);
 		
-		panelFirst.add(PanelSelectFile, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
+		panelFirst.add(PanelSelectFile, new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
 				GridBagConstraints.RELATIVE, new Insets(10, 10, 0, 10), 0, 0));
 		
 		
@@ -433,7 +449,7 @@ public class InteractiveRANSAC implements PlugIn {
 				GridBagConstraints.RELATIVE, insets, 0, 0) );
 		
 		Panelfunction.setBorder(selectfunction);
-		panelFirst.add(Panelfunction, new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER,
+		panelFirst.add(Panelfunction, new GridBagConstraints(3, 1, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
 				GridBagConstraints.RELATIVE, new Insets(10, 10, 0, 10), 0, 0));
 		
 		
@@ -455,96 +471,23 @@ public class InteractiveRANSAC implements PlugIn {
 				GridBagConstraints.RELATIVE, insets, 0, 0) );
 	     Panelslope.setBorder(selectslope);
 		
-		panelFirst.add(Panelslope, new GridBagConstraints(5, 2, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+		panelFirst.add(Panelslope, new GridBagConstraints(3, 2, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
 				GridBagConstraints.RELATIVE, new Insets(10, 10, 0, 10), 0, 0));
 		
 		
 		PanelCompileRes.add(Compile,new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
 				GridBagConstraints.RELATIVE, insets, 0, 0) );
+		PanelCompileRes.add(AutoCompile,new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
+				GridBagConstraints.RELATIVE, insets, 0, 0) );
+	
 		PanelCompileRes.setBorder(compileres);
 		
-		panelFirst.add(PanelCompileRes,  new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+		panelFirst.add(PanelCompileRes,  new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 		
 		
 		
-	
-		
-		/*
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.gridx = 0;
-		c.gridy = 0;
-		c.weightx = 1;
-		
-		++c.gridy;
-		c.insets = new Insets(10, 10, 0, 50);
-		panelFirst.add(scrollPane, c);
-		
-		
-		++c.gridy;
-		panelSecond.add(maxErrorSB, c);
-
-		++c.gridy;
-		panelSecond.add(maxErrorLabel, c);
-
-		++c.gridy;
-		c.insets = new Insets(10, 0, 0, 0);
-		panelSecond.add(minInliersSB, c);
-		c.insets = new Insets(0, 0, 0, 0);
-
-		++c.gridy;
-		panelSecond.add(minInliersLabel, c);
-
-		++c.gridy;
-		c.insets = new Insets(10, 0, 0, 0);
-		panelSecond.add(maxDistSB, c);
-		c.insets = new Insets(0, 0, 0, 0);
-
-		++c.gridy;
-		panelSecond.add(maxDistLabel, c);
-
-		++c.gridy;
-		c.insets = new Insets(30, 0, 0, 0);
-		panelSecond.add(choice, c);
-		c.insets = new Insets(0, 0, 0, 0);
-
-		++c.gridy;
-		c.insets = new Insets(10, 0, 0, 0);
-		panelSecond.add(lambdaSB, c);
-		c.insets = new Insets(0, 0, 0, 0);
-
-		++c.gridy;
-		panelSecond.add(lambdaLabel, c);
-
-		++c.gridy;
-		c.insets = new Insets(30, 0, 0, 0);
-		panelSecond.add(minSlopeSB, c);
-		c.insets = new Insets(0, 0, 0, 0);
-
-		++c.gridy;
-		panelSecond.add(minSlopeLabel, c);
-
-		++c.gridy;
-		c.insets = new Insets(10, 0, 0, 0);
-		panelSecond.add(maxSlopeSB, c);
-		c.insets = new Insets(0, 0, 0, 0);
-
-		++c.gridy;
-		panelSecond.add(maxSlopeLabel, c);
-
-		++c.gridy;
-		c.insets = new Insets(20, 120, 0, 120);
-		panelSecond.add(findCatastrophe, c);
-		c.insets = new Insets(0, 0, 0, 0);
-
-		++c.gridy;
-		c.insets = new Insets(10, 0, 0, 0);
-		panelSecond.add(minCatDist, c);
-		c.insets = new Insets(0, 0, 0, 0);
-
-		++c.gridy;
-		panelSecond.add(minCatDistLabel, c);
-
+	/*
 		++c.gridy;
 		c.insets = new Insets(20, 120, 0, 120);
 		panelFirst.add(Write, c);
@@ -587,8 +530,9 @@ public class InteractiveRANSAC implements PlugIn {
 		findCatastrophe
 				.addItemListener(new CatastrophyCheckBoxListener(this, findCatastrophe, minCatDistLabel, minCatDist));
 		minCatDist.addAdjustmentListener(new MinCatastrophyDistanceListener(this, minCatDistLabel, minCatDist));
-
+        Measureserial.addActionListener(new MeasureserialListener(this));
 		Compile.addActionListener(new CompileResultsListener(this));
+		AutoCompile.addActionListener(new AutoCompileResultsListener(this, row));
 		WriteStats.addActionListener(new WriteStatsListener(this));
 		WriteAgain.addActionListener(new WriteRatesListener(this));
 		done.addActionListener(new FinishButtonListener(this, false));
@@ -597,7 +541,6 @@ public class InteractiveRANSAC implements PlugIn {
 		
 		
 		panelFirst.setVisible(true);
-		panelSecond.setVisible(true);
 		
 		
 		
@@ -606,7 +549,6 @@ public class InteractiveRANSAC implements PlugIn {
 		
 		Cardframe.add(panelCont, BorderLayout.CENTER);
 	
-	
 		Cardframe.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		Cardframe.pack();
 		Cardframe.setVisible(true);
@@ -614,21 +556,23 @@ public class InteractiveRANSAC implements PlugIn {
 		
 	}
 	
-	
+         CompileRes compile = new CompileRes(this);
          public void displayclicked(final int trackindex){
      		
 
-        	 this.inputfile = inputfiles[trackindex];
-        	 this.inputdirectory = inputfiles[trackindex].getParent();
-     		this.mts = Tracking.loadMT(inputfiles[trackindex]);
+        	 this.inputfile = this.inputfiles[trackindex];
+        	 this.inputdirectory = this.inputfiles[trackindex].getParent();
+     		this.mts = Tracking.loadMT(this.inputfiles[trackindex]);
      		this.points = Tracking.toPoints(mts);
      		linearlist = new ArrayList<Pair<LinearFunction, ArrayList<PointFunctionMatch>>>();
      		dataset.removeAllSeries();
             this.dataset.addSeries(Tracking.drawPoints(mts));
 			Tracking.setColor(chart, 0, new Color(64, 64, 64));
 			Tracking.setStroke(chart, 0, 0.2f);
+	         row = trackindex;
+	         System.out.println(row);
      		updateRANSAC();
-     		
+     		compile.compileresults();
      		
      	}
      	
@@ -673,12 +617,12 @@ public class InteractiveRANSAC implements PlugIn {
 
 		linearsegments.clear();
 		indexedsegments.clear();
-		allrates.clear();
-		averagerates.clear();
+		ArrayList<Rateobject> allrates = new ArrayList<Rateobject>();
+		 ArrayList<Averagerate> averagerates = new ArrayList<Averagerate>();  
 		for ( int i = dataset.getSeriesCount() - 1; i > 0; --i )
 			dataset.removeSeries( i );
 
-		segments =
+		final ArrayList< Pair< AbstractFunction2D, ArrayList< PointFunctionMatch > > > segments =
 				Tracking.findAllFunctions( points, function, maxError, minInliers, maxDist );
 
 		if ( segments == null || segments.size() == 0 )
@@ -692,6 +636,7 @@ public class InteractiveRANSAC implements PlugIn {
 
 		final LinearFunction linear = new LinearFunction();
 		int i = 1, segment = 1, linearcount = 1;
+		
 		int count = 0;
 		int negcount = 0;
 		int rescount = 0;
@@ -703,7 +648,7 @@ public class InteractiveRANSAC implements PlugIn {
 		double growthrate = 0;
 		double shrinkrate = 0;
 
-		double minstartY = leastStart();
+		double minstartY = leastStart(segments);
 
 		double minstartX = Double.MAX_VALUE;
 		double minendX = Double.MAX_VALUE;
@@ -716,9 +661,8 @@ public class InteractiveRANSAC implements PlugIn {
 		ResultsTable rtAll = new ResultsTable();
 		for ( final Pair< AbstractFunction2D, ArrayList< PointFunctionMatch > > result : segments )
 		{
-			if ( LinearFunction.slopeFits( result.getB(), linear, minSlope, maxSlope ) || i > 0 )
+			if ( LinearFunction.slopeFits( result.getB(), linear, minSlope, maxSlope )  )
 			{
-				
 				
 				
 				final Pair< Double, Double > minMax = Tracking.fromTo( result.getB() );
@@ -734,7 +678,7 @@ public class InteractiveRANSAC implements PlugIn {
 				}
 				Polynomial<?, Point> polynomial = (Polynomial) result.getA();
 				
-				sortPoints(points);
+			
 				
 				dataset.addSeries( Tracking.drawFunction( polynomial, minMax.getA(), minMax.getB(), 0.5, "Segment " + segment ) );
 
@@ -758,9 +702,7 @@ public class InteractiveRANSAC implements PlugIn {
 				++i;
 
 				
-				if (points.get(points.size() - 1).getW()[0] - endX >= tptolerance) {
-					double startY = polynomial.predict(startX);
-					double linearrate = linear.getCoefficient(1);
+			
 				if ( functionChoice > 0 )
 				{
 					
@@ -776,7 +718,9 @@ public class InteractiveRANSAC implements PlugIn {
 					
 				
 				}
-				
+				if (points.get(points.size() - 1).getW()[0] - endX >= tptolerance) {
+					double startY = polynomial.predict(startX);
+					double linearrate = linear.getCoefficient(1);
 				if (linearrate > 0 && startY - minstartY > restolerance 
 						&& previousendX.size() > 0 ) {
 					rescount++;
@@ -798,7 +742,6 @@ public class InteractiveRANSAC implements PlugIn {
 					
 					Rateobject rate = new Rateobject(linearrate, (int)startX, (int)endX);
 					allrates.add(rate);
-					Compilepositiverates.put(row, allrates);
 					rt.incrementCounter();
 					rt.addValue("Start time", startX);
 					rt.addValue("End time", endX);
@@ -812,7 +755,7 @@ public class InteractiveRANSAC implements PlugIn {
 				
 				}
 				
-				
+				}
 				
 				dataset.addSeries( Tracking.drawPoints( Tracking.toPairList( result.getB() ), "Inliers " + segment ) );
 
@@ -822,12 +765,14 @@ public class InteractiveRANSAC implements PlugIn {
 
 				++i;
 				++segment;
-				}
+				
 			}
 			else
 			{
 				System.out.println( "Removed segment because slope is wrong." );
+
 			}
+		
 		}
 
 		if ( this.detectCatastrophe )
@@ -901,7 +846,6 @@ public class InteractiveRANSAC implements PlugIn {
 							
 							Rateobject rate = new Rateobject(linearrate, (int)startX, (int)endX);
 							allrates.add(rate);
-							Compilenegativerates.put(row, allrates);
 									Tracking.setColor( chart, i, new Color( 0, 0, 255 ) );
 									Tracking.setDisplayType( chart, i, true, false );
 									Tracking.setStroke( chart, i, 2f );
@@ -968,6 +912,8 @@ public class InteractiveRANSAC implements PlugIn {
 
 		Averagerate avrate = new Averagerate(averagegrowth, averageshrink, catfrequ, resfrequ);
 		averagerates.add(avrate);
+		Compilepositiverates.put(row, allrates);
+
         Compileaverage.put(row, avrate);
 		 
 		--updateCount;
@@ -1013,7 +959,7 @@ public class InteractiveRANSAC implements PlugIn {
 
 	}
 
-	public double leastStart() {
+	public double leastStart(final ArrayList< Pair< AbstractFunction2D, ArrayList< PointFunctionMatch > > > segments ) {
 
 		double minstartY = Double.MAX_VALUE;
 
