@@ -1273,7 +1273,7 @@ private static final Insets insets = new Insets(10, 0, 0, 0);
 				panelFirst.add(Methodchoice,  new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 				
-				
+/*				
 				Directoryoptions.add(inputField,  new GridBagConstraints(0, 4, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
 						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0) );
 				Directoryoptions.add(ChooseDirectory,  new GridBagConstraints(0, 5, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
@@ -1286,7 +1286,7 @@ private static final Insets insets = new Insets(10, 0, 0, 0);
 				panelFirst.add(Directoryoptions, new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 
-
+*/
 		       
 				panelFirst.setVisible(true);
 				cl.show(panelCont, "1");

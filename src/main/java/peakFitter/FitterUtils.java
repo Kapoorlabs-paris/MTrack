@@ -64,7 +64,7 @@ public class FitterUtils {
 			
 			
 			Pair<double[], double[]> minmaxpair = FitterUtils.MakeinitialEndpointguess(imgs, maxintensityline,
-					Intensityratio, ndims, labelindex, axisslope, axisintercept,
+					Intensityratio, ndims, labelindex, axisslope, axisintercept, iniparam.slope, iniparam.intercept,
 					iniparam.Curvature, iniparam.Inflection, startframe, currentframe);
 			
 			
@@ -166,7 +166,7 @@ public class FitterUtils {
 			return null;
 	}
 	
-	public static double[] MakeimprovedLineguess(ArrayList<CommonOutput> imgs, double slope, double intercept, double Curvature, double Inflection, double Intensityratio, double Inispacing,
+	public static double[] MakeimprovedLineguess(ArrayList<CommonOutput> imgs, double slope, double intercept, double zeroslope, double zerointercept, double Curvature, double Inflection, double Intensityratio, double Inispacing,
 			double[] psf, int label, int startframe, int currentframe)  {
 		
 		
@@ -194,9 +194,15 @@ public class FitterUtils {
        			
        			inputcursor.fwd();
        			inputcursor.localize(newposition);
-       			double distline = Math.abs(inputcursor.getDoublePosition(1) - slope * inputcursor.getDoublePosition(0) - intercept) / Math.sqrt(1 + slope * slope);
+       			double distline = 0;
+       			
+       			if (currentframe <= startframe + 1)
+       				distline = Math.abs(inputcursor.getDoublePosition(1) - zeroslope * inputcursor.getDoublePosition(0) - zerointercept) / Math.sqrt(1 + zeroslope * zeroslope);
+       			
+       			else
+       				distline =	Math.abs(inputcursor.getDoublePosition(1) - slope * inputcursor.getDoublePosition(0) - intercept) / Math.sqrt(1 + slope * slope);
        					
-       			if (currentframe > startframe + 1){
+       		
        			if (distline < cutoff){
        				
        				if (inputcursor.getDoublePosition(0) <= minVal[0]
@@ -211,23 +217,7 @@ public class FitterUtils {
     					maxVal[1] = inputcursor.getDoublePosition(1);
     				}
        			}
-       			}
        			
-       			else{
-       				
-       				if (inputcursor.getDoublePosition(0) <= minVal[0]
-    						&& inputcursor.get().get() / maxintensityline > Intensityratio) {
-    					minVal[0] = inputcursor.getDoublePosition(0);
-    					minVal[1] = inputcursor.getDoublePosition(1);
-    				}
-
-    				if (inputcursor.getDoublePosition(0) >= maxVal[0]
-    						&& inputcursor.get().get() / maxintensityline > Intensityratio) {
-    					maxVal[0] = inputcursor.getDoublePosition(0);
-    					maxVal[1] = inputcursor.getDoublePosition(1);
-    				}
-       				
-       			}
        			
        			
         	   }
@@ -335,6 +325,7 @@ public class FitterUtils {
 				labelindex = index;
 
 			}
+		
 		}
 
 		return labelindex;
@@ -414,7 +405,7 @@ public class FitterUtils {
 	}
 
 	public static final Pair<double[], double[]> MakeinitialEndpointguess(ArrayList<CommonOutputHF> imgs,
-			double maxintensityline, double Intensityratio, int ndims, int label, double slope, double intercept,
+			double maxintensityline, double Intensityratio, int ndims, int label, double slope, double intercept, double zeroslope, double zerointercept,
 			double Curvature, double Inflection, final int startframe, final int currentframe) {
 		long[] newposition = new long[ndims];
 		double[] minVal = { Double.MAX_VALUE, Double.MAX_VALUE };
@@ -433,9 +424,14 @@ public class FitterUtils {
 			outcursor.fwd();
 
 			outcursor.localize(newposition);
-
-			double distline = Math.abs(outcursor.getDoublePosition(1) - slope * outcursor.getDoublePosition(0) - intercept) / Math.sqrt(1 + slope * slope);
-		if (currentframe > startframe + 1){
+			double distline = 0;
+   			
+   			if (currentframe <= startframe + 1)
+   				distline = Math.abs(outcursor.getDoublePosition(1) - zeroslope * outcursor.getDoublePosition(0) - zerointercept) / Math.sqrt(1 + zeroslope * zeroslope);
+   			
+   			else
+   				distline =	Math.abs(outcursor.getDoublePosition(1) - slope * outcursor.getDoublePosition(0) - intercept) / Math.sqrt(1 + slope * slope);
+   					
                 if (distline < cutoff){			
 				if (outcursor.getDoublePosition(0) <= minVal[0]
 						&& outcursor.get().get() / maxintensityline > Intensityratio) {
@@ -451,25 +447,9 @@ public class FitterUtils {
 				}
 
                 }
-		}
 		
-		else{
 			
-			if (outcursor.getDoublePosition(0) <= minVal[0]
-					&& outcursor.get().get() / maxintensityline > Intensityratio) {
-				minVal[0] = outcursor.getDoublePosition(0);
-				minVal[1] = outcursor.getDoublePosition(1);
-			}
-
-			if (outcursor.getDoublePosition(0) >= maxVal[0]
-					&& outcursor.get().get() / maxintensityline > Intensityratio) {
-				maxVal[0] = outcursor.getDoublePosition(0);
-				maxVal[1] = outcursor.getDoublePosition(1);
-
-			}
-			
-			
-		}
+		
 		
 		}
 		Pair<double[], double[]> minmaxpair = new ValuePair<double[], double[]>(minVal, maxVal);

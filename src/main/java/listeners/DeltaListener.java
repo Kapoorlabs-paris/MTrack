@@ -33,9 +33,15 @@ public class DeltaListener implements AdjustmentListener {
     	   deltaScrollbar.addMouseListener( new StandardMouseListener( parent,ValueChange.SHOWMSERinHough ) );
 			
 		}
-       else
+       else if (parent.FindLinesViaMSER)
 		deltaScrollbar.addMouseListener( new StandardMouseListener( parent, ValueChange.SHOWMSER ) );
 
+       else{
+    	   
+    	   deltaScrollbar.addMouseListener( new StandardMouseListener( parent,ValueChange.SHOWHOUGH ) );
+    	   deltaScrollbar.addMouseListener( new StandardMouseListener( parent,ValueChange.SHOWMSERinHough ) );
+    	   
+       }
 		
 		
 	}

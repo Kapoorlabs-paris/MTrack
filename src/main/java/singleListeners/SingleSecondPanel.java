@@ -57,7 +57,7 @@ public class SingleSecondPanel {
 		
 		
 		// Panel Second
-		
+		parent.panelSecond.removeAll();
 		Deselect.setLayout(child.layout);
 		Timeselect.setLayout(child.layout);
 		Batchselect.setLayout(child.layout);

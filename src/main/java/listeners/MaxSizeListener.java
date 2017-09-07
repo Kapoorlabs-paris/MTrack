@@ -30,9 +30,18 @@ if (parent.FindLinesViaHOUGH){
 	maxsizeScrollbar.addMouseListener( new StandardMouseListener( parent,ValueChange.SHOWMSERinHough ) );
 						
 					}
-else
+else if (parent.FindLinesViaMSER)
+
 		maxsizeScrollbar.addMouseListener( new StandardMouseListener( parent, ValueChange.SHOWMSER ) );
+
+else{
+	maxsizeScrollbar.addMouseListener( new StandardMouseListener( parent,ValueChange.SHOWHOUGH ) );
+	maxsizeScrollbar.addMouseListener( new StandardMouseListener( parent,ValueChange.SHOWMSERinHough ) );
+	
+}
 	}
+	
+		
 
 	@Override
 	public void adjustmentValueChanged(final AdjustmentEvent event) {

@@ -396,31 +396,21 @@ public class DrawingUtils {
 
 		return KDtreeroi;
 	}
-	public static double Distance(final double[] cordone, final double[] cordtwo) {
-
-		double distance = 0;
-
-		int ndims = cordone.length;
-		for (int d = 0; d < ndims; ++d) {
-
-			distance += Math.pow((cordone[d] - cordtwo[d]), 2);
-
-		}
-		return Math.sqrt(distance);
-	}
 
 	public static ArrayList<EllipseRoi> getcurrentRois(MserTree<UnsignedByteType> newtree,
 			ArrayList<double[]> AllmeanCovar) {
 
+		ArrayList<double[]> redmeanandcovlist = new ArrayList<double[]>();
+		ArrayList<double[]> meanandcovchildlist = new ArrayList<double[]>();
+		ArrayList<double[]> meanandcovlist = new ArrayList<double[]>();
 		final HashSet<Mser<UnsignedByteType>> rootset = newtree.roots();
-
-		ArrayList<EllipseRoi> Allrois = new ArrayList<EllipseRoi>();
-
-		ArrayList<EllipseRoi> Allroiscopy = new ArrayList<EllipseRoi>();
+		
+		
 		final Iterator<Mser<UnsignedByteType>> rootsetiterator = rootset.iterator();
-
+		
+		
 		AllmeanCovar = new ArrayList<double[]>();
-
+		
 		while (rootsetiterator.hasNext()) {
 
 			Mser<UnsignedByteType> rootmser = rootsetiterator.next();
@@ -429,14 +419,66 @@ public class DrawingUtils {
 
 				final double[] meanandcov = { rootmser.mean()[0], rootmser.mean()[1], rootmser.cov()[0],
 						rootmser.cov()[1], rootmser.cov()[2] };
-				AllmeanCovar.add(meanandcov);
+				meanandcovlist.add(meanandcov);
 
 			}
 		}
+		
+		// We do this so the ROI remains attached the the same label and is not changed if the program is run again
+	   
+	       final Iterator<Mser<UnsignedByteType>> treeiterator = newtree.iterator();
+	       
+	       while (treeiterator.hasNext()) {
 
-		// We do this so the ROI remains attached the the same label and is not
-		// changed if the program is run again
-		SortListbyproperty.sortpointList(AllmeanCovar);
+				Mser<UnsignedByteType> mser = treeiterator.next();
+				//System.out.println(mser.getChildren().size());
+				if (mser.getChildren().size()  > 1) {
+
+					for (int index = 0; index < mser.getChildren().size(); ++index) {
+
+						final double[] meanandcovchild = { mser.getChildren().get(index).mean()[0],
+								mser.getChildren().get(index).mean()[1], mser.getChildren().get(index).cov()[0],
+								mser.getChildren().get(index).cov()[1], mser.getChildren().get(index).cov()[2] };
+
+						meanandcovchildlist.add(meanandcovchild);
+						AllmeanCovar.add(meanandcovchild);
+						
+					}
+
+				}
+
+			}
+	       redmeanandcovlist = meanandcovlist;
+			for (int childindex = 0; childindex < meanandcovchildlist.size(); ++childindex) {
+
+				final double[] meanchild = new double[] { meanandcovchildlist.get(childindex)[0],
+						meanandcovchildlist.get(childindex)[1] };
+
+				for (int index = 0; index < meanandcovlist.size(); ++index) {
+
+					final double[] mean = new double[] { meanandcovlist.get(index)[0], meanandcovlist.get(index)[1] };
+					final double[] covar = new double[] { meanandcovlist.get(index)[2], meanandcovlist.get(index)[3],
+							meanandcovlist.get(index)[4] };
+					final EllipseRoi ellipse = createEllipse(mean, covar, 3);
+
+					if (ellipse.contains((int) meanchild[0], (int) meanchild[1]))
+						redmeanandcovlist.remove(index);
+
+				}
+
+			}
+
+			for (int index = 0; index < redmeanandcovlist.size(); ++index) {
+
+				final double[] meanandcov = new double[] { redmeanandcovlist.get(index)[0], redmeanandcovlist.get(index)[1],
+						redmeanandcovlist.get(index)[2], redmeanandcovlist.get(index)[3], redmeanandcovlist.get(index)[4] };
+				AllmeanCovar.add(meanandcov);
+
+			}
+
+		ArrayList<EllipseRoi> Allrois = new ArrayList<EllipseRoi>();
+
+		
 		for (int index = 0; index < AllmeanCovar.size(); ++index) {
 
 			final double[] mean = { AllmeanCovar.get(index)[0], AllmeanCovar.get(index)[1] };
@@ -450,7 +492,6 @@ public class DrawingUtils {
 		}
 
 		return Allrois;
-
 	}
 
 	public static ArrayList<EllipseRoi> getcurrentRoisInt(MserTree<UnsignedByteType> newtree,

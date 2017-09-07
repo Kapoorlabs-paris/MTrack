@@ -110,6 +110,8 @@ public class SegMethodListener implements ActionListener {
 						parent.thirdDimension, parent.thirdDimensionSize);
 			}
 			parent.updatePreview(ValueChange.THIRDDIM);
+			parent.updatePreview(ValueChange.SHOWHOUGH);
+			parent.updatePreview(ValueChange.SHOWMSERinHough);
 			parent.UpdateHough();
 
 			

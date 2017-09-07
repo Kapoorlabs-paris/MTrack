@@ -319,7 +319,7 @@ public class Interactive_MTSingleChannelBasic implements PlugIn {
 	  panelFirst.add(Mserparam, new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 
-	  
+	 /* 
 		Directoryoptions.add(inputField,  new GridBagConstraints(0, 4, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
 				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0) );
 		Directoryoptions.add(ChooseDirectory,  new GridBagConstraints(0, 5, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
@@ -330,7 +330,7 @@ public class Interactive_MTSingleChannelBasic implements PlugIn {
 	   panelFirst.add(Directoryoptions, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));	
 	  
-	  
+	  */
 
 
 	

@@ -56,7 +56,7 @@ public class ThirdPanel {
 		// Panel Third
 		
 		
-		
+		parent.panelThird.removeAll();
 		Deselect.setLayout(parent.layout);
 		Timeselect.setLayout(parent.layout);
 		Segselect.setLayout(parent.layout);

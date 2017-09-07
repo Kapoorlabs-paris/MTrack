@@ -10,6 +10,7 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.text.DecimalFormat;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -152,22 +153,25 @@ public class FireTrigger implements ActionListener {
 		ImagePlus impB = new Opener().openImage(parent.chooserB.getSelectedFile().getPath());
 		// Tracking is done with imageA measurment is performed on
 		// imageB
-		parent.inputFieldcalX.setText(String.valueOf(impB.getCalibration().pixelWidth));
-		parent.inputFieldcalY.setText(String.valueOf(impB.getCalibration().pixelHeight));
-		parent.inputFieldT.setText(String.valueOf(impB.getCalibration().pixelDepth));
-		parent.inputFieldX.setText(String.valueOf(parent.psf[0]));
-		parent.inputFieldY.setText(String.valueOf(parent.psf[1]));
+		parent.inputFieldcalX.setText(String.valueOf(new DecimalFormat("#.###").format(impB.getCalibration().pixelWidth)));
+		parent.inputFieldcalY.setText(String.valueOf(new DecimalFormat("#.###").format(impB.getCalibration().pixelHeight)));
+		parent.inputFieldT.setText(String.valueOf(new DecimalFormat("#.###").format(impB.getCalibration().pixelDepth)));
+		parent.inputFieldX.setText(String.valueOf(new DecimalFormat("#.###").format(parent.psf[0])));
+		parent.inputFieldY.setText(String.valueOf(new DecimalFormat("#.###").format(parent.psf[1])));
 	
 		
 		TextField LoadtrackText = new TextField(
 				"Image read: " + parent.chooserB.getSelectedFile());
 		LoadtrackText.setColumns(30);
 		new Normalize();
-		
+		/*
 		parent.panelIntro.add(LoadtrackText, new GridBagConstraints(0, 4, 20, 1, 0.0, 0.0, GridBagConstraints.CENTER,
 				GridBagConstraints.HORIZONTAL, new Insets(0, 10, 0, 10), 0, 0));
 		parent.panelIntro.validate();
 		parent.frame.pack();
+		*/
+		
+		
 		parent.originalimg = ImageJFunctions.convertFloat(impB);
 
 		final FloatType type = parent.originalimg.randomAccess().get().createVariable();
@@ -180,7 +184,7 @@ public class FireTrigger implements ActionListener {
 		parent.addToName = parent.inputField.getText();
 		parent.panelIntro.validate();
 		
-		LoadtrackText.addTextListener(new InputListener(this, parent));
+	//	LoadtrackText.addTextListener(new InputListener(this, parent));
 		if (selectedindex == 0)
 		{
 			// Open Hyperstack images

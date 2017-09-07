@@ -33,9 +33,13 @@ if (parent.FindLinesViaHOUGH){
 	minDiversityScrollbar.addMouseListener( new StandardMouseListener( parent,ValueChange.SHOWMSERinHough ) );
 				
 			}
-else
+else if (parent.FindLinesViaMSER)
 		minDiversityScrollbar .addMouseListener( new StandardMouseListener( parent,ValueChange.SHOWMSER ) );
-
+else{
+	minDiversityScrollbar.addMouseListener( new StandardMouseListener( parent,ValueChange.SHOWHOUGH ) );
+	minDiversityScrollbar.addMouseListener( new StandardMouseListener( parent,ValueChange.SHOWMSERinHough ) );
+	
+}
 	}
 	
 

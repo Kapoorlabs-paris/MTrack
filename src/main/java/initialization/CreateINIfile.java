@@ -110,7 +110,6 @@ public class CreateINIfile {
 		
 		Prefs.set("RoiViaWatershed.boolean", parent.RoisViaWatershed);
 		
-		Prefs.set("SaveTxt.boolean", parent.SaveTxt);
 		
 		Prefs.savePreferences();
 		

@@ -127,7 +127,7 @@ public class MainFileChooser extends JPanel {
 		Border border = new CompoundBorder(new TitledBorder("1.1 Choose Mode"), new EmptyBorder(c.insets));
 		Border microborder = new CompoundBorder(new TitledBorder("1.3 Microscope Parameters"), new EmptyBorder(c.insets));
 		Border runborder = new CompoundBorder(new TitledBorder("1.4 Preprocessing Options"), new EmptyBorder(c.insets));
-		Border origborder = new CompoundBorder(new TitledBorder("1.2 Open movie"), new EmptyBorder(c.insets));
+		Border origborder = new CompoundBorder(new TitledBorder("1.2 Open movie and enter filename for results files"), new EmptyBorder(c.insets));
 
 		
 
@@ -165,7 +165,7 @@ public class MainFileChooser extends JPanel {
 		JComboBox<String> ChooseImage = new JComboBox<String>(Imagetype);
 		JComboBox<String> ChoosepreImage = new JComboBox<String>(preimage);
 		
-		final JButton ChooseDirectory = new JButton("Choose Directory");
+		final JButton ChooseDirectory = new JButton("Choose Directory to save results in");
 	   
 		
 		

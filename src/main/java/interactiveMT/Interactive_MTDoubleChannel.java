@@ -195,6 +195,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public double slopetolerance = 5;
 	public double Inispacing = 0.5;
 	public double maxdist = 10;
+	public double zerodist = 30;
 	public int numgaussians = 2;
 	public int thirdDimensionslider = 1;
 	public int thirdDimensionsliderInit = 1;
@@ -339,8 +340,8 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public RandomAccessibleInterval<FloatType> CurrentView;
 	public RandomAccessibleInterval<FloatType> CurrentPreprocessedView;
 
-	public int inix = 1;
-	public int iniy = 1;
+	public int inix = 0;
+	public int iniy = 0;
 	public double[] calibration;
 	public double radiusfactor = 1;
 	public MserTree<UnsignedByteType> newtree;
@@ -894,11 +895,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 			}
 		}
 		// if we got some mouse click but the ROI did not change we can return
-		if (!roiChanged && change == ValueChange.ROI) {
-			isComputing = false;
-			return;
-		}
-
+	
 		// Re-compute MSER ellipses if neccesary
 		ArrayList<EllipseRoi> Rois = new ArrayList<EllipseRoi>();
 
@@ -1222,17 +1219,17 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 		
 		
-		Directoryoptions.add(inputField,  new GridBagConstraints(0, 4, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
-				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0) );
-		Directoryoptions.add(ChooseDirectory,  new GridBagConstraints(0, 5, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
-				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0) );
+	//	Directoryoptions.add(inputField,  new GridBagConstraints(0, 4, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
+	//			GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0) );
+	//	Directoryoptions.add(ChooseDirectory,  new GridBagConstraints(0, 5, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
+	//			GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0) );
 	
-		Directoryoptions.setBorder(dirborder);
+	//	Directoryoptions.setBorder(dirborder);
 
 		
 		
-		panelFirst.add(Directoryoptions, new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
-				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+	//	panelFirst.add(Directoryoptions, new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+	//			GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 
 
        

@@ -84,11 +84,10 @@ public class LinefinderInteractiveHFMSER implements LinefinderHF{
         final FloatType type = source.randomAccess().get().createVariable();
 		
 
+    	ArrayList<double[]> redmeanandcovlist = new ArrayList<double[]>();
+		ArrayList<double[]> meanandcovchildlist = new ArrayList<double[]>();
 		ArrayList<double[]> ellipselist = new ArrayList<double[]>();
 		ArrayList<double[]> meanandcovlist = new ArrayList<double[]>();
-		
-		
-		
 		final HashSet<Mser<UnsignedByteType>> rootset = newtree.roots();
 		
 		
@@ -102,21 +101,67 @@ public class LinefinderInteractiveHFMSER implements LinefinderHF{
 			Mser<UnsignedByteType> rootmser = rootsetiterator.next();
 
 			if (rootmser.size() > 0) {
-                
-				
-				
-				
+
 				final double[] meanandcov = { rootmser.mean()[0], rootmser.mean()[1], rootmser.cov()[0],
 						rootmser.cov()[1], rootmser.cov()[2] };
 				meanandcovlist.add(meanandcov);
-				ellipselist.add(meanandcov);
 
 			}
 		}
 		
 		// We do this so the ROI remains attached the the same label and is not changed if the program is run again
-	       SortListbyproperty.sortpointList(ellipselist);
-		int count = 0;
+	   
+	       final Iterator<Mser<UnsignedByteType>> treeiterator = newtree.iterator();
+	       
+	       while (treeiterator.hasNext()) {
+
+				Mser<UnsignedByteType> mser = treeiterator.next();
+				//System.out.println(mser.getChildren().size());
+				if (mser.getChildren().size()  > 1) {
+
+					for (int index = 0; index < mser.getChildren().size(); ++index) {
+
+						final double[] meanandcovchild = { mser.getChildren().get(index).mean()[0],
+								mser.getChildren().get(index).mean()[1], mser.getChildren().get(index).cov()[0],
+								mser.getChildren().get(index).cov()[1], mser.getChildren().get(index).cov()[2] };
+
+						meanandcovchildlist.add(meanandcovchild);
+						ellipselist.add(meanandcovchild);
+						
+					}
+
+				}
+
+			}
+	       redmeanandcovlist = meanandcovlist;
+			for (int childindex = 0; childindex < meanandcovchildlist.size(); ++childindex) {
+
+				final double[] meanchild = new double[] { meanandcovchildlist.get(childindex)[0],
+						meanandcovchildlist.get(childindex)[1] };
+
+				for (int index = 0; index < meanandcovlist.size(); ++index) {
+
+					final double[] mean = new double[] { meanandcovlist.get(index)[0], meanandcovlist.get(index)[1] };
+					final double[] covar = new double[] { meanandcovlist.get(index)[2], meanandcovlist.get(index)[3],
+							meanandcovlist.get(index)[4] };
+					final EllipseRoi ellipse = createEllipse(mean, covar, 3);
+
+					if (ellipse.contains((int) meanchild[0], (int) meanchild[1]))
+						redmeanandcovlist.remove(index);
+
+				}
+
+			}
+
+			for (int index = 0; index < redmeanandcovlist.size(); ++index) {
+
+				final double[] meanandcov = new double[] { redmeanandcovlist.get(index)[0], redmeanandcovlist.get(index)[1],
+						redmeanandcovlist.get(index)[2], redmeanandcovlist.get(index)[3], redmeanandcovlist.get(index)[4] };
+				ellipselist.add(meanandcov);
+
+			}
+		    SortListbyproperty.sortpointList(ellipselist);
+		         int count = 0;
 			for (int index = 0; index < ellipselist.size(); ++index) {
 				
 				
@@ -129,10 +174,7 @@ public class LinefinderInteractiveHFMSER implements LinefinderHF{
 						ellipselist.get(index)[4] };
 				ellipseroi = GetDelta.createEllipse(mean, covar, 3);
 				
-	    		final double perimeter = ellipseroi.getLength();
-	    		final double smalleigenvalue = SmallerEigenvalue(mean, covar);
-	    		final double largeeigenvalue = LargeEigenvalue(mean, covar);
-	    	//	if (perimeter > 2 * Math.PI * 20 && smalleigenvalue/largeeigenvalue > 0.8){
+	    	
 	    
 	    			
 	    			Roiindex = count;
@@ -181,15 +223,14 @@ public class LinefinderInteractiveHFMSER implements LinefinderHF{
 
 				}
 				Allrois.add(ellipseroi);
-				if (subellipseroi!=null)
-				Allrois.add(subellipseroi);
+			
 				
 				CommonOutputHF currentOutput = new CommonOutputHF(framenumber, Roiindex, Roiimg, ActualRoiimg, interval, Allrois);
 				
 				
 				output.add(currentOutput);
 				
-			//	}
+		
 				
 			}
 
