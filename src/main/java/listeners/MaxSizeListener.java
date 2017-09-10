@@ -30,7 +30,7 @@ if (parent.FindLinesViaHOUGH){
 	maxsizeScrollbar.addMouseListener( new StandardMouseListener( parent,ValueChange.SHOWMSERinHough ) );
 						
 					}
-else if (parent.FindLinesViaMSER)
+else if (parent.FindLinesViaMSER|| parent.FindLinesViaMSERwHOUGH)
 
 		maxsizeScrollbar.addMouseListener( new StandardMouseListener( parent, ValueChange.SHOWMSER ) );
 

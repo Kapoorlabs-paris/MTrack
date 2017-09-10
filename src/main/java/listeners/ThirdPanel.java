@@ -47,29 +47,28 @@ public class ThirdPanel {
 	}
 	
 	
-	private JPanel Deselect = new JPanel();
-	private JPanel Timeselect = new JPanel();
-	private JPanel Segselect = new JPanel();
+
+	
 	public void Paint(){
 		
 		
 		// Panel Third
-		
-		
 		parent.panelThird.removeAll();
-		Deselect.setLayout(parent.layout);
-		Timeselect.setLayout(parent.layout);
-		Segselect.setLayout(parent.layout);
+	
+		parent.Deselect.setLayout(parent.layout);
+		parent.Timeselect.setLayout(parent.layout);
+		parent.Segselect.setLayout(parent.layout);
+		parent.panelThird.setLayout(parent.layout);
 		
 		final JScrollBar timeslider = new JScrollBar(Scrollbar.HORIZONTAL, parent.thirdDimensionsliderInit, 10, 0, 10 + parent.scrollbarSize);
 		
 		final JScrollBar starttimeslider = new JScrollBar(Scrollbar.HORIZONTAL, parent.starttime, 10, 0, 10 + parent.scrollbarSize);
 		
-		final JScrollBar endtimeslider = new JScrollBar(Scrollbar.HORIZONTAL, parent.endtime, 10, 0, 10 + parent.scrollbarSize);
-	
-		parent.thirdDimension = parent.computeScrollbarPositionFromValue(parent.thirdDimensionsliderInit, parent.thirdDimensionsliderInit, parent.thirdDimensionSize, parent.scrollbarSize);
-		
-		
+		final JScrollBar endtimeslider = new JScrollBar(Scrollbar.HORIZONTAL, parent.endtime , 10, 0, 10 + parent.scrollbarSize);
+	  
+		endtimeslider.setValue(parent.endtime);
+		starttimeslider.setValue(parent.starttime);
+		parent.thirdDimension = parent.computeScrollbarPositionFromValue(parent.thirdDimension, parent.thirdDimensionsliderInit, parent.thirdDimensionSize, parent.scrollbarSize);
 		
 		
 		final String timestring = "Time point for choosing ends ";
@@ -104,60 +103,57 @@ public class ThirdPanel {
 		
 		
 
-		Deselect.add(timeText,new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
+		parent.Deselect.add(timeText,new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
 				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 		
 
-		Deselect.add(timeslider,new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
+		parent.Deselect.add(timeslider,new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
 				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 		
-		Deselect.add(LeftClick,new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
+		parent.Deselect.add(LeftClick,new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
 				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 		
-		Deselect.add(SLeftClick,new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
+		parent.Deselect.add(SLeftClick,new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
 				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 		
 		
-		Deselect.setBorder(selectborder);
+		parent.Deselect.setBorder(selectborder);
 		
-		parent.panelThird.add(Deselect, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+		parent.panelThird.add(parent.Deselect, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
-		
 
 		
 		
-		Timeselect.add(timeTextstart,new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
+		parent.Timeselect.add(timeTextstart,new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
 				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 		
-		Timeselect.add(starttimeslider,new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
+		parent.Timeselect.add(starttimeslider,new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
 				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 		
-		Timeselect.add(timeTextend,new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
+		parent.Timeselect.add(timeTextend,new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
 				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 		
-		Timeselect.add(endtimeslider,new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
+		parent.Timeselect.add(endtimeslider,new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
 				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 		
 	
-		Timeselect.setBorder(timeborder);
+		parent.Timeselect.setBorder(timeborder);
 
-		parent.panelThird.add(Timeselect, new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+		parent.panelThird.add(parent.Timeselect, new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 		
 		
 		
-		
-		Segselect.add(ChooseMethod, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+		parent.Segselect.add(ChooseMethod, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0) );
 		
 		
 		
-		Segselect.setBorder(batchborder);
+		parent.Segselect.setBorder(batchborder);
 		
-		parent.panelThird.add(Segselect, new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+		parent.panelThird.add(parent.Segselect, new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 
-				
 				
 				// Load default optimizer options 
 				DefaultModelHF loaddefaultHF = new DefaultModelHF(parent);
@@ -197,12 +193,14 @@ public class ThirdPanel {
 				
 				parent.panelThird.add(parent.panelPrevious,  new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
-				parent.panelThird.validate();
+			
 				
+				parent.panelThird.revalidate();
+				parent.panelThird.repaint();
 				
+			
 
-				parent.panelThird.validate();
-				
+			
 				
 				parent.Cardframe.pack();
 	

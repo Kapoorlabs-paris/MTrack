@@ -47,14 +47,12 @@ import velocityanalyser.Trackstart;
 public class ProgressTrack extends SwingWorker<Void, Void> {
 
 final Interactive_MTDoubleChannel parent;
-final int starttime;
-final int endtime;
+
 	
-	public ProgressTrack(final Interactive_MTDoubleChannel parent, final int starttime, final int endtime){
+	public ProgressTrack(final Interactive_MTDoubleChannel parent){
 	
 		this.parent = parent;
-		this.starttime = starttime;
-		this.endtime = endtime;
+		
 	}
 	
 	
@@ -63,7 +61,9 @@ final int endtime;
 	@Override
 	protected Void doInBackground() throws Exception {
 
-		int next = 2;
+		int next = parent.starttime;
+		if(next == 1)
+			next = 2;
 		
 		Track newtrack = new Track(parent);
 		newtrack.Trackobject(next);

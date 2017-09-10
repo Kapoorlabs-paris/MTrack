@@ -46,6 +46,8 @@ public class MethodListener implements ActionListener {
 		
 		parent.controlnext.removeAll();
 		parent.controlprevious.removeAll();
+		parent.panelSecond.removeAll();
+		parent.panelNext.removeAll();
 		parent.controlnext.add(new JButton(new AbstractAction("Next\u22b3") {
 
 			/**
@@ -60,14 +62,18 @@ public class MethodListener implements ActionListener {
 			}
 		}));
 
+		
+	
+		
+		
 		parent.panelNext.add(parent.controlnext,  new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER,
 				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 	
 		parent.controlnext.setVisible(true);
-		
 		parent.panelFirst.add(parent.panelNext,  new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
-		parent.panelFirst.validate();
+		parent.panelFirst.revalidate();
+		parent.panelFirst.repaint();
 	
 		
 		
@@ -84,7 +90,6 @@ public class MethodListener implements ActionListener {
 			
 			
 
-			parent.panelSecond.setLayout(parent.layout);
 			parent.Mserparam.setLayout(parent.layout);
 			Border msborder = new CompoundBorder(new TitledBorder("MSER parameters"), new EmptyBorder(parent.c.insets));
 			final Scrollbar deltaS = new Scrollbar(Scrollbar.HORIZONTAL, parent.deltaInit, 10, 0, 10 + parent.scrollbarSize);
@@ -319,7 +324,7 @@ public class MethodListener implements ActionListener {
 			Dowatershed.addActionListener(new DowatershedListener(parent));
 			AdvancedOptions.addItemListener(new AdvancedSeedListener(parent));
 			FindLinesListener.addActionListener(new FindLinesListener(parent));
-			parent.panelSecond.validate();
+			parent.panelSecond.revalidate();
 			parent.panelSecond.repaint();
             parent.Cardframe.pack();
             parent.updatePreview(ValueChange.SHOWHOUGH);
@@ -497,7 +502,7 @@ public class MethodListener implements ActionListener {
 					new RhoSizeHoughListener(parent, rhoText, parent.rhoPerPixelMin, parent.rhoPerPixelMax, parent.scrollbarSize, rhoSize));
 			AdvancedOptions.addItemListener(new AdvancedSeedListener(parent));
 			ComputeTree.addActionListener(new ComputeTreeListener(parent));
-			parent.panelSecond.validate();
+			parent.panelSecond.revalidate();
 			parent.panelSecond.repaint();
 
 			
@@ -531,6 +536,7 @@ public class MethodListener implements ActionListener {
 				
 		
 		parent.panelSecond.validate();
+		
 		parent.Cardframe.pack();
 		
 	}

@@ -258,6 +258,8 @@ public class ProgressSeeds extends SwingWorker<Void, Void> {
 
 				parent.controlnext.removeAll();
 				parent.controlprevious.removeAll();
+				
+				
 				parent.controlnext.add(new JButton(new AbstractAction("\u22b2Prev") {
 
 					/**
@@ -287,15 +289,18 @@ public class ProgressSeeds extends SwingWorker<Void, Void> {
 					}
 				}));
 
+				parent.controlnext.revalidate();
+				parent.controlnext.repaint();
 				parent.panelNext.add(parent.controlnext, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0,
 						GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 
-				parent.controlnext.setVisible(true);
 
 				parent.panelSecond.add(parent.panelNext, new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0,
 						GridBagConstraints.EAST, GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
-
-				parent.panelSecond.validate();
+				parent.panelSecond.revalidate();
+				parent.panelSecond.repaint();
+				
+				
 
 				JPanel controlprevpanel = new JPanel();
 				JPanel prevpanel = new JPanel();
@@ -310,6 +315,7 @@ public class ProgressSeeds extends SwingWorker<Void, Void> {
 					public void actionPerformed(ActionEvent e) {
 						CardLayout cl = (CardLayout) parent.panelCont.getLayout();
 						cl.next(parent.panelCont);
+					    
 					}
 				}));
 
@@ -318,12 +324,18 @@ public class ProgressSeeds extends SwingWorker<Void, Void> {
 
 				controlprevpanel.setVisible(true);
 
+			
+				
+				
 				parent.panelFirst.add(prevpanel, new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+				 parent.panelFirst.repaint();
 				parent.panelFirst.validate();
-
+               
+				
 				ThirdPanel paintthird = new ThirdPanel(parent);
 				paintthird.Paint();
+			
 
 			}
 

@@ -31,7 +31,7 @@ public class Unstability_ScoreListener implements AdjustmentListener {
 			Unstability_ScoreScrollbar.addMouseListener( new StandardMouseListener( parent,ValueChange.SHOWMSERinHough ) );
 				
 			}
-		else if (parent.FindLinesViaMSER)
+		else if (parent.FindLinesViaMSER || parent.FindLinesViaMSERwHOUGH)
 		Unstability_ScoreScrollbar.addMouseListener( new StandardMouseListener( parent, ValueChange.SHOWMSER ) );
 		else{
 			

@@ -22,22 +22,16 @@ public class SkipFramesandTrackendsListener implements ActionListener {
 	
       final Interactive_MTDoubleChannel parent;
       final Interactive_MTDoubleChannelBasic child;
-      final int starttime;
-      final int endtime;
 	
-	public SkipFramesandTrackendsListener(final Interactive_MTDoubleChannel parent, final Interactive_MTDoubleChannelBasic child, final int starttime, final int endtime){
+	public SkipFramesandTrackendsListener(final Interactive_MTDoubleChannel parent, final Interactive_MTDoubleChannelBasic child){
 	
 		this.parent = parent;
-		this.starttime = starttime;
 		this.child = child;
-		this.endtime = endtime;
 	}
-public SkipFramesandTrackendsListener(final Interactive_MTDoubleChannel parent, final int starttime, final int endtime){
+public SkipFramesandTrackendsListener(final Interactive_MTDoubleChannel parent){
 		
 		this.parent = parent;
-		this.starttime = starttime;
 		this.child = null;
-		this.endtime = endtime;
 	}
 	
 	@Override
@@ -73,7 +67,7 @@ public SkipFramesandTrackendsListener(final Interactive_MTDoubleChannel parent, 
 		
 		
 		
-		ProgressSkip trackMT = new ProgressSkip(parent, starttime, endtime);
+		ProgressSkip trackMT = new ProgressSkip(parent);
 		trackMT.execute();
 
 	}

@@ -101,6 +101,7 @@ public class LinefinderInteractiveMSER  implements Linefinder{
 				final double[] meanandcov = { rootmser.mean()[0], rootmser.mean()[1], rootmser.cov()[0],
 						rootmser.cov()[1], rootmser.cov()[2] };
 				meanandcovlist.add(meanandcov);
+				ellipselist.add(meanandcov);
 
 			}
 		}
@@ -122,39 +123,12 @@ public class LinefinderInteractiveMSER  implements Linefinder{
 
 						meanandcovchildlist.add(meanandcovchild);
 						ellipselist.add(meanandcovchild);
-						System.out.println("Child found");
 					}
 
 				}
 
 			}
-	       redmeanandcovlist = meanandcovlist;
-			for (int childindex = 0; childindex < meanandcovchildlist.size(); ++childindex) {
-
-				final double[] meanchild = new double[] { meanandcovchildlist.get(childindex)[0],
-						meanandcovchildlist.get(childindex)[1] };
-
-				for (int index = 0; index < meanandcovlist.size(); ++index) {
-
-					final double[] mean = new double[] { meanandcovlist.get(index)[0], meanandcovlist.get(index)[1] };
-					final double[] covar = new double[] { meanandcovlist.get(index)[2], meanandcovlist.get(index)[3],
-							meanandcovlist.get(index)[4] };
-					final EllipseRoi ellipse = createEllipse(mean, covar, 3);
-
-					if (ellipse.contains((int) meanchild[0], (int) meanchild[1]))
-						redmeanandcovlist.remove(index);
-
-				}
-
-			}
-
-			for (int index = 0; index < redmeanandcovlist.size(); ++index) {
-
-				final double[] meanandcov = new double[] { redmeanandcovlist.get(index)[0], redmeanandcovlist.get(index)[1],
-						redmeanandcovlist.get(index)[2], redmeanandcovlist.get(index)[3], redmeanandcovlist.get(index)[4] };
-				ellipselist.add(meanandcov);
-
-			}
+	       
 		// We do this so the ROI remains attached the the same label and is not changed if the program is run again
 	       SortListbyproperty.sortpointList(ellipselist);
 		int count = 0;

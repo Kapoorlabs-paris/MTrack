@@ -52,8 +52,11 @@ public FindLinesListener (final Interactive_MTDoubleChannel parent, final Intera
 		parent.frame.add(parent.panel);
 		parent.frame.pack();
 		parent.frame.setSize(200, 100);
-		if (child==null)
+		if (child==null){
 		parent.frame.setLocationRelativeTo(parent.panelCont);
+		
+		
+		}
 		else
 			parent.frame.setLocationRelativeTo(child.panelCont);
 		parent.frame.setVisible(true);

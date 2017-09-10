@@ -12,14 +12,12 @@ import updateListeners.FinalPoint;
 public class ProgressSkip extends SwingWorker<Void, Void> {
 
 final Interactive_MTDoubleChannel parent;
-final int starttime;
-final int endtime;
+
 	
-	public ProgressSkip(final Interactive_MTDoubleChannel parent, final int starttime, final int endtime){
+	public ProgressSkip(final Interactive_MTDoubleChannel parent){
 	
 		this.parent = parent;
-		this.starttime = starttime;
-		this.endtime = endtime;
+		
 	}
 	
 	@Override
@@ -29,7 +27,7 @@ final int endtime;
 		
        
 
-		int next = starttime;
+		int next = parent.starttime;
 
 		if (next < 2)
 			next = 2;

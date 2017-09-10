@@ -23,6 +23,7 @@ import LineModels.Gaussiansplinethirdorderfixedds;
 import LineModels.MTFitFunction;
 import LineModels.UseLineModel.UserChoiceModel;
 import graphconstructs.Trackproperties;
+import ij.IJ;
 import ij.gui.EllipseRoi;
 import ij.gui.OvalRoi;
 import ij.gui.Overlay;
@@ -83,8 +84,7 @@ public class SubpixelVelocityPCLine extends BenchmarkAlgorithm
 	public double Inispacing;
 	public double maxdist;
 	public double zerodist;
-    public ArrayList<Pair<Integer, Pair<Double, Double>>> directionliststart;
-    public ArrayList<Pair<Integer, Pair<Double, Double>>> directionlistend;
+ 
 	public final int numgaussians;
 	public final int startframe;
 	double percent = 0;
@@ -214,38 +214,12 @@ public void setMaxdist (double maxdist) {
 		ArrayList<Roi> onlyroi = new ArrayList<Roi>();
 		final_paramliststart = new ArrayList<Indexedlength>();
 		final_paramlistend = new ArrayList<Indexedlength>();
-        directionliststart = new ArrayList<Pair<Integer, Pair<Double, Double>>>();
-        directionlistend = new ArrayList<Pair<Integer, Pair<Double, Double>>>();
+    
 		startinframe = new ArrayList<Trackproperties>();
 		endinframe = new ArrayList<Trackproperties>();
 
 		
-		for (int index = 0; index < PrevFrameparamstart.size(); ++index) {
-			if (framenumber > startframe + 1){
-			
-			double oldslope = (PrevFrameparamstart.get(index).currentpos[1] - PrevFrameparamstart.get(index).fixedpos[1] ) 
-					/(PrevFrameparamstart.get(index).currentpos[0] - PrevFrameparamstart.get(index).fixedpos[0]) ;
-			double oldintercept = PrevFrameparamstart.get(index).currentpos[1] - oldslope * PrevFrameparamstart.get(index).currentpos[0];
-			
-			directionliststart.add(new ValuePair<Integer, Pair<Double, Double>>(PrevFrameparamstart.get(index).seedLabel, new ValuePair<Double, Double>(oldslope, oldintercept)));
-			
-			
-			
-			}
-		}
-		
-		for (int index = 0; index < PrevFrameparamend.size(); ++index) {
-			if (framenumber > startframe + 1){
-			
-			double oldslope = (PrevFrameparamend.get(index).currentpos[1] - PrevFrameparamend.get(index).fixedpos[1] ) 
-					/(PrevFrameparamend.get(index).currentpos[0] - PrevFrameparamend.get(index).fixedpos[0]) ;
-			double oldintercept = PrevFrameparamend.get(index).currentpos[1] - oldslope * PrevFrameparamend.get(index).currentpos[0];
-			directionlistend.add(new ValuePair<Integer, Pair<Double, Double>>(PrevFrameparamend.get(index).seedLabel, new ValuePair<Double, Double>(oldslope, oldintercept)));
-			
-			
-			
-			}
-		}
+	
 		
 		
 		for (int index = 0; index < PrevFrameparamstart.size(); ++index) {
@@ -334,33 +308,19 @@ public void setMaxdist (double maxdist) {
 				double newslope = (paramnextframestart.currentpos[1] - paramnextframestart.fixedpos[1] ) 
 						/(paramnextframestart.currentpos[0] - paramnextframestart.fixedpos[0]) ;
 				
-				double dist = Math.toDegrees(Math.atan(((newslope - oldslope)/(1 + newslope * oldslope)))); 
-						//(paramnextframestart.currentpos[1] - oldslope * paramnextframestart.currentpos[0] -oldintercept)/Math.sqrt(1 + oldslope *oldslope);
+				double dist = (paramnextframestart.currentpos[1] - oldslope * paramnextframestart.currentpos[0] -oldintercept)/Math.sqrt(1 + oldslope *oldslope);
 						
 						//newslope - oldslope; 
 						//Math.toDegrees(Math.atan(Math.toRadians((newslope - oldslope)/(1 + newslope * oldslope))));
-				double mindist = Double.MAX_VALUE;
+				double mindist = (paramnextframestart.currentpos[1] - originalslope * paramnextframestart.currentpos[0] -originalintercept)/Math.sqrt(1 + originalslope *originalslope);
 				
-				for (int i = 0; i < directionliststart.size(); ++i){
-					
-					double otherdist = (paramnextframestart.currentpos[1] - directionliststart.get(i).getB().getA() * paramnextframestart.currentpos[0] 
-							- directionliststart.get(i).getB().getB())/Math.sqrt(1 + directionliststart.get(i).getB().getA() *directionliststart.get(i).getB().getA());
-					
-					if (otherdist < mindist){
-						
-						mindist = otherdist;
-						
-						
-						
-					}
-					
-				}
-				
+			
 				if (dist!=Double.NaN){
 				System.out.println(dist);
 				
 				// TCASM
-				if (Math.abs(dist) > maxdist && Math.abs(mindist) < 1 ){
+				if (Math.abs(dist) > maxdist  ){
+				//	IJ.log("Collision detected, activating TCASM layer");
 					paramnextframestart = PrevFrameparamstart.get(index);
 					newstartpoint = oldstartpoint;
 					newstartslope = PrevFrameparamstart.get(index).slope;
@@ -465,25 +425,12 @@ public void setMaxdist (double maxdist) {
 				double newslope = (paramnextframeend.currentpos[1] - paramnextframeend.fixedpos[1] ) 
 						/(paramnextframeend.currentpos[0] - paramnextframeend.fixedpos[0]) ;
 				
-				double dist = Math.toDegrees(Math.atan(((newslope - oldslope)/(1 + newslope * oldslope)))); 
-						//Math.toDegrees(Math.atan(Math.toRadians((newslope - oldslope)/(1 + newslope * oldslope))));
-				double mindist = Double.MAX_VALUE;
-	            for (int i = 0; i < directionlistend.size(); ++i){
-					
-					double otherdist = (paramnextframeend.currentpos[1] - directionlistend.get(i).getB().getA() * paramnextframeend.currentpos[0] 
-							- directionlistend.get(i).getB().getB())/Math.sqrt(1 + directionlistend.get(i).getB().getA() *directionlistend.get(i).getB().getA());
-					
-					if (otherdist < mindist){
-						
-						mindist = otherdist;
-						
-						
-						
-					}
-					
-				}
+				double dist = (paramnextframeend.currentpos[1] - oldslope * paramnextframeend.currentpos[0] -oldintercept)/Math.sqrt(1 + oldslope *oldslope);
+						//Math.toDegrees(Math.atan(((newslope - oldslope)/(1 + newslope * oldslope)))); 
+		
 				if (dist!=Double.NaN ){
-				if (Math.abs(dist) > maxdist  && Math.abs(mindist) < 1){
+				if (Math.abs(dist) > maxdist){
+				//	IJ.log("Collision detected, activating TCASM layer");
 					paramnextframeend = PrevFrameparamend.get(index);
 				    newendpoint = oldendpoint;	
 				    newendslope = PrevFrameparamend.get(index).slope;

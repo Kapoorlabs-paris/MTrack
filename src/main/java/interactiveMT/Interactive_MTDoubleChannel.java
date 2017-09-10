@@ -38,6 +38,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.JScrollBar;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
@@ -73,6 +74,7 @@ import listeners.DeltaListener;
 import listeners.DoMserSegmentation;
 import listeners.DoSegmentation;
 import listeners.EndTrackListener;
+import listeners.EndtimeListener;
 import listeners.MaxSizeHoughListener;
 import listeners.MaxSizeListener;
 import listeners.MethodListener;
@@ -83,10 +85,13 @@ import listeners.MinSizeHoughListener;
 import listeners.MinSizeListener;
 import listeners.RadiusListener;
 import listeners.SeedDisplayListener;
+import listeners.SegMethodListener;
 import listeners.ShowBitimgListener;
 import listeners.ShowwatershedimgListener;
 import listeners.SkipFramesandTrackendsListener;
+import listeners.StarttimeListener;
 import listeners.ThresholdHoughHFListener;
+import listeners.TimeListener;
 import listeners.Unstability_ScoreHoughListener;
 import mpicbg.imglib.multithreading.SimpleMultiThreading;
 import mpicbg.imglib.util.Util;
@@ -938,6 +943,8 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 				newHoughtree.put(label, newtree);
 				if (preprocessedimp != null) {
 
+					
+
 					for (int index = 0; index < Rois.size(); ++index) {
 
 						EllipseRoi or = Rois.get(index);
@@ -956,6 +963,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 
 					}
+
 				}
 
 			}
@@ -1118,12 +1126,14 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public JPanel panelSecond = new JPanel();
 	public JPanel panelThird = new JPanel();
 	public JPanel panelFourth = new JPanel();
-	
+
+	public JPanel controlprevpanel = new JPanel();
+	public JPanel prevpanel = new JPanel();
 	public JPanel controlnext = new JPanel();
 	public JPanel controlprevious = new JPanel();
-	private JPanel Methodchoice = new JPanel();
-	private JPanel Cannychoice = new JPanel();
-	private JPanel Directoryoptions = new JPanel();
+	public JPanel Methodchoice = new JPanel();
+	public JPanel Cannychoice = new JPanel();
+	public JPanel Directoryoptions = new JPanel();
 	public JPanel Mserparam = new JPanel();
 	public JPanel MserparamHF = new JPanel();
 	public JPanel Houghparam = new JPanel();
@@ -1137,7 +1147,9 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public final GridBagLayout layout = new GridBagLayout();
 	public final GridBagConstraints c = new GridBagConstraints();
 	
-	
+	public JPanel Deselect = new JPanel();
+	public JPanel Timeselect = new JPanel();
+	public JPanel Segselect = new JPanel();
 	public void Card() {
 
 		CardLayout cl = new CardLayout();
@@ -1174,8 +1186,9 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		String[] Method = { "MSER", "HOUGH","MSERwHOUGH" };
 		JComboBox<String> ChooseMethod = new JComboBox<String>(Method);
 
+		panelFirst.removeAll();
+		
 		panelFirst.setLayout(layout);
-        panelThird.setLayout(layout);
 		panelNext.setLayout(layout);
 		Cannychoice.setLayout(layout);
 		Directoryoptions.setLayout(layout);
@@ -1244,11 +1257,16 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		
 	
 
+		Deselect.setLayout(layout);
+		Timeselect.setLayout(layout);
+		Segselect.setLayout(layout);
+		panelThird.setLayout(layout);
+		
 		
 	
 		
 		Cardframe.add(panelCont, BorderLayout.CENTER);
-     
+        Cardframe.validate();
 		Cardframe.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		Cardframe.pack();
 		Cardframe.setVisible(true);
@@ -1523,7 +1541,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		 
 		 
 		inputFieldradi.addTextListener(new RadiusListener(this));
-		Finalize.addActionListener(new SkipFramesandTrackendsListener(this, starttime, endtime));
+		Finalize.addActionListener(new SkipFramesandTrackendsListener(this));
 		Record.addActionListener(new BatchModeListener(this));
 		AdvancedOptions.addItemListener(new AdvancedTrackerListener(this));
 
@@ -1713,7 +1731,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 
 		inputFieldradi.addTextListener(new RadiusListener(this));
-		Finalize.addActionListener(new SkipFramesandTrackendsListener(this, starttime, endtime));
+		Finalize.addActionListener(new SkipFramesandTrackendsListener(this));
 		Record.addActionListener(new BatchModeListener(this));
 		AdvancedOptions.addItemListener(new AdvancedTrackerListener(this));
 		panelFourth.validate();
@@ -2168,7 +2186,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		gd.addNumericField(
 				"Initial Spacing between Gaussians along the Polynomial curve = G * Min(Psf), G (enter positive number) = ",
 				Inispacing / Math.min(psf[0], psf[1]), 2);
-		gd.addNumericField("Maximum direction change per frame (in degrees)", maxdist, 2);
+		gd.addNumericField("Maximum direction change per frame (in pixels)", maxdist, 2);
 
 		
 
@@ -2209,7 +2227,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 				"Initial Spacing between Gaussians along the Polynomial curve = G * Min(Psf), G (enter positive number ) = ",
 				Inispacing / Math.min(psf[0], psf[1]), 2);
 
-		gd.addNumericField("Maximum direction change per frame (in degrees)", maxdist, 2);
+		gd.addNumericField("Maximum direction change per frame (in pixels)", maxdist, 2);
 		gd.addNumericField("Number of Gaussians for mask fits ", numgaussians, 2);
 		
 		gd.showDialog();

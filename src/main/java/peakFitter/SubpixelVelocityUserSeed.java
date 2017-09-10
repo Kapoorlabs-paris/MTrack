@@ -76,8 +76,7 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 	final int thirdDimsize;
 	private final UserChoiceModel model;
 	public double Inispacing;
-	   public ArrayList<Pair<Integer, Pair<Double, Double>>> directionliststart;
-	    public ArrayList<Pair<Integer, Pair<Double, Double>>> directionlistend;
+	
 	double percent = 0;
 	int maxghost = 5;
 
@@ -195,24 +194,10 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 		Inispacing = getInispacing();
 		ArrayList<Roi> onlyroi = new ArrayList<Roi>();
 		final_paramlistuser = new ArrayList<Indexedlength>();
-		  directionliststart = new ArrayList<Pair<Integer, Pair<Double, Double>>>();
-	        directionlistend = new ArrayList<Pair<Integer, Pair<Double, Double>>>();
+		
 		startinuserframe = new ArrayList<Trackproperties>();
 		
-		
-		for (int index = 0; index < Userframe.size(); ++index) {
-			if (framenumber > startframe + 1){
-			
-			double oldslope = (Userframe.get(index).currentpos[1] - Userframe.get(index).fixedpos[1] ) 
-					/(Userframe.get(index).currentpos[0] - Userframe.get(index).fixedpos[0]) ;
-			double oldintercept = Userframe.get(index).currentpos[1] - oldslope * Userframe.get(index).currentpos[0];
-			directionlistend.add(new ValuePair<Integer, Pair<Double, Double>>(Userframe.get(index).seedLabel, new ValuePair<Double, Double>(oldslope, oldintercept)));
-			
-			
-			
-			}
-		}
-		
+	
 		
 		
 		for (int index = 0; index < Userframe.size(); ++index) {
@@ -291,29 +276,17 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 			double newslope = (paramnextframestart.currentpos[1] - paramnextframestart.fixedpos[1] ) 
 					/(paramnextframestart.currentpos[0] - paramnextframestart.fixedpos[0]) ;
 			
-			double dist = Math.toDegrees(Math.atan(((newslope - oldslope)/(1 + newslope * oldslope)))); 
+			double dist = (paramnextframestart.currentpos[1] - oldslope * paramnextframestart.currentpos[0] -oldintercept)/Math.sqrt(1 + oldslope *oldslope);
+					//Math.toDegrees(Math.atan(((newslope - oldslope)/(1 + newslope * oldslope)))); 
 			
 			
 					//Math.toDegrees(Math.atan(Math.toRadians((newslope - oldslope) / (1 + newslope * oldslope))));
-			double mindist = Double.MAX_VALUE;
-            for (int i = 0; i < directionlistend.size(); ++i){
-				
-				double otherdist = (paramnextframestart.currentpos[1] - directionlistend.get(i).getB().getA() * paramnextframestart.currentpos[0] 
-						- directionlistend.get(i).getB().getB())/Math.sqrt(1 + directionlistend.get(i).getB().getA() *directionlistend.get(i).getB().getA());
-				
-				if (otherdist < mindist){
-					
-					mindist = otherdist;
-					
-					
-					
-				}
-				
-			}
+		
 			System.out.println("User " + dist);
 		
 			if (dist!=Double.NaN){
-			if (Math.abs(dist) > maxdist  && Math.abs(mindist) < 1) {
+			if (Math.abs(dist) > maxdist ) {
+			//	IJ.log("Collision detected, activating TCASM layer");
 				paramnextframestart = Userframe.get(index);
 				newstartpoint = oldstartpoint;
 				newstartslope = Userframe.get(index).slope;

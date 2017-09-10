@@ -31,7 +31,7 @@ public class MinSizeListener implements AdjustmentListener {
 			minsizeScrollbar.addMouseListener( new StandardMouseListener( parent,ValueChange.SHOWMSERinHough ) );
 						
 					}
-		else if (parent.FindLinesViaMSER)
+		else if (parent.FindLinesViaMSER|| parent.FindLinesViaMSERwHOUGH)
 
 			minsizeScrollbar.addMouseListener( new StandardMouseListener( parent, ValueChange.SHOWMSER ) );
 

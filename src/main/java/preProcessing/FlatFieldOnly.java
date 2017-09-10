@@ -37,9 +37,9 @@ import peakFitter.FitterUtils;
  * @param <FloatType>
  *            the type of the source image.
  */
-public class FlatFieldCorrection extends BenchmarkAlgorithm implements OutputAlgorithm< RandomAccessibleInterval< FloatType >>
+public class FlatFieldOnly extends BenchmarkAlgorithm implements OutputAlgorithm< RandomAccessibleInterval< FloatType >>
 {
-	private static final String BASE_ERROR_MSG = "[FlatFieldAndMedianFilter2D] ";
+	private static final String BASE_ERROR_MSG = "[FlatField2D] ";
 
 	private final RandomAccessibleInterval< FloatType > source;
 
@@ -61,7 +61,7 @@ public class FlatFieldCorrection extends BenchmarkAlgorithm implements OutputAlg
 	 *            determines the size of the neighborhood. In 2D or 3D, a radius
 	 *            of 1 will generate a 3x3 neighborhood.
 	 */
-	public FlatFieldCorrection( final RandomAccessibleInterval<FloatType> source, final int radius, final double[] psf )
+	public FlatFieldOnly( final RandomAccessibleInterval<FloatType> source, final int radius, final double[] psf )
 	{
 		this.source = source;
 		this.radius = radius;
@@ -69,7 +69,7 @@ public class FlatFieldCorrection extends BenchmarkAlgorithm implements OutputAlg
 	}
 	
 	
-	public FlatFieldCorrection( final RandomAccessibleInterval<FloatType> source, final int radius, final JProgressBar jpb, final double[] psf  )
+	public FlatFieldOnly( final RandomAccessibleInterval<FloatType> source, final int radius, final JProgressBar jpb, final double[] psf  )
 	{
 		this.source = source;
 		this.radius = radius;
@@ -117,7 +117,7 @@ public class FlatFieldCorrection extends BenchmarkAlgorithm implements OutputAlg
 				final IntervalView< FloatType > outputSlice = Views.hyperSlice( output, 2, z );
 			   
 				if(jpb!=null)
-				FitterUtils.SetProgressBar(jpb, 100 * percent/nz, "PreProcessing, please wait..");
+				FitterUtils.SetProgressBar(jpb, 100 * percent/nz, "Doing Flat field correction, please wait..");
 				
 				processSlice( slice, outputSlice );
 				
@@ -196,15 +196,12 @@ public class FlatFieldCorrection extends BenchmarkAlgorithm implements OutputAlg
 		subtract(correctedgaussimg, gaussimg);
 		
 		
-		
 		final Cursor< FloatType > cursor = out.localizingCursor();
 
-		final RectangleShape shape = new RectangleShape( radius, false );
-		final net.imglib2.algorithm.neighborhood.RectangleShape.NeighborhoodsAccessible<FloatType> nracessible = shape.neighborhoodsRandomAccessible( Views.extendZero( correctedgaussimg ) );
-		final RandomAccess< Neighborhood< FloatType >> nra = nracessible.randomAccess( correctedgaussimg );
+		
 
-		final int size = ( int ) nra.get().size();
-		final double[] values = new double[ size ];
+		final RandomAccess<FloatType> nra = correctedgaussimg.randomAccess();
+		
 
 		// Fill buffer with median values.
 		while ( cursor.hasNext() )
@@ -212,16 +209,11 @@ public class FlatFieldCorrection extends BenchmarkAlgorithm implements OutputAlg
 			cursor.fwd();
 			nra.setPosition( cursor );
 			
-			
-			int index = 0;
-			for ( final FloatType pixel : nra.get() )
-			{
-				values[ index++ ] = pixel.getRealDouble();
-			}
-
-			Arrays.sort( values, 0, index );
-			cursor.get().setReal( values[ ( index - 1 ) / 2 ] );
+		
+			cursor.get().setReal( nra.get().get());
 		}
+		
+	
 	}
 
 	@Override

@@ -34,6 +34,7 @@ import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.util.Util;
 import net.imglib2.view.Views;
 import peakFitter.SortListbyproperty;
+import util.DrawingUtils;
 
 public class LinefinderInteractiveHFMSER implements LinefinderHF{
 
@@ -93,93 +94,24 @@ public class LinefinderInteractiveHFMSER implements LinefinderHF{
 		
 		final Iterator<Mser<UnsignedByteType>> rootsetiterator = rootset.iterator();
 		
+		Allrois = DrawingUtils.getcurrentRois(newtree, ellipselist);
 		
 		
 		
-		while (rootsetiterator.hasNext()) {
-
-			Mser<UnsignedByteType> rootmser = rootsetiterator.next();
-
-			if (rootmser.size() > 0) {
-
-				final double[] meanandcov = { rootmser.mean()[0], rootmser.mean()[1], rootmser.cov()[0],
-						rootmser.cov()[1], rootmser.cov()[2] };
-				meanandcovlist.add(meanandcov);
-
-			}
-		}
-		
-		// We do this so the ROI remains attached the the same label and is not changed if the program is run again
-	   
-	       final Iterator<Mser<UnsignedByteType>> treeiterator = newtree.iterator();
-	       
-	       while (treeiterator.hasNext()) {
-
-				Mser<UnsignedByteType> mser = treeiterator.next();
-				//System.out.println(mser.getChildren().size());
-				if (mser.getChildren().size()  > 1) {
-
-					for (int index = 0; index < mser.getChildren().size(); ++index) {
-
-						final double[] meanandcovchild = { mser.getChildren().get(index).mean()[0],
-								mser.getChildren().get(index).mean()[1], mser.getChildren().get(index).cov()[0],
-								mser.getChildren().get(index).cov()[1], mser.getChildren().get(index).cov()[2] };
-
-						meanandcovchildlist.add(meanandcovchild);
-						ellipselist.add(meanandcovchild);
-						
-					}
-
-				}
-
-			}
-	       redmeanandcovlist = meanandcovlist;
-			for (int childindex = 0; childindex < meanandcovchildlist.size(); ++childindex) {
-
-				final double[] meanchild = new double[] { meanandcovchildlist.get(childindex)[0],
-						meanandcovchildlist.get(childindex)[1] };
-
-				for (int index = 0; index < meanandcovlist.size(); ++index) {
-
-					final double[] mean = new double[] { meanandcovlist.get(index)[0], meanandcovlist.get(index)[1] };
-					final double[] covar = new double[] { meanandcovlist.get(index)[2], meanandcovlist.get(index)[3],
-							meanandcovlist.get(index)[4] };
-					final EllipseRoi ellipse = createEllipse(mean, covar, 3);
-
-					if (ellipse.contains((int) meanchild[0], (int) meanchild[1]))
-						redmeanandcovlist.remove(index);
-
-				}
-
-			}
-
-			for (int index = 0; index < redmeanandcovlist.size(); ++index) {
-
-				final double[] meanandcov = new double[] { redmeanandcovlist.get(index)[0], redmeanandcovlist.get(index)[1],
-						redmeanandcovlist.get(index)[2], redmeanandcovlist.get(index)[3], redmeanandcovlist.get(index)[4] };
-				ellipselist.add(meanandcov);
-
-			}
 		    SortListbyproperty.sortpointList(ellipselist);
-		         int count = 0;
-			for (int index = 0; index < ellipselist.size(); ++index) {
+		int count = 0;
+			for (int index = 0; index < Allrois.size(); ++index) {
 				
 				
 				final ImgFactory<FloatType> factory = Util.getArrayOrCellImgFactory(Preprocessedsource, type);
 				RandomAccessibleInterval<FloatType>  Roiimg = factory.create(Preprocessedsource, type);
 				RandomAccessibleInterval<FloatType>  ActualRoiimg = factory.create(source, type);
 				
-				final double[] mean = { ellipselist.get(index)[0], ellipselist.get(index)[1] };
-				final double[] covar = { ellipselist.get(index)[2], ellipselist.get(index)[3],
-						ellipselist.get(index)[4] };
-				ellipseroi = GetDelta.createEllipse(mean, covar, 3);
-				
-	    	
-	    
+			
+				ellipseroi  = Allrois.get(index);
 	    			
 	    			Roiindex = count;
 	    			count++;
-				ellipseroi.setStrokeColor(Color.green);
 				
 
 				Cursor<FloatType> sourcecursor = Views.iterable(Preprocessedsource).localizingCursor();
@@ -222,7 +154,6 @@ public class LinefinderInteractiveHFMSER implements LinefinderHF{
 					
 
 				}
-				Allrois.add(ellipseroi);
 			
 				
 				CommonOutputHF currentOutput = new CommonOutputHF(framenumber, Roiindex, Roiimg, ActualRoiimg, interval, Allrois);

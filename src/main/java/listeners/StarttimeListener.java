@@ -38,13 +38,13 @@ public class StarttimeListener implements AdjustmentListener {
 
 		label.setText(string +  " = " + parent.starttime);
 
-		parent.thirdDimension = parent.starttime;
+		
 	
 	}
 	
 	public void shownew() {
 
-		parent.thirdDimension = parent.starttime;
+	
 		
 		if (parent.thirdDimension > parent.thirdDimensionSize) {
 			IJ.log("Max frame number exceeded, moving to last frame instead");

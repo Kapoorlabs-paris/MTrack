@@ -51,7 +51,7 @@ final int endtime;
 		parent.frame.setLocationRelativeTo(parent.panelCont);
 		parent.frame.setVisible(true);
 
-		ProgressTrack trackMT = new ProgressTrack(parent, starttime, endtime);
+		ProgressTrack trackMT = new ProgressTrack(parent);
 		trackMT.execute();
 
 	}

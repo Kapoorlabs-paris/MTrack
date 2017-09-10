@@ -51,6 +51,8 @@ public class SecondPanel {
 	private JPanel Deselect = new JPanel();
 	private JPanel Timeselect = new JPanel();
 	private JPanel Batchselect = new JPanel();
+	
+	
 	public void Paint(){
 		
 		
@@ -67,8 +69,6 @@ public class SecondPanel {
 		final JScrollBar endtimeslider = new JScrollBar(Scrollbar.HORIZONTAL, parent.endtime, 10, 0, 10 + parent.scrollbarSize);
 		
 		parent.thirdDimension = parent.computeScrollbarPositionFromValue(parent.thirdDimensionsliderInit, parent.thirdDimensionsliderInit, parent.thirdDimensionSize, parent.scrollbarSize);
-		
-		
 		
 		
 	

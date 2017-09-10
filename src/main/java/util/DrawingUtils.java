@@ -400,9 +400,9 @@ public class DrawingUtils {
 	public static ArrayList<EllipseRoi> getcurrentRois(MserTree<UnsignedByteType> newtree,
 			ArrayList<double[]> AllmeanCovar) {
 
-		ArrayList<double[]> redmeanandcovlist = new ArrayList<double[]>();
 		ArrayList<double[]> meanandcovchildlist = new ArrayList<double[]>();
 		ArrayList<double[]> meanandcovlist = new ArrayList<double[]>();
+		ArrayList<double[]> redmeanandcovlist = new ArrayList<double[]>();
 		final HashSet<Mser<UnsignedByteType>> rootset = newtree.roots();
 		
 		
@@ -420,7 +420,6 @@ public class DrawingUtils {
 				final double[] meanandcov = { rootmser.mean()[0], rootmser.mean()[1], rootmser.cov()[0],
 						rootmser.cov()[1], rootmser.cov()[2] };
 				meanandcovlist.add(meanandcov);
-
 			}
 		}
 		

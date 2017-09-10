@@ -17,6 +17,9 @@ import listeners.ChooseDirectoryListener;
 import listeners.FileChooserDirectory;
 import listeners.FireTrigger;
 import listeners.FirepreTrigger;
+import listeners.FlatfieldTrigger;
+import listeners.LoadModuletrigger;
+import listeners.MedianfilterTrigger;
 import listeners.PsfXListener;
 import listeners.PsfYListener;
 import listeners.SelfFirepreTrigger;
@@ -167,9 +170,10 @@ public class MainFileChooser extends JPanel {
 		
 		final JButton ChooseDirectory = new JButton("Choose Directory to save results in");
 	   
+		final Checkbox FlatField = new Checkbox("Do Flat Field Correction");
+		final Checkbox MedianFilter = new Checkbox("Apply Median Filter ");
+		final JButton Loadmodule = new JButton("Load tracking module");
 		
-		
-
 		/* Location */
 
 		c.anchor = GridBagConstraints.BOTH;
@@ -197,7 +201,8 @@ public class MainFileChooser extends JPanel {
 				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0) );
 		Original.add(ChooseDirectory,  new GridBagConstraints(0, 5, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
 				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0) );
-	
+		Original.add(FlatField,  new GridBagConstraints(0, 6, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
+				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0) );
 		Original.setBorder(origborder);
 		
 		panelIntro.add(Original,new GridBagConstraints(3, 0, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
@@ -235,10 +240,13 @@ public class MainFileChooser extends JPanel {
 	
 
 		
-		Start.add(ChoosepreImage, new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
+		Start.add(ChoosepreImage, new GridBagConstraints(0, 4, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
 				GridBagConstraints.RELATIVE, new Insets(10, 10, 0, 10), 0, 0));
 	
-
+		Start.add(MedianFilter, new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
+						GridBagConstraints.RELATIVE, new Insets(10, 10, 0, 10), 0, 0));
+		Start.add(Loadmodule, new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
+				GridBagConstraints.RELATIVE, new Insets(10, 10, 0, 10), 0, 0));
 		Start.setBorder(runborder);
 		panelIntro.add(Start, new GridBagConstraints(1, 2, 5, 1, 0.0, 0.0, GridBagConstraints.CENTER,
 				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
@@ -254,6 +262,11 @@ public class MainFileChooser extends JPanel {
 		Simple.addItemListener(new RunSimpleListener());
 		Advanced.addItemListener(new RunAdvancedListener());
 		ChooseImage.addActionListener(new FireTrigger(this, ChooseImage));
+		FlatField.addItemListener(new FlatfieldTrigger(this));
+		MedianFilter.addItemListener(new MedianfilterTrigger(this));
+		Loadmodule.addActionListener(new LoadModuletrigger(this));
+		
+		
 		ChoosepreImage.addActionListener(new FirepreTrigger(this, ChoosepreImage));
 		inputFieldX.addTextListener(new PsfXListener(this));
 		inputFieldY.addTextListener(new PsfYListener(this));
