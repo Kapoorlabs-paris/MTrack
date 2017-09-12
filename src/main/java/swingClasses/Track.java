@@ -169,7 +169,7 @@ public class Track {
 
 		}
 
-		if (parent.Allstart.get(0).size() > 0) {
+		if (parent.Allstart.get(0).size() > 1) {
 			ImagePlus impstartsec = ImageJFunctions.show(parent.originalimg);
 			final Trackstart trackerstart = new Trackstart(parent.Allstart, parent.endtime - next);
 			trackerstart.process();
@@ -179,7 +179,7 @@ public class Track {
 			impstartsec.draw();
 			impstartsec.setTitle("Graph Start A MT");
 		}
-		if (parent.Allend.get(0).size() > 0) {
+		if (parent.Allend.get(0).size() > 1) {
 			ImagePlus impendsec = ImageJFunctions.show(parent.originalimg);
 			final Trackend trackerend = new Trackend(parent.Allend, parent.endtime - next);
 
@@ -191,7 +191,7 @@ public class Track {
 			impendsec.setTitle("Graph Start B MT");
 		}
 
-		if (parent.returnVectorUser != null && parent.AllUser.get(0).size() > 0) {
+		if (parent.returnVectorUser != null && parent.AllUser.get(0).size() > 1) {
 			ImagePlus impstartsec = ImageJFunctions.show(parent.originalimg);
 			final Trackstart trackerstart = new Trackstart(parent.AllUser, parent.endtime - next);
 			trackerstart.process();

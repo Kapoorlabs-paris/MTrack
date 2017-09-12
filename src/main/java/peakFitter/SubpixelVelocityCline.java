@@ -285,6 +285,10 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 						/(paramnextframe.currentpos[0] - paramnextframe.fixedpos[0]) ;
 				
 				double dist = (paramnextframe.currentpos[1] - oldslope * paramnextframe.currentpos[0] -oldintercept)/Math.sqrt(1 + oldslope *oldslope);
+						
+						//Math.toDegrees(Math.atan(((newslope - oldslope)/(1 + newslope * oldslope)))); 
+						
+						//(paramnextframe.currentpos[1] - oldslope * paramnextframe.currentpos[0] -oldintercept)/Math.sqrt(1 + oldslope *oldslope);
 						//Math.toDegrees(Math.atan(((newslope - oldslope)/(1 + newslope * oldslope)))); 
 						 
 						//Math.toDegrees(Math.atan(Math.toRadians((newslope - oldslope)/(1 + newslope * oldslope))));
@@ -402,6 +406,11 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 						/(paramnextframeend.currentpos[0] - paramnextframeend.fixedpos[0]) ;
 				
 				double dist = (paramnextframeend.currentpos[1] - oldslope * paramnextframeend.currentpos[0] -oldintercept)/Math.sqrt(1 + oldslope *oldslope);
+
+						
+						//Math.toDegrees(Math.atan(((newslope - oldslope)/(1 + newslope * oldslope)))); 
+						
+						//(paramnextframeend.currentpos[1] - oldslope * paramnextframeend.currentpos[0] -oldintercept)/Math.sqrt(1 + oldslope *oldslope);
 						//Math.toDegrees(Math.atan(((newslope - oldslope)/(1 + newslope * oldslope)))); 
 			
 						//Math.toDegrees(Math.atan(Math.toRadians((newslope - oldslope)/(1 + newslope * oldslope))));
@@ -468,7 +477,7 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 
 	public Indexedlength Getfinaltrackparam(final Indexedlength iniparam, final int label, final double[] psf,
 			final int rate, final StartorEnd startorend) {
-
+		FitterUtils.SetProgressBarTime(jpb, percent, framenumber, thirdDimsize);
 		final double[] LMparam = FitterUtils.MakerepeatedLineguess(imgs, iniparam, model, Intensityratio, Inispacing, label, ndims, startframe, framenumber);
 		if (LMparam == null)
 			return iniparam;
@@ -656,7 +665,7 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 
 					System.out.println("Number of Gaussians used: " + numgaussians + " ds: " + ds);
 
-					FitterUtils.SetProgressBarTime(jpb, percent, framenumber, thirdDimsize);
+					
 
 					return PointofInterest;
 				} else {

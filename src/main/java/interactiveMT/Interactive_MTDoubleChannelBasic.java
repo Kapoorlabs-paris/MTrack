@@ -103,6 +103,9 @@ public class Interactive_MTDoubleChannelBasic implements PlugIn {
 
 	@Override
 	public void run(String arg) {
+		
+		System.out.println(parent.addToName + " " + parent.userfile);
+		
 		parent.usefolder = parent.userfile.getParentFile().getAbsolutePath();
 
 		parent.FindLinesViaMSER = true;
@@ -223,11 +226,8 @@ public class Interactive_MTDoubleChannelBasic implements PlugIn {
 		panelNext.setLayout(layout);
 		panelFirst.setName("Choose parameters to find Seeds");
 
-		final Checkbox Analyzekymo = new Checkbox("Analyze Kymograph");
-		final JButton ChooseDirectory = new JButton("Choose Directory");
-		TextField inputField = new TextField();
-		inputField.setColumns(20);
-		inputField.setText(parent.userfile.getName().replaceFirst("[.][^.]+$", ""));
+	
+	
 		final Label deltaText = new Label("Threshold difference = " + parent.delta, Label.CENTER);
 		final Label Unstability_ScoreText = new Label("Unstability Score = " + parent.Unstability_Score, Label.CENTER);
 		final Label minSizeText = new Label("Min size of  ellipses = " + parent.minSize, Label.CENTER);
@@ -252,7 +252,6 @@ public class Interactive_MTDoubleChannelBasic implements PlugIn {
 		
 
 		
-		parent.addToName = inputField.getText();
 		
 		
 		panelFirst.setLayout(layout);
@@ -262,15 +261,13 @@ public class Interactive_MTDoubleChannelBasic implements PlugIn {
 		Directoryoptions.setLayout(layout);
 		
 		
-		Border msborder = new CompoundBorder(new TitledBorder("1.6 MSER parameters"), new EmptyBorder(c.insets));
+		Border msborder = new CompoundBorder(new TitledBorder("1.5 MSER parameters"), new EmptyBorder(c.insets));
 		Directoryoptions.setLayout(layout);
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridx = 0;
 		c.gridy = 0;
 		c.weightx = 1;
 
-		Border dirborder = new CompoundBorder(new TitledBorder("1.5 File name"),
-				new EmptyBorder(c.insets));
 		
 		
 	
@@ -301,25 +298,12 @@ public class Interactive_MTDoubleChannelBasic implements PlugIn {
 	  panelFirst.add(Mserparam, new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 
-	 /* 
-		Directoryoptions.add(inputField,  new GridBagConstraints(0, 4, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
-				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0) );
-		Directoryoptions.add(ChooseDirectory,  new GridBagConstraints(0, 5, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
-				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0) );
 	
-		Directoryoptions.setBorder(dirborder);
-		
-	   panelFirst.add(Directoryoptions, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
-				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));	
-	  
-	*/  
-
 
 	
 		panelFirst.setVisible(true);
 		cl.show(panelCont, "1");
 
-		ChooseDirectory.addActionListener(new ChooseDirectoryListener(parent, inputField, parent.userfile));
 		deltaS.addAdjustmentListener(
 				new DeltaListener(parent, deltaText, parent.deltaMin, parent.deltaMax, parent.scrollbarSize, deltaS));
 		minSizeS.addAdjustmentListener(new MinSizeListener(parent, minSizeText, parent.minSizemin, parent.minSizemax,

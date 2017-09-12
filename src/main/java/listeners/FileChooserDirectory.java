@@ -35,9 +35,9 @@ import interactiveMT.MainFileChooser;
 			chooserA.showOpenDialog(parent.panelIntro);
 			
 			
-			parent.inputField.setText(parent.chooserB.getSelectedFile().getName().replaceFirst("[.][^.]+$", ""));
+			parent.userfile = parent.chooserB.getSelectedFile();
 
-			parent.addToName = parent.inputField.getText();
+		
 
 			
 		}

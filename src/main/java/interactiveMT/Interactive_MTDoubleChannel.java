@@ -134,6 +134,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public String usefolder = IJ.getDirectory("imagej");
 	public ColorProcessor cp = null;
 	public String addToName = "MTrack";
+	public TextField inputField = new TextField();
 	public ArrayList<float[]> deltadstart = new ArrayList<>();
 	public ArrayList<float[]> deltadend = new ArrayList<>();
 	public ArrayList<float[]> deltad = new ArrayList<>();
@@ -199,7 +200,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public double Intensityratio = 0.35;
 	public double slopetolerance = 5;
 	public double Inispacing = 0.5;
-	public double maxdist = 10;
+	public double maxdist = 30;
 	public double zerodist = 30;
 	public int numgaussians = 2;
 	public int thirdDimensionslider = 1;
@@ -603,7 +604,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 	public Interactive_MTDoubleChannel(final RandomAccessibleInterval<FloatType> originalimg,
 			final RandomAccessibleInterval<FloatType> originalPreprocessedimg, final double[] psf,
-			final double[] imgCal, final File userfile) {
+			final double[] imgCal, final File userfile, final String addToName) {
 
 		this.originalimg = originalimg;
 		this.originalPreprocessedimg = originalPreprocessedimg;
@@ -616,6 +617,8 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		
 		impcopy = imp.duplicate();
 
+		this.addToName = addToName;
+		
 		this.userfile = userfile;
 		calibration = imgCal;
 		System.out.println(calibration[0] + " " + calibration[1] + " " + calibration[2]);
@@ -626,7 +629,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public Interactive_MTDoubleChannel(final RandomAccessibleInterval<FloatType> originalimg,
 			final RandomAccessibleInterval<FloatType> originalPreprocessedimg,
 			final RandomAccessibleInterval<FloatType> kymoimg, final double[] psf, final double[] imgCal,
-			final File userfile) {
+			final File userfile, final String addToName) {
 
 		this.originalimg = originalimg;
 		this.originalPreprocessedimg = originalPreprocessedimg;
@@ -637,7 +640,8 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		imp = ImageJFunctions.show(originalimg);
 		imp.setTitle("Original movie");
 		impcopy = imp.duplicate();
-
+		this.addToName = addToName;
+		
 		this.userfile = userfile;
 		calibration = imgCal;
 		System.out.println(calibration[0] + " " + calibration[1]);
@@ -647,6 +651,9 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	@Override
 	public void run(String arg) {
 
+		
+		System.out.println(addToName + " " + userfile);
+		
 		usefolder = userfile.getParentFile().getAbsolutePath();
 		 newends = new Markendsnew(this);
 		
@@ -1175,12 +1182,8 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		this.thirdDimensionslider = (int) computeIntValueFromScrollbarPosition(thirdDimensionsliderInit, timeMin,
 				thirdDimensionSize, thirdDimensionSize);
 	
-		final JButton ChooseDirectory = new JButton("Choose Directory");
-		TextField inputField = new TextField();
-		inputField.setColumns(20);
-		inputField.setText(userfile.getName().replaceFirst("[.][^.]+$", ""));
+	
 
-		addToName = inputField.getText();
 		
 
 		String[] Method = { "MSER", "HOUGH","MSERwHOUGH" };
@@ -1211,8 +1214,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		Border cannyborder = new CompoundBorder(new TitledBorder("Edge enhancment (optional)"),
 				new EmptyBorder(c.insets));
 		
-		Border dirborder = new CompoundBorder(new TitledBorder("File name"),
-				new EmptyBorder(c.insets));
+		
 		
 		Cannychoice.add(inputradi, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
 				GridBagConstraints.RELATIVE, insets, 0, 0));
@@ -1232,17 +1234,6 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 		
 		
-	//	Directoryoptions.add(inputField,  new GridBagConstraints(0, 4, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
-	//			GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0) );
-	//	Directoryoptions.add(ChooseDirectory,  new GridBagConstraints(0, 5, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
-	//			GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0) );
-	
-	//	Directoryoptions.setBorder(dirborder);
-
-		
-		
-	//	panelFirst.add(Directoryoptions, new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
-	//			GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 
 
        
@@ -1252,7 +1243,6 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		
 		inputFieldradi.addTextListener(new RadiusListener(this));
 
-		ChooseDirectory.addActionListener(new ChooseDirectoryListener(this, inputField, userfile));
         ChooseMethod.addActionListener(new MethodListener(this, ChooseMethod));
 		
 	
@@ -2186,7 +2176,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		gd.addNumericField(
 				"Initial Spacing between Gaussians along the Polynomial curve = G * Min(Psf), G (enter positive number) = ",
 				Inispacing / Math.min(psf[0], psf[1]), 2);
-		gd.addNumericField("Maximum direction change per frame (in pixels)", maxdist, 2);
+		gd.addNumericField("Maximum direction change per frame (in degrees)", maxdist, 2);
 
 		
 
@@ -2227,7 +2217,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 				"Initial Spacing between Gaussians along the Polynomial curve = G * Min(Psf), G (enter positive number ) = ",
 				Inispacing / Math.min(psf[0], psf[1]), 2);
 
-		gd.addNumericField("Maximum direction change per frame (in pixels)", maxdist, 2);
+		gd.addNumericField("Maximum direction change per frame (in degrees)", maxdist, 2);
 		gd.addNumericField("Number of Gaussians for mask fits ", numgaussians, 2);
 		
 		gd.showDialog();

@@ -38,7 +38,7 @@ import net.imglib2.view.Views;
 import swingClasses.PreprocessFlat;
 import swingClasses.PreprocessMedian;
 
-public class MedianfilterTrigger implements ItemListener {
+public class MedianfilterTrigger implements ActionListener {
 
 	
 	final MainFileChooser parent;
@@ -49,7 +49,7 @@ public class MedianfilterTrigger implements ItemListener {
 	}
 	
 	@Override
-	public void itemStateChanged(ItemEvent e) {
+	public void actionPerformed(ActionEvent e) {
 		
 	
 		
@@ -66,6 +66,10 @@ public class MedianfilterTrigger implements ItemListener {
 	
 
 	}
+
+	
+
+	
 
 	
 }

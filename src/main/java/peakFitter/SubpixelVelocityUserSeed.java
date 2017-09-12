@@ -269,14 +269,17 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 			double newstartslope = paramnextframestart.slope;
 			double newstartintercept = paramnextframestart.intercept;
 			if (framenumber > startframe + 1){
-			double oldslope = (Userframe.get(index).currentpos[1] -  Userframe.get(index).currentpos[0])
-					/(Userframe.get(index).fixedpos[1] -  Userframe.get(index).fixedpos[0]);
+			double oldslope = (Userframe.get(index).currentpos[1] -  Userframe.get(index).fixedpos[1])
+					/(Userframe.get(index).currentpos[0] -  Userframe.get(index).fixedpos[0]);
 			
 			double oldintercept = Userframe.get(index).currentpos[1] - oldslope * Userframe.get(index).currentpos[0];
+			
 			double newslope = (paramnextframestart.currentpos[1] - paramnextframestart.fixedpos[1] ) 
 					/(paramnextframestart.currentpos[0] - paramnextframestart.fixedpos[0]) ;
 			
 			double dist = (paramnextframestart.currentpos[1] - oldslope * paramnextframestart.currentpos[0] -oldintercept)/Math.sqrt(1 + oldslope *oldslope);
+					//Math.toDegrees(Math.atan(((newslope - oldslope)/(1 + newslope * oldslope)))); 
+				//	(paramnextframestart.currentpos[1] - oldslope * paramnextframestart.currentpos[0] -oldintercept)/Math.sqrt(1 + oldslope *oldslope);
 					//Math.toDegrees(Math.atan(((newslope - oldslope)/(1 + newslope * oldslope)))); 
 			
 			
@@ -452,7 +455,7 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 			final int rate) {
 
 		final double[] LMparam = MakerepeatedLineguess(iniparam, label, rate);
-
+		FitterUtils.SetProgressBarTime(jpb, percent, framenumber, thirdDimsize);
 		if (LMparam == null)
 			return iniparam;
 
@@ -650,7 +653,7 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 					System.out.println("New XMask: " + endfit[0] + " New YMask: " + endfit[1]);
 				System.out.println("Number of Gaussians used: " + numgaussians + "ds: " + ds);
 
-				FitterUtils.SetProgressBarTime(jpb, percent, framenumber, thirdDimsize);
+				
 
 				return PointofInterest;
 

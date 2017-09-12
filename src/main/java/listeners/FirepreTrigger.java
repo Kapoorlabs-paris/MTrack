@@ -41,21 +41,19 @@ public class FirepreTrigger implements ActionListener {
 
 	
 	final MainFileChooser parent;
-	final JComboBox<String> choice;
 	
-	public FirepreTrigger(MainFileChooser parent,final JComboBox<String> choice ){
+	public FirepreTrigger(MainFileChooser parent ){
 		
 		this.parent = parent;
-		this.choice = choice;
 	}
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		
 	
-		int preindex = choice.getSelectedIndex();
+	
 		
-		if (preindex == 0){
+		
 		
 		parent.chooserA = new JFileChooser();
 		if (parent.chooserB != null)
@@ -126,10 +124,10 @@ public class FirepreTrigger implements ActionListener {
 				
 						if (parent.Simplemode)
 							new Interactive_MTDoubleChannelBasic(new Interactive_MTDoubleChannel(parent.originalimg, parent.originalPreprocessedimg,
-									parent.psf, parent.calibration, parent.chooserB.getSelectedFile())).run(null);
+									parent.psf, parent.calibration, parent.userfile, parent.addToName)).run(null);
 						else
 							new Interactive_MTDoubleChannel(parent.originalimg, parent.originalPreprocessedimg, parent.psf, parent.calibration,
-									parent.chooserB.getSelectedFile()).run(null);
+									parent.userfile, parent.addToName).run(null);
 			
 			
 			}
@@ -147,10 +145,10 @@ public class FirepreTrigger implements ActionListener {
 		
 			if (parent.Simplemode)
 				new Interactive_MTDoubleChannelBasic(new Interactive_MTDoubleChannel(parent.originalimg, parent.originalPreprocessedimg,
-						parent.psf, parent.calibration, parent.chooserB.getSelectedFile())).run(null);
+						parent.psf, parent.calibration, parent.userfile, parent.addToName)).run(null);
 			else
 				new Interactive_MTDoubleChannel(parent.originalimg, parent.originalPreprocessedimg, parent.psf, parent.calibration,
-						parent.chooserB.getSelectedFile()).run(null);
+						parent.userfile, parent.addToName).run(null);
 			
 		}
 		
@@ -163,27 +161,17 @@ public class FirepreTrigger implements ActionListener {
 
 			if (parent.Simplemode)
 				new Interactive_MTSingleChannelBasic(new Interactive_MTSingleChannel(parent.originalimg, parent.originalPreprocessedimg,
-						parent.psf, parent.calibration, parent.chooserB.getSelectedFile())).run(null);
+						parent.psf, parent.calibration, parent.userfile, parent.addToName)).run(null);
 			else
 				new Interactive_MTSingleChannel(parent.originalimg, parent.originalPreprocessedimg, parent.psf, parent.calibration,
-						parent.chooserB.getSelectedFile()).run(null);
+						parent.userfile, parent.addToName).run(null);
 			
 			
 		}
 		parent.frame.dispose();
 		}
-		}
-		else{
-			
-			
-			new Normalize();
-			
-			
-			Preprocess prestep = new Preprocess(parent);
-			
-		    prestep.execute();
-			
-		}
+		
+		
 		
 	
 

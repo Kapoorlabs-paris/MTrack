@@ -38,12 +38,12 @@ public class PreprocessMedian extends SwingWorker<Void, Void> {
 		
 		parent.frame.add(parent.jpb, BorderLayout.PAGE_END);
 		parent.frame.validate();
-		final MedianFilterOnly flatfilter = new MedianFilterOnly(parent.originalimg, 2, parent.jpb, parent.psf);
+		final MedianFilterOnly flatfilter = new MedianFilterOnly(parent.originalimg, parent.medianradius, parent.jpb, parent.psf);
 		flatfilter.process();
 		parent.originalPreprocessedimg = flatfilter.getResult();
 		
 		
-		
+		System.out.println(parent.medianradius);
 	
 	
 		

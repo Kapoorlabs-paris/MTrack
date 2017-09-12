@@ -8,6 +8,8 @@ import javax.swing.SwingWorker;
 
 import interactiveMT.Interactive_MTDoubleChannel;
 import interactiveMT.Interactive_MTDoubleChannelBasic;
+import interactiveMT.Interactive_MTSingleChannel;
+import interactiveMT.Interactive_MTSingleChannelBasic;
 import interactiveMT.MainFileChooser;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.algorithm.stats.Normalize;
@@ -60,13 +62,57 @@ public class Preprocess extends SwingWorker<Void, Void> {
 			// Normalize image intnesity
 			Normalize.normalize(Views.iterable(parent.originalPreprocessedimg), parent.minval, parent.maxval);
 			ImageJFunctions.show(parent.originalPreprocessedimg).setTitle("Preprocessed Movie");
-			
+			if (parent.selectedindex == 0)
+			{
+				
+							
+					
 							if (parent.Simplemode)
 								new Interactive_MTDoubleChannelBasic(new Interactive_MTDoubleChannel(parent.originalimg, parent.originalPreprocessedimg,
-										parent.psf, parent.calibration, parent.chooserB.getSelectedFile())).run(null);
+										parent.psf, parent.calibration, parent.userfile, parent.addToName)).run(null);
 							else
 								new Interactive_MTDoubleChannel(parent.originalimg, parent.originalPreprocessedimg, parent.psf, parent.calibration,
-										parent.chooserB.getSelectedFile()).run(null);
+										parent.userfile, parent.addToName).run(null);
+				
+				
+				}
+				
+				
+				
+				
+			
+			
+			
+			if (parent.selectedindex == 1){
+				
+				// Open Reber lab images
+				ImageJFunctions.show(parent.originalPreprocessedimg).setTitle("Preprocessed Movie");
+			
+				if (parent.Simplemode)
+					new Interactive_MTDoubleChannelBasic(new Interactive_MTDoubleChannel(parent.originalimg, parent.originalPreprocessedimg,
+							parent.psf, parent.calibration, parent.userfile, parent.addToName)).run(null);
+				else
+					new Interactive_MTDoubleChannel(parent.originalimg, parent.originalPreprocessedimg, parent.psf, parent.calibration,
+							parent.userfile, parent.addToName).run(null);
+				
+			}
+			
+			
+			if (parent.selectedindex == 2){
+				
+				// Open Surrey lab images
+				
+				ImageJFunctions.show(parent.originalPreprocessedimg).setTitle("Preprocessed Movie");
+
+				if (parent.Simplemode)
+					new Interactive_MTSingleChannelBasic(new Interactive_MTSingleChannel(parent.originalimg, parent.originalPreprocessedimg,
+							parent.psf, parent.calibration, parent.userfile, parent.addToName)).run(null);
+				else
+					new Interactive_MTSingleChannel(parent.originalimg, parent.originalPreprocessedimg, parent.psf, parent.calibration,
+							parent.userfile, parent.addToName).run(null);
+				
+				
+			}
 			
 			
 			

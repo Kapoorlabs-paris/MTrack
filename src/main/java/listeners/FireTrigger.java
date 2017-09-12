@@ -106,12 +106,12 @@ public class FireTrigger implements ActionListener {
 			
 			
 			
-			parent.panelIntro.add(seedimage,new GridBagConstraints(1, 3, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER,
+			parent.panelIntro.add(seedimage,new GridBagConstraints(1, 4, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER,
 					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 			
-			parent.panelIntro.add(dynamicimage,new GridBagConstraints(2, 3, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER,
+			parent.panelIntro.add(dynamicimage,new GridBagConstraints(2, 4, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER,
 					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
-			parent.panelIntro.add(dynamicimagesec,new GridBagConstraints(3, 3, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER,
+			parent.panelIntro.add(dynamicimagesec,new GridBagConstraints(3, 4, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER,
 					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 			
 			parent.panelIntro.validate();
@@ -182,6 +182,7 @@ public class FireTrigger implements ActionListener {
 		parent.inputField.setText(parent.chooserB.getSelectedFile().getName().replaceFirst("[.][^.]+$", ""));
 
 		parent.addToName = parent.inputField.getText();
+		parent.userfile = parent.chooserB.getSelectedFile();
 		parent.panelIntro.validate();
 		
 	//	LoadtrackText.addTextListener(new InputListener(this, parent));

@@ -448,6 +448,10 @@ public class DrawingUtils {
 
 			}
 	       redmeanandcovlist = meanandcovlist;
+	       
+	       /*
+	        * Remove parent, not always a good idea
+	        * 
 			for (int childindex = 0; childindex < meanandcovchildlist.size(); ++childindex) {
 
 				final double[] meanchild = new double[] { meanandcovchildlist.get(childindex)[0],
@@ -466,6 +470,7 @@ public class DrawingUtils {
 				}
 
 			}
+			*/
 
 			for (int index = 0; index < redmeanandcovlist.size(); ++index) {
 

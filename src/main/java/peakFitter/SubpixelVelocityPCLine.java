@@ -309,6 +309,10 @@ public void setMaxdist (double maxdist) {
 						/(paramnextframestart.currentpos[0] - paramnextframestart.fixedpos[0]) ;
 				
 				double dist = (paramnextframestart.currentpos[1] - oldslope * paramnextframestart.currentpos[0] -oldintercept)/Math.sqrt(1 + oldslope *oldslope);
+
+						
+						//Math.toDegrees(Math.atan(((newslope - oldslope)/(1 + newslope * oldslope))));  
+						//(paramnextframestart.currentpos[1] - oldslope * paramnextframestart.currentpos[0] -oldintercept)/Math.sqrt(1 + oldslope *oldslope);
 						
 						//newslope - oldslope; 
 						//Math.toDegrees(Math.atan(Math.toRadians((newslope - oldslope)/(1 + newslope * oldslope))));
@@ -426,6 +430,10 @@ public void setMaxdist (double maxdist) {
 						/(paramnextframeend.currentpos[0] - paramnextframeend.fixedpos[0]) ;
 				
 				double dist = (paramnextframeend.currentpos[1] - oldslope * paramnextframeend.currentpos[0] -oldintercept)/Math.sqrt(1 + oldslope *oldslope);
+
+						
+						//Math.toDegrees(Math.atan(((newslope - oldslope)/(1 + newslope * oldslope)))); 
+						//(paramnextframeend.currentpos[1] - oldslope * paramnextframeend.currentpos[0] -oldintercept)/Math.sqrt(1 + oldslope *oldslope);
 						//Math.toDegrees(Math.atan(((newslope - oldslope)/(1 + newslope * oldslope)))); 
 		
 				if (dist!=Double.NaN ){
@@ -485,7 +493,7 @@ public void setMaxdist (double maxdist) {
 
 	public Indexedlength Getfinaltrackparam(final Indexedlength iniparam, final int label, final double[] psf,
 			final int rate, final StartorEnd startorend) {
-
+		FitterUtils.SetProgressBarTime(jpb, percent, framenumber, thirdDimsize);
 		final double[] LMparam = FitterUtils.MakerepeatedLineguess(imgs, iniparam, model, Intensityratio, Inispacing, label, ndims, startframe, framenumber);
 		if (LMparam == null)
 			return iniparam;
@@ -679,7 +687,7 @@ public void setMaxdist (double maxdist) {
 
 					System.out.println("Number of Gaussians used: " + numgaussians + " ds: " + ds);
 
-					FitterUtils.SetProgressBarTime(jpb, percent, framenumber, thirdDimsize);
+					
 
 					return PointofInterest;
 				} else {
