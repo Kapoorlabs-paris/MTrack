@@ -256,6 +256,9 @@ public void setMaxdist (double maxdist) {
 
 					labelindex = labelstart.get(0);
 
+				
+			
+				
 				if (labelindex != Integer.MIN_VALUE) {
 					
 					
@@ -297,7 +300,7 @@ public void setMaxdist (double maxdist) {
 				double newstartslope = paramnextframestart.slope;
 				double newstartintercept = paramnextframestart.intercept;
 			
-				if (framenumber > startframe + 1){
+				if (framenumber > startframe + 1 || Math.abs(newstartslope)!=Double.NaN){
 					
 					
 				double oldslope = (PrevFrameparamstart.get(index).currentpos[1] - PrevFrameparamstart.get(index).fixedpos[1] ) 
@@ -319,11 +322,11 @@ public void setMaxdist (double maxdist) {
 				double mindist = (paramnextframestart.currentpos[1] - originalslope * paramnextframestart.currentpos[0] -originalintercept)/Math.sqrt(1 + originalslope *originalslope);
 				
 			
-				if (dist!=Double.NaN){
+				if (Math.abs(dist)!=Double.NaN){
 				System.out.println(dist);
 				
 				// TCASM
-				if (Math.abs(dist) > maxdist  ){
+				if (Math.abs(dist) > maxdist){
 				//	IJ.log("Collision detected, activating TCASM layer");
 					paramnextframestart = PrevFrameparamstart.get(index);
 					newstartpoint = oldstartpoint;
@@ -387,7 +390,6 @@ public void setMaxdist (double maxdist) {
 				if (labelindex != Integer.MIN_VALUE) {
 					paramnextframeend = Getfinaltrackparam(PrevFrameparamend.get(index), labelend.get(0), psf,
 							framenumber, StartorEnd.End); 
-
 					double[] currentposini = paramnextframeend.currentpos;
 					double[] previousposini = PrevFrameparamend.get(index).currentpos;
 					double distmin = Distance(currentposini, previousposini);
@@ -420,7 +422,7 @@ public void setMaxdist (double maxdist) {
 				double[] newendpoint = paramnextframeend.currentpos;
 				double newendslope = paramnextframeend.slope;
 				double newendintercept = paramnextframeend.intercept;
-				if (framenumber > startframe + 1){
+				if (framenumber > startframe + 1 || Math.abs(newendslope)!=Double.NaN){
 				
 				double oldslope = (PrevFrameparamend.get(index).currentpos[1] - PrevFrameparamend.get(index).fixedpos[1] ) 
 						/(PrevFrameparamend.get(index).currentpos[0] - PrevFrameparamend.get(index).fixedpos[0]) ;

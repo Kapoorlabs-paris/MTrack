@@ -304,7 +304,7 @@ public  class SingleTrackBatch {
 
 							bw.write(
 									"\tFrame\tLength (px)\tLength (real)\tiD\tCurrentPosX (px)\tCurrentPosY (px)\tCurrentPosX (real)\tCurrentPosY (real)"
-											+ "\tdeltaL (px)" + "\tdeltaL (real)\n");
+											+ "\tdeltaL (px)  \tdeltaL (real)  \tCalibrationX  \tCalibrationY  \tCalibrationT \n");
 
 							for (int index = 0; index < parent.startlengthlist.size(); ++index) {
 
@@ -345,6 +345,12 @@ public  class SingleTrackBatch {
 														+ "\t" + "\t"
 														+ parent.nf.format(
 																parent.startlengthlist.get(index).lengthrealperframe)
+														+ "\t" + "\t"
+														+  parent.nf.format(parent.calibration[0])  
+														+ "\t" + "\t"
+														+ parent.nf.format(parent.calibration[1])  
+														+ "\t" + "\t"
+														+ parent.nf.format(parent.calibration[2]) 
 														+ "\n");
 
 								}
@@ -508,7 +514,7 @@ public  class SingleTrackBatch {
 
 								bw.write(
 										"\tFrame\tLength (px)\tLength (real)\tiD\tCurrentPosX (px)\tCurrentPosY (px)\tCurrentPosX (real)\tCurrentPosY (real)"
-												+ "\tdeltaL (px)" + "\tdeltaL (real)\n");
+												+ "\tdeltaL (px)  \tdeltaL (real)  \tCalibrationX  \tCalibrationY  \tCalibrationT \n");
 
 								for (int index = 0; index < parent.endlengthlist.size(); ++index) {
 
@@ -520,8 +526,8 @@ public  class SingleTrackBatch {
 														.get(index - 1).currentpointpixel[1])
 
 											bw.write("\t" + parent.endlengthlist.get(index).framenumber + "\t" + "\t"
-													+ parent.nf.format(parent.endlengthlist.get(index).totallengthpixel) + "\t"
-													+ "\t" + parent.nf.format(parent.endlengthlist.get(index).totallengthreal)
+													+ parent.nf.format(parent.endlengthlist.get(index).totallengthpixel) + "\t"+ "\t"
+													+ "\t" + "\t"+ parent.nf.format(parent.endlengthlist.get(index).totallengthreal)
 													+ "\t" + "\t" + parent.nf.format(parent.endlengthlist.get(index).seedid)
 													+ "\t" + "\t"
 													+ parent.nf.format(parent.endlengthlist.get(index).currentpointpixel[0])
@@ -535,6 +541,12 @@ public  class SingleTrackBatch {
 													+ parent.nf.format(parent.endlengthlist.get(index).lengthpixelperframe)
 													+ "\t" + "\t"
 													+ parent.nf.format(parent.endlengthlist.get(index).lengthrealperframe)
+													+ "\t" + "\t"
+													+  parent.nf.format(parent.calibration[0])  
+													+ "\t" + "\t"
+													+ parent.nf.format(parent.calibration[1])  
+													+ "\t" + "\t"
+													+ parent.nf.format(parent.calibration[2]) 
 													+ "\n");
 
 									}
@@ -686,7 +698,7 @@ public  class SingleTrackBatch {
 
 							bw.write(
 									"\tFrame\tLength (px)\tLength (real)\tiD\tCurrentPosX (px)\tCurrentPosY (px)\tCurrentPosX (real)\tCurrentPosY (real)"
-											+ "\tdeltaL (px)" + "\tdeltaL (real)\n");
+											+ "\tdeltaL (px)  \tdeltaL (real)  \tCalibrationX  \tCalibrationY  \tCalibrationT \n");
 
 							for (int index = 0; index < parent.userlengthlist.size(); ++index) {
 								if (parent.userlengthlist.get(index).seedid == seedID) {
@@ -700,8 +712,8 @@ public  class SingleTrackBatch {
 															.get(index - 1).currentpointpixel[1])
 
 										bw.write("\t" + parent.userlengthlist.get(index).framenumber + "\t" + "\t"
-												+ parent.nf.format(parent.userlengthlist.get(index).totallengthpixel) + "\t"
-												+ "\t" + parent.nf.format(parent.userlengthlist.get(index).totallengthreal)
+												+ parent.nf.format(parent.userlengthlist.get(index).totallengthpixel) + "\t"+ "\t"
+												+ "\t"+ "\t" + parent.nf.format(parent.userlengthlist.get(index).totallengthreal)
 												+ "\t" + "\t" + parent.nf.format(parent.userlengthlist.get(index).seedid)
 												+ "\t" + "\t"
 												+ parent.nf.format(parent.userlengthlist.get(index).currentpointpixel[0])
@@ -715,6 +727,12 @@ public  class SingleTrackBatch {
 												+ parent.nf.format(parent.userlengthlist.get(index).lengthpixelperframe)
 												+ "\t" + "\t"
 												+ parent.nf.format(parent.userlengthlist.get(index).lengthrealperframe)
+												+ "\t" + "\t"
+												+  parent.nf.format(parent.calibration[0])  
+												+ "\t" + "\t"
+												+ parent.nf.format(parent.calibration[1])  
+												+ "\t" + "\t"
+												+ parent.nf.format(parent.calibration[2]) 
 												+ "\n");
 
 								}

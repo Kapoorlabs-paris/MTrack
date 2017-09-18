@@ -268,7 +268,7 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 			double[] newstartpoint = paramnextframestart.currentpos;
 			double newstartslope = paramnextframestart.slope;
 			double newstartintercept = paramnextframestart.intercept;
-			if (framenumber > startframe + 1){
+			if (framenumber > startframe + 1|| Math.abs(newstartslope)!=Double.NaN){
 			double oldslope = (Userframe.get(index).currentpos[1] -  Userframe.get(index).fixedpos[1])
 					/(Userframe.get(index).currentpos[0] -  Userframe.get(index).fixedpos[0]);
 			

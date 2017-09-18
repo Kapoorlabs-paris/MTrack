@@ -195,17 +195,34 @@ public class FitterUtils {
        			inputcursor.fwd();
        			inputcursor.localize(newposition);
        			double distline = 0;
-       			
-       			if (currentframe <= startframe + 1)
+       		
+       			if (currentframe <= startframe + 1 || Math.abs(slope)==Double.NaN )
        				distline = Math.abs(inputcursor.getDoublePosition(1) - zeroslope * inputcursor.getDoublePosition(0) - zerointercept) / Math.sqrt(1 + zeroslope * zeroslope);
        			
-       			else
+       			else if (currentframe > startframe + 1  && Math.abs(slope)!=Double.NaN)
        				distline =	Math.abs(inputcursor.getDoublePosition(1) - slope * inputcursor.getDoublePosition(0) - intercept) / Math.sqrt(1 + slope * slope);
-       					
-       		
-       			if (distline < cutoff){
-       				
-       				if (inputcursor.getDoublePosition(0) <= minVal[0]
+       			
+
+       			
+                if (distline < cutoff && Math.abs(distline)!=Double.NaN){			
+				if (inputcursor.getDoublePosition(0) <= minVal[0]
+						&& inputcursor.get().get() / maxintensityline > Intensityratio) {
+					minVal[0] = inputcursor.getDoublePosition(0);
+					minVal[1] = inputcursor.getDoublePosition(1);
+				}
+
+				if (inputcursor.getDoublePosition(0) >= maxVal[0]
+						&& inputcursor.get().get() / maxintensityline > Intensityratio) {
+					maxVal[0] = inputcursor.getDoublePosition(0);
+					maxVal[1] = inputcursor.getDoublePosition(1);
+
+				}
+
+                }
+                
+                else{
+                	
+                	if (inputcursor.getDoublePosition(0) <= minVal[0]
     						&& inputcursor.get().get() / maxintensityline > Intensityratio) {
     					minVal[0] = inputcursor.getDoublePosition(0);
     					minVal[1] = inputcursor.getDoublePosition(1);
@@ -215,8 +232,10 @@ public class FitterUtils {
     						&& inputcursor.get().get() / maxintensityline > Intensityratio) {
     					maxVal[0] = inputcursor.getDoublePosition(0);
     					maxVal[1] = inputcursor.getDoublePosition(1);
+
     				}
-       			}
+                	
+                }
        			
        			
        			
@@ -425,14 +444,16 @@ public class FitterUtils {
 
 			outcursor.localize(newposition);
 			double distline = 0;
-   			
-   			if (currentframe <= startframe + 1)
+			
+   			if (currentframe <= startframe + 1 || Math.abs(slope) == Double.NaN)
    				distline = Math.abs(outcursor.getDoublePosition(1) - zeroslope * outcursor.getDoublePosition(0) - zerointercept) / Math.sqrt(1 + zeroslope * zeroslope);
    			
-   			else
+   			else if (currentframe > startframe + 1 && Math.abs(slope)!=Double.NaN)
    				distline =	Math.abs(outcursor.getDoublePosition(1) - slope * outcursor.getDoublePosition(0) - intercept) / Math.sqrt(1 + slope * slope);
    					
-                if (distline < cutoff){			
+   			
+   			
+                if (distline < cutoff && Math.abs(distline)!=Double.NaN){			
 				if (outcursor.getDoublePosition(0) <= minVal[0]
 						&& outcursor.get().get() / maxintensityline > Intensityratio) {
 					minVal[0] = outcursor.getDoublePosition(0);
@@ -447,13 +468,34 @@ public class FitterUtils {
 				}
 
                 }
-		
+                
+                else{
+                	
+                	if (outcursor.getDoublePosition(0) <= minVal[0]
+    						&& outcursor.get().get() / maxintensityline > Intensityratio) {
+    					minVal[0] = outcursor.getDoublePosition(0);
+    					minVal[1] = outcursor.getDoublePosition(1);
+    				}
+
+    				if (outcursor.getDoublePosition(0) >= maxVal[0]
+    						&& outcursor.get().get() / maxintensityline > Intensityratio) {
+    					maxVal[0] = outcursor.getDoublePosition(0);
+    					maxVal[1] = outcursor.getDoublePosition(1);
+
+    				}
+                	
+                }
+                
+		System.out.println(Math.abs(distline));
 			
 		
 		
 		}
 		Pair<double[], double[]> minmaxpair = new ValuePair<double[], double[]>(minVal, maxVal);
 
+		
+		System.out.println(minVal[0] );
+		
 		return minmaxpair;
 
 	}

@@ -175,6 +175,9 @@ public class MainFileChooser extends JPanel {
 		
 		psf[0] = Float.parseFloat(inputFieldX.getText());
 		psf[1] = Float.parseFloat(inputFieldY.getText());
+		calibration[0] = Float.parseFloat(inputFieldcalX.getText());
+		calibration[1] = Float.parseFloat(inputFieldcalY.getText());
+		calibration[2] = Float.parseFloat(inputFieldT.getText());
 
 		String[] Imagetype = { "Two channel image as hyperstack", "Concatenated seed image followed by time-lapse images",
 				"Single channel time-lapse images" };
@@ -608,8 +611,9 @@ public class MainFileChooser extends JPanel {
 
 				// Tracking is done with imageA measurment is performed on
 				// imageB
-				calibration[0] = impB.getCalibration().pixelWidth;
-				calibration[1] = impB.getCalibration().pixelHeight;
+				calibration[0] = Float.parseFloat(inputFieldcalX.getText());
+				calibration[1] = Float.parseFloat(inputFieldcalY.getText());
+				calibration[2] = Float.parseFloat(inputFieldT.getText());
 				psf[0] = Float.parseFloat(inputFieldX.getText());
 				psf[1] = Float.parseFloat(inputFieldY.getText());
 				new Normalize();
