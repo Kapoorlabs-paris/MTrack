@@ -13,7 +13,7 @@ import net.imglib2.algorithm.localextrema.RefinedPeak;
 import net.imglib2.img.array.ArrayImgFactory;
 import net.imglib2.type.numeric.integer.IntType;
 import net.imglib2.type.numeric.real.FloatType;
-import preProcessing.GetLocalmaxmin;
+import preProcessing.GetLocalmaxminMT;
 import preProcessing.GlobalThresholding;
 
 /**
@@ -127,7 +127,7 @@ public class HoughTransformandMser extends BenchmarkAlgorithm implements OutputA
 					source.numDimensions());
 
 			// Get the list of all the detections
-			SubpixelMinlist = GetLocalmaxmin.HoughspaceMaxima(houghimg, interval, sizes, thetaPerPixel, rhoPerPixel);
+			SubpixelMinlist = GetLocalmaxminMT.HoughspaceMaxima(houghimg, interval, sizes, thetaPerPixel, rhoPerPixel);
 
 			// Reduce the number of detections by picking One line per
 			// Label,

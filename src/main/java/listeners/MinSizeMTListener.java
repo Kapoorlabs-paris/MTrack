@@ -9,14 +9,14 @@ import interactiveMT.Interactive_MTDoubleChannel;
 import interactiveMT.Interactive_MTDoubleChannel.ValueChange;
 import mpicbg.imglib.multithreading.SimpleMultiThreading;
 
-public class MinSizeListener implements AdjustmentListener {
+public class MinSizeMTListener implements AdjustmentListener {
 	final Label label;
 	final float min, max;
 	final int scrollbarSize;
 	final Interactive_MTDoubleChannel parent;
 	final Scrollbar minsizeScrollbar;
 
-	public MinSizeListener(final Interactive_MTDoubleChannel parent, final Label label, final float min, final float max, final int scrollbarSize,
+	public MinSizeMTListener(final Interactive_MTDoubleChannel parent, final Label label, final float min, final float max, final int scrollbarSize,
 			final Scrollbar minsizeScrollbar) {
 		this.label = label;
 		this.min = min;
@@ -27,17 +27,17 @@ public class MinSizeListener implements AdjustmentListener {
 		
 		if (parent.FindLinesViaHOUGH){
 			
-			minsizeScrollbar.addMouseListener( new StandardMouseListener( parent,ValueChange.SHOWHOUGH ) );
-			minsizeScrollbar.addMouseListener( new StandardMouseListener( parent,ValueChange.SHOWMSERinHough ) );
+			minsizeScrollbar.addMouseListener( new StandardsecMouseListener( parent,ValueChange.SHOWHOUGH ) );
+			minsizeScrollbar.addMouseListener( new StandardsecMouseListener( parent,ValueChange.SHOWMSERinHough ) );
 						
 					}
 		else if (parent.FindLinesViaMSER|| parent.FindLinesViaMSERwHOUGH)
 
-			minsizeScrollbar.addMouseListener( new StandardMouseListener( parent, ValueChange.SHOWMSER ) );
+			minsizeScrollbar.addMouseListener( new StandardsecMouseListener( parent, ValueChange.SHOWMSER ) );
 
 	else{
-		minsizeScrollbar.addMouseListener( new StandardMouseListener( parent,ValueChange.SHOWHOUGH ) );
-		minsizeScrollbar.addMouseListener( new StandardMouseListener( parent,ValueChange.SHOWMSERinHough ) );
+		minsizeScrollbar.addMouseListener( new StandardsecMouseListener( parent,ValueChange.SHOWHOUGH ) );
+		minsizeScrollbar.addMouseListener( new StandardsecMouseListener( parent,ValueChange.SHOWMSERinHough ) );
 		
 	}
 	}

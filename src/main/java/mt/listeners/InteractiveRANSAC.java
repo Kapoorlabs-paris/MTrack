@@ -96,6 +96,7 @@ public class InteractiveRANSAC implements PlugIn {
 	public static double MAX_CAT = 100.0;
 	public File inputfile;
 	public File[] inputfiles;
+	public double[] calibrations;
 	public String inputdirectory;
 	public NumberFormat nf = NumberFormat.getInstance(Locale.ENGLISH);
 	public ArrayList<Pair<LinearFunction, ArrayList<PointFunctionMatch>>> linearlist;
@@ -245,6 +246,7 @@ public class InteractiveRANSAC implements PlugIn {
 		Compilenegativerates = new HashMap<Integer, ArrayList<Rateobject>>();
 		Compileaverage = new HashMap<Integer, Averagerate>();
 		
+		calibrations = new double[3];
 	 lifecount = new ArrayList<Pair<Integer, Double>>();
 	 countfile = 0;
 	 AllMoviesB = new ArrayList<File>();
@@ -324,12 +326,15 @@ public class InteractiveRANSAC implements PlugIn {
 			userTableModel.addRow(currenttrack);
 		}
 		
-		
+	
 		  table = new JTable(userTableModel);
-		
+			table.setPreferredSize(new Dimension(300, 200));
+		  table.setAutoResizeMode( JTable.AUTO_RESIZE_OFF );
 		 scrollPane = new JScrollPane(table);
 		 scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-		 scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		 scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+		 scrollPane.setMinimumSize(new Dimension(300, 200));
+		 scrollPane.setMaximumSize(new Dimension(300, 200));
 		 scrollPane.setPreferredSize(new Dimension(300, 200));
 		 
 			// Location
@@ -564,9 +569,10 @@ public class InteractiveRANSAC implements PlugIn {
         	 this.inputdirectory = this.inputfiles[trackindex].getParent();
      		this.mts = Tracking.loadMT(this.inputfiles[trackindex]);
      		this.points = Tracking.toPoints(mts);
+     		this.calibrations = Tracking.loadCalibration(this.inputfiles[trackindex]);
      		linearlist = new ArrayList<Pair<LinearFunction, ArrayList<PointFunctionMatch>>>();
      		dataset.removeAllSeries();
-            this.dataset.addSeries(Tracking.drawPoints(mts));
+            this.dataset.addSeries(Tracking.drawPoints(mts, calibrations));
 			Tracking.setColor(chart, 0, new Color(64, 64, 64));
 			Tracking.setStroke(chart, 0, 0.2f);
 	         row = trackindex;
@@ -659,6 +665,8 @@ public class InteractiveRANSAC implements PlugIn {
 		ArrayList<Double> previousendX = new ArrayList<Double>();
 		ResultsTable rt = new ResultsTable();
 		ResultsTable rtAll = new ResultsTable();
+		
+		sortPoints(points);
 		for ( final Pair< AbstractFunction2D, ArrayList< PointFunctionMatch > > result : segments )
 		{
 			if ( LinearFunction.slopeFits( result.getB(), linear, minSlope, maxSlope )  )
@@ -670,12 +678,19 @@ public class InteractiveRANSAC implements PlugIn {
 				double startX = minMax.getA();
 				double endX = minMax.getB();
 				
-
+			
+				
+				
+				
 				if (startX < minstartX) {
 
 					minstartX = startX;
+				}
+				if (endX < minendX){
+					
 					minendX = endX;
 				}
+				
 				Polynomial<?, Point> polynomial = (Polynomial) result.getA();
 				
 			
@@ -718,7 +733,12 @@ public class InteractiveRANSAC implements PlugIn {
 					
 				
 				}
-				if (points.get(points.size() - 1).getW()[0] - endX >= tptolerance) {
+				
+				System.out.println("Global start and end" + points.get(points.size() - 1).getW()[0] + " "+ points.get(0).getW()[0]);
+				// Ignore last growth event and tiny start events
+				
+				if (points.get(points.size() - 1).getW()[0] - endX >= tptolerance && endX - points.get(0).getW()[0] >=tptolerance
+						){
 					double startY = polynomial.predict(startX);
 					double linearrate = linear.getCoefficient(1);
 				if (linearrate > 0 && startY - minstartY > restolerance 
@@ -727,25 +747,27 @@ public class InteractiveRANSAC implements PlugIn {
 					restimediff += -previousendX.get(previousendX.size() - 1) + startX;
 
 				}
-
+					
 				
 				
-				if (linearrate > 0  ) {
+				if (linearrate > 0) {
 
 					count++;
 					growthrate = linearrate;
+					
 					timediff += endX - startX;
 					lifetime = endX - startX;
 					averagegrowth += linearrate;
 					lifecount.add(new ValuePair<Integer, Double>(count, lifetime));
 					
 					
-					Rateobject rate = new Rateobject(linearrate, (int)startX, (int)endX);
+					Rateobject rate = new Rateobject(linearrate * calibrations[0] / calibrations[2], (int)(startX* calibrations[2]), (int)(endX* calibrations[2]));
 					allrates.add(rate);
 					rt.incrementCounter();
-					rt.addValue("Start time", startX);
-					rt.addValue("End time", endX);
-					rt.addValue("Growth Rate", linearrate);
+					rt.addValue("Start time", startX* calibrations[2]);
+					rt.addValue("End time", endX* calibrations[2]);
+					rt.addValue("Growth Rate", linearrate * calibrations[0] / calibrations[2]);
+					
 
 				}
 
@@ -754,10 +776,8 @@ public class InteractiveRANSAC implements PlugIn {
 				
 				
 				}
-				
 				}
-				
-				dataset.addSeries( Tracking.drawPoints( Tracking.toPairList( result.getB() ), "Inliers " + segment ) );
+				dataset.addSeries( Tracking.drawPoints( Tracking.toPairList( result.getB() ), calibrations, "Inliers " + segment ) );
 
 				Tracking.setColor( chart, i, new Color( 255, 0, 0 ) );
 				Tracking.setDisplayType( chart, i, false, true );
@@ -788,9 +808,11 @@ public class InteractiveRANSAC implements PlugIn {
 					final Pair< AbstractFunction2D, ArrayList< PointFunctionMatch > > start = segments.get( catastrophy );
 					final Pair< AbstractFunction2D, ArrayList< PointFunctionMatch > > end = segments.get( catastrophy + 1 );
 
-					final double tStart = start.getB().get( start.getB().size() -1 ).getP1().getL()[ 0 ];
-					final double tEnd = end.getB().get( 0 ).getP1().getL()[ 0 ];
+					 double tStart = start.getB().get( start.getB().size() -1 ).getP1().getL()[ 0 ];
+					 double tEnd = end.getB().get( 0 ).getP1().getL()[ 0 ];
 
+				
+					
 					final double lStart = start.getB().get( start.getB().size() -1 ).getP1().getL()[ 1 ];
 					final double lEnd = end.getB().get( 0 ).getP1().getL()[ 1 ];
 
@@ -828,7 +850,9 @@ public class InteractiveRANSAC implements PlugIn {
 									dataset.addSeries( Tracking.drawFunction( (Polynomial)fit.getA(), minMax.getA()-1, minMax.getB()+1, 0.1, minY - 2.5, maxY + 2.5, "C " + catastrophy ) );
 									double startX = minMax.getA();
 									double endX = minMax.getB();
+									
 								
+									
 							double	linearrate = fit.getA().getCoefficient(1);
 							if (linearrate < 0) {
 
@@ -839,12 +863,13 @@ public class InteractiveRANSAC implements PlugIn {
 								averageshrink += linearrate;
 
 								rt.incrementCounter();
-								rt.addValue("Start time", startX);
-								rt.addValue("End time", endX);
-								rt.addValue("Growth Rate", linearrate);
+								rt.addValue("Start time", startX* calibrations[2]);
+								rt.addValue("End time", endX * calibrations[2]);
+								rt.addValue("Growth Rate", linearrate * calibrations[0] / calibrations[2]);
 							}
 							
-							Rateobject rate = new Rateobject(linearrate, (int)startX, (int)endX);
+							Rateobject rate = new Rateobject(linearrate* calibrations[0] / calibrations[2],
+									(int)(startX*calibrations[2]), (int)(endX* calibrations[2]));
 							allrates.add(rate);
 									Tracking.setColor( chart, i, new Color( 0, 0, 255 ) );
 									Tracking.setDisplayType( chart, i, true, false );
@@ -852,7 +877,7 @@ public class InteractiveRANSAC implements PlugIn {
 
 									++i;
 
-									dataset.addSeries( Tracking.drawPoints( Tracking.toPairList( fit.getB() ), "C(inl) " + catastrophy ) );
+									dataset.addSeries( Tracking.drawPoints( Tracking.toPairList( fit.getB() ), calibrations, "C(inl) " + catastrophy ) );
 
 									Tracking.setColor( chart, i, new Color( 0, 0, 255 ) );
 									Tracking.setDisplayType( chart, i, false, true );
@@ -884,33 +909,36 @@ public class InteractiveRANSAC implements PlugIn {
 			}
 		}
 		if (count > 0)
-			averagegrowth /= count;
+			averagegrowth /= count* calibrations[0] / calibrations[2];
 
 		if (count > 0) 
 
-			catfrequ = count / timediff;
+			catfrequ = count / (timediff * calibrations[2]);
 		
 		if (rescount > 0)
 
-			resfrequ = rescount / restimediff;
+			resfrequ = rescount / (restimediff * calibrations[2]);
 		
 		if (negcount > 0)
-			averageshrink /= negcount;
+			averageshrink /= negcount* calibrations[0] / calibrations[2];
 		
 		if(resfrequ < 0)
 			resfrequ = 0;
 		
-		rt.show("Rates(pixel units)");
+		rt.show("Rates(real units)");
 
 		rtAll.incrementCounter();
 		rtAll.addValue("Average Growth", averagegrowth);
+		rtAll.addValue("Growth events", count);
 		rtAll.addValue("Average Shrink", averageshrink);
+		rtAll.addValue("Shrink events", negcount);
 		rtAll.addValue("Catastrophe Frequency", catfrequ);
+		rtAll.addValue("Catastrophe events", count - 1);
 		rtAll.addValue("Rescue Frequency", resfrequ);
+		rtAll.addValue("Rescue events", rescount);
+		rtAll.show("Average Rates and Frequencies (real units)");
 
-		rtAll.show("Average Rates and Frequencies (pixel units)");
-
-		Averagerate avrate = new Averagerate(averagegrowth, averageshrink, catfrequ, resfrequ);
+		Averagerate avrate = new Averagerate(averagegrowth, averageshrink, catfrequ, resfrequ, count, negcount, count - 1, rescount);
 		averagerates.add(avrate);
 		Compilepositiverates.put(row, allrates);
 

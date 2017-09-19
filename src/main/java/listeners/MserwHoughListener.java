@@ -178,19 +178,19 @@ public class MserwHoughListener implements ItemListener {
 			c.insets = new Insets(10, 175, 0, 175);
 			parent.panelSecond.add(FindLinesListener, c);
 
-			deltaS.addAdjustmentListener(new DeltaListener(parent, deltaText, parent.deltaMin, parent.deltaMax, parent.scrollbarSize, deltaS));
+			deltaS.addAdjustmentListener(new DeltaMTListener(parent, deltaText, parent.deltaMin, parent.deltaMax, parent.scrollbarSize, deltaS));
 
 			Unstability_ScoreS.addAdjustmentListener(
 					new Unstability_ScoreListener(parent, Unstability_ScoreText, parent.Unstability_ScoreMin, parent.Unstability_ScoreMax, parent.scrollbarSize, Unstability_ScoreS));
 
-			minDiversityS.addAdjustmentListener(new MinDiversityListener(parent, minDiversityText, parent.minDiversityMin,
+			minDiversityS.addAdjustmentListener(new MinDiversityMTListener(parent, minDiversityText, parent.minDiversityMin,
 					parent.minDiversityMax, parent.scrollbarSize, minDiversityS));
 
 			minSizeS.addAdjustmentListener(
-					new MinSizeListener(parent, minSizeText, parent.minSizemin, parent.minSizemax, parent.scrollbarSize, minSizeS));
+					new MinSizeMTListener(parent, minSizeText, parent.minSizemin, parent.minSizemax, parent.scrollbarSize, minSizeS));
 
 			maxSizeS.addAdjustmentListener(
-					new MaxSizeListener(parent, maxSizeText, parent.maxSizemin, parent.maxSizemax, parent.scrollbarSize, maxSizeS));
+					new MaxSizeMTListener(parent, maxSizeText, parent.maxSizemin, parent.maxSizemax, parent.scrollbarSize, maxSizeS));
 
 			min.addItemListener(new DarktobrightListener(parent));
 
@@ -202,7 +202,6 @@ public class MserwHoughListener implements ItemListener {
 			rhoSize.addAdjustmentListener(
 					new RhoSizeHoughListener(parent, rhoText, parent.rhoPerPixelMin, parent.rhoPerPixelMax, parent.scrollbarSize, rhoSize));
 			AdvancedOptions.addItemListener(new AdvancedSeedListener(parent));
-			ComputeTree.addActionListener(new ComputeTreeListener(parent));
 			parent.panelSecond.validate();
 			parent.panelSecond.repaint();
 

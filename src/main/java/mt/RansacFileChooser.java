@@ -203,7 +203,6 @@ public class RansacFileChooser extends JPanel {
 			++c.gridy;
 			c.insets = new Insets(10, 10, 10, 0);
 			panelIntro.add(Done, c);
-			Measurebatch.addActionListener(new MeasurebatchListener(frame));
 			
 			Done.addActionListener(new DoneButtonListener(frame, true));
 			panelIntro.validate();
@@ -265,93 +264,6 @@ public class RansacFileChooser extends JPanel {
 	}
 	
 	
-	protected class MeasurebatchListener implements ActionListener {
-
-		final Frame parent;
-
-		public MeasurebatchListener(Frame parent) {
-
-			this.parent = parent;
-
-		}
-
-		@Override
-		public void actionPerformed(final ActionEvent arg0) {
-
-			int result;
-
-			chooserA = new JFileChooser();
-
-			chooserA.setCurrentDirectory(new java.io.File("."));
-			chooserA.setDialogTitle(choosertitleA);
-			chooserA.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-			//
-			// disable the "All files" option.
-			//
-			chooserA.setAcceptAllFileFilterUsed(false);
-			FileNameExtensionFilter filter = new FileNameExtensionFilter("Rate Files", "txt");
-
-			chooserA.setFileFilter(filter);
-			chooserA.showOpenDialog(parent);
-
-			AllMovies = chooserA.getSelectedFile().listFiles(new FilenameFilter() {
-
-				@Override
-				public boolean accept(File pathname, String filename) {
-
-					return (filename.endsWith(".txt") && !filename.contains("Rates") && !filename.contains("Average")
-							&& !filename.contains("All"));
-				}
-			});
-
-			ArrayList<Pair<Integer, ArrayList<Pair<Integer, Double>>>> Alllife = new ArrayList<Pair<Integer, ArrayList<Pair<Integer, Double>>>>();
-			ResultsTable rtAll = new ResultsTable();
-			
-			for (int i = 0; i < AllMovies.length; ++i) {
-
-				
-				BatchRANSAC batch = new BatchRANSAC(Tracking.loadMT((AllMovies[i])), AllMovies[i], rtAll);
-				
-				batch.run(null);
-				Pair<Integer, ArrayList<Pair<Integer,Double>>> life = new ValuePair<Integer, ArrayList<Pair<Integer,Double>>>(i, batch.lifetime);
-				Alllife.add(life);
-				
-				
-			}
-			List<Pair<Integer,Double>> Xvalues = new ArrayList<Pair<Integer,Double>>();
-
-			for (final Pair<Integer, ArrayList<Pair<Integer,Double>>> key : Alllife){
-			
-				Xvalues.addAll(key.getB());
-			}
-			
-			
-			
-			XYSeries timeseries = Tracking.drawPoints(Xvalues, "Time Distribution");
-			XYSeries counterseries = new XYSeries("Time Distribution");
-			
-			
-			for (final Pair<Integer, Double> key : Xvalues){
-				
-				counterseries.add(key.getB(), key.getA());
-			}
-			
-			
-			XYSeriesCollection dataset = new XYSeriesCollection(counterseries);
-			
-			 final JFreeChart chart =
-					  ChartFactory.createScatterPlot("Time Distribution",
-					  "Time (px)", "Count of growth events", dataset);
-					  
-					  DisplayPoints.display(chart, new Dimension(800, 500));
-	
-
-			LengthDistribution.GetLengthDistribution(AllMovies);
-			Singlefile();
-
-		}
-
-	}
 
 	public void Singlefile() {
 

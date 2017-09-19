@@ -15,8 +15,7 @@ import javax.swing.JOptionPane;
 
 import interactiveMT.Interactive_MTDoubleChannel;
 import listeners.DowatershedListener;
-import listeners.ShowBitimgListener;
-import listeners.ShowwatershedimgListener;
+
 import listeners.ThresholdHoughListener;
 
 public class UpdateHoughListener implements ItemListener {

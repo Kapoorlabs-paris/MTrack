@@ -5,11 +5,11 @@ import java.awt.event.ItemListener;
 
 import interactiveMT.Interactive_MTDoubleChannel;
 
-public class ShowwatershedimgListener implements ItemListener {
+public class ShowwatershedimgMTListener implements ItemListener {
 	
 	final Interactive_MTDoubleChannel parent;
 	
-	public ShowwatershedimgListener(final Interactive_MTDoubleChannel parent ){
+	public ShowwatershedimgMTListener(final Interactive_MTDoubleChannel parent ){
 		
 		this.parent = parent;
 	}

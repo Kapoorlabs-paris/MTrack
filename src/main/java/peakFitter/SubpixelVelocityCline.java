@@ -41,7 +41,6 @@ import net.imglib2.util.ValuePair;
 import net.imglib2.view.Views;
 import peakFitter.GaussianMaskFitMSER.EndfitMSER;
 import peakFitter.SubpixelVelocityPCLine.StartorEnd;
-import preProcessing.GetLocalmaxmin;
 import util.Boundingboxes;
 
 public class SubpixelVelocityCline extends BenchmarkAlgorithm

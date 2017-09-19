@@ -24,7 +24,7 @@ public class MaxSizeHoughListener implements AdjustmentListener {
 		this.scrollbarSize = scrollbarSize;
         this.parent = parent;
 		this.maxsizeScrollbar = maxsizeScrollbar;
-		maxsizeScrollbar.addMouseListener( new StandardMouseListener( parent, ValueChange.SHOWMSERinHough ) );
+		maxsizeScrollbar.addMouseListener( new StandardsecMouseListener( parent, ValueChange.SHOWMSERinHough ) );
 	}
 
 	@Override

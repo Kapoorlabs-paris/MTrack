@@ -56,11 +56,10 @@ import listeners.AdvancedSeedListener;
 import listeners.AdvancedTrackerListener;
 import listeners.BeginTrackListener;
 import listeners.ChooseDirectoryListener;
-import listeners.ComputeTreeListener;
-import listeners.DeltaListener;
+import listeners.DeltaMTListener;
 import listeners.EndTrackListener;
 import listeners.FindLinesListener;
-import listeners.MinSizeListener;
+import listeners.MinSizeMTListener;
 import listeners.SeedDisplayListener;
 import listeners.SkipFramesandTrackendsListener;
 import listeners.TrackendsListener;
@@ -305,8 +304,8 @@ public class Interactive_MTDoubleChannelBasic implements PlugIn {
 		cl.show(panelCont, "1");
 
 		deltaS.addAdjustmentListener(
-				new DeltaListener(parent, deltaText, parent.deltaMin, parent.deltaMax, parent.scrollbarSize, deltaS));
-		minSizeS.addAdjustmentListener(new MinSizeListener(parent, minSizeText, parent.minSizemin, parent.minSizemax,
+				new DeltaMTListener(parent, deltaText, parent.deltaMin, parent.deltaMax, parent.scrollbarSize, deltaS));
+		minSizeS.addAdjustmentListener(new MinSizeMTListener(parent, minSizeText, parent.minSizemin, parent.minSizemax,
 				parent.scrollbarSize, minSizeS));
 		Unstability_ScoreS.addAdjustmentListener(new Unstability_ScoreListener(parent, Unstability_ScoreText,
 				parent.Unstability_ScoreMin, parent.Unstability_ScoreMax, parent.scrollbarSize, Unstability_ScoreS));

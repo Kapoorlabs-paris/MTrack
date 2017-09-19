@@ -67,27 +67,27 @@ import labeledObjects.Indexedlength;
 import listeners.AdvancedTrackerListener;
 import listeners.BeginTrackListener;
 import listeners.ChooseDirectoryListener;
-import listeners.ComputeMserinHoughListener;
 import listeners.DarktobrightListener;
 import listeners.DeltaHoughListener;
-import listeners.DeltaListener;
+import listeners.DeltaMTListener;
 import listeners.DoMserSegmentation;
 import listeners.DoSegmentation;
 import listeners.EndTrackListener;
 import listeners.EndtimeListener;
 import listeners.MaxSizeHoughListener;
-import listeners.MaxSizeListener;
+import listeners.MaxSizeMTListener;
 import listeners.MethodListener;
 import listeners.MinDiversityHoughListener;
 import listeners.Unstability_ScoreListener;
-import listeners.MinDiversityListener;
+import listeners.MinDiversityMTListener;
 import listeners.MinSizeHoughListener;
-import listeners.MinSizeListener;
+import listeners.MinSizeMTListener;
 import listeners.RadiusListener;
 import listeners.SeedDisplayListener;
 import listeners.SegMethodListener;
-import listeners.ShowBitimgListener;
-import listeners.ShowwatershedimgListener;
+import listeners.ShowBitimgMTListener;
+import listeners.ShowautoListener;
+import listeners.ShowwatershedimgMTListener;
 import listeners.SkipFramesandTrackendsListener;
 import listeners.StarttimeListener;
 import listeners.ThresholdHoughHFListener;
@@ -107,8 +107,9 @@ import net.imglib2.type.numeric.integer.UnsignedByteType;
 import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.util.Pair;
 import net.imglib2.view.Views;
-import preProcessing.GetLocalmaxmin;
-import preProcessing.GetLocalmaxmin.IntensityType;
+import preProcessing.GetLocalmaxminMT;
+import preProcessing.GetLocalmaxminMT.IntensityType;
+import preProcessing.GlobalThresholding;
 import preProcessing.Kernels;
 import preProcessing.MedianFilter2D;
 import trackerType.MTTracker;
@@ -186,6 +187,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public boolean analyzekymo = false;
 	public boolean darktobright = false;
 	public boolean displayBitimg = false;
+	public boolean autothreshold = true;
 	public boolean displayWatershedimg = false;
 	public boolean displayoverlay = true;
 	public long minSize = 1;
@@ -219,7 +221,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public int minSizeInit = 10;
 	public int maxSizeInit = 5000;
 
-	public float thresholdHoughInit = new Float(0.25);
+	public float thresholdHoughInit = new Float(0.1);
 	public float rhoPerPixelInit = new Float(1);
 	public float thetaPerPixelInit = new Float(1);
 	public JLabel inputMaxdpixel;
@@ -612,11 +614,12 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		this.Kymoimg = null;
 		standardRectangle = new Rectangle(inix, iniy, (int) originalimg.dimension(0) - 2 * inix,
 				(int) originalimg.dimension(1) - 2 * iniy);
+		
+		
 		imp = ImageJFunctions.show(originalimg);
 		imp.setTitle("Original movie");
 		
 		impcopy = imp.duplicate();
-
 		this.addToName = addToName;
 		
 		this.userfile = userfile;
@@ -635,9 +638,12 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		this.originalPreprocessedimg = originalPreprocessedimg;
 		this.Kymoimg = kymoimg;
 		this.psf = psf;
+		
+
 		standardRectangle = new Rectangle(inix, iniy, (int) originalimg.dimension(0) - 2 * inix,
 				(int) originalimg.dimension(1) - 2 * iniy);
 		imp = ImageJFunctions.show(originalimg);
+		
 		imp.setTitle("Original movie");
 		impcopy = imp.duplicate();
 		this.addToName = addToName;
@@ -719,7 +725,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		
 		preprocessedimp = ImageJFunctions.show(CurrentView);
 		preprocessedimp.setTitle("Active image" + " " +  "time point : " + thirdDimension);
-		
+	
 	
 		
 		Roi roi = preprocessedimp.getRoi();
@@ -778,17 +784,19 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 			}
 			
 			else {
+			
 				final float[] pixels = (float[]) preprocessedimp.getProcessor().getPixels();
 				final Cursor<FloatType> c = Views.iterable(CurrentView).cursor();
 
 				for (int i = 0; i < pixels.length; ++i)
-					pixels[i] = c.next().get();
+					pixels[i] = (float) c.next().get();
 
 				preprocessedimp.updateAndDraw();
 
 			}
 
 			preprocessedimp.setTitle("Active image" + " " + "time point : " + thirdDimension);
+		
 			}
 		
 		if (change == ValueChange.THIRDDIMmouse) {
@@ -799,6 +807,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 			}
 			
 			else {
+			
 				final float[] pixels = (float[]) preprocessedimp.getProcessor().getPixels();
 				final Cursor<FloatType> c = Views.iterable(CurrentView).cursor();
 
@@ -810,7 +819,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 			}
 
 			preprocessedimp.setTitle("Active image" + " " + "time point : " + thirdDimension);
-			
+		
 			preprocessedimp.getCanvas().removeMouseListener(ml);
 			newends.markendnew();
 			
@@ -819,9 +828,12 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 		if (change == ValueChange.THIRDDIMTrack) {
 
-			if (preprocessedimp == null)
+			if (preprocessedimp == null){
 				preprocessedimp = ImageJFunctions.show(CurrentView);
+				
+			}
 			else {
+			
 				final float[] pixels = (float[]) preprocessedimp.getProcessor().getPixels();
 				final Cursor<FloatType> c = Views.iterable(CurrentView).cursor();
 
@@ -833,7 +845,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 			}
 
 			preprocessedimp.setTitle("Active image" + " " +  "time point : " + thirdDimension);
-
+		
 			// check if Roi changed
 
 			long[] min = { (long) standardRectangle.getMinX(), (long) standardRectangle.getMinY() };
@@ -852,7 +864,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 			if (preprocessedimp != null)
 				preprocessedimp.close();
 			preprocessedimp = ImageJFunctions.show(CurrentPreprocessedView);
-
+		
 			Roi roi = preprocessedimp.getRoi();
 
 			Rectangle rect = roi.getBounds();
@@ -992,19 +1004,21 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 					standardRectangle);
 
 			bitimg = new ArrayImgFactory<BitType>().create(newimg, new BitType());
-
 			bitimgFloat = new ArrayImgFactory<FloatType>().create(newimg, new FloatType());
 
-			GetLocalmaxmin.ThresholdingBit(currentPreprocessedimg, bitimg, thresholdHough);
-			GetLocalmaxmin.Thresholding(currentPreprocessedimg, bitimgFloat, thresholdHough, IntensityType.Gaussian,
+			if(autothreshold)
+			thresholdHough = (float) 0.75 * ( GlobalThresholding.AutomaticThresholding(currentPreprocessedimg));
+			
+			System.out.println(thresholdHough);
+			GetLocalmaxminMT.ThresholdingMTBit(currentPreprocessedimg, bitimg, thresholdHough);
+			GetLocalmaxminMT.ThresholdingMT(currentPreprocessedimg, bitimgFloat, thresholdHough,IntensityType.Gaussian,
 					new double[]{0.5, 0.5});
 
 			if (displayBitimg)
 				ImageJFunctions.show(bitimg);
 
 			WatershedDistimg<FloatType> WaterafterDisttransform = new WatershedDistimg<FloatType>(
-					currentPreprocessedimg, bitimg);
-			WaterafterDisttransform.checkInput();
+					Kernels.CannyEdgeandMean(currentPreprocessedimg, Cannyradius), bitimg);
 			WaterafterDisttransform.process();
 			intimg = WaterafterDisttransform.getResult();
 			Maxlabel = WaterafterDisttransform.GetMaxlabelsseeded(intimg);
@@ -1405,6 +1419,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		final Scrollbar threshold = new Scrollbar(Scrollbar.HORIZONTAL, (int) thresholdHoughInit, 10, 0,
 				10 + scrollbarSize);
 
+		final Checkbox autothresh = new Checkbox("Auto determine threshold", autothreshold);
 		final Checkbox displayBit = new Checkbox("Display Bitimage ", displayBitimg);
 		final Checkbox displayWatershed = new Checkbox("Display Watershedimage ", displayWatershedimg);
 
@@ -1441,40 +1456,43 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 		HoughparamHF.add(displayBit,  new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
-
-		HoughparamHF.add(displayWatershed,  new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+		
+		HoughparamHF.add(autothresh,  new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+		
+		HoughparamHF.add(displayWatershed,  new GridBagConstraints(0, 4, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 	   
 	
 		
-		HoughparamHF.add(deltaText,  new GridBagConstraints(0, 4, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+		HoughparamHF.add(deltaText,  new GridBagConstraints(0, 5, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 		 
-		HoughparamHF.add(deltaS,  new GridBagConstraints(0, 5, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+		HoughparamHF.add(deltaS,  new GridBagConstraints(0, 6, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 
-		HoughparamHF.add(Unstability_ScoreText,  new GridBagConstraints(0, 6, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+		HoughparamHF.add(Unstability_ScoreText,  new GridBagConstraints(0, 7, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 
-		HoughparamHF.add(Unstability_ScoreS,  new GridBagConstraints(0, 7, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+		HoughparamHF.add(Unstability_ScoreS,  new GridBagConstraints(0, 8, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 		
-		HoughparamHF.add(minDiversityText,  new GridBagConstraints(0, 8, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+		HoughparamHF.add(minDiversityText,  new GridBagConstraints(0, 9, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 
-	HoughparamHF.add(minDiversityS,  new GridBagConstraints(0, 9, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+	HoughparamHF.add(minDiversityS,  new GridBagConstraints(0, 10, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 		   
-		HoughparamHF.add(minSizeText,  new GridBagConstraints(0, 10, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+		HoughparamHF.add(minSizeText,  new GridBagConstraints(0, 11, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 
-		HoughparamHF.add(minSizeS,  new GridBagConstraints(0, 11, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+		HoughparamHF.add(minSizeS,  new GridBagConstraints(0, 12, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 		  
-		HoughparamHF.add(maxSizeText,  new GridBagConstraints(0, 12, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+		HoughparamHF.add(maxSizeText,  new GridBagConstraints(0, 13, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 		 
-		HoughparamHF.add(maxSizeS,  new GridBagConstraints(0, 13, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+		HoughparamHF.add(maxSizeS,  new GridBagConstraints(0, 14, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 		 
 		
@@ -1536,24 +1554,25 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		AdvancedOptions.addItemListener(new AdvancedTrackerListener(this));
 
 		 
-		deltaS.addAdjustmentListener(new DeltaListener(this, deltaText, deltaMin, deltaMax,scrollbarSize, deltaS));
+		deltaS.addAdjustmentListener(new DeltaMTListener(this, deltaText, deltaMin, deltaMax,scrollbarSize, deltaS));
 
 		Unstability_ScoreS.addAdjustmentListener(
 				new Unstability_ScoreListener(this, Unstability_ScoreText, Unstability_ScoreMin, Unstability_ScoreMax, scrollbarSize, Unstability_ScoreS));
 
-		minDiversityS.addAdjustmentListener(new MinDiversityListener(this, minDiversityText, minDiversityMin,
+		minDiversityS.addAdjustmentListener(new MinDiversityMTListener(this, minDiversityText, minDiversityMin,
 				minDiversityMax, scrollbarSize, minDiversityS));
 
 		minSizeS.addAdjustmentListener(
-				new MinSizeListener(this, minSizeText, minSizemin, minSizemax, scrollbarSize, minSizeS));
+				new MinSizeMTListener(this, minSizeText, minSizemin, minSizemax, scrollbarSize, minSizeS));
 
 		maxSizeS.addAdjustmentListener(
-				new MaxSizeListener(this, maxSizeText, maxSizemin, maxSizemax, scrollbarSize, maxSizeS));
+				new MaxSizeMTListener(this, maxSizeText, maxSizemin, maxSizemax, scrollbarSize, maxSizeS));
 		threshold.addAdjustmentListener(new ThresholdHoughHFListener(this, thresholdText, thresholdHoughMin,
 				thresholdHoughMax, scrollbarSize, threshold));
 
-		displayBit.addItemListener(new ShowBitimgListener(this));
-		displayWatershed.addItemListener(new ShowwatershedimgListener(this));
+		displayBit.addItemListener(new ShowBitimgMTListener(this));
+		autothresh.addItemListener(new ShowautoListener(this));
+		displayWatershed.addItemListener(new ShowwatershedimgMTListener(this));
 		// Dowatershed.addActionListener(new DowatershedListener(this));
 		displayBitimg = false;
 		displayWatershedimg = false;
@@ -1705,19 +1724,19 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 			
 		 
 		 
-			deltaS.addAdjustmentListener(new DeltaListener(this, deltaText, deltaMin, deltaMax,scrollbarSize, deltaS));
+			deltaS.addAdjustmentListener(new DeltaMTListener(this, deltaText, deltaMin, deltaMax,scrollbarSize, deltaS));
 
 			Unstability_ScoreS.addAdjustmentListener(
 					new Unstability_ScoreListener(this, Unstability_ScoreText, Unstability_ScoreMin, Unstability_ScoreMax, scrollbarSize, Unstability_ScoreS));
 
-			minDiversityS.addAdjustmentListener(new MinDiversityListener(this, minDiversityText, minDiversityMin,
+			minDiversityS.addAdjustmentListener(new MinDiversityMTListener(this, minDiversityText, minDiversityMin,
 					minDiversityMax, scrollbarSize, minDiversityS));
 
 			minSizeS.addAdjustmentListener(
-					new MinSizeListener(this, minSizeText, minSizemin, minSizemax, scrollbarSize, minSizeS));
+					new MinSizeMTListener(this, minSizeText, minSizemin, minSizemax, scrollbarSize, minSizeS));
 
 			maxSizeS.addAdjustmentListener(
-					new MaxSizeListener(this, maxSizeText, maxSizemin, maxSizemax, scrollbarSize, maxSizeS));
+					new MaxSizeMTListener(this, maxSizeText, maxSizemin, maxSizemax, scrollbarSize, maxSizeS));
 
 
 		inputFieldradi.addTextListener(new RadiusListener(this));

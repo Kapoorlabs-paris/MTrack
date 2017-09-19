@@ -24,7 +24,7 @@ public class MinSizeHoughListener implements AdjustmentListener {
 		this.scrollbarSize = scrollbarSize;
         this.parent = parent;
 		this.minsizeScrollbar = minsizeScrollbar;
-		minsizeScrollbar.addMouseListener( new StandardMouseListener( parent,ValueChange.SHOWMSERinHough ) );
+		minsizeScrollbar.addMouseListener( new StandardsecMouseListener( parent,ValueChange.SHOWMSERinHough ) );
 
 	}
 

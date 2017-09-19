@@ -239,9 +239,9 @@ public class InteractiveRegression implements PlugIn {
 			}
 	        
 	        
-	        dataset.addSeries(Tracking.drawPoints(mtspoly, "Function fit"));
-	        dataset.addSeries(Tracking.drawPoints(maxima, "Extremum"));
-	        dataset.addSeries(Tracking.drawPoints(mts, "Original Data"));
+	        dataset.addSeries(Tracking.drawPoints(mtspoly, new double[]{1,1,1}, "Function fit"));
+	        dataset.addSeries(Tracking.drawPoints(maxima, new double[]{1,1,1}, "Extremum"));
+	        dataset.addSeries(Tracking.drawPoints(mts, new double[]{1,1,1}, "Original Data"));
 	      //  dataset.addSeries(Tracking.drawPoints(mtspolyderiv, "Derivative of Function fit"));
 	      //  dataset.addSeries(Tracking.drawPoints(mtspolysecderiv, " SecondDerivative of Function fit"));
 	        

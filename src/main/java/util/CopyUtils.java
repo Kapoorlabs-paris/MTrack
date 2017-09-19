@@ -453,7 +453,7 @@ public class CopyUtils {
 			totalimg = Views.hyperSlice(originalimg, 2, thirdDimension - 1);
 
 		}
-
+		
 		return totalimg;
 
 	}

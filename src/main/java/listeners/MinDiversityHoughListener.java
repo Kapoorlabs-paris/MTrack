@@ -27,7 +27,7 @@ public class MinDiversityHoughListener implements AdjustmentListener {
 		this.parent = parent;
 		this.scrollbarSize = scrollbarSize;
 		this.minDiversityScrollbar = minDiversityScrollbar;
-		minDiversityScrollbar .addMouseListener( new StandardMouseListener( parent,ValueChange.SHOWMSERinHough ) );
+		minDiversityScrollbar .addMouseListener( new StandardsecMouseListener( parent,ValueChange.SHOWMSERinHough ) );
 
 	}
 	

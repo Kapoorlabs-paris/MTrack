@@ -28,7 +28,6 @@ import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.view.Views;
 import poissonSimulator.Poissonprocess;
 import preProcessing.Kernels;
-import preProcessing.GetLocalmaxmin.IntensityType;
 
 public class FakeMT {
 	

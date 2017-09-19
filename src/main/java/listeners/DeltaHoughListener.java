@@ -25,7 +25,7 @@ public class DeltaHoughListener implements AdjustmentListener {
 		this.scrollbarSize = scrollbarSize;
 
 		this.deltaScrollbar = deltaScrollbar;
-		deltaScrollbar.addMouseListener( new StandardMouseListener( parent, ValueChange.SHOWMSERinHough ) );
+		deltaScrollbar.addMouseListener( new StandardsecMouseListener( parent, ValueChange.SHOWHOUGH ) );
 
 	}
 

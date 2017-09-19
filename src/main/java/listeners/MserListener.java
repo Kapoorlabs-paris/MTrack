@@ -154,26 +154,25 @@ import updateListeners.DefaultModelHF;
 			//	c.insets = new Insets(10, 180, 0, 180);
 			//	parent.panelSecond.add(FindLinesbatchListener, c);
 				
-				deltaS.addAdjustmentListener(new DeltaListener(parent, deltaText, parent.deltaMin, parent.deltaMax, 
+				deltaS.addAdjustmentListener(new DeltaMTListener(parent, deltaText, parent.deltaMin, parent.deltaMax, 
 						parent.scrollbarSize, deltaS));
 
 				Unstability_ScoreS.addAdjustmentListener(
 						new Unstability_ScoreListener(parent, Unstability_ScoreText, parent.Unstability_ScoreMin, parent.Unstability_ScoreMax, 
 								parent.scrollbarSize, Unstability_ScoreS));
 
-				minDiversityS.addAdjustmentListener(new MinDiversityListener(parent, minDiversityText, parent.minDiversityMin,
+				minDiversityS.addAdjustmentListener(new MinDiversityMTListener(parent, minDiversityText, parent.minDiversityMin,
 						parent.minDiversityMax, parent.scrollbarSize, minDiversityS));
 
 				minSizeS.addAdjustmentListener(
-						new MinSizeListener(parent, minSizeText,parent.minSizemin, parent.minSizemax,
+						new MinSizeMTListener(parent, minSizeText,parent.minSizemin, parent.minSizemax,
                       parent.scrollbarSize, minSizeS));
 
 				maxSizeS.addAdjustmentListener(
-						new MaxSizeListener(parent,maxSizeText,parent. maxSizemin, parent.maxSizemax, 
+						new MaxSizeMTListener(parent,maxSizeText,parent. maxSizemin, parent.maxSizemax, 
 								parent.scrollbarSize, maxSizeS));
 
 				AdvancedOptions.addItemListener(new AdvancedSeedListener(parent));
-				ComputeTree.addActionListener(new ComputeTreeListener(parent));
 				FindLinesListener.addActionListener(new FindLinesListener(parent));
 				FindLinesbatchListener.addActionListener(new FindLinesbatchListener(parent));
 				parent.panelSecond.validate();

@@ -13,12 +13,12 @@ import interactiveMT.Interactive_MTDoubleChannelBasic;
  * @author spreibi
  *
  */
-public class StandardMouseListener implements MouseListener
+public class StandardsecMouseListener implements MouseListener
 {
 	final Interactive_MTDoubleChannel parent;
 	final ValueChange change;
 
-	public StandardMouseListener( final Interactive_MTDoubleChannel parent, final ValueChange change )
+	public StandardsecMouseListener( final Interactive_MTDoubleChannel parent, final ValueChange change )
 	{
 		this.parent = parent;
 		this.change = change;

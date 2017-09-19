@@ -22,7 +22,6 @@ import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.util.Pair;
 import net.imglib2.util.ValuePair;
-import peakFitter.SubpixelLengthPCKalmanLine;
 import peakFitter.SubpixelLengthPCLine;
 import peakFitter.SubpixelVelocityPCLine;
 import peakFitter.SubpixelVelocityUserSeed;

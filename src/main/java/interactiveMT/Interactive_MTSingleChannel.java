@@ -4,9 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Button;
 import java.awt.CardLayout;
 import java.awt.Checkbox;
-import java.awt.CheckboxGroup;
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -28,14 +26,12 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Locale;
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -61,47 +57,11 @@ import ij.gui.GenericDialog;
 import ij.gui.OvalRoi;
 import ij.gui.Overlay;
 import ij.gui.Roi;
-import ij.plugin.Macro_Runner;
 import ij.plugin.PlugIn;
-import ij.plugin.frame.RoiManager;
 import ij.process.ColorProcessor;
-import interactiveMT.Interactive_MTDoubleChannel.ValueChange;
 import labeledObjects.CommonOutputHF;
 import labeledObjects.Indexedlength;
-import listeners.AdvancedSeedListener;
-import listeners.AdvancedTrackerListener;
-import listeners.BeginTrackListener;
-import listeners.ChooseDirectoryListener;
-import listeners.ComputeMserinHoughListener;
-import listeners.ComputeTreeListener;
-import listeners.DarktobrightListener;
-import listeners.DeltaHoughListener;
-import listeners.DeltaListener;
-import listeners.DoMserSegmentation;
-import listeners.DoSegmentation;
-import listeners.DowatershedListener;
-import listeners.EndTrackListener;
-import listeners.FindLinesListener;
-import listeners.HoughListener;
-import listeners.MaxSizeHoughListener;
-import listeners.MaxSizeListener;
-import listeners.MethodListener;
-import listeners.MinDiversityHoughListener;
-import listeners.Unstability_ScoreListener;
-import listeners.MinDiversityListener;
-import listeners.MinSizeHoughListener;
-import listeners.MinSizeListener;
-import listeners.MserListener;
-import listeners.MserwHoughListener;
-import listeners.RadiusListener;
-import listeners.SeedDisplayListener;
-import listeners.ShowBitimgListener;
-import listeners.ShowwatershedimgListener;
-import listeners.SkipFramesandTrackendsListener;
-import listeners.ThresholdHoughHFListener;
-import listeners.ThresholdHoughListener;
-import listeners.TrackendsListener;
-import listeners.Unstability_ScoreHoughListener;
+import listeners.ShowautoListener;
 import mpicbg.imglib.multithreading.SimpleMultiThreading;
 import mpicbg.imglib.util.Util;
 import net.imglib2.Cursor;
@@ -116,56 +76,29 @@ import net.imglib2.type.numeric.integer.UnsignedByteType;
 import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.util.Pair;
 import net.imglib2.view.Views;
-import preProcessing.GetLocalmaxmin;
-import preProcessing.GetLocalmaxmin.IntensityType;
+import preProcessing.GetLocalmaxminMT.IntensityType;
+import preProcessing.GetLocalmaxminMT;
 import preProcessing.GlobalThresholding;
 import preProcessing.Kernels;
 import preProcessing.MedianFilter2D;
 import singleListeners.SingleAdvancedTrackerListener;
 import singleListeners.SingleBatchModeListener;
-import singleListeners.SingleBeginTrackListener;
 import singleListeners.SingleChooseDirectoryListener;
-import singleListeners.SingleComputeMserinHoughListener;
-import singleListeners.SingleDarktobrightListener;
-import singleListeners.SingleDeltaHoughListener;
 import singleListeners.SingleDeltaListener;
-import singleListeners.SingleDoMserSegmentation;
-import singleListeners.SingleDoSegmentation;
-import singleListeners.SingleEndTrackListener;
-import singleListeners.SingleHoughListener;
-import singleListeners.SingleMaxSizeHoughListener;
 import singleListeners.SingleMaxSizeListener;
 import singleListeners.SingleMethodListener;
-import singleListeners.SingleMinDiversityHoughListener;
 import singleListeners.SingleMinDiversityListener;
-import singleListeners.SingleMinSizeHoughListener;
 import singleListeners.SingleMinSizeListener;
-import singleListeners.SingleMoveNextListener;
-import singleListeners.SingleMserListener;
-import singleListeners.SingleMserwHoughListener;
 import singleListeners.SingleRadiusListener;
-import singleListeners.SingleSeedDisplayListener;
 import singleListeners.SingleShowBitimgListener;
 import singleListeners.SingleShowwatershedimgListener;
 import singleListeners.SingleSkipFramesandTrackendsListener;
 import singleListeners.SingleThresholdHoughHFListener;
-import singleListeners.SingleUnstability_ScoreHoughListener;
 import singleListeners.SingleUnstability_ScoreListener;
+import singleListeners.SingleshowautoListener;
 import trackerType.MTTracker;
-import updateListeners.BatchModeListener;
-import updateListeners.DefaultModel;
-import updateListeners.DefaultModelHF;
-import updateListeners.FinalPoint;
-import updateListeners.FinalizechoicesListener;
-import updateListeners.Markends;
-import updateListeners.MoveNextListener;
-import updateListeners.MoveToFrameListener;
 import updateListeners.SingleDefaultModelHF;
-import updateListeners.SingleFinalPoint;
-import updateListeners.SingleFinalizechoicesListener;
-import updateListeners.SingleMarkends;
 import updateListeners.SingleMarkendsnew;
-import updateListeners.SingleMoveToFrameListener;
 import util.Boundingboxes;
 
 /**
@@ -232,6 +165,7 @@ public class Interactive_MTSingleChannel implements PlugIn {
 	public boolean analyzekymo = false;
 	public boolean darktobright = false;
 	public boolean displayBitimg = false;
+	public boolean autothreshold = true;
 	public boolean displayWatershedimg = false;
 	public boolean displayoverlay = true;
 	public long minSize = 1;
@@ -263,7 +197,7 @@ public class Interactive_MTSingleChannel implements PlugIn {
 	public int minSizeInit = 10;
 	public int maxSizeInit = 5000;
 
-	public float thresholdHoughInit = new Float(0.25);
+	public float thresholdHoughInit = new Float(0.1);
 	public float rhoPerPixelInit = new Float(1);
 	public float thetaPerPixelInit = new Float(1);
 	public JLabel inputMaxdpixel;
@@ -799,9 +733,12 @@ public class Interactive_MTSingleChannel implements PlugIn {
 		if (change == ValueChange.THIRDDIM) {
 			System.out.println("Current Time point: " + thirdDimension);
 
-			if (preprocessedimp == null)
+			if (preprocessedimp == null){
 				preprocessedimp = ImageJFunctions.show(CurrentView);
+				
+			}
 			else {
+			
 				final float[] pixels = (float[]) preprocessedimp.getProcessor().getPixels();
 				final Cursor<FloatType> c = Views.iterable(CurrentView).cursor();
 
@@ -813,6 +750,7 @@ public class Interactive_MTSingleChannel implements PlugIn {
 			}
 
 			preprocessedimp.setTitle("Original image Current View in third dimension: " + " " + thirdDimension);
+		
 		}
 
 		if (change == ValueChange.THIRDDIMmouse) {
@@ -823,6 +761,7 @@ public class Interactive_MTSingleChannel implements PlugIn {
 			}
 			
 			else {
+			
 				final float[] pixels = (float[]) preprocessedimp.getProcessor().getPixels();
 				final Cursor<FloatType> c = Views.iterable(CurrentView).cursor();
 
@@ -834,21 +773,24 @@ public class Interactive_MTSingleChannel implements PlugIn {
 			}
 
 			preprocessedimp.setTitle("Active image" + " " + "time point : " + thirdDimension);
-			
+		
 			preprocessedimp.getCanvas().removeMouseListener(ml);
 			newends.markendnew();
 			
 			}
 		if (change == ValueChange.THIRDDIMTrack) {
 
-			if (preprocessedimp == null)
+			if (preprocessedimp == null){
 				preprocessedimp = ImageJFunctions.show(CurrentView);
+		
+			}
 			else {
+			
 				final float[] pixels = (float[]) preprocessedimp.getProcessor().getPixels();
 				final Cursor<FloatType> c = Views.iterable(CurrentView).cursor();
 
 				for (int i = 0; i < pixels.length; ++i)
-					pixels[i] = c.next().get();
+					pixels[i] = (float)c.next().get();
 
 				preprocessedimp.updateAndDraw();
 
@@ -875,7 +817,7 @@ public class Interactive_MTSingleChannel implements PlugIn {
 			if (preprocessedimp != null)
 				preprocessedimp.close();
 			preprocessedimp = ImageJFunctions.show(CurrentPreprocessedView);
-
+		
 			Roi roi = preprocessedimp.getRoi();
 		
 
@@ -1023,12 +965,16 @@ public class Interactive_MTSingleChannel implements PlugIn {
 					standardRectangle);
 
 			bitimg = new ArrayImgFactory<BitType>().create(newimg, new BitType());
-			
 			bitimgFloat = new ArrayImgFactory<FloatType>().create(newimg, new FloatType());
-			
-			GetLocalmaxmin.ThresholdingBit(currentPreprocessedimg, bitimg, thresholdHough);
-			GetLocalmaxmin.Thresholding(currentPreprocessedimg, bitimgFloat, thresholdHough, IntensityType.Gaussian, new double[]{0.5, 0.5});
 
+			
+			if(autothreshold)
+				thresholdHough = (float)0.75 * ( GlobalThresholding.AutomaticThresholding(currentPreprocessedimg));
+				
+			
+			GetLocalmaxminMT.ThresholdingMTBit(currentPreprocessedimg, bitimg, thresholdHough);
+			GetLocalmaxminMT.ThresholdingMT(currentPreprocessedimg, bitimgFloat, thresholdHough,IntensityType.Gaussian,
+					new double[]{0.5, 0.5});
 			if (displayBitimg)
 				ImageJFunctions.show(bitimg);
 
@@ -1466,7 +1412,7 @@ panelPrevious.removeAll();
 
 		final Scrollbar threshold = new Scrollbar(Scrollbar.HORIZONTAL, (int) thresholdHoughInit, 10, 0,
 				10 + scrollbarSize);
-
+		final Checkbox autothresh = new Checkbox("Auto determine threshold", autothreshold);
 		final Checkbox displayBit = new Checkbox("Display Bitimage ", displayBitimg);
 		final Checkbox displayWatershed = new Checkbox("Display Watershedimage ", displayWatershedimg);
 
@@ -1503,34 +1449,35 @@ panelPrevious.removeAll();
 
 		HoughparamHF.add(displayBit,  new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
-
-		HoughparamHF.add(displayWatershed,  new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+		HoughparamHF.add(autothresh,  new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+		HoughparamHF.add(displayWatershed,  new GridBagConstraints(0, 4, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 	   
 	
 		
-		HoughparamHF.add(deltaText,  new GridBagConstraints(0, 4, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+		HoughparamHF.add(deltaText,  new GridBagConstraints(0, 5, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 		 
-		HoughparamHF.add(deltaS,  new GridBagConstraints(0, 5, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+		HoughparamHF.add(deltaS,  new GridBagConstraints(0, 6, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 
-		HoughparamHF.add(Unstability_ScoreText,  new GridBagConstraints(0, 6, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+		HoughparamHF.add(Unstability_ScoreText,  new GridBagConstraints(0, 7, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 
-		HoughparamHF.add(Unstability_ScoreS,  new GridBagConstraints(0, 7, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+		HoughparamHF.add(Unstability_ScoreS,  new GridBagConstraints(0, 8, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 		   
 		HoughparamHF.add(minSizeText,  new GridBagConstraints(0, 8, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 
-		HoughparamHF.add(minSizeS,  new GridBagConstraints(0, 9, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+		HoughparamHF.add(minSizeS,  new GridBagConstraints(0, 10, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 		  
-		HoughparamHF.add(maxSizeText,  new GridBagConstraints(0, 10, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+		HoughparamHF.add(maxSizeText,  new GridBagConstraints(0, 11, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 		 
-		HoughparamHF.add(maxSizeS,  new GridBagConstraints(0, 11, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+		HoughparamHF.add(maxSizeS,  new GridBagConstraints(0, 12, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 		 
 		
@@ -1609,6 +1556,7 @@ panelPrevious.removeAll();
 				thresholdHoughMax, scrollbarSize, threshold));
 
 		displayBit.addItemListener(new SingleShowBitimgListener(this));
+		autothresh.addItemListener(new SingleshowautoListener(this));
 		displayWatershed.addItemListener(new SingleShowwatershedimgListener(this));
 		// Dowatershed.addActionListener(new DowatershedListener(this));
 		displayBitimg = false;

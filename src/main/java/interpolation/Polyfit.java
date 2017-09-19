@@ -181,8 +181,8 @@ public class Polyfit {
         
         
         XYSeriesCollection dataset = new XYSeriesCollection();
-        dataset.addSeries(Tracking.drawPoints(mtspoly, "Function fit"));
-        dataset.addSeries(Tracking.drawPoints(mts, "Original Data"));
+        dataset.addSeries(Tracking.drawPoints(mtspoly, new double[]{1,1,1}, "Function fit"));
+        dataset.addSeries(Tracking.drawPoints(mts, new double[]{1,1,1} ,"Original Data"));
      
         
        JFreeChart  chart = Tracking.makeChart(dataset);

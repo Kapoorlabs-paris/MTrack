@@ -5,12 +5,12 @@ import java.awt.event.ItemListener;
 
 import interactiveMT.Interactive_MTDoubleChannel;
 
-public class ShowBitimgListener implements ItemListener {
+public class ShowBitimgMTListener implements ItemListener {
 	
 	
 final Interactive_MTDoubleChannel parent;
 	
-	public ShowBitimgListener(final Interactive_MTDoubleChannel parent ){
+	public ShowBitimgMTListener(final Interactive_MTDoubleChannel parent ){
 		
 		this.parent = parent;
 	}

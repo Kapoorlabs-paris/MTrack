@@ -35,9 +35,11 @@ public class CompileRes {
 			BufferedWriter bwfrequ = new BufferedWriter(fwfrequ);
 			
 			parent.AllMoviesB.add(parent.inputfile);
-			bw.write("\tStartTime (px)\tEndTime(px)\tLinearRateSlope(px)\tFileName\n");
+			bw.write("\tStartTime \tEndTime\tLinearRateSlope\tFileName\n");
 			bwfrequ.write(
-					"\tAverageGrowthrate(px)\tAverageShrinkrate(px)\tCatastropheFrequency(px)\tRescueFrequency(px)\tFileName\n");
+					"\tAverageGrowthrate\tAverageShrinkrate\tCatastropheFrequency\tRescueFrequency"
+					+ "\tGrowth events\tShrink events\tCatastrophe events\tRescue events"
+					+ "\tFileName\n");
 			
 
 			for (Map.Entry<Integer, ArrayList<Rateobject>>  allrates: parent.Compilepositiverates.entrySet()){
@@ -85,11 +87,17 @@ public class CompileRes {
 				double averageshrink = rateobject.averageshrink;
 				double catfrequ = rateobject.catfrequ;
 				double resfrequ = rateobject.resfrequ;
+				int growthevent = rateobject.growthevent;
+				int shrinkevent = rateobject.shrinkevent;
+				int catevent = rateobject.catevent;
+				int resevent = rateobject.resevent;
 			
 
 			bwfrequ.write("\t" + parent.nf.format(averagegrowth) + "\t" + "\t" + "\t" + "\t"
 					+ parent.nf.format(averageshrink) + "\t" + "\t" + "\t" + parent.nf.format(catfrequ) + "\t" + "\t"
 					+ "\t" + parent.nf.format(resfrequ) + "\t" + "\t"
+					+ parent.nf.format(growthevent) + "\t" + "\t" + "\t" + parent.nf.format(shrinkevent) + "\t" + "\t"
+					+ "\t" + parent.nf.format(catevent) + "\t" + "\t"+ parent.nf.format(resevent) + "\t" + "\t"
 							+ File + "\t" + "\t"
 
 					+ "\n" + "\n");

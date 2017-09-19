@@ -44,7 +44,7 @@ import net.imglib2.util.ValuePair;
 import net.imglib2.view.Views;
 import peakFitter.GaussianMaskFitMSER.EndfitMSER;
 import peakFitter.SubpixelVelocityPCLine.StartorEnd;
-import preProcessing.GetLocalmaxmin;
+import preProcessing.GetLocalmaxminMT;
 
 public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements OutputAlgorithm<ArrayList<Indexedlength>> {
 
@@ -345,7 +345,7 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 
 			currentimg = Views.interval(currentimg, interval);
 
-			final double maxintensityline = GetLocalmaxmin.computeMaxIntensity(currentimg);
+			final double maxintensityline = GetLocalmaxminMT.computeMaxIntensity(currentimg);
 			final double minintensityline = 0;
 			final double axisslope = (iniparam.currentpos[1] - iniparam.fixedpos[1]) / (iniparam.currentpos[0] - iniparam.fixedpos[0]);
 			final double axisintercept = iniparam.currentpos[1] - axisslope * iniparam.currentpos[0] ;

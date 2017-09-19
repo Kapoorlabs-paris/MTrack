@@ -6,6 +6,7 @@ import java.util.Iterator;
 
 
 import drawandOverlay.AddGaussian;
+import ij.IJ;
 import ij.ImageJ;
 import ij.ImagePlus;
 import ij.ImageStack;
@@ -53,7 +54,7 @@ import net.imglib2.util.RealSum;
 import net.imglib2.util.ValuePair;
 import net.imglib2.view.Views;
 
-public class GetLocalmaxmin {
+public class GetLocalmaxminMT {
 
 	public static enum IntensityType {
 		Gaussian, Original, One
@@ -62,7 +63,7 @@ public class GetLocalmaxmin {
 	protected IntensityType intensityType;
 
 	// Thresholding a FloatType to set values below the threshold to 0 intensity
-	public static void Thresholding(RandomAccessibleInterval<FloatType> img, RandomAccessibleInterval<FloatType> imgout,
+	public static void ThresholdingMT(RandomAccessibleInterval<FloatType> img, RandomAccessibleInterval<FloatType> imgout,
 			Float ThresholdValue, final IntensityType setintensity, double[] sigma) {
 
 		final double[] backpos = new double[imgout.numDimensions()];
@@ -71,6 +72,7 @@ public class GetLocalmaxmin {
 		final RandomAccess<FloatType> outbound = imgout.randomAccess();
 
 		while (bound.hasNext()) {
+
 
 			bound.fwd();
 
@@ -104,7 +106,6 @@ public class GetLocalmaxmin {
 				outbound.get().setZero();
 
 			}
-
 		}
 	}
 
@@ -346,7 +347,7 @@ public class GetLocalmaxmin {
 			double minPeakValue =   0.5 * houghval; 
 			double smallsigma = 1;
 			double bigsigma = 1.1;
-			SubpixelMinlist = GetLocalmaxmin.ScalespaceMinima(houghimage, interval, thetaPerPixel, rhoPerPixel,
+			SubpixelMinlist = GetLocalmaxminMT.ScalespaceMinima(houghimage, interval, thetaPerPixel, rhoPerPixel,
 					minPeakValue, smallsigma, bigsigma);
 			
 			return SubpixelMinlist;
@@ -605,7 +606,7 @@ public class GetLocalmaxmin {
 		final Cursor<IntType> intcursor = Views.iterable(intimg).localizingCursor();
 		final RandomAccess<FloatType> ranac = inputimg.randomAccess();
 		
-       Pair<FloatType, FloatType> pair = GetLocalmaxmin.computeMinMaxIntensity(inputimg);
+       Pair<FloatType, FloatType> pair = GetLocalmaxminMT.computeMinMaxIntensity(inputimg);
 		
 		// Neglect bright beads
 		
@@ -814,7 +815,9 @@ public class GetLocalmaxmin {
 
 		return SubpixelMinlist;
 	}
-	public static  void ThresholdingBit( final RandomAccessibleInterval<FloatType> currentPreprocessedimg, final RandomAccessibleInterval< BitType > out, final Float threshold )
+	public static  void ThresholdingMTBit( final RandomAccessibleInterval<FloatType> currentPreprocessedimg,
+			final RandomAccessibleInterval< BitType > out,
+			final Float threshold )
 	{
 		final Cursor< FloatType > cIn = Views.iterable( currentPreprocessedimg ).localizingCursor();
 		final RandomAccess< BitType > rOut = out.randomAccess();
@@ -826,14 +829,19 @@ public class GetLocalmaxmin {
 			rOut.setPosition( cIn );
 
 			rOut.localize(position);
-			if ( cIn.get().get() >= ( threshold ) )
+			if ( cIn.get().get() >= ( threshold ) ){
 				
 				rOut.get().setOne();
-			else
+				
+			}
+			else{
 				rOut.get().setZero();
+				
+			}
 		}
+		
 	}
-	public static void ThresholdingBit(RandomAccessibleInterval<FloatType> img,
+	public static void ThresholdingMTBit(RandomAccessibleInterval<FloatType> img,
 			RandomAccessibleInterval<BitType> imgout, FloatType thresholdHough) {
 		Normalize.normalize(Views.iterable(img), new FloatType(0), new FloatType(255));
 		Normalize.normalize(Views.iterable(img), new FloatType(0), new FloatType(255));

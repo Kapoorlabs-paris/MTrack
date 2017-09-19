@@ -36,7 +36,7 @@ import net.imglib2.util.Pair;
 import net.imglib2.util.ValuePair;
 import net.imglib2.view.Views;
 import peakFitter.GaussianMaskFitMSER.EndfitMSER;
-import preProcessing.GetLocalmaxmin;
+import preProcessing.GetLocalmaxminMT;
 import psf_Tookit.GaussianLineFitParam;
 import util.Boundingboxes;
 
@@ -256,7 +256,7 @@ public class SubpixelLocationLine extends BenchmarkAlgorithm
 
 		final Cursor<FloatType> inputcursor = Views.iterable(currentimg).localizingCursor();
 
-		final double maxintensityline = GetLocalmaxmin.computeMaxIntensity(currentimg);
+		final double maxintensityline = GetLocalmaxminMT.computeMaxIntensity(currentimg);
 
 		while (inputcursor.hasNext()) {
 

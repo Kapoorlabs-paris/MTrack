@@ -14,12 +14,8 @@ import java.awt.event.ItemListener;
 import javax.swing.JPanel;
 
 import listeners.AdvancedSeedListener;
-import listeners.ComputeTreeListener;
-import listeners.DeltaListener;
 import listeners.FindLinesListener;
-import listeners.MaxSizeListener;
-import listeners.MinDiversityListener;
-import listeners.MinSizeListener;
+
 import listeners.Unstability_ScoreListener;
 import interactiveMT.Interactive_MTSingleChannel;
 import interactiveMT.Interactive_MTSingleChannel.ValueChange;

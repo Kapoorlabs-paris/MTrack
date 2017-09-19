@@ -12,6 +12,7 @@ import net.imglib2.algorithm.BenchmarkAlgorithm;
 import net.imglib2.algorithm.OutputAlgorithm;
 import net.imglib2.algorithm.labeling.AllConnectedComponents;
 import net.imglib2.algorithm.labeling.Watershed;
+import net.imglib2.algorithm.stats.Normalize;
 import net.imglib2.img.ImgFactory;
 import net.imglib2.img.array.ArrayImgFactory;
 import net.imglib2.img.display.imagej.ImageJFunctions;
@@ -25,7 +26,7 @@ import net.imglib2.type.NativeType;
 import net.imglib2.type.logic.BitType;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.type.numeric.integer.IntType;
-import net.imglib2.type.numeric.real.FloatType;
+import net.imglib2.type.numeric.integer.UnsignedByteType;
 import net.imglib2.util.Util;
 import net.imglib2.view.Views;
 @SuppressWarnings("deprecation")
@@ -37,7 +38,7 @@ implements OutputAlgorithm <RandomAccessibleInterval<IntType>> {
 	
 	private final RandomAccessibleInterval<BitType> bitimg;
 	private RandomAccessibleInterval<IntType> watershedimage;
-	RandomAccessibleInterval<FloatType> distimg;
+	RandomAccessibleInterval<UnsignedByteType> distimg;
 	/**
 	 * Do watershedding after doing distance transformation on the biimg
 	 * provided by the user using a user set threshold value.
@@ -70,11 +71,12 @@ implements OutputAlgorithm <RandomAccessibleInterval<IntType>> {
 
 		// Perform the distance transform
 		final T type = source.randomAccess().get().createVariable();
-		final ImgFactory<FloatType> factory = Util.getArrayOrCellImgFactory(source, new FloatType());
-		distimg = factory.create(source, new FloatType());
+		final ImgFactory<UnsignedByteType> factory = Util.getArrayOrCellImgFactory(source, new UnsignedByteType());
+		distimg = factory.create(source, new UnsignedByteType());
 
 		DistanceTransformImage(source, distimg);
 		//ImageJFunctions.show(distimg);
+		
 		// Prepare seed image for watershedding
 				NativeImgLabeling<Integer, IntType> oldseedLabeling = new NativeImgLabeling<Integer, IntType>(
 						new ArrayImgFactory<IntType>().create(source, new IntType()));
@@ -85,6 +87,7 @@ implements OutputAlgorithm <RandomAccessibleInterval<IntType>> {
 						new ArrayImgFactory<IntType>().create(source, new IntType()));
 
 				outputLabeling = GetlabeledImage(distimg, oldseedLabeling);
+				
 				watershedimage = outputLabeling.getStorageImg();
 		
 		
@@ -96,7 +99,7 @@ implements OutputAlgorithm <RandomAccessibleInterval<IntType>> {
 		
 		return watershedimage;
 	}
-    public RandomAccessibleInterval<FloatType> getDistanceTransformedimg() {
+    public RandomAccessibleInterval<UnsignedByteType> getDistanceTransformedimg() {
 		
 		return distimg;
 	}
@@ -119,7 +122,7 @@ implements OutputAlgorithm <RandomAccessibleInterval<IntType>> {
 	 */
 
 	private void DistanceTransformImage(RandomAccessibleInterval<T> inputimg,
-			RandomAccessibleInterval<FloatType> outimg) {
+			RandomAccessibleInterval<UnsignedByteType> outimg) {
 		int n = inputimg.numDimensions();
 
 		// make an empty list
@@ -141,7 +144,7 @@ implements OutputAlgorithm <RandomAccessibleInterval<IntType>> {
 		final NearestNeighborSearchOnKDTree<BitType> search = new NearestNeighborSearchOnKDTree<BitType>(tree);
 
 		// randomaccess on the output
-		final RandomAccess<FloatType> ranac = outimg.randomAccess();
+		final RandomAccess<UnsignedByteType> ranac = outimg.randomAccess();
 
 		// reset cursor for the input (or make a new one)
 		cursor.reset();
@@ -191,7 +194,6 @@ implements OutputAlgorithm <RandomAccessibleInterval<IntType>> {
 		// Getting unique labelled image (old version)
 		AllConnectedComponents.labelAllConnectedComponents(oldseedLabeling, bitimg, labelGenerator,
 				AllConnectedComponents.getStructuringElement(inputimg.numDimensions()));
-
 		return oldseedLabeling;
 	}
 	
@@ -221,7 +223,7 @@ implements OutputAlgorithm <RandomAccessibleInterval<IntType>> {
 
 	}
 
-	public NativeImgLabeling<Integer, IntType> GetlabeledImage(RandomAccessibleInterval<FloatType> inputimg,
+	public NativeImgLabeling<Integer, IntType> GetlabeledImage(RandomAccessibleInterval<UnsignedByteType> inputimg,
 			NativeImgLabeling<Integer, IntType> seedLabeling) {
 
 		int n = inputimg.numDimensions();
@@ -232,7 +234,7 @@ implements OutputAlgorithm <RandomAccessibleInterval<IntType>> {
 		final NativeImgLabeling<Integer, IntType> outputLabeling = new NativeImgLabeling<Integer, IntType>(
 				new ArrayImgFactory<IntType>().create(inputimg, new IntType()));
 
-		final Watershed<FloatType, Integer> watershed = new Watershed<FloatType, Integer>();
+		final Watershed<UnsignedByteType, Integer> watershed = new Watershed<UnsignedByteType, Integer>();
 
 		watershed.setSeeds(seedLabeling);
 		watershed.setIntensityImage(inputimg);

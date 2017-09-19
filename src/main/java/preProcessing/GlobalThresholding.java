@@ -32,7 +32,7 @@ public class GlobalThresholding {
 		Float ThresholdNew, Thresholdupdate;
 
 		Pair<FloatType, FloatType> pair = new ValuePair<FloatType, FloatType>(min, max);
-		pair = GetLocalmaxmin.computeMinMaxIntensity(inputimg);
+		pair = GetLocalmaxminMT.computeMinMaxIntensity(inputimg);
 
 		ThresholdNew = (pair.getB().get() - pair.getA().get()) / 2;
 
@@ -63,7 +63,7 @@ public static Float AutomaticThresholdingSec(RandomAccessibleInterval<FloatType>
 		Float ThresholdNew, Thresholdupdate;
 
 		Pair<FloatType, FloatType> pair = new ValuePair<FloatType, FloatType>(min, max);
-		pair = GetLocalmaxmin.computesecondMinMaxIntensity(inputimg);
+		pair = GetLocalmaxminMT.computesecondMinMaxIntensity(inputimg);
 
 		ThresholdNew = (pair.getB().get() - pair.getA().get()) / 2;
 

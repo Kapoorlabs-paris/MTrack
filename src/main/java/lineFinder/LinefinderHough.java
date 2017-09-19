@@ -23,7 +23,8 @@ import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.util.Pair;
 import net.imglib2.util.RealSum;
 import net.imglib2.view.Views;
-import preProcessing.GetLocalmaxmin;
+
+import preProcessing.GetLocalmaxminMT;
 import preProcessing.GlobalThresholding;
 import preProcessing.Kernels;
 import util.Boundingboxes;
@@ -84,7 +85,7 @@ public class LinefinderHough implements Linefinder {
 		RandomAccessibleInterval<BitType> bitimg = new ArrayImgFactory<BitType>().create(Preprocessedsource, new BitType());
 		FloatType T = new FloatType(Math.round(ThresholdValue));
 
-		GetLocalmaxmin.ThresholdingBit(Preprocessedsource, bitimg, T);
+		GetLocalmaxminMT.ThresholdingMTBit(Preprocessedsource, bitimg, T);
 		
 		WatershedDistimg<FloatType> WaterafterDisttransform = new WatershedDistimg<FloatType>(Preprocessedsource, bitimg);
 		WaterafterDisttransform.checkInput();
@@ -139,7 +140,7 @@ public class LinefinderHough implements Linefinder {
 			final double avg = computeAverage( Views.iterable(houghimage) );
 			System.out.println(avg);
 			if(avg > 0){
-			SubpixelMinlist = GetLocalmaxmin.HoughspaceMaxima(houghimage, interval, sizes, thetaPerPixel, rhoPerPixel);
+			SubpixelMinlist = GetLocalmaxminMT.HoughspaceMaxima(houghimage, interval, sizes, thetaPerPixel, rhoPerPixel);
 
 			// Reduce the number of detections by picking One line per Label,
 			// using the best detection for each label

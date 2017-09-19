@@ -176,7 +176,7 @@ public class FlatFieldOnly extends BenchmarkAlgorithm implements OutputAlgorithm
 		
 		double[] sigma = new double[in.numDimensions()];
 		for (int d = 0; d < in.numDimensions(); ++d) {
-			sigma[d] = (int) Math.round((in.realMax(d) - in.realMin(d)) / 20.0);
+			sigma[d] = (int) Math.round((in.realMax(d) - in.realMin(d)) / 24.0);
 		}
 		
 		RandomAccessibleInterval<FloatType> gaussimg = util.CopyUtils.copyImage(in);

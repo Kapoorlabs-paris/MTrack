@@ -10,7 +10,7 @@ import interactiveMT.Interactive_MTDoubleChannel;
 import interactiveMT.Interactive_MTDoubleChannel.ValueChange;
 import updateListeners.Markends;
 
-public class DeltaListener implements AdjustmentListener {
+public class DeltaMTListener implements AdjustmentListener {
 	final Label label;
 	 Interactive_MTDoubleChannel parent;
 	final float min, max;
@@ -18,7 +18,7 @@ public class DeltaListener implements AdjustmentListener {
 
 	final Scrollbar deltaScrollbar;
 
-	public DeltaListener(	final Interactive_MTDoubleChannel parent, final Label label, final float min, final float max, final int scrollbarSize,
+	public DeltaMTListener(	final Interactive_MTDoubleChannel parent, final Label label, final float min, final float max, final int scrollbarSize,
 			final Scrollbar deltaScrollbar) {
 		this.label = label;
 		this.parent = parent;
@@ -29,17 +29,17 @@ public class DeltaListener implements AdjustmentListener {
 		this.deltaScrollbar = deltaScrollbar;
 		
        if (parent.FindLinesViaHOUGH){
-    	   deltaScrollbar.addMouseListener( new StandardMouseListener( parent,ValueChange.SHOWHOUGH ) );
-    	   deltaScrollbar.addMouseListener( new StandardMouseListener( parent,ValueChange.SHOWMSERinHough ) );
+    	   deltaScrollbar.addMouseListener( new StandardsecMouseListener( parent,ValueChange.SHOWHOUGH ) );
+    	   deltaScrollbar.addMouseListener( new StandardsecMouseListener( parent,ValueChange.SHOWMSERinHough ) );
 			
 		}
        else if (parent.FindLinesViaMSER || parent.FindLinesViaMSERwHOUGH)
-		deltaScrollbar.addMouseListener( new StandardMouseListener( parent, ValueChange.SHOWMSER ) );
+		deltaScrollbar.addMouseListener( new StandardsecMouseListener( parent, ValueChange.SHOWMSER ) );
 
        else{
     	   
-    	   deltaScrollbar.addMouseListener( new StandardMouseListener( parent,ValueChange.SHOWHOUGH ) );
-    	   deltaScrollbar.addMouseListener( new StandardMouseListener( parent,ValueChange.SHOWMSERinHough ) );
+    	   deltaScrollbar.addMouseListener( new StandardsecMouseListener( parent,ValueChange.SHOWHOUGH ) );
+    	   deltaScrollbar.addMouseListener( new StandardsecMouseListener( parent,ValueChange.SHOWMSERinHough ) );
     	   
        }
 		

@@ -7,8 +7,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
@@ -49,7 +51,8 @@ public  class SingleTrack {
         final Interactive_MTSingleChannel parent;
         ArrayList<PlusMinusSeed> plusminusstartlist = new ArrayList<PlusMinusSeed>();
     	ArrayList<PlusMinusSeed> plusminusendlist = new ArrayList<PlusMinusSeed>();
-	
+    	HashMap<Integer, Double> startseedmap = new HashMap<Integer, Double>();
+    	HashMap<Integer, Double> endseedmap = new HashMap<Integer, Double>();
 	public SingleTrack(final Interactive_MTSingleChannel parent){
 	
 		this.parent = parent;
@@ -220,25 +223,12 @@ public  class SingleTrack {
 			}
 			
 
-
-	
-			
-
 			ResultsTable rtAll = new ResultsTable();
 			int MaxSeedLabel, MinSeedLabel;
-			if (parent.Allstart.get(0).size() > 0) {
-			 MaxSeedLabel = parent.Allstart.get(0).get(parent.Allstart.get(0).size() - 1).seedlabel;
-			 MinSeedLabel = parent.Allstart.get(0).get(0).seedlabel;
-			}
 			
-			else{
-				MaxSeedLabel = parent.Allend.get(0).get(parent.Allend.get(0).size() - 1).seedlabel;
-				MinSeedLabel = parent.Allend.get(0).get(0).seedlabel;
-				
-				
-			}
 			double growratestart = 0;
 			double growrateend = 0;
+			
 			if (parent.Allstart.get(0).size() > 0) {
 				
 				 MaxSeedLabel = parent.Allstart.get(0).get(parent.Allstart.get(0).size() - 1).seedlabel;
@@ -315,6 +305,8 @@ public  class SingleTrack {
 
 								parent.startlengthlist.add(startMT);
 
+								startseedmap.put(seedID, growratestart);
+								
 							}
 						}
 					}
@@ -322,8 +314,7 @@ public  class SingleTrack {
 				
 			
 
-				
-		
+			
 			}
 			}
 				for (int index = 0; index < parent.startlengthlist.size(); ++index) {
@@ -429,7 +420,7 @@ public  class SingleTrack {
 
 									parent.endlengthlist.add(endMT);
 
-									
+									endseedmap.put(seedID, growrateend);
 
 								}
 							}
@@ -438,34 +429,82 @@ public  class SingleTrack {
 					
 					
 					
-					String plusorminusstart = (growratestart > growrateend) ? "Plus" : "Minus" ;
-					String plusorminusend = (growratestart > growrateend) ? "Minus" : "Plus" ;
 					
-					if (parent.seedmap.get(currentseed) == Whichend.start || parent.seedmap.get(currentseed) == Whichend.end && parent.seedmap.get(currentseed) != Whichend.both ){
-						plusorminusstart = "Zeroend";
-						plusorminusend = "Zeroend";
-						
-					}
 					
-					PlusMinusSeed pmseedEndA = new PlusMinusSeed(currentseed, plusorminusstart);
-					PlusMinusSeed pmseedEndB = new PlusMinusSeed(currentseed, plusorminusend);
-					plusminusstartlist.add(pmseedEndA);
-					plusminusendlist.add(pmseedEndB);
-					
-						
-						double count = 0;
-						for (int index = 0; index < parent.endlengthlist.size(); ++index) {
-
-							
-							
-							if (parent.endlengthlist.get(index).seedid == currentseed ) {
-								if (index > 0 && parent.endlengthlist.get(index).currentpointpixel[0] != parent.endlengthlist.get(index - 1).currentpointpixel[0]
-										&& parent.endlengthlist.get(index).currentpointpixel[1] != parent.endlengthlist.get(index - 1).currentpointpixel[1])
-									count++;
-								
-							}
 						}
 						
+
+						
+						// Compare seed maps to ascribe plus minus or zero label
+						
+						Iterator it = startseedmap.entrySet().iterator();
+						
+						while(it.hasNext()){
+							
+							Map.Entry<Integer, Double> pair = (Map.Entry<Integer, Double>) it.next();
+							
+							int key = pair.getKey();
+							double endrate = 0;
+						
+							if(endseedmap.containsKey(key))
+							 endrate = endseedmap.get(key);
+							
+							double startrate = startseedmap.get(key);
+							String plusorminusend = (startrate > endrate) ? "Minus" : "Plus" ;
+							String plusorminusstart = (startrate > endrate) ? "Plus" : "Minus" ;
+							if (parent.seedmap.get(key) == Whichend.start || parent.seedmap.get(key) == Whichend.end && parent.seedmap.get(key) != Whichend.both ){
+								plusorminusend = "Zeroend";
+								plusorminusstart = "Zeroend";
+							}
+							
+							PlusMinusSeed pmseedEndB = new PlusMinusSeed(key, plusorminusend);
+							plusminusendlist.add(pmseedEndB);
+							PlusMinusSeed pmseedEndA = new PlusMinusSeed(key, plusorminusstart);
+							plusminusstartlist.add(pmseedEndA);
+						}
+						
+						
+						
+		               Iterator itend = endseedmap.entrySet().iterator();
+						
+						while(itend.hasNext()){
+							
+							Map.Entry<Integer, Double> pair = (Map.Entry<Integer, Double>) itend.next();
+							
+							double startrate = 0;
+							int key = pair.getKey();
+							double endrate = endseedmap.get(key);
+							if (startseedmap.containsKey(key))
+							startrate = startseedmap.get(key);
+							String plusorminusstart = (startrate > endrate) ? "Minus" : "Plus" ;
+							String plusorminusend = (startrate > endrate) ? "Plus" : "Minus" ;
+							if (parent.seedmap.get(key) == Whichend.start || parent.seedmap.get(key) == Whichend.end && parent.seedmap.get(key) != Whichend.both ){
+								plusorminusend = "Zeroend";
+								plusorminusstart = "Zeroend";
+							}
+							
+							PlusMinusSeed pmseedEndB = new PlusMinusSeed(key, plusorminusend);
+							plusminusendlist.add(pmseedEndB);
+							PlusMinusSeed pmseedEndA = new PlusMinusSeed(key, plusorminusstart);
+							plusminusstartlist.add(pmseedEndA);
+						}
+						
+						
+						
+						
+						
+						
+						if (parent.Allend.get(0).size() > 0) {
+
+							MaxSeedLabel = parent.Allend.get(0).get(parent.Allend.get(0).size() - 1).seedlabel;
+							MinSeedLabel = parent.Allend.get(0).get(0).seedlabel;
+							
+							for (int currentseed = MinSeedLabel; currentseed < MaxSeedLabel + 1; ++currentseed) {
+
+					
+					
+						
+					
 
 			                for (int j = 0; j < plusminusendlist.size(); ++j){
 							
@@ -480,7 +519,7 @@ public  class SingleTrack {
 
 								bw.write(
 										"\tFrame\tLength (px)\tLength (real)\tiD\tCurrentPosX (px)\tCurrentPosY (px)\tCurrentPosX (real)\tCurrentPosY (real)"
-												+ "\tdeltaL (px)  \tdeltaL (real)  \tCalibrationX  \tCalibrationY  \tCalibrationT \n");
+												+ "\tdeltaL (px) \tdeltaL (real)  \tCalibrationX  \tCalibrationY  \tCalibrationT \n");
 
 								for (int index = 0; index < parent.endlengthlist.size(); ++index) {
 
@@ -491,7 +530,7 @@ public  class SingleTrack {
 												&& parent.endlengthlist.get(index).currentpointpixel[1] != parent.endlengthlist
 														.get(index - 1).currentpointpixel[1])
 
-											bw.write("\t" + parent.endlengthlist.get(index).framenumber + "\t" + "\t"
+											bw.write("\t" + parent.nf.format(parent.endlengthlist.get(index).framenumber) + "\t" + "\t"
 													+ parent.nf.format(parent.endlengthlist.get(index).totallengthpixel) + "\t"+ "\t"
 													+ "\t"+ "\t" + parent.nf.format(parent.endlengthlist.get(index).totallengthreal)
 													+ "\t" + "\t" + parent.nf.format(parent.endlengthlist.get(index).seedid)
@@ -508,12 +547,13 @@ public  class SingleTrack {
 													+ "\t" + "\t"
 													+ parent.nf.format(parent.endlengthlist.get(index).lengthrealperframe)
 													+ "\t" + "\t"
-													+  parent.nf.format(parent.calibration[0])  
+													+ parent.nf.format(parent.calibration[0])  
 													+ "\t" + "\t"
 													+ parent.nf.format(parent.calibration[1])  
 													+ "\t" + "\t"
-													+ parent.nf.format(parent.calibration[2]) 
-													+ "\n");
+													+ parent.nf.format(parent.calibration[2]) + 
+													
+													"\n");
 
 									}
 
@@ -525,6 +565,8 @@ public  class SingleTrack {
 							}
 							}
 			}
+			
+							}
 						
 					
 					for (int index = 0; index < parent.endlengthlist.size(); ++index) {
@@ -551,95 +593,102 @@ public  class SingleTrack {
 			}
 					}
 				
-					
+				
 					if (parent.Allstart.get(0).size() > 0) {
 						
 						 MaxSeedLabel = parent.Allstart.get(0).get(parent.Allstart.get(0).size() - 1).seedlabel;
 						 MinSeedLabel = parent.Allstart.get(0).get(0).seedlabel;
-						 
-						
+					
 
 						
 						for (int currentseed = MinSeedLabel; currentseed < MaxSeedLabel + 1; ++currentseed) {
 
-						
-					for (int j = 0; j < plusminusstartlist.size(); ++j){
-						
-						if (plusminusstartlist.get(j).seedid == currentseed){
 
-							try {
-								File fichier = new File(parent.usefolder + "//" + parent.addToName + "SeedLabel" + currentseed
-										+ plusminusstartlist.get(j).plusorminus + ".txt");
 
-								FileWriter fw = new FileWriter(fichier);
-								BufferedWriter bw = new BufferedWriter(fw);
+							for (int j = 0; j < plusminusstartlist.size(); ++j){
+								
+								if (plusminusstartlist.get(j).seedid == currentseed){
 
-								bw.write(
-										"\tFrame\tLength (px)\tLength (real)\tiD\tCurrentPosX (px)\tCurrentPosY (px)\tCurrentPosX (real)\tCurrentPosY (real)"
-												+ "\tdeltaL (px)  \tdeltaL (real)  \tCalibrationX  \tCalibrationY  \tCalibrationT \n");
+									try {
+										File fichier = new File(parent.usefolder + "//" + parent.addToName + "SeedLabel" + currentseed
+												+ plusminusstartlist.get(j).plusorminus + ".txt");
 
-								for (int index = 0; index < parent.startlengthlist.size(); ++index) {
+										FileWriter fw = new FileWriter(fichier);
+										BufferedWriter bw = new BufferedWriter(fw);
 
-									if (parent.startlengthlist.get(index).seedid == currentseed) {
+										bw.write(
+												"\tFrame\tLength (px)\tLength (real)\tiD\tCurrentPosX (px)\tCurrentPosY (px)\tCurrentPosX (real)\tCurrentPosY (real)"
+														+ "\tdeltaL (px)  \tdeltaL (real)  \tCalibrationX  \tCalibrationY  \tCalibrationT \n");
 
-										if (index > 0
-												&& parent.startlengthlist
-														.get(index).currentpointpixel[0] != parent.startlengthlist
-																.get(index - 1).currentpointpixel[0]
-												&& parent.startlengthlist
-														.get(index).currentpointpixel[1] != parent.startlengthlist
-																.get(index - 1).currentpointpixel[1])
+										for (int index = 0; index < parent.startlengthlist.size(); ++index) {
 
-											bw.write(
-													"\t" + parent.startlengthlist.get(index).framenumber + "\t" + "\t"
-															+ parent.nf.format(
-																	parent.startlengthlist.get(index).totallengthpixel)
-															+ "\t" + "\t"
-															+ parent.nf.format(
-																	parent.startlengthlist.get(index).totallengthreal)
-															+ "\t" + "\t"
-															+ parent.nf.format(parent.startlengthlist.get(index).seedid)
-															+ "\t" + "\t"
-															+ parent.nf.format(
-																	parent.startlengthlist.get(index).currentpointpixel[0])
-															+ "\t" + "\t"
-															+ parent.nf.format(
-																	parent.startlengthlist.get(index).currentpointpixel[1])
-															+ "\t" + "\t"
-															+ parent.nf.format(
-																	parent.startlengthlist.get(index).currentpointreal[0])
-															+ "\t" + "\t"
-															+ parent.nf.format(
-																	parent.startlengthlist.get(index).currentpointreal[1])
-															+ "\t" + "\t"
-															+ parent.nf.format(
-																	parent.startlengthlist.get(index).lengthpixelperframe)
-															+ "\t" + "\t"
-															+ parent.nf.format(
-																	parent.startlengthlist.get(index).lengthrealperframe)
-															+  parent.nf.format(parent.calibration[0])  
-															+ "\t" + "\t"
-															+ parent.nf.format(parent.calibration[1])  
-															+ "\t" + "\t"
-															+ parent.nf.format(parent.calibration[2]) 
-															+ "\n");
+											if (parent.startlengthlist.get(index).seedid == currentseed) {
 
+												if (index > 0
+														&& parent.startlengthlist
+																.get(index).currentpointpixel[0] != parent.startlengthlist
+																		.get(index - 1).currentpointpixel[0]
+														&& parent.startlengthlist
+																.get(index).currentpointpixel[1] != parent.startlengthlist
+																		.get(index - 1).currentpointpixel[1])
+
+													bw.write(
+															"\t" + parent.nf.format(parent.startlengthlist.get(index).framenumber) + "\t" + "\t"
+																	+ parent.nf.format(
+																			parent.startlengthlist.get(index).totallengthpixel)
+																	+ "\t" + "\t"
+																	+ parent.nf.format(
+																			parent.startlengthlist.get(index).totallengthreal)
+																	+ "\t" + "\t"
+																	+ parent.nf.format(parent.startlengthlist.get(index).seedid)
+																	+ "\t" + "\t"
+																	+ parent.nf.format(
+																			parent.startlengthlist.get(index).currentpointpixel[0])
+																	+ "\t" + "\t"
+																	+ parent.nf.format(
+																			parent.startlengthlist.get(index).currentpointpixel[1])
+																	+ "\t" + "\t"
+																	+ parent.nf.format(
+																			parent.startlengthlist.get(index).currentpointreal[0])
+																	+ "\t" + "\t"
+																	+ parent.nf.format(
+																			parent.startlengthlist.get(index).currentpointreal[1])
+																	+ "\t" + "\t"
+																	+ parent.nf.format(
+																			parent.startlengthlist.get(index).lengthpixelperframe)
+																	+ "\t" + "\t"
+																	+ parent.nf.format(
+																			parent.startlengthlist.get(index).lengthrealperframe)
+																	+ "\t" + "\t"
+																	+  parent.nf.format(parent.calibration[0])  
+																	+ "\t" + "\t"
+																	+ parent.nf.format(parent.calibration[1])  
+																	+ "\t" + "\t"
+																	+ parent.nf.format(parent.calibration[2]) + 
+																	
+															
+															"\n");
+
+											}
+
+										}
+									
+										bw.close();
+										fw.close();
+
+									} catch (IOException e) {
 									}
-
 								}
-							
-								bw.close();
-								fw.close();
-
-							} catch (IOException e) {
 							}
+
+
 						}
 					}
-				
-						}
-					}
-				
 			
+					
+					
+					
+					
 			if (parent.returnVectorUser != null && parent.AllUser.get(0).size() > 0) {
 				final ArrayList<Trackproperties> first = parent.AllUser.get(0);
 				MaxSeedLabel = first.get(first.size() - 1).seedlabel;
@@ -740,14 +789,14 @@ public  class SingleTrack {
 
 						try {
 							File fichier = new File(parent.usefolder + "//" + parent.addToName + "SeedLabel" + seedID
-									+ "Zeromarked" + ".txt");
+									+ "-Zeroend" + ".txt");
 
 							FileWriter fw = new FileWriter(fichier);
 							BufferedWriter bw = new BufferedWriter(fw);
 
 							bw.write(
 									"\tFrame\tLength (px)\tLength (real)\tiD\tCurrentPosX (px)\tCurrentPosY (px)\tCurrentPosX (real)\tCurrentPosY (real)"
-											+ "\tdeltaL (px)  \tdeltaL (real)  \tCalibrationX  \tCalibrationY  \tCalibrationT \n");
+											+ "\tdeltaL (px) \tdeltaL (real) \tCalibrationX  \tCalibrationY  \tFrametoSec \n");
 
 							for (int index = 0; index < parent.userlengthlist.size(); ++index) {
 								if (parent.userlengthlist.get(index).seedid == seedID) {
@@ -760,7 +809,7 @@ public  class SingleTrack {
 													.get(index).currentpointpixel[1] != parent.userlengthlist
 															.get(index - 1).currentpointpixel[1])
 
-										bw.write("\t" + parent.userlengthlist.get(index).framenumber + "\t" + "\t"
+										bw.write("\t" + parent.nf.format(parent.userlengthlist.get(index).framenumber) + "\t" + "\t"
 												+ parent.nf.format(parent.userlengthlist.get(index).totallengthpixel) + "\t"+ "\t"
 												+ "\t" + "\t"+ parent.nf.format(parent.userlengthlist.get(index).totallengthreal)
 												+ "\t" + "\t" + parent.nf.format(parent.userlengthlist.get(index).seedid)
@@ -776,12 +825,14 @@ public  class SingleTrack {
 												+ parent.nf.format(parent.userlengthlist.get(index).lengthpixelperframe)
 												+ "\t" + "\t"
 												+ parent.nf.format(parent.userlengthlist.get(index).lengthrealperframe)
-												+  parent.nf.format(parent.calibration[0])  
+												+ "\t" + "\t"
+												+ parent.nf.format(parent.calibration[0])  
 												+ "\t" + "\t"
 												+ parent.nf.format(parent.calibration[1])  
 												+ "\t" + "\t"
-												+ parent.nf.format(parent.calibration[2]) 
-												+ "\n");
+												+ parent.nf.format(parent.calibration[2]) + 
+												
+												"\n");
 
 								}
 

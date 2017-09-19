@@ -26,20 +26,31 @@ public class ThresholdHoughHFListener implements AdjustmentListener {
 		this.scrollbarSize = scrollbarSize;
 
 		this.thresholdScrollbar = thresholdScrollbar;
-		thresholdScrollbar.addMouseListener( new StandardMouseListener( parent,ValueChange.SHOWHOUGH ) );
-		thresholdScrollbar.addMouseListener( new StandardMouseListener( parent,ValueChange.SHOWMSERinHough ) );
+		thresholdScrollbar.addMouseListener( new StandardsecMouseListener( parent,ValueChange.SHOWHOUGH ) );
+		thresholdScrollbar.addMouseListener( new StandardsecMouseListener( parent,ValueChange.SHOWMSERinHough ) );
 		
 		
 	}
 
 	@Override
 	public void adjustmentValueChanged(final AdjustmentEvent event) {
-		parent.thresholdHough = parent.computeValueFromScrollbarPosition(event.getValue(), min, max, scrollbarSize);
+		
 
+		if (parent.autothreshold)
+		
+		
 		thresholdScrollbar.setValue(parent.computeScrollbarPositionFromValue(parent.thresholdHough, min, max, scrollbarSize));
-
+		
+		else{
+			
+		parent.thresholdHough = parent.computeValueFromScrollbarPosition(event.getValue(), min, max, scrollbarSize);
+		
+		thresholdScrollbar.setValue(parent.computeScrollbarPositionFromValue(parent.thresholdHough, min, max, scrollbarSize));
+		
+		}
+		
+		
 		label.setText("threshold Value = " + parent.thresholdHough);
 
-		
 	}
 }

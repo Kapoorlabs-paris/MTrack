@@ -21,7 +21,7 @@ import net.imglib2.type.logic.BitType;
 import net.imglib2.type.numeric.integer.IntType;
 import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.util.Pair;
-import preProcessing.GetLocalmaxmin;
+import preProcessing.GetLocalmaxminMT;
 import preProcessing.GlobalThresholding;
 import preProcessing.Kernels;
 import util.Boundingboxes;
@@ -81,7 +81,7 @@ public class LinefinderHFHough implements LinefinderHF {
 		final Float ThresholdValue = GlobalThresholding.AutomaticThresholding(Preprocessedsource);
 		RandomAccessibleInterval<BitType> bitimg = new ArrayImgFactory<BitType>().create(Preprocessedsource, new BitType());
 		FloatType T = new FloatType(Math.round(ThresholdValue));
-		GetLocalmaxmin.ThresholdingBit(Preprocessedsource, bitimg, T);
+		GetLocalmaxminMT.ThresholdingMTBit(Preprocessedsource, bitimg, T);
 		
 		WatershedDistimg<FloatType> WaterafterDisttransform = new WatershedDistimg<FloatType>(Preprocessedsource, bitimg);
 		WaterafterDisttransform.checkInput();

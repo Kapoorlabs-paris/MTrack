@@ -18,7 +18,7 @@ import net.imglib2.img.Img;
 import net.imglib2.type.numeric.integer.IntType;
 import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.view.Views;
-import preProcessing.GetLocalmaxmin.IntensityType;
+import preProcessing.GetLocalmaxminMT.IntensityType;
 
 public class PushCurves {
 

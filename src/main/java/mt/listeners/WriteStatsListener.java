@@ -120,7 +120,7 @@ public class WriteStatsListener implements ActionListener {
 			
 			
 			
-			XYSeries timeseries = Tracking.drawPoints(Xvalues, "Time Distribution");
+			XYSeries timeseries = Tracking.drawPoints(Xvalues, new double[]{1,1,1}, "Time Distribution");
 			XYSeries counterseries = new XYSeries("Time Distribution");
 			
 			

@@ -26,8 +26,8 @@ import net.imglib2.type.numeric.integer.IntType;
 import net.imglib2.type.numeric.integer.UnsignedByteType;
 import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.view.Views;
-import preProcessing.GetLocalmaxmin;
-import preProcessing.GetLocalmaxmin.IntensityType;
+import preProcessing.GetLocalmaxminMT;
+import preProcessing.GetLocalmaxminMT.IntensityType;
 import util.Boundingboxes;
 
 public class OverlayLines {

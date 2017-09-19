@@ -26,7 +26,7 @@ public class ThresholdHoughListener implements AdjustmentListener {
 		this.scrollbarSize = scrollbarSize;
 
 		this.thresholdScrollbar = thresholdScrollbar;
-		thresholdScrollbar.addMouseListener( new StandardMouseListener( parent,ValueChange.SHOWHOUGH ) );
+		thresholdScrollbar.addMouseListener( new StandardsecMouseListener( parent,ValueChange.SHOWHOUGH ) );
 	//	thresholdScrollbar.addMouseListener( new StandardMouseListener( parent,ValueChange.SHOWMSERinHough ) );
 		
 		

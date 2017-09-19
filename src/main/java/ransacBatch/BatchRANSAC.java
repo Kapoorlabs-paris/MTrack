@@ -132,7 +132,7 @@ public class BatchRANSAC implements PlugIn {
 		averagerates = new ArrayList<Averagerate>();
 	 lifecount = new ArrayList<Pair<Integer, Double>>();
 		linearlist = new ArrayList<Pair<LinearFunction, ArrayList<PointFunctionMatch>>>();
-		this.dataset.addSeries(Tracking.drawPoints(mts));
+		this.dataset.addSeries(Tracking.drawPoints(mts, new double[]{1,1,1}));
 		Tracking.setColor(chart, 0, new Color(64, 64, 64));
 		Tracking.setStroke(chart, 0, 0.75f);
 		setFunction();
@@ -441,7 +441,7 @@ public class BatchRANSAC implements PlugIn {
 				
 				
 				
-				dataset.addSeries( Tracking.drawPoints( Tracking.toPairList( result.getB() ), "Inliers " + segment ) );
+				dataset.addSeries( Tracking.drawPoints( Tracking.toPairList( result.getB() ), new double[]{1,1,1}, "Inliers " + segment ) );
 
 				Tracking.setColor( chart, i, new Color( 255, 0, 0 ) );
 				Tracking.setDisplayType( chart, i, false, true );
@@ -534,7 +534,7 @@ public class BatchRANSAC implements PlugIn {
 
 									++i;
 
-									dataset.addSeries( Tracking.drawPoints( Tracking.toPairList( fit.getB() ), "C(inl) " + catastrophy ) );
+									dataset.addSeries( Tracking.drawPoints( Tracking.toPairList( fit.getB() ), new double[]{1,1,1}, "C(inl) " + catastrophy ) );
 
 									Tracking.setColor( chart, i, new Color( 0, 0, 255 ) );
 									Tracking.setDisplayType( chart, i, false, true );
@@ -583,13 +583,16 @@ public class BatchRANSAC implements PlugIn {
 
 		rtAll.incrementCounter();
 		rtAll.addValue("Average Growth", averagegrowth);
+		rtAll.addValue("Growth events", count);
 		rtAll.addValue("Average Shrink", averageshrink);
+		rtAll.addValue("Shrink events", negcount);
 		rtAll.addValue("Catastrophe Frequency", catfrequ);
+		rtAll.addValue("Catastrophe events", count - 1);
 		rtAll.addValue("Rescue Frequency", resfrequ);
+		rtAll.addValue("Rescue events", rescount);
+		rtAll.show("Average Rates and Frequencies (real units)");
 
-		rtAll.show("Average Rates and Frequencies (pixel units)");
-
-		Averagerate avrate = new Averagerate(averagegrowth, averageshrink, catfrequ, resfrequ);
+		Averagerate avrate = new Averagerate(averagegrowth, averageshrink, catfrequ, resfrequ, count, negcount, count - 1, rescount);
 		averagerates.add(avrate);
 
 		--updateCount;

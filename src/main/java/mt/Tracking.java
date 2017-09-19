@@ -107,6 +107,45 @@ public class Tracking
 		return points;
 	}
 	
+	public static double[] loadCalibration(final File file)
+	{
+		
+		double[] calibrations = new double[3];
+		double calibrationX = 1, calibrationY = 1, calibrationT = 1;
+		try
+		{
+			BufferedReader in = Util.openFileRead( file );
+
+			while( in.ready() )
+			{
+				String line = in.readLine().trim();
+
+				while ( line.contains( "\t\t" ) )
+					line = line.replaceAll( "\t\t", "\t" );
+
+				if ( line.length() >= 3 && line.matches( "[0-9].*" ) )
+				{
+					final String[] split = line.trim().split( "\t" );
+
+					calibrationX = Double.parseDouble( split[ 10 ] );
+				    calibrationY = Double.parseDouble( split[ 11 ] );
+					calibrationT = Double.parseDouble( split[ 12 ] );
+
+				}
+			}
+		}
+		catch ( Exception e )
+		{
+			e.printStackTrace();
+			return null;
+		}
+		
+		calibrations[0] = calibrationX;
+		calibrations[1] = calibrationY;
+		calibrations[2] = calibrationT;
+		
+		return calibrations;
+	}
 	
 	public static ArrayList< Pair< Integer, Double > > loadMT( final File file )
 	{
@@ -201,14 +240,14 @@ public class Tracking
 		return normalpoints;
 	}
 	
-	public static XYSeries drawPoints( final List< Pair< Integer, Double > > mts ) { return drawPoints( mts, "MT Length" ); }
-	public static XYSeries drawPoints( final List< Pair< Integer, Double > > mts, final String name )
+	public static XYSeries drawPoints( final List< Pair< Integer, Double > > mts, double[] calibrations ) { return drawPoints( mts, calibrations, "MT Length" ); }
+	public static XYSeries drawPoints( final List< Pair< Integer, Double > > mts, double[] calibrations, final String name )
 	{
 		XYSeries series = new XYSeries( name );
 
 		if (mts!=null){
 		for ( final Pair< Integer, Double > mt : mts )
-			series.add( mt.getA(), mt.getB() );
+			series.add(  mt.getA(), mt.getB() );
 		}
 		return series;
 	}

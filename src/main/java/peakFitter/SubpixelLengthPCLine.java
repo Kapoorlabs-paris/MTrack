@@ -36,7 +36,7 @@ import net.imglib2.util.Pair;
 import net.imglib2.util.ValuePair;
 import net.imglib2.view.Views;
 import peakFitter.GaussianMaskFitMSER.EndfitMSER;
-import preProcessing.GetLocalmaxmin;
+import preProcessing.GetLocalmaxminMT;
 import util.Boundingboxes;
 
 public class SubpixelLengthPCLine extends BenchmarkAlgorithm
@@ -376,7 +376,7 @@ public ArrayList<Indexedlength> getEndPoints(){
 
 					double[] startfit = new double[ndims];
 					double[] endfit = new double[ndims];
-					final double maxintensityline = GetLocalmaxmin.computeMaxIntensity(currentimg);
+					final double maxintensityline = GetLocalmaxminMT.computeMaxIntensity(currentimg);
 					double[] startparam = new double[ndims ];
 					double[] endparam = new double[ndims];
 					for (int d = 0; d < ndims; ++d) {
@@ -498,7 +498,7 @@ public ArrayList<Indexedlength> getEndPoints(){
 					final double background = finalparamstart[2 * ndims + 1];
 					double[] startfit = new double[ndims];
 					double[] endfit = new double[ndims];
-					final double maxintensityline = GetLocalmaxmin.computeMaxIntensity(currentimg);
+					final double maxintensityline = GetLocalmaxminMT.computeMaxIntensity(currentimg);
 					double[] startparam = new double[ndims ];
 					double[] endparam = new double[ndims];
 					for (int d = 0; d < ndims; ++d) {

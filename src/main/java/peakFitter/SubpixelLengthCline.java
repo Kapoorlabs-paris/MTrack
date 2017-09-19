@@ -24,7 +24,7 @@ import net.imglib2.algorithm.OutputAlgorithm;
 import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.view.Views;
 import peakFitter.GaussianMaskFitMSER.EndfitMSER;
-import preProcessing.GetLocalmaxmin;
+import preProcessing.GetLocalmaxminMT;
 import util.Boundingboxes;
 
 public class SubpixelLengthCline extends BenchmarkAlgorithm
@@ -324,7 +324,7 @@ implements OutputAlgorithm<ArrayList<Indexedlength>> {
 				final int numgaussians = (int) Math.round(ds / sigmas);
 					double[] startfit = new double[ndims];
 					double[] endfit = new double[ndims];
-					final double maxintensityline = GetLocalmaxmin.computeMaxIntensity(currentimg);
+					final double maxintensityline = GetLocalmaxminMT.computeMaxIntensity(currentimg);
 
 
 					System.out.println("Doing Mask Fits: ");

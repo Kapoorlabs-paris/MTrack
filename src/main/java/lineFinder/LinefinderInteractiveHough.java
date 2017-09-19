@@ -25,7 +25,7 @@ import net.imglib2.util.Pair;
 import net.imglib2.util.RealSum;
 import net.imglib2.view.Views;
 import peakFitter.FitterUtils;
-import preProcessing.GetLocalmaxmin;
+import preProcessing.GetLocalmaxminMT;
 import preProcessing.GlobalThresholding;
 import preProcessing.Kernels;
 import util.Boundingboxes;
@@ -134,7 +134,7 @@ public class LinefinderInteractiveHough implements Linefinder {
 			final double avg = computeAverage( Views.iterable(houghimage) );
 			if(avg > 0){
 			// Get the list of all the detections
-			SubpixelMinlist = GetLocalmaxmin.HoughspaceMaxima(houghimage, interval, sizes, thetaPerPixel, rhoPerPixel);
+			SubpixelMinlist = GetLocalmaxminMT.HoughspaceMaxima(houghimage, interval, sizes, thetaPerPixel, rhoPerPixel);
 
 			// Reduce the number of detections by picking One line per Label,
 			// using the best detection for each label

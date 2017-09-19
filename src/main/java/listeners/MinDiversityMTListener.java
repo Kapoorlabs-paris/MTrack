@@ -10,7 +10,7 @@ import interactiveMT.Interactive_MTDoubleChannel.ValueChange;
 import interactiveMT.Interactive_PSFAnalyze;
 import mpicbg.imglib.multithreading.SimpleMultiThreading;
 
-public class MinDiversityListener implements AdjustmentListener {
+public class MinDiversityMTListener implements AdjustmentListener {
 	final Label label;
 	final float min, max;
 	final int scrollbarSize;
@@ -19,7 +19,7 @@ public class MinDiversityListener implements AdjustmentListener {
 	
 	
 
-	public MinDiversityListener(final Interactive_MTDoubleChannel parent, final Label label, final float min, final float max, final int scrollbarSize,
+	public MinDiversityMTListener(final Interactive_MTDoubleChannel parent, final Label label, final float min, final float max, final int scrollbarSize,
 			final Scrollbar minDiversityScrollbar) {
 		this.label = label;
 		this.min = min;
@@ -30,15 +30,15 @@ public class MinDiversityListener implements AdjustmentListener {
 		
 if (parent.FindLinesViaHOUGH){
 			
-	minDiversityScrollbar.addMouseListener( new StandardMouseListener( parent,ValueChange.SHOWHOUGH ) );
-	minDiversityScrollbar.addMouseListener( new StandardMouseListener( parent,ValueChange.SHOWMSERinHough ) );
+	minDiversityScrollbar.addMouseListener( new StandardsecMouseListener( parent,ValueChange.SHOWHOUGH ) );
+	minDiversityScrollbar.addMouseListener( new StandardsecMouseListener( parent,ValueChange.SHOWMSERinHough ) );
 				
 			}
 else if (parent.FindLinesViaMSER || parent.FindLinesViaMSERwHOUGH)
-		minDiversityScrollbar .addMouseListener( new StandardMouseListener( parent,ValueChange.SHOWMSER ) );
+		minDiversityScrollbar .addMouseListener( new StandardsecMouseListener( parent,ValueChange.SHOWMSER ) );
 else{
-	minDiversityScrollbar.addMouseListener( new StandardMouseListener( parent,ValueChange.SHOWHOUGH ) );
-	minDiversityScrollbar.addMouseListener( new StandardMouseListener( parent,ValueChange.SHOWMSERinHough ) );
+	minDiversityScrollbar.addMouseListener( new StandardsecMouseListener( parent,ValueChange.SHOWHOUGH ) );
+	minDiversityScrollbar.addMouseListener( new StandardsecMouseListener( parent,ValueChange.SHOWMSERinHough ) );
 	
 }
 	}

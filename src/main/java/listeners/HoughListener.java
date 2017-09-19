@@ -147,8 +147,8 @@ public class HoughListener implements ItemListener {
 			rhoSize.addAdjustmentListener(
 					new RhoSizeHoughListener(parent, rhoText, parent.rhoPerPixelMin, parent.rhoPerPixelMax, parent.scrollbarSize, rhoSize));
 
-			displayBit.addItemListener(new ShowBitimgListener(parent));
-			displayWatershed.addItemListener(new ShowwatershedimgListener(parent));
+			displayBit.addItemListener(new ShowBitimgMTListener(parent));
+			displayWatershed.addItemListener(new ShowwatershedimgMTListener(parent));
 			Dowatershed.addActionListener(new DowatershedListener(parent));
 			AdvancedOptions.addItemListener(new AdvancedSeedListener(parent));
 			FindLinesListener.addActionListener(new FindLinesListener(parent));

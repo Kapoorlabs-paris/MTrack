@@ -23,7 +23,7 @@ import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.util.Pair;
 import net.imglib2.util.ValuePair;
 import net.imglib2.view.Views;
-import preProcessing.GetLocalmaxmin;
+import preProcessing.GetLocalmaxminMT;
 import util.Boundingboxes;
 
 public class FitterUtils {
@@ -57,7 +57,7 @@ public class FitterUtils {
 
 			currentimg = Views.interval(currentimg, interval);
 
-			final double maxintensityline = GetLocalmaxmin.computeMaxIntensity(currentimg);
+			final double maxintensityline = GetLocalmaxminMT.computeMaxIntensity(currentimg);
 			final double minintensityline = 0;
 			final double axisslope = (iniparam.currentpos[1] - iniparam.fixedpos[1]) / (iniparam.currentpos[0] - iniparam.fixedpos[0]);
 			final double axisintercept = iniparam.currentpos[1] - axisslope * iniparam.currentpos[0] ;
@@ -183,7 +183,7 @@ public class FitterUtils {
 
 		final Cursor<FloatType> inputcursor = Views.iterable(currentimg).localizingCursor();
 
-		final double maxintensityline = GetLocalmaxmin.computeMaxIntensity(currentimg);
+		final double maxintensityline = GetLocalmaxminMT.computeMaxIntensity(currentimg);
 
            
 
@@ -486,7 +486,6 @@ public class FitterUtils {
                 	
                 }
                 
-		System.out.println(Math.abs(distline));
 			
 		
 		
@@ -494,7 +493,6 @@ public class FitterUtils {
 		Pair<double[], double[]> minmaxpair = new ValuePair<double[], double[]>(minVal, maxVal);
 
 		
-		System.out.println(minVal[0] );
 		
 		return minmaxpair;
 

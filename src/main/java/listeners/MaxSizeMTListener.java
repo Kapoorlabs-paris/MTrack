@@ -9,14 +9,14 @@ import interactiveMT.Interactive_MTDoubleChannel;
 import interactiveMT.Interactive_MTDoubleChannel.ValueChange;
 import mpicbg.imglib.multithreading.SimpleMultiThreading;
 
-public class MaxSizeListener implements AdjustmentListener {
+public class MaxSizeMTListener implements AdjustmentListener {
 	final Label label;
 	final float min, max;
 	final int scrollbarSize;
     final Interactive_MTDoubleChannel parent;
 	final Scrollbar maxsizeScrollbar;
 
-	public MaxSizeListener(final Interactive_MTDoubleChannel parent,final Label label, final float min, final float max, final int scrollbarSize,
+	public MaxSizeMTListener(final Interactive_MTDoubleChannel parent,final Label label, final float min, final float max, final int scrollbarSize,
 			final Scrollbar maxsizeScrollbar) {
 		this.label = label;
 		this.min = min;
@@ -26,17 +26,17 @@ public class MaxSizeListener implements AdjustmentListener {
 		this.maxsizeScrollbar = maxsizeScrollbar;
 if (parent.FindLinesViaHOUGH){
 			
-	maxsizeScrollbar.addMouseListener( new StandardMouseListener( parent,ValueChange.SHOWHOUGH ) );
-	maxsizeScrollbar.addMouseListener( new StandardMouseListener( parent,ValueChange.SHOWMSERinHough ) );
+	maxsizeScrollbar.addMouseListener( new StandardsecMouseListener( parent,ValueChange.SHOWHOUGH ) );
+	maxsizeScrollbar.addMouseListener( new StandardsecMouseListener( parent,ValueChange.SHOWMSERinHough ) );
 						
 					}
 else if (parent.FindLinesViaMSER|| parent.FindLinesViaMSERwHOUGH)
 
-		maxsizeScrollbar.addMouseListener( new StandardMouseListener( parent, ValueChange.SHOWMSER ) );
+		maxsizeScrollbar.addMouseListener( new StandardsecMouseListener( parent, ValueChange.SHOWMSER ) );
 
 else{
-	maxsizeScrollbar.addMouseListener( new StandardMouseListener( parent,ValueChange.SHOWHOUGH ) );
-	maxsizeScrollbar.addMouseListener( new StandardMouseListener( parent,ValueChange.SHOWMSERinHough ) );
+	maxsizeScrollbar.addMouseListener( new StandardsecMouseListener( parent,ValueChange.SHOWHOUGH ) );
+	maxsizeScrollbar.addMouseListener( new StandardsecMouseListener( parent,ValueChange.SHOWMSERinHough ) );
 	
 }
 	}

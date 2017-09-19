@@ -27,16 +27,16 @@ public class Unstability_ScoreListener implements AdjustmentListener {
 		this.Unstability_ScoreScrollbar = Unstability_ScoreScrollbar;
 		if (parent.FindLinesViaHOUGH){
 			
-			Unstability_ScoreScrollbar.addMouseListener( new StandardMouseListener( parent,ValueChange.SHOWHOUGH ) );
-			Unstability_ScoreScrollbar.addMouseListener( new StandardMouseListener( parent,ValueChange.SHOWMSERinHough ) );
+			Unstability_ScoreScrollbar.addMouseListener( new StandardsecMouseListener( parent,ValueChange.SHOWHOUGH ) );
+			Unstability_ScoreScrollbar.addMouseListener( new StandardsecMouseListener( parent,ValueChange.SHOWMSERinHough ) );
 				
 			}
 		else if (parent.FindLinesViaMSER || parent.FindLinesViaMSERwHOUGH)
-		Unstability_ScoreScrollbar.addMouseListener( new StandardMouseListener( parent, ValueChange.SHOWMSER ) );
+		Unstability_ScoreScrollbar.addMouseListener( new StandardsecMouseListener( parent, ValueChange.SHOWMSER ) );
 		else{
 			
-			Unstability_ScoreScrollbar.addMouseListener( new StandardMouseListener( parent,ValueChange.SHOWHOUGH ) );
-			Unstability_ScoreScrollbar.addMouseListener( new StandardMouseListener( parent,ValueChange.SHOWMSERinHough ) );
+			Unstability_ScoreScrollbar.addMouseListener( new StandardsecMouseListener( parent,ValueChange.SHOWHOUGH ) );
+			Unstability_ScoreScrollbar.addMouseListener( new StandardsecMouseListener( parent,ValueChange.SHOWMSERinHough ) );
 			
 		}
 	}
