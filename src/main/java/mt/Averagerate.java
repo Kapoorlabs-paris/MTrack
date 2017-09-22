@@ -1,5 +1,7 @@
 package mt;
 
+import java.io.File;
+
 public class Averagerate {
 
 	
@@ -11,11 +13,12 @@ public class Averagerate {
 	public final int shrinkevent;
 	public final int catevent;
 	public final int resevent;
+	public final File file;
 
 	
 	
 	public Averagerate(final double averagegrowth,  final double averageshrink,final double catfrequ, final double resfrequ,
-			final int growthevent, final int shrinkevent, final int catevent, final int resevent){
+			final int growthevent, final int shrinkevent, final int catevent, final int resevent, final File file){
 		
 		this.averagegrowth = averagegrowth;
 		this.averageshrink = averageshrink;
@@ -26,6 +29,7 @@ public class Averagerate {
 		this.shrinkevent = shrinkevent;
 		this.catevent = catevent;
 		this.resevent = resevent;
+		this.file = file;
 		
 	}
 	

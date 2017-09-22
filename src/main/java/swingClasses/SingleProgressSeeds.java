@@ -184,33 +184,6 @@ final Interactive_MTSingleChannelBasic child;
 			if (child!=null){
 				child.controlnext.removeAll();
 				child.controlprevious.removeAll();
-				child.controlnext.add(new JButton(new AbstractAction("\u22b2Prev") {
-
-					/**
-					 * 
-					 */
-					private static final long serialVersionUID = 1L;
-
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						CardLayout cl = (CardLayout) child.panelCont.getLayout();
-
-						cl.previous(child.panelCont);
-					}
-				}));
-			 
-				
-
-				child.panelNext.add(child.controlnext,  new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER,
-						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
-			
-				child.controlnext.setVisible(true);
-				
-				
-				child.panelSecond.add(child.panelNext,  new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
-						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
-			
-				child.panelSecond.validate();
 				
 				
 				JPanel controlprevpanel = new JPanel();
@@ -317,7 +290,8 @@ final Interactive_MTSingleChannelBasic child;
 			
 			
 			}
-			
+			final int maxSeed = parent.PrevFrameparam.getA().get(parent.PrevFrameparam.getA().size() - 1).seedLabel;
+			parent.nextseed = maxSeed;
 			parent.preprocessedimp.getCanvas().removeMouseListener(parent.ml);
 			parent.newends.markendnew();
 			parent.frame.dispose();

@@ -89,7 +89,7 @@ public  class SingleTrack {
 				parent.updatePreview(ValueChange.SHOWMSER);
 
 				LinefinderInteractiveHFMSER newlineMser = new LinefinderInteractiveHFMSER(groundframe, groundframepre,
-						parent.newtree,  parent.thirdDimension);
+						parent.newtree,  parent.thirdDimension, parent.IDALL);
 					parent.returnVector = SingleFindlinesVia.LinefindingMethodHF(groundframe, groundframepre, parent.PrevFrameparam,
 							 parent.thirdDimension, parent.psf, newlineMser, parent.userChoiceModel, parent.Domask, parent.Intensityratio,
 							parent.Inispacing, parent.seedmap, parent.jpb, parent.starttime, parent.endtime, parent.maxdist, parent.numgaussians);
@@ -115,7 +115,7 @@ public  class SingleTrack {
 				parent.updatePreview(ValueChange.SHOWHOUGH);
 				parent.updatePreview(ValueChange.SHOWMSERinHough);
 				SingleLinefinderInteractiveHFHough newlineHough = new SingleLinefinderInteractiveHFHough(parent,groundframe,
-						groundframepre, parent.Maxlabel, parent.thirdDimension);
+						groundframepre, parent.Maxlabel, parent.thirdDimension, parent.IDALL);
 				
 					parent.returnVector = SingleFindlinesVia.LinefindingMethodHF(groundframe, groundframepre, parent.PrevFrameparam,
 							 parent.thirdDimension, parent.psf, newlineHough, parent.userChoiceModel,parent.Domask, parent.Intensityratio,
@@ -142,7 +142,7 @@ public  class SingleTrack {
 				
 				parent.updatePreview(ValueChange.SHOWMSER);
 				LinefinderInteractiveHFMSERwHough newlineMserwHough = new LinefinderInteractiveHFMSERwHough(groundframe,
-						groundframepre, parent.newtree, parent.thirdDimension, parent.thetaPerPixel, parent.rhoPerPixel);
+						groundframepre, parent.newtree, parent.thirdDimension, parent.thetaPerPixel, parent.rhoPerPixel, parent.IDALL);
 					parent.returnVector = SingleFindlinesVia.LinefindingMethodHF(groundframe, groundframepre, parent.PrevFrameparam,
 							 parent.thirdDimension, parent.psf, newlineMserwHough, parent.userChoiceModel, parent.Domask, parent.Intensityratio,
 							parent.Inispacing, parent.seedmap, parent.jpb, parent.starttime, parent.endtime, parent.maxdist, parent.numgaussians);
@@ -458,6 +458,7 @@ public  class SingleTrack {
 							}
 							
 							PlusMinusSeed pmseedEndB = new PlusMinusSeed(key, plusorminusend);
+							if(endseedmap.containsKey(key))
 							plusminusendlist.add(pmseedEndB);
 							PlusMinusSeed pmseedEndA = new PlusMinusSeed(key, plusorminusstart);
 							plusminusstartlist.add(pmseedEndA);
@@ -486,6 +487,7 @@ public  class SingleTrack {
 							PlusMinusSeed pmseedEndB = new PlusMinusSeed(key, plusorminusend);
 							plusminusendlist.add(pmseedEndB);
 							PlusMinusSeed pmseedEndA = new PlusMinusSeed(key, plusorminusstart);
+							if(startseedmap.containsKey(key))
 							plusminusstartlist.add(pmseedEndA);
 						}
 						

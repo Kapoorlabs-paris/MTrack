@@ -90,46 +90,11 @@ public class RansacFileChooser extends JPanel {
 	Dimension dim = new Dimension(400, 400);
 	
 	public RansacFileChooser() {
-		panelIntro.setPreferredSize(dim);
-		PanelDirectory.setPreferredSize(dim);
-		
-		final JFrame frame = new JFrame("Welcome to the Ransac Part of MTV tracker");
-		Border selectdirectory = new CompoundBorder(new TitledBorder("Load directory"),
-				new EmptyBorder(c.insets));
-		final Button Measureserial = new Button("Select directory of MTV tracker generated files");
-		panelCont.add(panelIntro, "1");
-	
-
-		panelIntro.setLayout(layout);
-		PanelDirectory.setLayout(layout);
 		
 		
-		c.insets = new Insets(5, 5, 5, 5);
-		c.anchor = GridBagConstraints.BOTH;
-		c.ipadx = 35;
-
-		c.gridwidth = 10;
-		c.gridheight = 10;
-		c.gridy = 1;
-		c.gridx = 0;
-		
-		PanelDirectory.add(Measureserial,  new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST,
-				GridBagConstraints.HORIZONTAL, insets, 0, 0));
-	
-		PanelDirectory.setBorder(selectdirectory);
-		panelIntro.add(PanelDirectory,  new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
-				GridBagConstraints.RELATIVE, new Insets(10, 10, 0, 10), 0, 0));
+		new InteractiveRANSAC().run(null);
 		
 		
-
-		panelIntro.setVisible(true);
-		Measureserial.addActionListener(new MeasureserialListener(frame));
-		frame.addWindowListener(new FrameListener(frame));
-		frame.add(panelCont, BorderLayout.CENTER);
-		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		frame.pack();
-		frame.setVisible(true);
-
 	}
 
 	protected class SimpleListener implements ItemListener {
@@ -254,6 +219,8 @@ public class RansacFileChooser extends JPanel {
 				}
 			});
 
+			
+			
 			
 			new InteractiveRANSAC(AllMovies).run(null);
 		parent.dispose();

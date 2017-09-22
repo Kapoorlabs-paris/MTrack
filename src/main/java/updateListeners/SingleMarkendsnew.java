@@ -34,9 +34,7 @@ final Interactive_MTSingleChannel parent;
 		
 		parent.preprocessedimp.getCanvas().addMouseListener(parent.ml = new MouseListener() {
 			final ImageCanvas canvas = parent.preprocessedimp.getWindow().getCanvas();
-			final int maxSeed = parent.PrevFrameparam.getA().get(parent.PrevFrameparam.getA().size() - 1).seedLabel;
-			int nextseed = maxSeed;
-			ArrayList<OvalRoi> userroi = new ArrayList<OvalRoi>();
+		
 			@Override
 public void mouseClicked(MouseEvent e) {
 				
@@ -154,10 +152,10 @@ public void mouseClicked(MouseEvent e) {
 					SingleSubpixelLengthUserSeed newseed = new SingleSubpixelLengthUserSeed(parent);
 					
 					
-					Indexedlength userseed = newseed.UserSeed(new double[]{x, y}, nextseed, Bigroi);
+					Indexedlength userseed = newseed.UserSeed(new double[]{x, y}, parent.nextseed, Bigroi);
 					
 					parent.Userframe.add(userseed);
-					nextseed++;
+					parent.nextseed++;
 					
 					parent.ClickedPoints.add(newpoint);
 					parent.AllSeedrois.add(Bigroi);

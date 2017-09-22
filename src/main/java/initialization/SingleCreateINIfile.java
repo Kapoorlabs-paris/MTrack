@@ -113,7 +113,7 @@ public class SingleCreateINIfile {
 		Prefs.set("SaveTxt.boolean", parent.SaveTxt);
 		
 		Prefs.savePreferences();
-		
+		 Prefs.set("autothreshold", parent.autothreshold);
 		System.exit(1);
 		
 	}

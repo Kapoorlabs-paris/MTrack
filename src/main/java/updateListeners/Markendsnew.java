@@ -32,8 +32,7 @@ public class Markendsnew {
 		
 		parent.preprocessedimp.getCanvas().addMouseListener(parent.ml = new MouseListener() {
 			final ImageCanvas canvas = parent.preprocessedimp.getWindow().getCanvas();
-			final int maxSeed = parent.PrevFrameparam.getA().get(parent.PrevFrameparam.getA().size() - 1).seedLabel;
-			int nextseed = maxSeed;
+			
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				
@@ -142,15 +141,15 @@ public class Markendsnew {
 					SubpixelLengthUserSeed newseed = new SubpixelLengthUserSeed(parent);
 					
 					
-					Indexedlength userseed = newseed.UserSeed(new double[]{x, y}, nextseed, Bigroi);
+					Indexedlength userseed = newseed.UserSeed(new double[]{x, y}, parent.nextseed, Bigroi);
 					
 					parent.Userframe.add(userseed);
-					nextseed++;
+					parent.nextseed++;
 					
 					parent.ClickedPoints.add(newpoint);
 					parent.AllSeedrois.add(Bigroi);
 					
-					System.out.println("User clicked: " + x + " ," + y);
+					System.out.println("User clicked: " + x + " ," + y + " " + "Seed ID:" + parent.nextseed);
 					
 					
 					

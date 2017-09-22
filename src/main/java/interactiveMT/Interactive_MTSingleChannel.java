@@ -125,7 +125,7 @@ public class Interactive_MTSingleChannel implements PlugIn {
 	boolean Simplemode = false;
 	boolean Advancedmode = false;
 	boolean Kymomode = false;
-	public double maxdist = 30;
+	public double maxdist = 50;
 	public JLabel inputradi;
 	public TextField inputFieldradi;
 	// steps per octave
@@ -356,6 +356,7 @@ public class Interactive_MTSingleChannel implements PlugIn {
 	public FinalInterval interval;
 	public RandomAccessibleInterval<UnsignedByteType> newimg;
 	public RandomAccessibleInterval<BitType> bitimg;
+	public int nextseed;
 	public RandomAccessibleInterval<FloatType> bitimgFloat;
 	public ArrayList<double[]> AllmeanCovar = new ArrayList<double[]>();
 	public long Cannyradius;
@@ -974,7 +975,7 @@ public class Interactive_MTSingleChannel implements PlugIn {
 			
 			GetLocalmaxminMT.ThresholdingMTBit(currentPreprocessedimg, bitimg, thresholdHough);
 			GetLocalmaxminMT.ThresholdingMT(currentPreprocessedimg, bitimgFloat, thresholdHough,IntensityType.Gaussian,
-					new double[]{0.5, 0.5});
+					new double[]{0.5 *  Cannyradius, 0.5* Cannyradius});
 			if (displayBitimg)
 				ImageJFunctions.show(bitimg);
 

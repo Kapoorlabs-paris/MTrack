@@ -303,10 +303,16 @@ public class FitterUtils {
 			FinalInterval interval = imgs.get(indexx).interval;
 			currentimg = Views.interval(currentimg, interval);
 
+		
+			
+
+		
+
 			if (fixedpoint.getIntPosition(0) >= interval.min(0) && fixedpoint.getIntPosition(0) <= interval.max(0)
 					&& fixedpoint.getIntPosition(1) >= interval.min(1)
 					&& fixedpoint.getIntPosition(1) <= interval.max(1)) {
-
+				
+				
 				for (int i = 0; i < imgs.get(indexx).Allrois.size(); ++i) {
 
 					EllipseRoi roi = imgs.get(indexx).Allrois.get(i);

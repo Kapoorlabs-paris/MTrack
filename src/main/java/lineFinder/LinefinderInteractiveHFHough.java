@@ -52,7 +52,7 @@ public class LinefinderInteractiveHFHough implements LinefinderHF {
 	private int Roiindex;
 	private ArrayList<EllipseRoi> Allrois;
 	private EllipseRoi ellipseroi;
-	
+	private final ArrayList<Pair<Integer, double[]>> IDALL;
 	
 	
 	public LinefinderInteractiveHFHough (final Interactive_MTDoubleChannel parent,
@@ -60,13 +60,13 @@ public class LinefinderInteractiveHFHough implements LinefinderHF {
 			final RandomAccessibleInterval<FloatType> Preprocessedsource, 
 			
 			final int MaxLabel,
-			final int framenumber){
+			final int framenumber, 	 final ArrayList<Pair<Integer, double[]>> IDALL){
 		this.parent = parent;
 		this.source = source;
 		this.Preprocessedsource = Preprocessedsource;
 		
 		this.Maxlabel = MaxLabel;
-		
+		this.IDALL = IDALL;
 		this.framenumber = framenumber;
 		ndims = source.numDimensions();
 		
@@ -101,7 +101,7 @@ public class LinefinderInteractiveHFHough implements LinefinderHF {
 			
 			MserTree<UnsignedByteType> tree = parent.newHoughtree.get(label);
 			LinefinderInteractiveHFMSER newlineMser = new LinefinderInteractiveHFMSER(ActualRoiimg, roiimg,
-					tree, parent.thirdDimension);
+					tree, parent.thirdDimension, IDALL);
 			newlineMser.process();
 			outputcurr = newlineMser.getResult();
 			

@@ -52,7 +52,9 @@ import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.util.Pair;
 import net.imglib2.view.Views;
 import preProcessing.GetLocalmaxminMT;
+import preProcessing.GlobalThresholding;
 import preProcessing.Kernels;
+import preProcessing.GetLocalmaxminMT.IntensityType;
 import swingClasses.ProgressBatch;
 import trackerType.MTTracker;
 import util.Boundingboxes;
@@ -101,6 +103,7 @@ public class BatchMode implements PlugIn, Runnable {
 	public JProgressBar jpbpre;
 	public int numgaussians = Prefs.getInt(".Numg.int", 2);
     public double maxdist = Prefs.getDouble(".Maxdist.double", 20);
+    public boolean autothreshold = Prefs.getBoolean(".autothreshold", true);
 	public JLabel label = new JLabel("Progress..");
 	public JFrame frame = new JFrame();
 	public JPanel panel = new JPanel();
@@ -275,7 +278,7 @@ public class BatchMode implements PlugIn, Runnable {
 	// first and last slice to process
 	public int endStack;
 	public int thirdDimension;
-
+	public RandomAccessibleInterval<FloatType> bitimgFloat;
 	public boolean isFinished = false;
 	public boolean wasCanceled = false;
 	public int detcount = 0;
@@ -541,11 +544,15 @@ public class BatchMode implements PlugIn, Runnable {
 			currentPreprocessedimg = util.CopyUtils.extractImage(CurrentPreprocessedView, interval);
 
 			newimg = util.CopyUtils.copytoByteImage(currentPreprocessedimg, standardRectangle);
-
+			if(autothreshold)
+				thresholdHough = (float) 0.75 * ( GlobalThresholding.AutomaticThresholding(currentPreprocessedimg));
+				
 			RandomAccessibleInterval<BitType> bitimg = new ArrayImgFactory<BitType>().create(newimg, new BitType());
+			bitimgFloat = new ArrayImgFactory<FloatType>().create(newimg, new FloatType());
 			FloatType T = new FloatType(Math.round(thresholdHough));
 			GetLocalmaxminMT.ThresholdingMTBit(currentPreprocessedimg, bitimg, T);
-
+			GetLocalmaxminMT.ThresholdingMT(currentPreprocessedimg, bitimgFloat, thresholdHough,IntensityType.Gaussian,
+					new double[]{0.5 * Cannyradius, 0.5 * Cannyradius});
 			if (displayBitimg)
 				ImageJFunctions.show(bitimg);
 

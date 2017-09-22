@@ -202,7 +202,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public double Intensityratio = 0.35;
 	public double slopetolerance = 5;
 	public double Inispacing = 0.5;
-	public double maxdist = 30;
+	public double maxdist = 50;
 	public double zerodist = 30;
 	public int numgaussians = 2;
 	public int thirdDimensionslider = 1;
@@ -375,6 +375,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public ArrayList<Pair<double[], OvalRoi>> ClickedPoints = new ArrayList<Pair<double[], OvalRoi>>();
 	public Pair<ArrayList<Indexedlength>, ArrayList<Indexedlength>> PrevFrameparam;
 	public ArrayList<Indexedlength> Userframe;
+	public int nextseed;
 	public Pair<ArrayList<Indexedlength>, ArrayList<Indexedlength>> NewFrameparam;
 	public ArrayList<Indexedlength> UserframeNew;
 	public ArrayList<Integer> Accountedframes = new ArrayList<Integer>();
@@ -1012,7 +1013,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 			System.out.println(thresholdHough);
 			GetLocalmaxminMT.ThresholdingMTBit(currentPreprocessedimg, bitimg, thresholdHough);
 			GetLocalmaxminMT.ThresholdingMT(currentPreprocessedimg, bitimgFloat, thresholdHough,IntensityType.Gaussian,
-					new double[]{0.5, 0.5});
+					new double[]{0.5 * Cannyradius, 0.5 * Cannyradius});
 
 			if (displayBitimg)
 				ImageJFunctions.show(bitimg);
@@ -1519,7 +1520,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		
 		 
 		 
-			JPanel controlprevious = new JPanel();
+			
 			controlprevious.add(new JButton(new AbstractAction("\u22b2Prev") {
 
 			

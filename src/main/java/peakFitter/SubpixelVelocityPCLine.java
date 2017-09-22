@@ -74,7 +74,7 @@ public class SubpixelVelocityPCLine extends BenchmarkAlgorithm
 	public double termepsilon = 1e-2;
 	// Mask fits iteration param
 	public int iterations = 200;
-	public double cutoffdistance = 25;
+	public double cutoffdistance = 250;
 	public boolean halfgaussian = false;
 	public double Intensityratio;
 	final JProgressBar jpb;
@@ -245,6 +245,8 @@ public void setMaxdist (double maxdist) {
 				fixedstartpoint.setPosition(new long[] { (long) PrevFrameparamstart.get(index).fixedpos[0],
 						(long) PrevFrameparamstart.get(index).fixedpos[1] });
 
+				System.out.println(fixedstartpoint);
+				
 				ArrayList<Integer> labelstart = FitterUtils.Getlabel(imgs, fixedstartpoint, originalslope,
 						originalintercept);
 				Indexedlength paramnextframestart;
@@ -279,12 +281,18 @@ public void setMaxdist (double maxdist) {
 							
 							double dist = Distance(currentpos, previousposini);
 							
-								if (dist < distmin) {
+								if (dist < distmin && dist!=0) {
 									distmin = dist;
 									labelindex = labelstart.get(j);
 									paramnextframestart = test;
 								
 							}
+								if (distmin == 0){
+									labelindex = labelstart.get(j);
+									paramnextframestart = test;
+									
+								}
+								
 						}
 					}
 				}
@@ -310,14 +318,15 @@ public void setMaxdist (double maxdist) {
 				double newslope = (paramnextframestart.currentpos[1] - paramnextframestart.fixedpos[1] ) 
 						/(paramnextframestart.currentpos[0] - paramnextframestart.fixedpos[0]) ;
 				
-				double dist = (paramnextframestart.currentpos[1] - oldslope * paramnextframestart.currentpos[0] -oldintercept)/Math.sqrt(1 + oldslope *oldslope);
+				double dist = Math.toDegrees(Math.atan(((newslope - oldslope)/(1 + newslope * oldslope)))); 
+						
+						//(paramnextframestart.currentpos[1] - oldslope * paramnextframestart.currentpos[0] -oldintercept)/Math.sqrt(1 + oldslope *oldslope);
 
 						
 						//Math.toDegrees(Math.atan(((newslope - oldslope)/(1 + newslope * oldslope))));  
 						//(paramnextframestart.currentpos[1] - oldslope * paramnextframestart.currentpos[0] -oldintercept)/Math.sqrt(1 + oldslope *oldslope);
 						
 						//newslope - oldslope; 
-						//Math.toDegrees(Math.atan(Math.toRadians((newslope - oldslope)/(1 + newslope * oldslope))));
 				double mindist = (paramnextframestart.currentpos[1] - originalslope * paramnextframestart.currentpos[0] -originalintercept)/Math.sqrt(1 + originalslope *originalslope);
 				
 			
@@ -326,7 +335,7 @@ public void setMaxdist (double maxdist) {
 				
 				// TCASM
 				if (Math.abs(dist) > maxdist){
-				//	IJ.log("Collision detected, activating TCASM layer");
+					IJ.log("Collision detected, activating TCASM layer");
 					paramnextframestart = PrevFrameparamstart.get(index);
 					newstartpoint = oldstartpoint;
 					newstartslope = PrevFrameparamstart.get(index).slope;
@@ -381,6 +390,7 @@ public void setMaxdist (double maxdist) {
 				ArrayList<Integer> labelend = FitterUtils.Getlabel(imgs, fixedendpoint, originalslopeend,
 						originalinterceptend);
 				Indexedlength paramnextframeend;
+				
 				int labelindex = Integer.MIN_VALUE;
 
 				if (labelend.size() > 0)
@@ -402,12 +412,18 @@ public void setMaxdist (double maxdist) {
 							
 							double dist = Distance(currentpos, previousposini);
 						
-								if (dist < distmin) {
+								if (dist < distmin && dist!=0) {
 									distmin = dist;
 									labelindex = labelend.get(j);
 									paramnextframeend = test;
 								
 							}
+								
+								if (distmin == 0){
+									labelindex = labelend.get(j);
+									paramnextframeend = test;
+									
+								}
 						}
 					}
 				}
@@ -438,8 +454,11 @@ public void setMaxdist (double maxdist) {
 						//Math.toDegrees(Math.atan(((newslope - oldslope)/(1 + newslope * oldslope)))); 
 		
 				if (dist!=Double.NaN ){
+					
+					System.out.println(dist + " " + maxdist);
+					
 				if (Math.abs(dist) > maxdist){
-				//	IJ.log("Collision detected, activating TCASM layer");
+					IJ.log("Collision detected, activating TCASM layer");
 					paramnextframeend = PrevFrameparamend.get(index);
 				    newendpoint = oldendpoint;	
 				    newendslope = PrevFrameparamend.get(index).slope;

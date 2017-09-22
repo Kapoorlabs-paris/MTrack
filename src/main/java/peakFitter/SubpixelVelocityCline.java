@@ -69,7 +69,7 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 	// Mask fits iteration param
 	int iterations = 200;
 	private final boolean DoMask;
-	public double cutoffdistance = 25;
+	public double cutoffdistance = 250;
 	public double maxdist;
 	public boolean halfgaussian = false;
 	public double Intensityratio;
@@ -249,12 +249,18 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 							
 							double dist = Distance(currentpos, previousposini);
 						
-								if (dist < distmin) {
+								if (dist < distmin && dist!=0) {
 									distmin = dist;
 									labelindex = j;
 									paramnextframe = test;
 								
 							}
+								
+								if (distmin == 0){
+									labelindex = labelstart.get(j);
+									paramnextframe = test;
+									
+								}
 						}
 					}
 				}
@@ -297,7 +303,7 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 				System.out.println(dist);
 		
 				// TCASM
-				if (Math.abs(dist) > maxdist ){
+				if (Math.abs(dist) > maxdist && dist!=0){
 					//IJ.log("Collision detected, activating TCASM layer");
 					paramnextframe = PrevFrameparamstart.get(index);
 					newstartpoint = oldstartpoint;
@@ -375,11 +381,17 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 							double[] currentpos = test.currentpos;
 							
 							double dist = Distance(currentpos, previousposini);
-								if (dist < distmin) {
+								if (dist < distmin && dist!=0) {
 									distmin = dist;
 									labelindex = j;
 									paramnextframeend = test;
 							}
+								
+								if (distmin == 0){
+									labelindex = labelend.get(j);
+									paramnextframeend = test;
+									
+								}
 						}
 					}
 				}
@@ -404,7 +416,9 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 				double newslope = (paramnextframeend.currentpos[1] - paramnextframeend.fixedpos[1] ) 
 						/(paramnextframeend.currentpos[0] - paramnextframeend.fixedpos[0]) ;
 				
-				double dist = (paramnextframeend.currentpos[1] - oldslope * paramnextframeend.currentpos[0] -oldintercept)/Math.sqrt(1 + oldslope *oldslope);
+				double dist = Math.toDegrees(Math.atan(((newslope - oldslope)/(1 + newslope * oldslope))));
+						
+						//(paramnextframeend.currentpos[1] - oldslope * paramnextframeend.currentpos[0] -oldintercept)/Math.sqrt(1 + oldslope *oldslope);
 
 						
 						//Math.toDegrees(Math.atan(((newslope - oldslope)/(1 + newslope * oldslope)))); 
@@ -412,14 +426,13 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 						//(paramnextframeend.currentpos[1] - oldslope * paramnextframeend.currentpos[0] -oldintercept)/Math.sqrt(1 + oldslope *oldslope);
 						//Math.toDegrees(Math.atan(((newslope - oldslope)/(1 + newslope * oldslope)))); 
 			
-						//Math.toDegrees(Math.atan(Math.toRadians((newslope - oldslope)/(1 + newslope * oldslope))));
 				
 				if (dist!=Double.NaN){
 				System.out.println(dist);
 				
 				// TCASM
 				if (Math.abs(dist) > maxdist ){
-				//	IJ.log("Collision detected, activating TCASM layer");
+					IJ.log("Collision detected, activating TCASM layer");
 					paramnextframeend = PrevFrameparamend.get(index);
 					newendpoint = oldendpoint;
 					 newendslope = PrevFrameparamend.get(index).slope;

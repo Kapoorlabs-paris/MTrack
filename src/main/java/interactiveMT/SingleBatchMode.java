@@ -52,7 +52,9 @@ import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.util.Pair;
 import net.imglib2.view.Views;
 import preProcessing.GetLocalmaxminMT;
+import preProcessing.GlobalThresholding;
 import preProcessing.Kernels;
+import preProcessing.GetLocalmaxminMT.IntensityType;
 import swingClasses.SingleProgressBatch;
 import trackerType.MTTracker;
 import util.Boundingboxes;
@@ -76,6 +78,7 @@ public class SingleBatchMode implements PlugIn, Runnable {
 	public boolean AdvancedChoice = false;
 	public boolean AdvancedChoiceSeeds = false;
 	   public double maxdist = Prefs.getDouble(".Maxdist.double", Math.PI / 4);
+	   public boolean autothreshold = Prefs.getBoolean(".autothreshold", true);
 	boolean Simplemode = false;
 	boolean Advancedmode = false;
 	boolean Kymomode = false;
@@ -146,7 +149,7 @@ public class SingleBatchMode implements PlugIn, Runnable {
 	public long Size = 1;
 
 	public boolean enablerhoPerPixel = false;
-
+	public RandomAccessibleInterval<FloatType> bitimgFloat;
 	public String batchfolder;
 	public float Unstability_Score = (float) Prefs.getDouble(".Unstability_Score.double", 1);
 	public float minDiversity = (float) Prefs.getDouble(".minDiversity.double", 1);
@@ -535,11 +538,15 @@ public class SingleBatchMode implements PlugIn, Runnable {
 			currentPreprocessedimg = util.CopyUtils.extractImage(CurrentPreprocessedView, interval);
 
 			newimg = util.CopyUtils.copytoByteImage(currentPreprocessedimg, standardRectangle);
-
+			if(autothreshold)
+				thresholdHough = (float) 0.75 * ( GlobalThresholding.AutomaticThresholding(currentPreprocessedimg));
+				
 			RandomAccessibleInterval<BitType> bitimg = new ArrayImgFactory<BitType>().create(newimg, new BitType());
+			bitimgFloat = new ArrayImgFactory<FloatType>().create(newimg, new FloatType());
 			FloatType T = new FloatType(Math.round(thresholdHough));
 			GetLocalmaxminMT.ThresholdingMTBit(currentPreprocessedimg, bitimg, T);
-
+			GetLocalmaxminMT.ThresholdingMT(currentPreprocessedimg, bitimgFloat, thresholdHough,IntensityType.Gaussian,
+					new double[]{0.5 * Cannyradius, 0.5 * Cannyradius});
 			if (displayBitimg)
 				ImageJFunctions.show(bitimg);
 

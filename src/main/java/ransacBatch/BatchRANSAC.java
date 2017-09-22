@@ -592,7 +592,7 @@ public class BatchRANSAC implements PlugIn {
 		rtAll.addValue("Rescue events", rescount);
 		rtAll.show("Average Rates and Frequencies (real units)");
 
-		Averagerate avrate = new Averagerate(averagegrowth, averageshrink, catfrequ, resfrequ, count, negcount, count - 1, rescount);
+		Averagerate avrate = new Averagerate(averagegrowth, averageshrink, catfrequ, resfrequ, count, negcount, count - 1, rescount, this.inputfile);
 		averagerates.add(avrate);
 
 		--updateCount;

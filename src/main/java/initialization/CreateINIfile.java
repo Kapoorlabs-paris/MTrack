@@ -110,6 +110,7 @@ public class CreateINIfile {
 		
 		Prefs.set("RoiViaWatershed.boolean", parent.RoisViaWatershed);
 		
+        Prefs.set("autothreshold", parent.autothreshold);
 		
 		Prefs.savePreferences();
 		

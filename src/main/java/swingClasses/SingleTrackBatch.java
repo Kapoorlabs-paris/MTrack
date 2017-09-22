@@ -86,7 +86,7 @@ public  class SingleTrackBatch {
 
 				parent.updatePreview(ValueChange.SHOWMSER);
 				LinefinderInteractiveHFMSER newlineMser = new LinefinderInteractiveHFMSER(groundframe, groundframepre,
-						parent.newtree,  parent.thirdDimension);
+						parent.newtree,  parent.thirdDimension, parent.IDALL);
 					parent.returnVector = SingleFindlinesVia.LinefindingMethodHF(groundframe, groundframepre, parent.PrevFrameparam,
 							 parent.thirdDimension, parent.psf, newlineMser, parent.parent.userChoiceModel, parent.Domask, parent.Intensityratio,
 							parent.Inispacing, parent.seedmap, parent.jpb, next, parent.thirdDimensionSize, parent.maxdist, parent.numgaussians);
@@ -105,7 +105,7 @@ public  class SingleTrackBatch {
 				parent.updatePreview(ValueChange.SHOWHOUGH);
 				parent.updatePreview(ValueChange.SHOWMSERinHough);
 				SingleLinefinderInteractiveHFHough newlineHough = new SingleLinefinderInteractiveHFHough(parent.parent,groundframe,
-						groundframepre, parent.Maxlabel, parent.thirdDimension);
+						groundframepre, parent.Maxlabel, parent.thirdDimension, parent.IDALL);
 				
 					parent.returnVector = SingleFindlinesVia.LinefindingMethodHF(groundframe, groundframepre, parent.PrevFrameparam,
 							 parent.thirdDimension, parent.psf, newlineHough, parent.parent.userChoiceModel,parent.Domask, parent.Intensityratio,
@@ -123,7 +123,7 @@ public  class SingleTrackBatch {
 				
 				parent.updatePreview(ValueChange.SHOWMSER);
 				LinefinderInteractiveHFMSERwHough newlineMserwHough = new LinefinderInteractiveHFMSERwHough(groundframe,
-						groundframepre, parent.newtree, parent.thirdDimension, parent.thetaPerPixel, parent.rhoPerPixel);
+						groundframepre, parent.newtree, parent.thirdDimension, parent.thetaPerPixel, parent.rhoPerPixel, parent.IDALL);
 				if (parent.parent.showDeterministic) {
 					parent.returnVector = SingleFindlinesVia.LinefindingMethodHF(groundframe, groundframepre, parent.PrevFrameparam,
 							 parent.thirdDimension, parent.psf, newlineMserwHough, parent.parent.userChoiceModel, parent.Domask, parent.Intensityratio,
@@ -424,6 +424,7 @@ public  class SingleTrackBatch {
 							}
 							
 							PlusMinusSeed pmseedEndB = new PlusMinusSeed(key, plusorminusend);
+							if(endseedmap.containsKey(key))
 							plusminusendlist.add(pmseedEndB);
 							PlusMinusSeed pmseedEndA = new PlusMinusSeed(key, plusorminusstart);
 							plusminusstartlist.add(pmseedEndA);
@@ -452,6 +453,7 @@ public  class SingleTrackBatch {
 							PlusMinusSeed pmseedEndB = new PlusMinusSeed(key, plusorminusend);
 							plusminusendlist.add(pmseedEndB);
 							PlusMinusSeed pmseedEndA = new PlusMinusSeed(key, plusorminusstart);
+							if(startseedmap.containsKey(key))
 							plusminusstartlist.add(pmseedEndA);
 						}
 						

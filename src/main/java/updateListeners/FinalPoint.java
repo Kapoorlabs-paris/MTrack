@@ -183,7 +183,6 @@ public class FinalPoint implements ActionListener {
 			Pair<Integer, double[]> seedpair = new ValuePair<Integer, double[]>(seedid, seedpos);
 
 			parent.IDALL.add(seedpair);
-
 		}
 
 	
@@ -191,7 +190,6 @@ public class FinalPoint implements ActionListener {
 		if (child != null){
 			SkipFramesandTrackendsListener track =  new SkipFramesandTrackendsListener(parent, child);
 			track.goSkip();
-			
 		}
 			
 

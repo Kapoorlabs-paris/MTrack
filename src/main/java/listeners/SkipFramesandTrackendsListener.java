@@ -65,10 +65,15 @@ public SkipFramesandTrackendsListener(final Interactive_MTDoubleChannel parent){
 		parent.frame.setVisible(true);
 
 		
-		
+		if (child!=null){
+			ProgressSkip trackMT = new ProgressSkip(parent, child);
+			trackMT.execute();
+			
+		}
+		else{
 		
 		ProgressSkip trackMT = new ProgressSkip(parent);
 		trackMT.execute();
-
+		}
 	}
 }

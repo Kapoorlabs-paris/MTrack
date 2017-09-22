@@ -6,6 +6,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
@@ -55,9 +56,11 @@ public class CompileResultsListener implements ActionListener {
 			BufferedWriter bwfrequ = new BufferedWriter(fwfrequ);
 			
 			parent.AllMoviesB.add(parent.inputfile);
-			bw.write("\tStartTime (px)\tEndTime(px)\tLinearRateSlope(px)\tFileName\n");
+			bw.write("\tStartTime (real)\tEndTime(real)\tLinearRateSlope(real)\tFileName\n");
 			bwfrequ.write(
-					"\tAverageGrowthrate(px)\tAverageShrinkrate(px)\tCatastropheFrequency(px)\tRescueFrequency(px)\tFileName\n");
+					"\tAverageGrowthrate(real)\tAverageShrinkrate(real)\tCatastropheFrequency(real)\tRescueFrequency(real)"
+					+ "\tGrowth events \tShrink events\tRescue events\tCatastrophe events"
+					+ "\tFileName\n");
 			
 
 			for (Map.Entry<Integer, ArrayList<Rateobject>>  allrates: parent.Compilepositiverates.entrySet()){
@@ -77,8 +80,8 @@ public class CompileResultsListener implements ActionListener {
                         	 
                         	  
                         	
-							bw.write("\t" + parent.nf.format(startX) + "\t" + "\t" + parent.nf.format(endX) + "\t"
-									+ "\t" + parent.nf.format(linearrate) + "\t" + "\t" + File   + "\t" + "\t" + "\n");
+							bw.write("\t" + new DecimalFormat("#.####").format(startX) + "\t" + "\t" + new DecimalFormat("#.####").format(endX) + "\t"
+									+ "\t" + new DecimalFormat("#.####").format(linearrate) + "\t" + "\t" + File   + "\t" + "\t" + "\n");
 							
 							
 							
@@ -95,21 +98,25 @@ public class CompileResultsListener implements ActionListener {
 				
 			for (Map.Entry<Integer, Averagerate>  allaverage: parent.Compileaverage.entrySet()){
 				
-				int key = allaverage.getKey();
 				Averagerate rateobject = allaverage.getValue();
-				String File = parent.inputfiles[key].getName();
+				String File = rateobject.file.getName();
 			
 				
-			
 				double averagegrowth = rateobject.averagegrowth;
 				double averageshrink = rateobject.averageshrink;
 				double catfrequ = rateobject.catfrequ;
 				double resfrequ = rateobject.resfrequ;
+				int growevent = rateobject.growthevent;
+				int shrinkevent = rateobject.shrinkevent;
+				int resevent = rateobject.resevent;
+				int catevent = rateobject.catevent;
 			
 
-			bwfrequ.write("\t" + parent.nf.format(averagegrowth) + "\t" + "\t" + "\t" + "\t"
-					+ parent.nf.format(averageshrink) + "\t" + "\t" + "\t" + parent.nf.format(catfrequ) + "\t" + "\t"
-					+ "\t" + parent.nf.format(resfrequ) + "\t" + "\t"
+			bwfrequ.write("\t" + new DecimalFormat("#.####").format(averagegrowth) + "\t" + "\t" + "\t" + "\t"
+					+ new DecimalFormat("#.####").format(averageshrink) + "\t" + "\t" + "\t" + new DecimalFormat("#.####").format(catfrequ) + "\t" + "\t"
+					+ "\t" + new DecimalFormat("#.####").format(resfrequ) + "\t" + "\t"
+					+ new DecimalFormat("#.####").format(growevent)  + "\t" + "\t" + new DecimalFormat("#.####").format(shrinkevent) + "\t" + "\t"
+					+ "\t" + new DecimalFormat("#.####").format(resevent) + "\t" + "\t" + new DecimalFormat("#.####").format(catevent) + "\t" + "\t"
 							+ File + "\t" + "\t"
 
 					+ "\n" + "\n");

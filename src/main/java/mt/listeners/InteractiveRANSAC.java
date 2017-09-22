@@ -160,7 +160,10 @@ public class InteractiveRANSAC implements PlugIn {
 		this(0, 300, 3.0, 0.1, 10.0, 10, 50, 1, 0.1, file);
 		nf.setMaximumFractionDigits(5);
 	}
-	
+	public InteractiveRANSAC() {
+		this(0, 300, 3.0, 0.1, 10.0, 10, 50, 1, 0.1, null);
+		nf.setMaximumFractionDigits(5);
+	}
 	
 	public InteractiveRANSAC(final ArrayList<Pair<Integer, Double>> mts, final int minTP, final int maxTP,
 			final double maxError, final double minSlope, final double maxSlope, final int maxDist,
@@ -208,8 +211,10 @@ public class InteractiveRANSAC implements PlugIn {
 		this.lambda = lambda;
 		this.mts = null;
 		this.points= null;
+		if (file!=null){
 		this.inputfiles = file;
 		this.inputdirectory = file[0].getParent();
+		}
 		this.maxError = maxError;
 		this.minSlope = minSlope;
 		this.maxSlope = maxSlope;
@@ -319,22 +324,20 @@ public class InteractiveRANSAC implements PlugIn {
 		
 		
 				
-		
+		if (inputfiles!=null){
 		for (int i = 0; i < inputfiles.length; ++i) {
 			
 			String[] currenttrack = {(inputfiles[i].getName())};
 			userTableModel.addRow(currenttrack);
 		}
-		
+		}
 	
 		  table = new JTable(userTableModel);
-			table.setPreferredSize(new Dimension(300, 200));
-		  table.setAutoResizeMode( JTable.AUTO_RESIZE_OFF );
+		//	table.setPreferredSize(new Dimension(300, 200));
+		  table.setAutoResizeMode( JTable.AUTO_RESIZE_ALL_COLUMNS );
 		 scrollPane = new JScrollPane(table);
-		 scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-		 scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 		 scrollPane.setMinimumSize(new Dimension(300, 200));
-		 scrollPane.setMaximumSize(new Dimension(300, 200));
+		// scrollPane.setMaximumSize(new Dimension(300, 200));
 		 scrollPane.setPreferredSize(new Dimension(300, 200));
 		 
 			// Location
@@ -576,7 +579,7 @@ public class InteractiveRANSAC implements PlugIn {
 			Tracking.setColor(chart, 0, new Color(64, 64, 64));
 			Tracking.setStroke(chart, 0, 0.2f);
 	         row = trackindex;
-	         System.out.println(row);
+	         setFunction();
      		updateRANSAC();
      		compile.compileresults();
      		
@@ -646,6 +649,7 @@ public class InteractiveRANSAC implements PlugIn {
 		int count = 0;
 		int negcount = 0;
 		int rescount = 0;
+		int catcount = 0;
 		double timediff = 0;
 		double restimediff = 0;
 		double negtimediff = 0;
@@ -735,9 +739,9 @@ public class InteractiveRANSAC implements PlugIn {
 				}
 				
 				System.out.println("Global start and end" + points.get(points.size() - 1).getW()[0] + " "+ points.get(0).getW()[0]);
-				// Ignore last growth event and tiny start events
+				// Ignore  tiny start events
 				
-				if (points.get(points.size() - 1).getW()[0] - endX >= tptolerance && endX - points.get(0).getW()[0] >=tptolerance
+				if ( endX - points.get(0).getW()[0] >=tptolerance
 						){
 					double startY = polynomial.predict(startX);
 					double linearrate = linear.getCoefficient(1);
@@ -754,7 +758,9 @@ public class InteractiveRANSAC implements PlugIn {
 
 					count++;
 					growthrate = linearrate;
-					
+					// Ignore last growth event for getting fcat
+					if(points.get(points.size() - 1).getW()[0] - endX >= tptolerance)
+						catcount++;
 					timediff += endX - startX;
 					lifetime = endX - startX;
 					averagegrowth += linearrate;
@@ -770,6 +776,7 @@ public class InteractiveRANSAC implements PlugIn {
 					
 
 				}
+			
 
 				if(linearrate > 0){
 				previousendX.add(endX);
@@ -909,36 +916,37 @@ public class InteractiveRANSAC implements PlugIn {
 			}
 		}
 		if (count > 0)
-			averagegrowth /= count* calibrations[0] / calibrations[2];
+			averagegrowth /= count;
 
-		if (count > 0) 
+		if (catcount > 0) 
 
-			catfrequ = count / (timediff * calibrations[2]);
+			catfrequ = catcount / (timediff * calibrations[2]);
 		
 		if (rescount > 0)
 
 			resfrequ = rescount / (restimediff * calibrations[2]);
 		
 		if (negcount > 0)
-			averageshrink /= negcount* calibrations[0] / calibrations[2];
+			averageshrink /= negcount;
 		
 		if(resfrequ < 0)
 			resfrequ = 0;
 		
 		rt.show("Rates(real units)");
-
+		averageshrink*= calibrations[0] / calibrations[2];
+		averagegrowth*= calibrations[0] / calibrations[2];
 		rtAll.incrementCounter();
 		rtAll.addValue("Average Growth", averagegrowth);
 		rtAll.addValue("Growth events", count);
 		rtAll.addValue("Average Shrink", averageshrink);
 		rtAll.addValue("Shrink events", negcount);
 		rtAll.addValue("Catastrophe Frequency", catfrequ);
-		rtAll.addValue("Catastrophe events", count - 1);
+		rtAll.addValue("Catastrophe events", catcount);
 		rtAll.addValue("Rescue Frequency", resfrequ);
 		rtAll.addValue("Rescue events", rescount);
 		rtAll.show("Average Rates and Frequencies (real units)");
 
-		Averagerate avrate = new Averagerate(averagegrowth, averageshrink, catfrequ, resfrequ, count, negcount, count - 1, rescount);
+		Averagerate avrate = new Averagerate(averagegrowth, averageshrink, catfrequ, resfrequ, count, negcount, catcount, rescount, this.inputfile);
 		averagerates.add(avrate);
 		Compilepositiverates.put(row, allrates);
 

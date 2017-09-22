@@ -31,6 +31,7 @@ import net.imglib2.img.ImgFactory;
 import net.imglib2.img.display.imagej.ImageJFunctions;
 import net.imglib2.type.numeric.integer.UnsignedByteType;
 import net.imglib2.type.numeric.real.FloatType;
+import net.imglib2.util.Pair;
 import net.imglib2.util.Util;
 import net.imglib2.view.Views;
 import peakFitter.SortListbyproperty;
@@ -52,11 +53,12 @@ public class LinefinderInteractiveHFMSERwHough implements LinefinderHF{
 	private EllipseRoi ellipseroi;
 	private final double thetaPerPixel;
 	private final double rhoPerPixel;
+	private final ArrayList<Pair<Integer, double[]>> IDALL;
 	public LinefinderInteractiveHFMSERwHough (final RandomAccessibleInterval<FloatType> source, 
 			final RandomAccessibleInterval<FloatType> Preprocessedsource, 
 			final MserTree<UnsignedByteType> newtree,
 			 final int framenumber, final double thetaPerPixel,
-			final double rhoPerPixel){
+			final double rhoPerPixel, final ArrayList<Pair<Integer, double[]>> IDALL){
 		
 		this.newtree = newtree;
 		this.source = source;
@@ -64,6 +66,7 @@ public class LinefinderInteractiveHFMSERwHough implements LinefinderHF{
 		this.thetaPerPixel = thetaPerPixel;
 		this.rhoPerPixel = rhoPerPixel;
 		this.framenumber = framenumber;
+		this.IDALL = IDALL;
 		ndims = source.numDimensions();
 	}
 	
@@ -123,7 +126,7 @@ public class LinefinderInteractiveHFMSERwHough implements LinefinderHF{
 				final double[] covar = { ellipselist.get(index)[2], ellipselist.get(index)[3],
 						ellipselist.get(index)[4] };
 				ellipseroi = GetDelta.createEllipse(mean, covar, 3);
-				
+
 	    		final double perimeter = ellipseroi.getLength();
 	    		final double smalleigenvalue = SmallerEigenvalue(mean, covar);
 	    			
@@ -180,13 +183,15 @@ public class LinefinderInteractiveHFMSERwHough implements LinefinderHF{
 				// Obtain the slope and intercept of the line by obtaining the major axis of the ellipse (super fast and accurate)
 				
 				
-				
+			
+						
 				CommonOutputHF currentOutput = new CommonOutputHF(framenumber, Roiindex, Roiimg, ActualRoiimg, interval, Allrois);
 				
 				
 				output.add(currentOutput);
 				
 				}
+			
 				
 
 		

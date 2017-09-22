@@ -116,6 +116,7 @@ public class Tracking
 		{
 			BufferedReader in = Util.openFileRead( file );
 
+			
 			while( in.ready() )
 			{
 				String line = in.readLine().trim();

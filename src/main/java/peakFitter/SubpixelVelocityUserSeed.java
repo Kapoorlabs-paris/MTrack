@@ -67,7 +67,7 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 	// Mask fits iteration param
 	public int iterations = 200;
 	public double maxdist = 10;
-	public double zerodist = 30;
+	public double zerodist = 250;
 	public double cutoffdistance = 15;
 	public boolean halfgaussian = false;
 	public double Intensityratio;
@@ -248,12 +248,20 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 						double dist = Distance(currentpos, previouspos);
 						
 							
-							if (dist < distmin) {
+							if (dist < distmin && dist!=0) {
 								distmin = dist;
 								labelindex = labelstart.get(j);
 								paramnextframestart = test;
 							
 						}
+							
+							
+							if (distmin == 0){
+								labelindex = labelstart.get(j);
+								paramnextframestart = test;
+								
+							}
+							
 					}
 				}
 			}
@@ -277,13 +285,14 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 			double newslope = (paramnextframestart.currentpos[1] - paramnextframestart.fixedpos[1] ) 
 					/(paramnextframestart.currentpos[0] - paramnextframestart.fixedpos[0]) ;
 			
-			double dist = (paramnextframestart.currentpos[1] - oldslope * paramnextframestart.currentpos[0] -oldintercept)/Math.sqrt(1 + oldslope *oldslope);
+			double dist = Math.toDegrees(Math.atan(((newslope - oldslope)/(1 + newslope * oldslope))));
+					
+					//(paramnextframestart.currentpos[1] - oldslope * paramnextframestart.currentpos[0] -oldintercept)/Math.sqrt(1 + oldslope *oldslope);
 					//Math.toDegrees(Math.atan(((newslope - oldslope)/(1 + newslope * oldslope)))); 
 				//	(paramnextframestart.currentpos[1] - oldslope * paramnextframestart.currentpos[0] -oldintercept)/Math.sqrt(1 + oldslope *oldslope);
 					//Math.toDegrees(Math.atan(((newslope - oldslope)/(1 + newslope * oldslope)))); 
 			
 			
-					//Math.toDegrees(Math.atan(Math.toRadians((newslope - oldslope) / (1 + newslope * oldslope))));
 		
 			System.out.println("User " + dist);
 		

@@ -31,6 +31,7 @@ import net.imglib2.img.ImgFactory;
 import net.imglib2.img.display.imagej.ImageJFunctions;
 import net.imglib2.type.numeric.integer.UnsignedByteType;
 import net.imglib2.type.numeric.real.FloatType;
+import net.imglib2.util.Pair;
 import net.imglib2.util.Util;
 import net.imglib2.view.Views;
 import peakFitter.SortListbyproperty;
@@ -47,20 +48,23 @@ public class LinefinderInteractiveHFMSER implements LinefinderHF{
 	private final int framenumber;
 	private ArrayList<CommonOutputHF> output;
 	private ArrayList<EllipseRoi> Allrois;
+	
 	private ArrayList<Mser<UnsignedByteType>> mserchildren;
 	public boolean darktoBright = false;
 	private int Roiindex;
 	private final int ndims;
 	private EllipseRoi ellipseroi;
 	private EllipseRoi subellipseroi;
+	private final ArrayList<Pair<Integer, double[]>> IDALL;
 	public LinefinderInteractiveHFMSER (final RandomAccessibleInterval<FloatType> source, 
 			final RandomAccessibleInterval<FloatType> Preprocessedsource,
-			MserTree<UnsignedByteType> newtree,  final int framenumber){
+			MserTree<UnsignedByteType> newtree,  final int framenumber, ArrayList<Pair<Integer, double[]>> IDALL){
 		
 		this.newtree = newtree;
 		this.source = source;
 		this.Preprocessedsource = Preprocessedsource;
 		this.framenumber = framenumber;
+		this.IDALL = IDALL;
 		ndims = source.numDimensions();
 	}
 	
@@ -109,7 +113,7 @@ public class LinefinderInteractiveHFMSER implements LinefinderHF{
 				
 			
 				ellipseroi  = Allrois.get(index);
-	    			
+					
 	    			Roiindex = count;
 	    			count++;
 				
@@ -160,10 +164,9 @@ public class LinefinderInteractiveHFMSER implements LinefinderHF{
 				
 				
 				output.add(currentOutput);
+					}
 				
-		
 				
-			}
 
 		
 
