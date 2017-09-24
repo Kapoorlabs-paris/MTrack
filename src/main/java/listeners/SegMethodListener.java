@@ -150,7 +150,6 @@ public class SegMethodListener implements ActionListener {
 				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 	
 		parent.controlnext.setVisible(true);
-		parent.controlnext.validate();
 		parent.panelThird.add(parent.panelNext,  new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 	

@@ -32,6 +32,7 @@ import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -65,6 +66,7 @@ import ij.ImagePlus;
 import ij.gui.Overlay;
 import ij.measure.ResultsTable;
 import ij.plugin.PlugIn;
+import listeners.MethodListener;
 import mpicbg.models.Point;
 import mt.Averagerate;
 import mt.DisplayPoints;
@@ -283,7 +285,7 @@ public class InteractiveRANSAC implements PlugIn {
 	JPanel PanelDirectory = new JPanel();
 	private JPanel PanelParameteroptions = new JPanel();
 	private JPanel PanelSavetoFile = new JPanel();
-	private JPanel Panelfunction = new JPanel();
+	public JPanel Panelfunction = new JPanel();
 	private JPanel Panelslope = new JPanel();
 	private JPanel PanelCompileRes = new JPanel();
 	public JTable table;
@@ -374,11 +376,9 @@ public class InteractiveRANSAC implements PlugIn {
 		final Scrollbar maxSlopeSB = new Scrollbar(Scrollbar.HORIZONTAL, this.maxSlopeInt, 1, MIN_SLIDER,
 				MAX_SLIDER + 1);
 
-		final Choice choice = new Choice();
-		choice.add("Linear Function only");
-		choice.add("Linearized Quadratic function");
-		choice.add("Linearized Cubic function");
-
+	
+		String[] Method = { "Linear Function only", "Linearized Quadratic function","Linearized Cubic function" };
+		JComboBox<String> ChooseMethod = new JComboBox<String>(Method);
 		this.lambdaSB = new Scrollbar(Scrollbar.HORIZONTAL, this.lambdaInt, 1, MIN_SLIDER, MAX_SLIDER + 1);
 
 		final Label maxErrorLabel = new Label("Max. Error (pixels) (px)) = " + new DecimalFormat("#.##").format(this.maxError), Label.CENTER);
@@ -407,7 +407,6 @@ public class InteractiveRANSAC implements PlugIn {
 		
 		final Button WriteStats = new Button("Compute Length and Lifetime distribution");
 		final Button WriteAgain = new Button("Save Rates and Frequencies to File");
-		choice.select(functionChoice);
 		setFunction();
 
 		PanelDirectory.add(Measureserial,  new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST,
@@ -448,7 +447,7 @@ public class InteractiveRANSAC implements PlugIn {
 		
 		
 
-		Panelfunction.add(choice,new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+		Panelfunction.add(ChooseMethod,new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 				GridBagConstraints.RELATIVE, insets, 0, 0) );
 		
 		Panelfunction.add(lambdaSB,new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER,
@@ -531,7 +530,8 @@ public class InteractiveRANSAC implements PlugIn {
 		maxErrorSB.addAdjustmentListener(new MaxErrorListener(this, maxErrorLabel, maxErrorSB));
 		minInliersSB.addAdjustmentListener(new MinInliersListener(this, minInliersLabel, minInliersSB));
 		maxDistSB.addAdjustmentListener(new MaxDistListener(this, maxDistLabel, maxDistSB));
-		choice.addItemListener(new FunctionItemListener(this));
+		
+		ChooseMethod.addActionListener(new FunctionItemListener(this, ChooseMethod));
 		lambdaSB.addAdjustmentListener(new LambdaListener(this, lambdaLabel, lambdaSB));
 		minSlopeSB.addAdjustmentListener(new MinSlopeListener(this, minSlopeSB, minSlopeLabel));
 		maxSlopeSB.addAdjustmentListener(new MaxSlopeListener(this, maxSlopeSB, maxSlopeLabel));
@@ -601,7 +601,8 @@ public class InteractiveRANSAC implements PlugIn {
 			this.function = new InterpolatedPolynomial<LinearFunction, HigherOrderPolynomialFunction>(
 					new LinearFunction(), new HigherOrderPolynomialFunction(3), 1 - this.lambda);
 		}
-
+System.out.println("Choice: " + functionChoice);
+		
 	}
 
 	public void setLambdaEnabled(final boolean state) {

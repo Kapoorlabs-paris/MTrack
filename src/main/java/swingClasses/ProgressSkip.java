@@ -68,21 +68,7 @@ final Interactive_MTDoubleChannelBasic child;
 			if (child!=null){
 				
 				child.panelNext.removeAll();
-				child.controlnext.removeAll();
-				child.controlnext.add(new JButton(new AbstractAction("\u22b2Prev") {
-
-					/**
-					 * 
-					 */
-					private static final long serialVersionUID = 1L;
-
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						CardLayout cl = (CardLayout) child.panelCont.getLayout();
-
-						cl.previous(child.panelCont);
-					}
-				}));
+				
 				
 				child.controlnext.add(new JButton(new AbstractAction("Enter RANSAC stage\u22b3") {
 
@@ -111,23 +97,9 @@ final Interactive_MTDoubleChannelBasic child;
 				
 			}
 			if (child == null){
-				parent.controlprevious.removeAll();
-				parent.panelPrevious.removeAll();
+				parent.panelNext.removeAll();
 				
-				parent.panelPrevious.add(new JButton(new AbstractAction("\u22b2Prev") {
-
-					/**
-					 * 
-					 */
-					private static final long serialVersionUID = 1L;
-
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						CardLayout cl = (CardLayout) parent.panelCont.getLayout();
-
-						cl.previous(parent.panelCont);
-					}
-				}));
+				
 				
 				parent.controlprevious.add(new JButton(new AbstractAction("Enter RANSAC stage\u22b3") {
 

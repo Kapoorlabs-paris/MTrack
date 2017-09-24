@@ -202,7 +202,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public double Intensityratio = 0.35;
 	public double slopetolerance = 5;
 	public double Inispacing = 0.5;
-	public double maxdist = 50;
+	public double maxdist = 20;
 	public double zerodist = 30;
 	public int numgaussians = 2;
 	public int thirdDimensionslider = 1;
@@ -1520,7 +1520,9 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		
 		 
 		 
-			
+
+			JPanel controlprevious = new JPanel();
+
 			controlprevious.add(new JButton(new AbstractAction("\u22b2Prev") {
 
 			
@@ -1544,6 +1546,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 			panelFourth.add(panelPrevious,  new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 		
+			
 			
 		 
 		 

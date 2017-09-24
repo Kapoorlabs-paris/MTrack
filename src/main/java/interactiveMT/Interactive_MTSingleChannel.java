@@ -1504,8 +1504,8 @@ panelPrevious.removeAll();
 					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 		
 		 
-		 
-			controlnext.removeAll();
+		 JPanel controlprevious = new JPanel();
+
 			controlprevious.add(new JButton(new AbstractAction("\u22b2Prev") {
 
 			
@@ -1677,7 +1677,8 @@ panelPrevious.removeAll();
 					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 		
 		 
-		 controlnext.removeAll();
+		 JPanel controlprevious = new JPanel();
+
 			controlprevious.add(new JButton(new AbstractAction("\u22b2Prev") {
 
 			
