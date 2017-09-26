@@ -361,7 +361,7 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 			Pair<double[], double[]> minmaxpair = FitterUtils.MakeinitialEndpointguessUser(imgs, maxintensityline,
 					Intensityratio, ndims, labelindex, axisslope, axisintercept, iniparam.Curvature,
 					iniparam.Inflection, rate, framenumber);
-
+			
 			for (int d = 0; d < ndims; ++d) {
 
 				minVal[d] = minmaxpair.getA()[d];

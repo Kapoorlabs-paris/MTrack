@@ -41,7 +41,7 @@ public class FitterUtils {
 	}
 
 	
-	static int cutoff = 1;
+	static int cutoff = 10;
 	public static double[] MakerepeatedLineguess(ArrayList<CommonOutputHF> imgs, Indexedlength iniparam, UserChoiceModel model,  double Intensityratio, double Inispacing, int label, int ndims, 
 			int startframe, int currentframe) {
 
@@ -67,7 +67,14 @@ public class FitterUtils {
 					Intensityratio, ndims, labelindex, axisslope, axisintercept, iniparam.slope, iniparam.intercept,
 					iniparam.Curvature, iniparam.Inflection, startframe, currentframe);
 			
-			
+              if ((int)Math.abs(minmaxpair.getA()[0] - iniparam.currentpos[0]) >= 100 || 
+            		  (int)Math.abs(minmaxpair.getA()[1] - iniparam.currentpos[1]) >=100){
+				
+            	  minmaxpair = FitterUtils.MakeinitialEndpointguessSame(imgs, maxintensityline,
+      					Intensityratio, ndims, labelindex, axisslope, axisintercept, iniparam.slope, iniparam.intercept,
+      					iniparam.Curvature, iniparam.Inflection, startframe, currentframe);
+				
+			}
 			
 			
 			for (int d = 0; d < ndims; ++d) {
@@ -78,13 +85,7 @@ public class FitterUtils {
 			}
 			
 			
-			if ((int)minVal[0] == (int)maxVal[0] && (int)minVal[1] == (int)maxVal[1]){
-				
-				minVal = (Distance(iniparam.currentpos, minVal) < Distance(iniparam.currentpos, maxVal))? iniparam.currentpos: minVal;
-				minVal = (Distance(iniparam.currentpos, minVal) > Distance(iniparam.currentpos, maxVal))? iniparam.currentpos: maxVal;
-				
-				
-			}
+			
 
 			if (model == UserChoiceModel.Line) {
 
@@ -286,6 +287,101 @@ public class FitterUtils {
 		return MinandMax;
            }
        
+	
+	public static double[] MakeimprovedLineguessSame(ArrayList<CommonOutput> imgs, double slope, double intercept, double zeroslope, double zerointercept, double Curvature, double Inflection, double Intensityratio, double Inispacing,
+			double[] psf, int label, int startframe, int currentframe)  {
+		
+		
+		int ndims = psf.length;
+		long[] newposition = new long[ndims];
+		double[] minVal = { Double.MAX_VALUE, Double.MAX_VALUE };
+		double[] maxVal = { -Double.MIN_VALUE, -Double.MIN_VALUE };
+
+		RandomAccessibleInterval<FloatType> currentimg = imgs.get(label).Actualroi;
+
+		FinalInterval interval = imgs.get(label).interval;
+		
+		currentimg = Views.interval(currentimg, interval);
+
+		final Cursor<FloatType> inputcursor = Views.iterable(currentimg).localizingCursor();
+
+		final double maxintensityline = GetLocalmaxminMT.computeMaxIntensity(currentimg);
+
+           
+
+           
+          
+        	   
+        	   while(inputcursor.hasNext()){
+       			
+       			inputcursor.fwd();
+       			inputcursor.localize(newposition);
+       			double distline = 0;
+       		
+       			if (currentframe <= startframe + 1 || Math.abs(slope)==Double.NaN )
+       				distline = Math.abs(inputcursor.getDoublePosition(1) - zeroslope * inputcursor.getDoublePosition(0) - zerointercept) / Math.sqrt(1 + zeroslope * zeroslope);
+       			
+       			else if (currentframe > startframe + 1  && Math.abs(slope)!=Double.NaN)
+       				distline =	Math.abs(inputcursor.getDoublePosition(1) - slope * inputcursor.getDoublePosition(0) - intercept) / Math.sqrt(1 + slope * slope);
+       			
+
+       			
+                	
+                	if (inputcursor.getDoublePosition(0) <= minVal[0]
+    						&& inputcursor.get().get() / maxintensityline > Intensityratio) {
+    					minVal[0] = inputcursor.getDoublePosition(0);
+    					minVal[1] = inputcursor.getDoublePosition(1);
+    				}
+
+    				if (inputcursor.getDoublePosition(0) >= maxVal[0]
+    						&& inputcursor.get().get() / maxintensityline > Intensityratio) {
+    					maxVal[0] = inputcursor.getDoublePosition(0);
+    					maxVal[1] = inputcursor.getDoublePosition(1);
+
+    				}
+                	
+                
+       			
+       			
+       			
+        	   }
+		final double[] MinandMax = new double[2 * ndims + 3];
+
+		
+			for (int d = 0; d < ndims; ++d) {
+
+				MinandMax[d] = minVal[d];
+				MinandMax[d + ndims] = maxVal[d];
+			}
+
+		
+
+		// This parameter is guess estimate for spacing between the Gaussians
+		MinandMax[2 * ndims] =   Inispacing;
+		MinandMax[2 * ndims + 1] = maxintensityline; 
+		// This parameter guess estimates the background noise level
+		MinandMax[2 * ndims + 2] = 0.0; 
+		
+		
+		System.out.println("Label: " + label + " " + "Detection: " + " StartX: " + MinandMax[0] + " StartY: "
+				+ MinandMax[1] + " EndX: " + MinandMax[2] + " EndY: " + MinandMax[3]);
+
+		
+		
+			for (int d = 0; d < ndims; ++d) {
+
+				if (MinandMax[d] == Double.MAX_VALUE || MinandMax[d + ndims] == -Double.MIN_VALUE)
+					return null;
+				
+				if (MinandMax[d] <= 0 || MinandMax[d + ndims] <= 0)
+					return null;
+
+			}
+		
+
+		return MinandMax;
+           }
+	
 	public static ArrayList<Integer> Getlabel(final ArrayList<CommonOutputHF> imgs, final Point fixedpoint,
 			final double originalslope, final double originalintercept) {
 
@@ -513,6 +609,70 @@ public class FitterUtils {
 		return minmaxpair;
 
 	}
+	
+	
+	
+	public static final Pair<double[], double[]> MakeinitialEndpointguessSame(ArrayList<CommonOutputHF> imgs,
+			double maxintensityline, double Intensityratio, int ndims, int label, double slope, double intercept, double zeroslope, double zerointercept,
+			double Curvature, double Inflection, final int startframe, final int currentframe) {
+		long[] newposition = new long[ndims];
+		double[] minVal = { Double.MAX_VALUE, Double.MAX_VALUE };
+		double[] maxVal = { -Double.MIN_VALUE, -Double.MIN_VALUE };
+
+		RandomAccessibleInterval<FloatType> currentimg = imgs.get(label).Roi;
+
+		
+		FinalInterval interval = imgs.get(label).interval;
+
+		currentimg = Views.interval(currentimg, interval);
+
+		final Cursor<FloatType> outcursor = Views.iterable(currentimg).localizingCursor();
+
+		while (outcursor.hasNext()) {
+
+			outcursor.fwd();
+
+			outcursor.localize(newposition);
+			double distline = 0;
+			
+   			if (currentframe <= startframe + 1 || Math.abs(slope) == Double.NaN)
+   				distline = Math.abs(outcursor.getDoublePosition(1) - zeroslope * outcursor.getDoublePosition(0) - zerointercept) / Math.sqrt(1 + zeroslope * zeroslope);
+   			
+   			else if (currentframe > startframe + 1 && Math.abs(slope)!=Double.NaN)
+   				distline =	Math.abs(outcursor.getDoublePosition(1) - slope * outcursor.getDoublePosition(0) - intercept) / Math.sqrt(1 + slope * slope);
+   					
+   			
+   			
+               
+                	
+                	if (outcursor.getDoublePosition(0) <= minVal[0]
+    						&& outcursor.get().get() / maxintensityline > Intensityratio) {
+    					minVal[0] = outcursor.getDoublePosition(0);
+    					minVal[1] = outcursor.getDoublePosition(1);
+    				}
+
+    				if (outcursor.getDoublePosition(0) >= maxVal[0]
+    						&& outcursor.get().get() / maxintensityline > Intensityratio) {
+    					maxVal[0] = outcursor.getDoublePosition(0);
+    					maxVal[1] = outcursor.getDoublePosition(1);
+
+    				}
+                	
+                }
+                
+			
+		
+		
+		
+		Pair<double[], double[]> minmaxpair = new ValuePair<double[], double[]>(minVal, maxVal);
+
+		
+		
+		return minmaxpair;
+
+	}
+
+	
 
 	public static final Pair<double[], double[]> MakeinitialEndpointguessUser(ArrayList<CommonOutputHF> imgs,
 			double maxintensityline, double Intensityratio, int ndims, int label, double slope, double intercept,
@@ -586,6 +746,60 @@ public class FitterUtils {
 
 	}
 
+
+
+	public static final Pair<double[], double[]> MakeinitialEndpointguessUserSame(ArrayList<CommonOutputHF> imgs,
+			double maxintensityline, double Intensityratio, int ndims, int label, double slope, double intercept,
+			double Curvature, double Inflection, int startframe, int framenumber) {
+		long[] newposition = new long[ndims];
+		double[] minVal = { Double.MAX_VALUE, Double.MAX_VALUE };
+		double[] maxVal = { -Double.MIN_VALUE, -Double.MIN_VALUE };
+
+		RandomAccessibleInterval<FloatType> currentimg = imgs.get(label).Roi;
+
+		FinalInterval interval = imgs.get(label).interval;
+
+		currentimg = Views.interval(currentimg, interval);
+
+		final Cursor<FloatType> outcursor = Views.iterable(currentimg).localizingCursor();
+
+		while (outcursor.hasNext()) {
+
+			outcursor.fwd();
+
+			outcursor.localize(newposition);
+
+			double distline = Math.abs(outcursor.getDoublePosition(1) - slope * outcursor.getDoublePosition(0) - intercept) / Math.sqrt(1 + slope * slope);
+			
+			
+				if (outcursor.getDoublePosition(0) <= minVal[0]
+						&& outcursor.get().get() / maxintensityline > Intensityratio) {
+					minVal[0] = outcursor.getDoublePosition(0);
+					minVal[1] = outcursor.getDoublePosition(1);
+				}
+
+				if (outcursor.getDoublePosition(0) >= maxVal[0]
+						&& outcursor.get().get() / maxintensityline > Intensityratio) {
+					maxVal[0] = outcursor.getDoublePosition(0);
+					maxVal[1] = outcursor.getDoublePosition(1);
+
+				}
+				
+			
+
+				
+		}
+		
+		
+		
+		
+		
+		Pair<double[], double[]> minmaxpair = new ValuePair<double[], double[]>(minVal, maxVal);
+
+		return minmaxpair;
+
+	}
+	
 	public static void SetProgressBar(JProgressBar jpb, double percent) {
 
 		jpb.setValue((int) Math.round(percent));
