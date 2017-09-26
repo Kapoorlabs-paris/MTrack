@@ -76,6 +76,15 @@ public class FitterUtils {
 				maxVal[d] = minmaxpair.getB()[d];
 
 			}
+			
+			
+			if ((int)minVal[0] == (int)maxVal[0] && (int)minVal[1] == (int)maxVal[1]){
+				
+				minVal = (Distance(iniparam.currentpos, minVal) < Distance(iniparam.currentpos, maxVal))? iniparam.currentpos: minVal;
+				minVal = (Distance(iniparam.currentpos, minVal) > Distance(iniparam.currentpos, maxVal))? iniparam.currentpos: maxVal;
+				
+				
+			}
 
 			if (model == UserChoiceModel.Line) {
 
@@ -438,6 +447,7 @@ public class FitterUtils {
 
 		RandomAccessibleInterval<FloatType> currentimg = imgs.get(label).Roi;
 
+		
 		FinalInterval interval = imgs.get(label).interval;
 
 		currentimg = Views.interval(currentimg, interval);

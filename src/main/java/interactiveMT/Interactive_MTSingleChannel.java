@@ -970,7 +970,7 @@ public class Interactive_MTSingleChannel implements PlugIn {
 
 			
 			if(autothreshold)
-				thresholdHough = (float)0.75 * ( GlobalThresholding.AutomaticThresholding(currentPreprocessedimg));
+				thresholdHough = (float)( GlobalThresholding.AutomaticThresholding(currentPreprocessedimg));
 				
 			
 			GetLocalmaxminMT.ThresholdingMTBit(currentPreprocessedimg, bitimg, thresholdHough);
@@ -1104,7 +1104,7 @@ public class Interactive_MTSingleChannel implements PlugIn {
 	}
 
 	// Making the card
-	public JFrame Cardframe = new JFrame("MicroTubule Velocity Tracker (Advanced Mode)");
+	public JFrame Cardframe = new JFrame("MTrack (Advanced Mode)");
 	
 	public JPanel panelCont = new JPanel();
 	public JPanel panelNext = new JPanel();

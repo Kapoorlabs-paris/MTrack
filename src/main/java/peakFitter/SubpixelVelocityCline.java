@@ -304,7 +304,7 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 		
 				// TCASM
 				if (Math.abs(dist) > maxdist && dist!=0){
-					//IJ.log("Collision detected, activating TCASM layer");
+					IJ.log("Collision mistake detected, activating TCASM layer"+ oldstartpoint[0] + " " + oldstartpoint[1]);
 					paramnextframe = PrevFrameparamstart.get(index);
 					newstartpoint = oldstartpoint;
 					newstartslope = PrevFrameparamstart.get(index).slope;
@@ -432,7 +432,7 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 				
 				// TCASM
 				if (Math.abs(dist) > maxdist ){
-					IJ.log("Collision detected, activating TCASM layer");
+					IJ.log("Collision mistake detected, activating TCASM layer"+ oldendpoint[0] + " " + oldendpoint[1]);
 					paramnextframeend = PrevFrameparamend.get(index);
 					newendpoint = oldendpoint;
 					 newendslope = PrevFrameparamend.get(index).slope;

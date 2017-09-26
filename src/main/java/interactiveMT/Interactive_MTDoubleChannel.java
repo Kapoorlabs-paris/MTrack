@@ -203,6 +203,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public double slopetolerance = 5;
 	public double Inispacing = 0.5;
 	public double maxdist = 20;
+	public double maxdisp = 50;
 	public double zerodist = 30;
 	public int numgaussians = 2;
 	public int thirdDimensionslider = 1;
@@ -1008,7 +1009,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 			bitimgFloat = new ArrayImgFactory<FloatType>().create(newimg, new FloatType());
 
 			if(autothreshold)
-			thresholdHough = (float) 0.75 * ( GlobalThresholding.AutomaticThresholding(currentPreprocessedimg));
+			thresholdHough = (float) ( GlobalThresholding.AutomaticThresholding(currentPreprocessedimg));
 			
 			System.out.println(thresholdHough);
 			GetLocalmaxminMT.ThresholdingMTBit(currentPreprocessedimg, bitimg, thresholdHough);
@@ -1139,7 +1140,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	}
 
 	// Making the card
-	public JFrame Cardframe = new JFrame("MicroTubule Velocity Tracker (Advanced Mode)");
+	public JFrame Cardframe = new JFrame("MTrack (Advanced Mode)");
 
 	public JPanel panelCont = new JPanel();
 	public JPanel panelNext = new JPanel();
@@ -2200,7 +2201,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 				"Initial Spacing between Gaussians along the Polynomial curve = G * Min(Psf), G (enter positive number) = ",
 				Inispacing / Math.min(psf[0], psf[1]), 2);
 		gd.addNumericField("Maximum direction change per frame (in degrees)", maxdist, 2);
-
+		gd.addNumericField("Maximum displacement (in pixels)", maxdisp, 2);
 		
 
 		gd.showDialog();
@@ -2216,6 +2217,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		Intensityratio = gd.getNextNumber();
 		Inispacing = gd.getNextNumber() * Math.min(psf[0], psf[1]);
 		maxdist = gd.getNextNumber();
+		maxdisp = gd.getNextNumber();
 
 		
 
@@ -2242,6 +2244,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 		gd.addNumericField("Maximum direction change per frame (in degrees)", maxdist, 2);
 		gd.addNumericField("Number of Gaussians for mask fits ", numgaussians, 2);
+		gd.addNumericField("Maximum displacement (in pixels)", maxdisp, 2);
 		
 		gd.showDialog();
 		indexmodel = gd.getNextChoiceIndex();
@@ -2260,7 +2263,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 		numgaussians = (int) gd.getNextNumber();
 	
-
+		maxdisp = gd.getNextNumber();
 		return !gd.wasCanceled();
 	}
 

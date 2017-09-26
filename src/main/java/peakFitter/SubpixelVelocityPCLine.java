@@ -82,6 +82,7 @@ public class SubpixelVelocityPCLine extends BenchmarkAlgorithm
 	private final UserChoiceModel model;
 	public double Inispacing;
 	public double maxdist;
+	public double maxdisp;
 	public double zerodist;
  
 	public final int numgaussians;
@@ -120,6 +121,18 @@ public void setMaxdist (double maxdist) {
 		
 		return maxdist;
 	}
+	
+public void setMaxdisp (double maxdisp) {
+		
+		this.maxdisp = maxdisp;
+	}
+	
+	public double getMaxdisp(){
+		
+		return maxdisp;
+	}
+	
+	
 	public void setCutoffdistance(double cutoffdistance) {
 		this.cutoffdistance = cutoffdistance;
 	}
@@ -335,7 +348,7 @@ public void setMaxdist (double maxdist) {
 				
 				// TCASM
 				if (Math.abs(dist) > maxdist){
-					IJ.log("Collision detected, activating TCASM layer");
+					IJ.log("Collision mistake detected, activating TCASM layer" + oldstartpoint[0] + " " + oldstartpoint[1]);
 					paramnextframestart = PrevFrameparamstart.get(index);
 					newstartpoint = oldstartpoint;
 					newstartslope = PrevFrameparamstart.get(index).slope;
@@ -458,7 +471,7 @@ public void setMaxdist (double maxdist) {
 					System.out.println(dist + " " + maxdist);
 					
 				if (Math.abs(dist) > maxdist){
-					IJ.log("Collision detected, activating TCASM layer");
+					IJ.log("Collision mistake detected, activating TCASM layer"+ oldendpoint[0] + " " + oldendpoint[1]);
 					paramnextframeend = PrevFrameparamend.get(index);
 				    newendpoint = oldendpoint;	
 				    newendslope = PrevFrameparamend.get(index).slope;
@@ -536,6 +549,7 @@ public void setMaxdist (double maxdist) {
 				fixed_param[d] = 1.0 / Math.pow(psf[d], 2);
 
 			}
+			
 			fixed_param[ndims] = iniparam.originalslope;
 			fixed_param[ndims + 1] = iniparam.originalintercept;
 			fixed_param[ndims + 2] = Inispacing;

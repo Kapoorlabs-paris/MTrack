@@ -118,7 +118,7 @@ public class InteractiveRANSAC implements PlugIn {
 
 	final XYSeriesCollection dataset;
 	final JFreeChart chart;
-	final SVGGraphics2D svgchart;
+	//final SVGGraphics2D svgchart;
 	int updateCount = 0;
 	public ArrayList<Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>>> segments;
 	public HashMap<Integer, Pair<Double, Double>> indexedsegments;
@@ -198,9 +198,9 @@ public class InteractiveRANSAC implements PlugIn {
 		this.maxSlope = computeValueFromDoubleExpScrollbarPosition(this.maxSlopeInt, MAX_SLIDER, MAX_ABS_SLOPE);
 		this.dataset = new XYSeriesCollection();
 		this.chart = Tracking.makeChart(dataset, "Microtubule Length Plot", "Timepoint", "MT Length");
-		this.svgchart = new SVGGraphics2D(500, 500);
+	//	this.svgchart = new SVGGraphics2D(500, 500);
 		this.jFreeChartFrame = Tracking.display(chart, new Dimension(500, 500));
-		this.chart.draw(svgchart, new Rectangle2D.Double(0, 0, 500, 500), null);
+	//	this.chart.draw(svgchart, new Rectangle2D.Double(0, 0, 500, 500), null);
 	};
 
 	public InteractiveRANSAC(final int minTP, final int maxTP,
@@ -236,9 +236,9 @@ public class InteractiveRANSAC implements PlugIn {
 		this.maxSlope = computeValueFromDoubleExpScrollbarPosition(this.maxSlopeInt, MAX_SLIDER, MAX_ABS_SLOPE);
 		this.dataset = new XYSeriesCollection();
 		this.chart = Tracking.makeChart(dataset, "Microtubule Length Plot", "Timepoint", "MT Length");
-		this.svgchart = new SVGGraphics2D(500, 500);
+	//	this.svgchart = new SVGGraphics2D(500, 500);
 		this.jFreeChartFrame = Tracking.display(chart, new Dimension(500, 500));
-		this.chart.draw(svgchart, new Rectangle2D.Double(0, 0, 500, 500), null);
+		//this.chart.draw(svgchart, new Rectangle2D.Double(0, 0, 500, 500), null);
 	};
 	
 	

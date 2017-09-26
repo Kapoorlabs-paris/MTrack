@@ -67,8 +67,8 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 	// Mask fits iteration param
 	public int iterations = 200;
 	public double maxdist = 10;
-	public double zerodist = 250;
-	public double cutoffdistance = 15;
+	public double zerodist = 25;
+	public double cutoffdistance = 250;
 	public boolean halfgaussian = false;
 	public double Intensityratio;
 	final JProgressBar jpb;
@@ -298,7 +298,7 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 		
 			if (dist!=Double.NaN){
 			if (Math.abs(dist) > maxdist ) {
-			//	IJ.log("Collision detected, activating TCASM layer");
+				IJ.log("Collision mistake detected, activating TCASM layer" + oldstartpoint[0] + " " + oldstartpoint[1]);
 				paramnextframestart = Userframe.get(index);
 				newstartpoint = oldstartpoint;
 				newstartslope = Userframe.get(index).slope;

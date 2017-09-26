@@ -211,7 +211,7 @@ public class Interactive_MTSingleChannelBasic implements PlugIn {
 
 	}
 
-	public JFrame CardframeSimple = new JFrame("MicroTubule Velocity Tracker (Simple Mode)");
+	public JFrame CardframeSimple = new JFrame("MTrack (Simple Mode)");
 	public JPanel controlnext = new JPanel();
 	public JPanel controlprevious = new JPanel();
 	public JPanel panelCont = new JPanel();
