@@ -19,8 +19,7 @@ import ij.gui.Overlay;
 import ij.gui.PointRoi;
 import ij.gui.Roi;
 import ij.process.ColorProcessor;
-import kdTreeBlobs.FlagNode;
-import kdTreeBlobs.NNFlagsearchKDtree;
+
 import labeledObjects.Indexedlength;
 import labeledObjects.KalmanIndexedlength;
 import mpicbg.imglib.util.Util;
@@ -396,6 +395,8 @@ public class DrawingUtils {
 
 		return KDtreeroi;
 	}
+
+
 
 	public static ArrayList<EllipseRoi> getcurrentRois(MserTree<UnsignedByteType> newtree,
 			ArrayList<double[]> AllmeanCovar) {

@@ -1,6 +1,5 @@
 package swingClasses;
 
-import java.awt.CardLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
@@ -8,14 +7,12 @@ import java.util.concurrent.ExecutionException;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
-import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 
 import ij.IJ;
 import interactiveMT.Interactive_MTSingleChannel;
 import interactiveMT.Interactive_MTSingleChannelBasic;
 import mt.listeners.InteractiveRANSAC;
-import updateListeners.FinalPoint;
 
 public class SingleProgressSkip extends SwingWorker<Void, Void> {
 

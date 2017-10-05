@@ -1,12 +1,10 @@
 package swingClasses;
 
-import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.AbstractAction;
@@ -15,20 +13,14 @@ import javax.swing.JPanel;
 import javax.swing.SwingWorker;
 
 import LineModels.UseLineModel.UserChoiceModel;
-import ij.IJ;
 import ij.gui.OvalRoi;
 import ij.gui.Overlay;
-import ij.gui.Roi;
-import interactiveMT.Interactive_MTDoubleChannel;
 import interactiveMT.Interactive_MTSingleChannel;
 import interactiveMT.Interactive_MTSingleChannelBasic;
-import labeledObjects.KalmanIndexedlength;
 import lineFinder.FindlinesVia;
 import lineFinder.LinefinderInteractiveHough;
 import lineFinder.LinefinderInteractiveMSER;
 import lineFinder.LinefinderInteractiveMSERwHough;
-import listeners.SecondPanel;
-import listeners.ThirdPanel;
 import mpicbg.imglib.util.Util;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.type.numeric.real.FloatType;

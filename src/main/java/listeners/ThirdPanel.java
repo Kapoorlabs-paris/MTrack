@@ -81,13 +81,13 @@ public class ThirdPanel {
 		
 		
 		
-		Border selectborder = new CompoundBorder(new TitledBorder("Option 1"),
+		Border selectborder = new CompoundBorder(new TitledBorder("Deselect and select ends"),
 				new EmptyBorder(parent.c.insets));
 		
-		Border timeborder = new CompoundBorder(new TitledBorder("Option 2"),
+		Border timeborder = new CompoundBorder(new TitledBorder("Select time"),
 				new EmptyBorder(parent.c.insets));
 		
-		Border batchborder = new CompoundBorder(new TitledBorder("Option 3"),
+		Border batchborder = new CompoundBorder(new TitledBorder("Select segmentation method"),
 				new EmptyBorder(parent.c.insets));
 		
 		

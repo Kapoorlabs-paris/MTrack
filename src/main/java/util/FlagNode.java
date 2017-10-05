@@ -1,4 +1,4 @@
-package kdTreeBlobs;
+package util;
 
 public class FlagNode<K> {
 	private K value;
@@ -24,4 +24,3 @@ public class FlagNode<K> {
 		this.value = value;
 	}
 }
-

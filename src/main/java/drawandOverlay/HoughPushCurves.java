@@ -1,6 +1,6 @@
 package drawandOverlay;
 
-import lut.SinCosinelut;
+
 import net.imglib2.Cursor;
 import net.imglib2.RandomAccess;
 import net.imglib2.RandomAccessibleInterval;

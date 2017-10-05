@@ -54,7 +54,6 @@ import net.imglib2.util.ValuePair;
 import parallelization.ProcessFiles;
 import parallelization.Split;
 import peakFitter.FitterUtils;
-import spim.Threads;
 import updateListeners.FinalPoint;
 
 public class ProgressBatch extends SwingWorker<Void, Void> {

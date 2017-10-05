@@ -10,32 +10,23 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.jgrapht.graph.DefaultWeightedEdge;
-import org.jgrapht.graph.SimpleWeightedGraph;
-
 import MTObjects.ResultsMT;
-import drawandOverlay.DisplayGraph;
-
 import graphconstructs.Trackproperties;
-import ij.IJ;
 import ij.ImagePlus;
 import ij.gui.Line;
 import ij.gui.Overlay;
 import ij.measure.ResultsTable;
 import ij.plugin.frame.RoiManager;
-import interactiveMT.BatchMode;
 import interactiveMT.Interactive_MTSingleChannel.ValueChange;
 import labeledObjects.PlusMinusSeed;
 import interactiveMT.SingleBatchMode;
 import interactiveMT.Interactive_MTSingleChannel.Whichend;
 import lineFinder.FindlinesVia;
-import lineFinder.LinefinderInteractiveHFHough;
 import lineFinder.LinefinderInteractiveHFMSER;
 import lineFinder.LinefinderInteractiveHFMSERwHough;
 import lineFinder.SingleFindlinesVia;
 import lineFinder.SingleLinefinderInteractiveHFHough;
 import net.imglib2.RandomAccessibleInterval;
-import net.imglib2.img.display.imagej.ImageJFunctions;
 import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.view.Views;
 import velocityanalyser.Trackend;

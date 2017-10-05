@@ -1,15 +1,12 @@
 package swingClasses;
 
-import java.awt.Color;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -18,10 +15,7 @@ import org.jgrapht.graph.SimpleWeightedGraph;
 
 import MTObjects.ResultsMT;
 import drawandOverlay.DisplayGraph;
-import drawandOverlay.DisplayGraphKalman;
-import graphconstructs.KalmanTrackproperties;
 import graphconstructs.Trackproperties;
-import ij.IJ;
 import ij.ImagePlus;
 import ij.gui.Line;
 import ij.gui.Overlay;
@@ -38,10 +32,7 @@ import lineFinder.LinefinderInteractiveHFMSERwHough;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.img.display.imagej.ImageJFunctions;
 import net.imglib2.type.numeric.real.FloatType;
-import net.imglib2.util.Pair;
 import net.imglib2.view.Views;
-import trackerType.KFsearch;
-import trackerType.TrackModel;
 import velocityanalyser.Trackend;
 import velocityanalyser.Trackstart;
 

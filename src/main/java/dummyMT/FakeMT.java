@@ -9,9 +9,7 @@ import java.util.Random;
 
 
 import drawandOverlay.AddGaussian;
-import fakeMTgenerator.Dummylines;
-import fakeMTgenerator.Dummyprops;
-import fakeMTgenerator.Indexofline;
+
 import houghandWatershed.Finalfunction;
 import ij.IJ;
 import ij.ImageJ;

@@ -4,7 +4,6 @@ package preProcessing;
 import java.util.Random;
 
 import drawandOverlay.AddGaussian;
-import fftMethods.FFTConvolution;
 import net.imglib2.Cursor;
 import net.imglib2.IterableInterval;
 import net.imglib2.RandomAccess;
@@ -26,7 +25,7 @@ public class Kernels {
 
 	
 	public static enum ProcessingType {
-		Horizontaledge, Verticaledge, Gradientmag, NaiveEdge, Meanfilter, SupressThresh, CannyEdge
+		Gradientmag, NaiveEdge, Meanfilter, SupressThresh, CannyEdge
 	}
 	      // Any preprocessing
 
@@ -39,10 +38,7 @@ public class Kernels {
 				
 				switch(edge){
 				
-				case Horizontaledge:
-					imgout = inputimg;
-					HorizontalEdge(imgout);
-					break;
+				
 				case Meanfilter:
 					imgout = Meanfilterandsupress(inputimg, 1.0);
 					break;
@@ -52,10 +48,7 @@ public class Kernels {
 				case Gradientmag:
 					imgout = GradientmagnitudeImage(inputimg);
 					break;
-				case Verticaledge:
-					imgout = inputimg;
-					VerticalEdge(imgout);
-					break;
+			
 				case SupressThresh:
 					imgout = Supressthresh(inputimg);
 					break;
@@ -77,89 +70,7 @@ public class Kernels {
 	
 	
 	
-	public static void ButterflyKernel(final RandomAccessibleInterval<FloatType> inputimage) {
-
-		final float[] butterflyKernel = new float[] { 0, -2, 0, 1, 2, 1, 0, -2, 0 };
-
-		final Img<FloatType> Butterfly = ArrayImgs.floats(butterflyKernel, new long[] { 3, 3 });
-
-		// apply convolution to convolve input data with kernels
-
-		new FFTConvolution<FloatType>(inputimage, Butterfly, new ArrayImgFactory<ComplexFloatType>()).convolve();
-	}
-
-	public static void GeneralButterflyKernel(final RandomAccessibleInterval<FloatType> inputimage, double linewidth,
-			double dtheta) {
-		final double size = Math.sqrt((inputimage.dimension(0) * inputimage.dimension(0)
-				+ inputimage.dimension(1) * inputimage.dimension(1)));
-		final double gradientmaggth = linewidth / Math.sin(Math.toRadians(dtheta));
-		final double mask = -(2 * gradientmaggth + size) / 2;
-		final float[] butterflyKernel = new float[] { 0, (float) mask, 0, (float) gradientmaggth, (float) size,
-				(float) gradientmaggth, 0, (float) mask, 0 };
-
-		final Img<FloatType> Butterfly = ArrayImgs.floats(butterflyKernel, new long[] { 3, 3 });
-
-		// apply convolution to convolve input data with kernels
-
-		new FFTConvolution<FloatType>(inputimage, Butterfly, new ArrayImgFactory<ComplexFloatType>()).convolve();
-	}
-
-	public static void BigButterflyKernel(final RandomAccessibleInterval<FloatType> inputimage) {
-
-		final float[] butterflyKernel = new float[] { -10, -15, -22, -22, -22, -22, -22, -15, -10, -1, -6, -13, -22,
-				-22, -22, -13, -6, -1, 3, 6, 4, -3, -22, -3, 4, 6, 3, 3, 11, 19, 28, 42, 28, 19, 11, 3, 3, 11, 27, 42,
-				42, 42, 27, 11, 3, 3, 11, 19, 28, 42, 28, 19, 11, 3, 3, 6, 4, -3, -22, -3, 4, 6, 3, -1, -6, -13, -22,
-				-22, -22, -13, -6, -1, -10, -15, -22, -22, -22, -22, -22, -15, -10
-
-		};
-
-		final Img<FloatType> Butterfly = ArrayImgs.floats(butterflyKernel, new long[] { 9, 9 });
-
-		// apply convolution to convolve input data with kernels
-
-		new FFTConvolution<FloatType>(inputimage, Butterfly, new ArrayImgFactory<ComplexFloatType>()).convolve();
-
-	}
-
-	public static void HorizontalEdge(final RandomAccessibleInterval<FloatType> inputimage) {
-		final float[] HorizontalEdgeFilterKernel = new float[] { -1, 0, 1, -1, 0, 1, -1, 0, 1 };
-
-
-		final Img<FloatType> HorizontalEdgeFilter = ArrayImgs.floats(HorizontalEdgeFilterKernel, new long[] { 3, 3 });
-		// apply convolution to convolve input data with kernels
-
-		new FFTConvolution<FloatType>(inputimage, HorizontalEdgeFilter, new ArrayImgFactory<ComplexFloatType>())
-				.convolve();
-
-	}
-
-	public static void VerticalEdge(final RandomAccessibleInterval<FloatType> inputimage) {
-
-		final float[] VerticalEdgeFilterKernel = new float[] { -1, -1, -1, 0, 0, 0, 1, 1, 1 };
-
-		final Img<FloatType> VerticalEdgeFilter = ArrayImgs.floats(VerticalEdgeFilterKernel, new long[] { 3, 3 });
-		// apply convolution to convolve input data with kernels
-
-		new FFTConvolution<FloatType>(inputimage, VerticalEdgeFilter, new ArrayImgFactory<ComplexFloatType>())
-				.convolve();
-
-	}
-
-	public static void Edgedetector(final RandomAccessibleInterval<FloatType> inputimage) {
-		final float[] HorizontalEdgeFilterKernel = new float[] { -1, 0, 1, -1, 0, 1, -1, 0, 1 };
-
-		final float[] VerticalEdgeFilterKernel = new float[] { -1, -1, -1, 0, 0, 0, 1, 1, 1 };
-
-		final Img<FloatType> HorizontalEdgeFilter = ArrayImgs.floats(HorizontalEdgeFilterKernel, new long[] { 3, 3 });
-		final Img<FloatType> VerticalEdgeFilter = ArrayImgs.floats(VerticalEdgeFilterKernel, new long[] { 3, 3 });
-		// apply convolution to convolve input data with kernels
-
-		new FFTConvolution<FloatType>(inputimage, HorizontalEdgeFilter, new ArrayImgFactory<ComplexFloatType>())
-				.convolve();
-		new FFTConvolution<FloatType>(inputimage, VerticalEdgeFilter, new ArrayImgFactory<ComplexFloatType>())
-				.convolve();
-
-	}
+	
 
 	// Do mean filtering on the inputimage
 	public static void MeanFilter(RandomAccessibleInterval<FloatType> inputimage,
