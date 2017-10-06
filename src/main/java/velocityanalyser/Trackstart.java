@@ -5,7 +5,6 @@ import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
 
 
-import graphconstructs.Logger;
 import graphconstructs.Trackproperties;
 import labeledObjects.Subgraphs;
 import net.imglib2.util.Pair;
@@ -21,7 +20,6 @@ public class Trackstart implements Linetracker {
 		private SimpleWeightedGraph< double[], DefaultWeightedEdge > graph;
 		private ArrayList<Subgraphs> Framedgraph;
 		private ArrayList<Pair<Integer, double[]>> ID;
-		protected Logger logger = Logger.DEFAULT_LOGGER;
 		protected String errorMessage;
 
 		public Trackstart(
@@ -100,11 +98,7 @@ public class Trackstart implements Linetracker {
 			}
 		
 
-		@Override
-		public void setLogger( final Logger logger) {
-			this.logger = logger;
-			
-		}
+		
 		
 
 		@Override

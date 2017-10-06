@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.util.ArrayList;
 
 import beadObjects.Beadprop;
-import graphconstructs.Logger;
 import ij.gui.OvalRoi;
 import ij.gui.Roi;
 import mpicbg.imglib.util.Util;
@@ -20,7 +19,6 @@ public class BeadfinderInteractiveDoG implements Beadfinder {
 
 	
 	private static final String BASE_ERROR_MSG = "[BeadfinderDoG] ";
-	protected Logger logger = Logger.DEFAULT_LOGGER;
 	protected String errorMessage;
 	private ArrayList<Beadprop> ProbBlobs;
 	private final RandomAccessibleInterval<FloatType> source;
@@ -136,12 +134,7 @@ public class BeadfinderInteractiveDoG implements Beadfinder {
 		return null;
 	}
 
-	@Override
-	public void setLogger(Logger logger) {
-		// TODO Auto-generated method stub
-		
-	}
-
+	
 	
 	
 	

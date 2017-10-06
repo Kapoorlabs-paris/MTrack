@@ -8,7 +8,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import graphconstructs.Logger;
 import houghandWatershed.HoughTransformandMser;
 import ij.IJ;
 import ij.ImagePlus;
@@ -40,7 +39,6 @@ public class LinefinderHFMSERwHough implements LinefinderHF{
 
 	private static final String BASE_ERROR_MSG = "[Line-Finder]";
 	protected String errorMessage;
-	protected Logger logger = Logger.DEFAULT_LOGGER;
 	private final RandomAccessibleInterval<FloatType> source;
 	private final RandomAccessibleInterval<FloatType> Preprocessedsource;
 	private final int framenumber;
@@ -492,11 +490,7 @@ public class LinefinderHFMSERwHough implements LinefinderHF{
 	}
 
 
-@Override
-public void setLogger(Logger logger) {
-	this.logger = logger;
-	
-}
+
 	
 }
 

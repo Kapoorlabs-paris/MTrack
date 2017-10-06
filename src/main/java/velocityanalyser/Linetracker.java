@@ -3,8 +3,7 @@ package velocityanalyser;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
 
-import graphconstructs.Logger;
-import graphconstructs.Staticproperties;
+
 import net.imglib2.algorithm.OutputAlgorithm;
 public interface Linetracker extends OutputAlgorithm< SimpleWeightedGraph< double[], DefaultWeightedEdge > > {
 
@@ -16,7 +15,6 @@ public interface Linetracker extends OutputAlgorithm< SimpleWeightedGraph< doubl
 		 * @param logger
 		 *            the logger to echo messages to.
 		 */
-		public void setLogger( final Logger logger );
 	}
 	
 

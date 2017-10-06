@@ -1,23 +1,15 @@
 package lineFinder;
 
-import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import javax.security.auth.login.AccountExpiredException;
 import javax.swing.JProgressBar;
 
 
 import LineModels.UseLineModel.UserChoiceModel;
-import graphconstructs.KalmanTrackproperties;
 import graphconstructs.Trackproperties;
-import ij.IJ;
-import ij.ImagePlus;
-import ij.gui.Overlay;
-import ij.gui.Roi;
 import interactiveMT.Interactive_MTDoubleChannel.Whichend;
 import labeledObjects.Indexedlength;
-import labeledObjects.KalmanIndexedlength;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.util.Pair;
@@ -25,7 +17,6 @@ import net.imglib2.util.ValuePair;
 import peakFitter.SubpixelLengthPCLine;
 import peakFitter.SubpixelVelocityPCLine;
 import peakFitter.SubpixelVelocityUserSeed;
-import preProcessing.Kernels;
 
 public  class FindlinesVia {
 

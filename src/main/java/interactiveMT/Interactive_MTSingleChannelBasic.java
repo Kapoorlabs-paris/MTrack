@@ -11,7 +11,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Label;
-import java.awt.Rectangle;
 import java.awt.Scrollbar;
 import java.awt.TextField;
 import java.awt.event.ActionEvent;
@@ -26,7 +25,6 @@ import java.util.HashMap;
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -36,62 +34,33 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
-import fiji.tool.SliceObserver;
 import ij.IJ;
 import ij.ImageStack;
 import ij.gui.OvalRoi;
 import ij.gui.Overlay;
 import ij.gui.Roi;
-import ij.plugin.Macro_Runner;
 import ij.plugin.PlugIn;
-import initialization.SingleCreateINIfile;
 import interactiveMT.Interactive_MTSingleChannel.ValueChange;
 import labeledObjects.CommonOutputHF;
 import labeledObjects.Indexedlength;
-import listeners.AdvancedSeedListener;
-import listeners.AdvancedTrackerListener;
-import listeners.BeginTrackListener;
-import listeners.ChooseDirectoryListener;
-import listeners.EndTrackListener;
-import listeners.FindLinesListener;
-import listeners.SeedDisplayListener;
-import listeners.SkipFramesandTrackendsListener;
-import listeners.TrackendsListener;
-import listeners.Unstability_ScoreListener;
-import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.algorithm.componenttree.mser.MserTree;
 import net.imglib2.img.display.imagej.ImageJFunctions;
 import net.imglib2.type.numeric.integer.UnsignedByteType;
-import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.util.Pair;
 import net.imglib2.view.Views;
 import singleListeners.SingleAdvancedSeedListener;
 import singleListeners.SingleAdvancedTrackerListener;
 import singleListeners.SingleBatchModeListener;
-import singleListeners.SingleBeginTrackListener;
 import singleListeners.SingleChooseDirectoryListener;
-import singleListeners.SingleComputeTreeListener;
 import singleListeners.SingleDeltaListener;
-import singleListeners.SingleEndTrackListener;
 import singleListeners.SingleFindLinesListener;
 import singleListeners.SingleMinSizeListener;
-import singleListeners.SingleMoveNextListener;
 import singleListeners.SingleSeedDisplayListener;
 import singleListeners.SingleSkipFramesandTrackendsListener;
 import singleListeners.SingleUnstability_ScoreListener;
-import updateListeners.BatchModeListener;
-import updateListeners.DefaultModel;
-import updateListeners.DefaultModelHF;
-import updateListeners.FinalPoint;
-import updateListeners.Markends;
-import updateListeners.MoveNextListener;
-import updateListeners.MoveToFrameListener;
 import updateListeners.SingleDefaultModel;
 import updateListeners.SingleDefaultModelHF;
-import updateListeners.SingleFinalPoint;
-import updateListeners.SingleMarkends;
 import updateListeners.SingleMarkendsnew;
-import updateListeners.SingleMoveToFrameListener;
 
 public class Interactive_MTSingleChannelBasic implements PlugIn {
 
@@ -140,7 +109,7 @@ public class Interactive_MTSingleChannelBasic implements PlugIn {
 		parent.setInitialminSize(parent.minSizeInit);
 		parent.setInitialsearchradius(parent.initialSearchradiusInit);
 		parent.setInitialmaxsearchradius(parent.maxSearchradius);
-
+		parent.setInitialmaxSize((int)(parent.originalimg.dimension(0) * parent.originalimg.dimension(1)));
 		parent.Cannyradius = (long) (parent.radiusfactor
 				* Math.ceil(Math.sqrt(parent.psf[0] * parent.psf[0] + parent.psf[1] * parent.psf[1])));
 		if (parent.originalimg.numDimensions() < 3) {

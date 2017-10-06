@@ -9,7 +9,6 @@ import org.jgrapht.graph.SimpleWeightedGraph;
 
 import fiji.tool.SliceListener;
 import fiji.tool.SliceObserver;
-import graphconstructs.KalmanTrackproperties;
 import ij.ImagePlus;
 import ij.gui.Line;
 import ij.gui.Overlay;

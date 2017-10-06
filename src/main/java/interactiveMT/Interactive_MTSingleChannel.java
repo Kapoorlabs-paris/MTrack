@@ -637,7 +637,7 @@ public class Interactive_MTSingleChannel implements PlugIn {
 		setInitialminSize(minSizeInit);
 		setInitialsearchradius(initialSearchradiusInit);
 		setInitialmaxsearchradius(maxSearchradius);
-		
+		setInitialmaxSize((int)(originalimg.dimension(0) * originalimg.dimension(1)));
 		Cannyradius = (long) (radiusfactor * Math.ceil(Math.sqrt(psf[0] * psf[0] + psf[1] * psf[1])));
 		if (originalimg.numDimensions() < 3) {
 

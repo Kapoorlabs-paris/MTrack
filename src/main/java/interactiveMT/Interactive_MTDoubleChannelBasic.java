@@ -131,6 +131,7 @@ public class Interactive_MTDoubleChannelBasic implements PlugIn {
 		parent.setInitialminSize(parent.minSizeInit);
 		parent.setInitialsearchradius(parent.initialSearchradiusInit);
 		parent.setInitialmaxsearchradius(parent.maxSearchradius);
+		parent.setInitialmaxSize((int)(parent.originalimg.dimension(0) * parent.originalimg.dimension(1)));
 
 		parent.Cannyradius = (long) (parent.radiusfactor
 				* Math.ceil(Math.sqrt(parent.psf[0] * parent.psf[0] + parent.psf[1] * parent.psf[1])));

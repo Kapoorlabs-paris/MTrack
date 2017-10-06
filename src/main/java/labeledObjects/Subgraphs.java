@@ -4,8 +4,6 @@ package labeledObjects;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
 
-import graphconstructs.KalmanTrackproperties;
-import graphconstructs.Staticproperties;
 
 
 public class Subgraphs {

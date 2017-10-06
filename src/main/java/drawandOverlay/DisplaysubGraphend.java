@@ -8,7 +8,6 @@ import org.jgrapht.graph.DefaultWeightedEdge;
 
 import fiji.tool.SliceListener;
 import fiji.tool.SliceObserver;
-import graphconstructs.Staticproperties;
 import ij.ImagePlus;
 import ij.gui.Line;
 import ij.gui.Overlay;

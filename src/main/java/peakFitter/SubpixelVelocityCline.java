@@ -1,12 +1,7 @@
 package peakFitter;
 
-import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-
 import javax.swing.JProgressBar;
 
 import LineModels.GaussianLineds;
@@ -14,18 +9,13 @@ import LineModels.GaussianSplinesecorder;
 import LineModels.GaussianSplinethirdorder;
 import LineModels.MTFitFunction;
 import LineModels.UseLineModel.UserChoiceModel;
-import graphconstructs.Staticproperties;
 import graphconstructs.Trackproperties;
 import ij.IJ;
-import ij.gui.EllipseRoi;
 import ij.gui.OvalRoi;
-import ij.gui.Overlay;
 import ij.gui.Roi;
 import interactiveMT.Interactive_MTSingleChannel.Whichend;
-import labeledObjects.CommonOutput;
 import labeledObjects.CommonOutputHF;
 import labeledObjects.Indexedlength;
-import labeledObjects.LabelledImg;
 import lineFinder.LinefinderHF;
 import mpicbg.imglib.util.Util;
 import net.imglib2.Cursor;
@@ -40,8 +30,6 @@ import net.imglib2.util.Pair;
 import net.imglib2.util.ValuePair;
 import net.imglib2.view.Views;
 import peakFitter.GaussianMaskFitMSER.EndfitMSER;
-import peakFitter.SubpixelVelocityPCLine.StartorEnd;
-import util.Boundingboxes;
 
 public class SubpixelVelocityCline extends BenchmarkAlgorithm
 		implements OutputAlgorithm<Pair<ArrayList<Indexedlength>, ArrayList<Indexedlength>>> {

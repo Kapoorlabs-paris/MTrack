@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 
 import beadObjects.Beadprop;
-import graphconstructs.Logger;
 import ij.gui.Roi;
 import mserMethods.GetDelta;
 import net.imglib2.Cursor;
@@ -24,7 +23,6 @@ import net.imglib2.view.Views;
 public class BeadfinderInteractiveMSER implements Beadfinder {
 
 	private static final String BASE_ERROR_MSG = "[BeadfinderMSER] ";
-	protected Logger logger = Logger.DEFAULT_LOGGER;
 	protected String errorMessage;
 	private ArrayList<Beadprop> ProbBlobs;
 	private final RandomAccessibleInterval<FloatType> source;
@@ -220,10 +218,6 @@ public class BeadfinderInteractiveMSER implements Beadfinder {
 		return null;
 	}
 
-	@Override
-	public void setLogger(Logger logger) {
-		// TODO Auto-generated method stub
-
-	}
+	
 
 }

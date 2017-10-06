@@ -8,20 +8,14 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
-import graphconstructs.KalmanTrackproperties;
 import graphconstructs.Trackproperties;
-import ij.ImagePlus;
-import ij.ImageStack;
 import ij.gui.EllipseRoi;
 import ij.gui.Line;
 import ij.gui.OvalRoi;
 import ij.gui.Overlay;
 import ij.gui.PointRoi;
 import ij.gui.Roi;
-import ij.process.ColorProcessor;
-
 import labeledObjects.Indexedlength;
-import labeledObjects.KalmanIndexedlength;
 import mpicbg.imglib.util.Util;
 import net.imglib2.KDTree;
 import net.imglib2.Point;
@@ -31,10 +25,8 @@ import net.imglib2.RealPoint;
 import net.imglib2.algorithm.componenttree.mser.Mser;
 import net.imglib2.algorithm.componenttree.mser.MserTree;
 import net.imglib2.algorithm.localextrema.RefinedPeak;
-import net.imglib2.img.display.imagej.ImageJFunctions;
 import net.imglib2.type.numeric.integer.IntType;
 import net.imglib2.type.numeric.integer.UnsignedByteType;
-import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.util.Pair;
 import peakFitter.SortListbyproperty;
 
@@ -174,30 +166,7 @@ public class DrawingUtils {
 
 	}
 
-	public static ArrayList<double[]> OriginalPointsKalman(
-			Pair<Pair<ArrayList<KalmanTrackproperties>, ArrayList<KalmanTrackproperties>>, Pair<ArrayList<KalmanIndexedlength>, ArrayList<KalmanIndexedlength>>> returnVector) {
-
-		ArrayList<double[]> Originalpoints = new ArrayList<double[]>();
-
-		for (int index = 0; index < returnVector.getA().getA().size(); ++index) {
-
-			KalmanTrackproperties vector = returnVector.getA().getA().get(index);
-
-			Originalpoints.add(new double[] { vector.originalpoint[0], vector.originalpoint[1] });
-
-		}
-
-		for (int index = 0; index < returnVector.getA().getB().size(); ++index) {
-
-			KalmanTrackproperties vector = returnVector.getA().getB().get(index);
-
-			Originalpoints.add(new double[] { vector.originalpoint[0], vector.originalpoint[1] });
-
-		}
-
-		return Originalpoints;
-
-	}
+	
 
 	public static void Trackplot(int detcount,
 			Pair<Pair<ArrayList<Trackproperties>, ArrayList<Trackproperties>>, Pair<ArrayList<Indexedlength>, ArrayList<Indexedlength>>> returnVector,
@@ -294,72 +263,7 @@ public class DrawingUtils {
 
 	}
 
-	public static void TrackplotKalman(int detcount,
-			Pair<Pair<ArrayList<KalmanTrackproperties>, ArrayList<KalmanTrackproperties>>, 
-			Pair<ArrayList<KalmanIndexedlength>, ArrayList<KalmanIndexedlength>>> returnVector,
-			Pair<ArrayList<KalmanTrackproperties>, ArrayList<KalmanIndexedlength>> returnVectorUser,
-			HashMap<Integer, ArrayList<Roi>> AllpreviousRois, Color colorLineTrack, Color colorTrack,
-			Color inactiveColor, Overlay overlay, int maxghost) {
-
-		ArrayList<Roi> AllselectedRoi = new ArrayList<Roi>();
-
-		if (returnVector != null) {
-			for (int index = 0; index < returnVector.getA().getA().size(); ++index) {
-
-				KalmanTrackproperties vector = returnVector.getA().getA().get(index);
-
-				PointRoi selectedRoi = new PointRoi(vector.currentpoint[0], vector.currentpoint[1]);
-
-				AllselectedRoi.add(selectedRoi);
-
-			}
-
-			for (int index = 0; index < returnVector.getA().getB().size(); ++index) {
-
-				KalmanTrackproperties vector = returnVector.getA().getB().get(index);
-
-				PointRoi selectedRoi = new PointRoi(vector.currentpoint[0], vector.currentpoint[1]);
-
-				AllselectedRoi.add(selectedRoi);
-
-			}
-			AllpreviousRois.put(detcount, AllselectedRoi);
-
-			if (detcount <= maxghost) {
-				for (int i = 1; i < detcount; ++i) {
-
-					for (int index = 0; index < AllpreviousRois.get(i).size(); ++index) {
-
-						overlay.add(AllpreviousRois.get(i).get(index));
-
-					}
-
-				}
-			} else {
-				for (int i = 1; i < detcount; ++i) {
-					for (int index = 0; index < AllpreviousRois.get(i).size(); ++index) {
-						Roi roi = AllpreviousRois.get(i).get(index);
-						overlay.remove(roi);
-
-					}
-				}
-				for (int i = detcount - maxghost + 2; i < detcount; ++i) {
-					for (int index = 0; index < AllpreviousRois.get(i).size(); ++index) {
-
-						Roi oldroi = AllpreviousRois.get(i).get(index);
-						oldroi.setStrokeColor(colorTrack);
-
-						overlay.add(oldroi);
-
-					}
-
-				}
-
-			}
-
-		}
-
-	}
+	
 
 	public static OvalRoi getNearestRois(ArrayList<OvalRoi> Allrois, double[] Clickedpoint) {
 

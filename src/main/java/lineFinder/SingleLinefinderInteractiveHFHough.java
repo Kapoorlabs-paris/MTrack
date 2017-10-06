@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 
-import graphconstructs.Logger;
 import ij.ImagePlus;
 import ij.gui.EllipseRoi;
 import ij.gui.Overlay;
@@ -41,7 +40,6 @@ public class SingleLinefinderInteractiveHFHough implements LinefinderHF {
 	
 	private static final String BASE_ERROR_MSG = "[Line-Finder]";
 	protected String errorMessage;
-	protected Logger logger = Logger.DEFAULT_LOGGER;
 	private final RandomAccessibleInterval<FloatType> source;
 	private final RandomAccessibleInterval<FloatType> Preprocessedsource;
 	final Interactive_MTSingleChannel parent;
@@ -187,11 +185,7 @@ public class SingleLinefinderInteractiveHFHough implements LinefinderHF {
        
 		
 	}
-@Override
-public void setLogger(Logger logger) {
-	this.logger = logger;
-	
-}
+
 
 	
 
