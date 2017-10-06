@@ -83,17 +83,7 @@ public class SingleSkipFramesandTrackendsListener implements ActionListener {
 		trackMT.execute();
 		}
 		
-		if (child!=null){
 		
-		SingleProgressSkip trackMT = new SingleProgressSkip(parent, child);
-		trackMT.execute();
-		
-		}
-		else{
-			SingleProgressSkip trackMT = new SingleProgressSkip(parent);
-			trackMT.execute();
-			
-		}
 
 	}
 }

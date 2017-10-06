@@ -53,7 +53,7 @@ public class DeltaMTListener implements AdjustmentListener {
 
 		deltaScrollbar.setValue(parent.computeScrollbarPositionFromValue(parent.delta, min, max, scrollbarSize));
 
-		label.setText("Intensity threshold = " + parent.delta);
+		label.setText("Threshold difference = " + parent.delta);
 
 		
 	}

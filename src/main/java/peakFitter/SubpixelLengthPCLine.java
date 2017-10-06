@@ -456,6 +456,7 @@ public ArrayList<Indexedlength> getEndPoints(){
 					final double currentslope = (endparam[1] - startparam[1]) / (endparam[0] - startparam[0]);
 					final double currentintercept = endparam[1] - currentslope * endparam[0];
 
+					
 					System.out.println("Fits :" + "StartX:" + startparam[0] + " StartY:" + startparam[1] + " " + "EndX:"
 							+ endparam[0] + "EndY: " + endparam[1] + " " + "ds: " + finalparamstart[4] );
 					

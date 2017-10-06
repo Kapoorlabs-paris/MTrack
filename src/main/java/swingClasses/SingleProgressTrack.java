@@ -26,7 +26,9 @@ final int endtime;
 	@Override
 	protected Void doInBackground() throws Exception {
 
-		int next = 2;
+		int next = parent.starttime;
+		if(next == 1)
+			next = 2;
 		
 		SingleTrack newtrack = new SingleTrack(parent);
 		newtrack.Trackobject(next);

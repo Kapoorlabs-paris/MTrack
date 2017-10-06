@@ -92,14 +92,18 @@ public class SingleSecondPanel {
 		
 		
 		
-		Border selectborder = new CompoundBorder(new TitledBorder("Option 1"),
+		Border selectborder = new CompoundBorder(new TitledBorder("Deselect and select ends"),
 				new EmptyBorder(child.c.insets));
 		
-		Border timeborder = new CompoundBorder(new TitledBorder("Option 2"),
+		Border timeborder = new CompoundBorder(new TitledBorder("Select time"),
 				new EmptyBorder(child.c.insets));
 		
-		Border batchborder = new CompoundBorder(new TitledBorder("Option 3"),
+		Border batchborder = new CompoundBorder(new TitledBorder("Save parameters"),
 				new EmptyBorder(child.c.insets));
+		
+		Border overallborder = new CompoundBorder(new TitledBorder("1.6 Options"),
+				new EmptyBorder(child.c.insets));
+		
 		
 		
 		final Label LeftClick = new Label(
@@ -162,7 +166,7 @@ public class SingleSecondPanel {
 		
 		child.panelSecond.add(Batchselect, new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
-
+		child.panelSecond.setBorder(overallborder);
 				
 				child.inputLabelX = new JLabel("Enter start time point for tracking");
 				child.inputFieldX = new TextField();

@@ -72,7 +72,6 @@ public  class FindlinesVia {
 			growthtracker.setIntensityratio(intensityratio);
 			growthtracker.setInispacing(Inispacing);
 			growthtracker.setMaxdist(maxdist);
-			//growthtracker.setSlopetolerance(slopetolerance);
 			growthtracker.checkInput();
 			growthtracker.process();
 			Accountedframes  = growthtracker.getAccountedframes();

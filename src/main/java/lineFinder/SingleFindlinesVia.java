@@ -35,7 +35,7 @@ public class SingleFindlinesVia {
 			final boolean DoMask, final double intensityratio, final double Inispacing, final HashMap<Integer, Whichend> Trackstart, final JProgressBar jpb, final int starttime,
 			final int thirdDimsize, final double maxdist, final int numgaussians) {
 
-		Pair<Pair<ArrayList<Trackproperties>, ArrayList<Trackproperties>>,Pair<ArrayList<Indexedlength>,ArrayList<Indexedlength>>> returnVector = null;
+	
 		
 		
 
@@ -51,7 +51,7 @@ public class SingleFindlinesVia {
 			ArrayList<Trackproperties> startStateVectors = growthtracker.getstartStateVectors();
 			ArrayList<Trackproperties> endStateVectors = growthtracker.getendStateVectors();
 			Pair<ArrayList<Trackproperties>, ArrayList<Trackproperties>> Statevectors = new ValuePair<ArrayList<Trackproperties>, ArrayList<Trackproperties>>(startStateVectors, endStateVectors); 
-			returnVector = 
+			Pair<Pair<ArrayList<Trackproperties>, ArrayList<Trackproperties>>,Pair<ArrayList<Indexedlength>,ArrayList<Indexedlength>>>  returnVector = 
 					new ValuePair<Pair<ArrayList<Trackproperties>, ArrayList<Trackproperties>>,Pair<ArrayList<Indexedlength>,ArrayList<Indexedlength>>>(Statevectors, NewFrameparam);
 			
 			
@@ -73,7 +73,7 @@ public class SingleFindlinesVia {
 			final boolean DoMask, final double intensityratio, final double Inispacing, final JProgressBar jpb,
 			final int thirdDimsize, final double maxdist, int starttime) {
 
-		Pair<ArrayList<Trackproperties>,ArrayList<Indexedlength>> returnVector = null;
+		
 		
 		
 
@@ -87,7 +87,7 @@ public class SingleFindlinesVia {
 			
 			ArrayList<Indexedlength> NewFrameparam = growthtracker.getResult();
 			ArrayList<Trackproperties> startStateVectors = growthtracker.getstartStateVectors();
-			returnVector = 
+			Pair<ArrayList<Trackproperties>,ArrayList<Indexedlength>> returnVector = 
 					new ValuePair<ArrayList<Trackproperties>,ArrayList<Indexedlength>>(startStateVectors, NewFrameparam);
 			
 			

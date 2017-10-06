@@ -11,18 +11,8 @@ import java.awt.Scrollbar;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
-import javax.swing.JPanel;
-
-import listeners.AdvancedSeedListener;
-import listeners.FindLinesListener;
-
-import listeners.Unstability_ScoreListener;
 import interactiveMT.Interactive_MTSingleChannel;
 import interactiveMT.Interactive_MTSingleChannel.ValueChange;
-import interactiveMT.Interactive_PSFAnalyze;
-import mpicbg.imglib.multithreading.SimpleMultiThreading;
-import updateListeners.DefaultModel;
-import updateListeners.DefaultModelHF;
 import updateListeners.SingleDefaultModel;
 
 
@@ -83,11 +73,11 @@ import updateListeners.SingleDefaultModel;
 				parent.maxSize = (int) parent.computeValueFromScrollbarPosition(parent.maxSizeInit, 
 						parent.maxSizemin, parent.maxSizemax, parent.scrollbarSize);
 
-				final Label deltaText = new Label("Grey Level Seperation between Components = " + parent.delta, Label.CENTER);
-				final Label Unstability_ScoreText = new Label("Unstability Score = " + parent.Unstability_Score, Label.CENTER);
+				final Label deltaText = new Label("Intensity threshold = " + parent.delta, Label.CENTER);
+				final Label Unstability_ScoreText = new Label("Unstability score = " + parent.Unstability_Score, Label.CENTER);
 				final Label minDiversityText = new Label("minDiversity = " +parent.minDiversity, Label.CENTER);
-				final Label minSizeText = new Label("Min # of pixels inside MSER Ellipses = " + parent.minSize, Label.CENTER);
-				final Label maxSizeText = new Label("Max # of pixels inside MSER Ellipses = " + parent.maxSize, Label.CENTER);
+				final Label minSizeText = new Label("Min size of ellipses = " + parent.minSize, Label.CENTER);
+				final Label maxSizeText = new Label("Max size of ellipses = " + parent.maxSize, Label.CENTER);
 
 				
 

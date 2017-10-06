@@ -37,7 +37,7 @@ public class SingleDeltaHoughListener implements AdjustmentListener {
 
 		deltaScrollbar.setValue(parent.computeScrollbarPositionFromValue(parent.delta, min, max, scrollbarSize));
 
-		label.setText("Grey Level Seperation between Components = " + parent.delta);
+		label.setText("Threshold difference = " + parent.delta);
 
 		
 	}
