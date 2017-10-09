@@ -95,7 +95,6 @@ public class WriteStatsListener implements ActionListener {
 			
 		}
 		
-		System.out.println(minstartY);
 		return minstartY;
 		
 	}
@@ -126,7 +125,7 @@ public class WriteStatsListener implements ActionListener {
 			
 			for (final Pair<Integer, Double> key : Xvalues){
 				
-				counterseries.add(key.getB(), key.getA());
+				counterseries.add(key.getB() * parent.calibrations[2], key.getA());
 			}
 			
 			
@@ -134,12 +133,12 @@ public class WriteStatsListener implements ActionListener {
 			
 			 final JFreeChart chart =
 					  ChartFactory.createScatterPlot("LifeTime Distribution",
-					  "Time (px)", "Count of growth events", dataset);
+					  "Time (sec)", "Count of growth events", dataset);
 					  
 					  DisplayPoints.display(chart, new Dimension(800, 500));
 	
 
-			LengthDistribution.GetLengthDistributionArray(parent.AllMoviesB);
+			LengthDistribution.GetLengthDistributionArray(parent.AllMoviesB, parent.calibrations);
 			
 		
 	}

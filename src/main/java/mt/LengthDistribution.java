@@ -2,22 +2,32 @@ package mt;
 
 import java.awt.Dimension;
 import java.io.File;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Set;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.title.TextTitle;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+import org.jfree.ui.RectangleEdge;
 
+import fit.polynomial.Polynomial;
+import mpicbg.models.NotEnoughDataPointsException;
+import mpicbg.models.Point;
 import net.imglib2.util.Pair;
 import net.imglib2.util.ValuePair;
 
 public class LengthDistribution {
+	
+	
+	
 
 	public static double Lengthdistro(File file) {
 
@@ -43,7 +53,7 @@ public class LengthDistribution {
 
 	}
 
-	public static void GetLengthDistribution(File[] AllMovies) {
+	public static void GetLengthDistribution(File[] AllMovies,  double[] calibration) {
 
 		ArrayList<Double> maxlist = new ArrayList<Double>();
 		for (int i = 0; i < AllMovies.length; ++i) {
@@ -110,7 +120,7 @@ public class LengthDistribution {
 			}
 			
 			if (maxvalue!=Integer.MIN_VALUE)
-				counterseries.add(length, maxvalue );
+				counterseries.add(length * calibration[0], maxvalue );
 
 			
 			
@@ -123,12 +133,12 @@ public class LengthDistribution {
 		  dataset.addSeries(counterseries); 
 		  final JFreeChart chart =
 		  ChartFactory.createScatterPlot("MT length distribution",
-		  "Length (px)", "Number of MT", dataset);
+		  "Length (micrometer)", "Number of MT", dataset);
 		  
 		  DisplayPoints.display(chart, new Dimension(800, 500));
 	}
 	
-	public static void GetLengthDistributionArray(ArrayList<File> AllMovies) {
+	public static void GetLengthDistributionArray(ArrayList<File> AllMovies, double[] calibration) {
 
 		ArrayList<Double> maxlist = new ArrayList<Double>();
 		for (int i = 0; i < AllMovies.size(); ++i) {
@@ -144,7 +154,8 @@ public class LengthDistribution {
 		int min = 0;
 		int max = (int) Math.round(maxlist.get(maxlist.size() - 1)) + 1;
 		XYSeries counterseries = new XYSeries("MT length distribution");
-
+		XYSeries Logcounterseries = new XYSeries("MT Log length distribution");
+		final ArrayList<Point> points = new ArrayList<Point>();
 		for (int length = 0; length < max; ++length) {
 
 			HashMap<Integer, Integer> frameseed = new HashMap<Integer, Integer>();
@@ -194,23 +205,60 @@ public class LengthDistribution {
 					maxvalue = Count;
 			}
 			
-			if (maxvalue!=Integer.MIN_VALUE)
-				counterseries.add(length, maxvalue );
+			if (maxvalue!=Integer.MIN_VALUE){
+				counterseries.add(length * calibration[0], maxvalue );
 
+				if (maxvalue > 0){
+			 Logcounterseries.add((length * calibration[0]), Math.log(maxvalue));
+			 points.add(new Point(new double[]{length * calibration[0], Math.log(maxvalue) }));
+				}
 			
-			
-			  
-			 
-
+			}
 		}
 		
 		final XYSeriesCollection dataset = new XYSeriesCollection();
 		  dataset.addSeries(counterseries); 
+		  final XYSeriesCollection Logdataset = new XYSeriesCollection();
+		  Logdataset.addSeries(Logcounterseries); 
+		  
 		  final JFreeChart chart =
 		  ChartFactory.createScatterPlot("MT length distribution",
-		  "Length (px)", "Number of MT", dataset);
+		  "Length (micrometer)", "Number of MT", dataset);
 		  
+		  // Fitting line to log of the length distribution
+		  interpolation.Polynomial poly = new interpolation.Polynomial(1);
+			 try {
+				
+				 
+				 poly.fitFunction(points);
+				
+				 
+				
+			} catch (NotEnoughDataPointsException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			 
+			 
+			 NumberFormat nf = NumberFormat.getInstance(Locale.ENGLISH);
+				nf.setMaximumFractionDigits(3);
+			 TextTitle legendText = new TextTitle("Mean Length" 
+		  			 + nf.format(-1.0/poly.getCoefficients(1)));
+		  				 legendText.setPosition(RectangleEdge.RIGHT);
+			 
 		  DisplayPoints.display(chart, new Dimension(800, 500));
+		  chart.addSubtitle(legendText);
+		  
+		  final JFreeChart logchart =
+				  ChartFactory.createScatterPlot("MT Log length distribution",
+				  "Length (micrometer)", "Number of MT", Logdataset);
+		  DisplayPoints.display(logchart, new Dimension(800, 500));
+		  for (int i = 1; i >= 0; --i)
+				System.out.println(poly.getCoefficients(i) + "  " + "x" + " X to the power of "  + i );
+		  
+		  
+		  Logdataset.addSeries(Tracking.drawFunction(poly, counterseries.getMinX(), counterseries.getMaxX(), 0.5, "Straight line fit"));
+		  
 	}
 	
 }

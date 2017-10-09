@@ -60,7 +60,8 @@ public class AutoCompileResultsListener implements ActionListener {
 			e1.printStackTrace();
 		}
 		
-		
+		WriteStatsListener stats = new WriteStatsListener(parent);
+		stats.writeStatstofile();
 		
 
 	}

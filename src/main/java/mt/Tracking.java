@@ -262,6 +262,17 @@ public class Tracking
 
 		return series;
 	}
+	
+	public static XYSeries drawFunction( final interpolation.Polynomial polynomial, final double from, final double to, final double step, final String name )
+	{
+		XYSeries series = new XYSeries( name );
+
+		for ( double x = from; x <= to; x = x + step )
+			series.add( x, polynomial.predict( x ) );
+
+		return series;
+	}
+	
 	public static XYSeries drawFunction( final Polynomial< ?, Point > polynomial, final double from, final double to, final double step, final double minY, final double maxY, final String name )
 	{
 		XYSeries series = new XYSeries( name );

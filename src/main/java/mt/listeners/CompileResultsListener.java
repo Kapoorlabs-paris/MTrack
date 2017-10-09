@@ -35,7 +35,8 @@ public class CompileResultsListener implements ActionListener {
 	public void actionPerformed(final ActionEvent arg0) {
 
 		compileresults();
-
+		WriteStatsListener stats = new WriteStatsListener(parent);
+		stats.writeStatstofile();
 	}
 
 	
