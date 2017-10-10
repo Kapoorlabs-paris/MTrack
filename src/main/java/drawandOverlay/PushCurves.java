@@ -354,16 +354,12 @@ public class PushCurves {
 				intensity = 0;
 
 			switch (setintensity) {
-			case Original:
-				outbound.get().setReal(distance);
-				break;
+			
 
 			case Gaussian:
 				outbound.get().setReal(intensity);
 				break;
-			case One:
-				outbound.get().setReal(intensity);
-				break;
+			
 			default:
 				outbound.get().setReal(intensity);
 				break;

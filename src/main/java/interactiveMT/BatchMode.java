@@ -552,7 +552,7 @@ public class BatchMode implements PlugIn, Runnable {
 			FloatType T = new FloatType(Math.round(thresholdHough));
 			GetLocalmaxminMT.ThresholdingMTBit(currentPreprocessedimg, bitimg, T);
 			GetLocalmaxminMT.ThresholdingMT(currentPreprocessedimg, bitimgFloat, thresholdHough,IntensityType.Gaussian,
-					new double[]{0.5 * Cannyradius, 0.5 * Cannyradius});
+					new double[]{ Cannyradius,  Cannyradius});
 			if (displayBitimg)
 				ImageJFunctions.show(bitimg);
 

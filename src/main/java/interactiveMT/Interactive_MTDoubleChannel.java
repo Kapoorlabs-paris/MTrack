@@ -1009,12 +1009,12 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 			bitimgFloat = new ArrayImgFactory<FloatType>().create(newimg, new FloatType());
 
 			if(autothreshold)
-			thresholdHough = (float) ( GlobalThresholding.AutomaticThresholding(currentPreprocessedimg));
+			thresholdHough = (float) ( 0.75 *  GlobalThresholding.AutomaticThresholding(currentPreprocessedimg));
 			
 			System.out.println(thresholdHough);
 			GetLocalmaxminMT.ThresholdingMTBit(currentPreprocessedimg, bitimg, thresholdHough);
 			GetLocalmaxminMT.ThresholdingMT(currentPreprocessedimg, bitimgFloat, thresholdHough,IntensityType.Gaussian,
-					new double[]{0.5 * Cannyradius, 0.5 * Cannyradius});
+					new double[]{ Cannyradius,  Cannyradius});
 
 			if (displayBitimg)
 				ImageJFunctions.show(bitimg);

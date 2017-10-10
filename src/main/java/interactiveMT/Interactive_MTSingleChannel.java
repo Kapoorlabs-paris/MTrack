@@ -970,12 +970,12 @@ public class Interactive_MTSingleChannel implements PlugIn {
 
 			
 			if(autothreshold)
-				thresholdHough = (float)( GlobalThresholding.AutomaticThresholding(currentPreprocessedimg));
+				thresholdHough = (float)( 0.75 * GlobalThresholding.AutomaticThresholding(currentPreprocessedimg));
 				
 			
 			GetLocalmaxminMT.ThresholdingMTBit(currentPreprocessedimg, bitimg, thresholdHough);
 			GetLocalmaxminMT.ThresholdingMT(currentPreprocessedimg, bitimgFloat, thresholdHough,IntensityType.Gaussian,
-					new double[]{0.5 *  Cannyradius, 0.5* Cannyradius});
+					new double[]{Cannyradius,  Cannyradius});
 			if (displayBitimg)
 				ImageJFunctions.show(bitimg);
 

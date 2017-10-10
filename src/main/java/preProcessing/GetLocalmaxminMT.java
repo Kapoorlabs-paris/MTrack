@@ -57,7 +57,7 @@ import net.imglib2.view.Views;
 public class GetLocalmaxminMT {
 
 	public static enum IntensityType {
-		Gaussian, Original, One
+		Gaussian
 	}
 
 	protected IntensityType intensityType;
@@ -83,18 +83,14 @@ public class GetLocalmaxminMT {
 				bound.localize(backpos);
 				switch (setintensity) {
 
-				case Original:
-					outbound.get().set(bound.get());
-					break;
+				
 
 				case Gaussian:
 					AddGaussian.addGaussian(imgout, backpos, sigma);
 					break;
-				case One:
-					outbound.get().setReal(1);
-					break;
+				
 				default:
-					outbound.get().setReal(1);
+					AddGaussian.addGaussian(imgout, backpos, sigma);
 					break;
 
 				}
@@ -165,16 +161,11 @@ public class GetLocalmaxminMT {
 				center.localize(position);
 				switch (setintensity) {
 
-				case Original:
-					outbound.get().set(center.get());
-					break;
 
 				case Gaussian:
 					AddGaussian.addGaussian(output, position, sigma);
 					break;
-				case One:
-					outbound.get().setOne();
-					break;
+				
 
 				}
 
@@ -239,9 +230,7 @@ public class GetLocalmaxminMT {
 				center.localize(position);
 				switch (setintensity) {
 
-				case Original:
-					outbound.get().set(center.get());
-					break;
+				
 
 				case Gaussian:
 					AddGaussian.addGaussian(output, position, sigma);
@@ -689,18 +678,13 @@ public class GetLocalmaxminMT {
 				center.localize(position);
 				switch (setintensity) {
 
-				case Original:
-					outbound.get().set(center.get());
-					break;
+			
 
 				case Gaussian:
 					AddGaussian.addGaussian(output, position, sigma);
 					break;
 
-				case One:
-					outbound.get().set(1);
-					break;
-
+				
 				default:
 					AddGaussian.addGaussian(output, position, sigma);
 					break;
@@ -757,17 +741,13 @@ public class GetLocalmaxminMT {
 				center.localize(position);
 				switch (setintensity) {
 
-				case Original:
-					outbound.get().set(center.get());
-					break;
+				
 
 				case Gaussian:
 					AddGaussian.addGaussian(output, position, sigma);
 					break;
 
-				case One:
-					outbound.get().set(1);
-					break;
+			
 
 				default:
 					AddGaussian.addGaussian(output, position, sigma);
