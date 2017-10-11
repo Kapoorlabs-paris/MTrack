@@ -71,7 +71,7 @@ public class Tracking
 					final String[] split = line.trim().split( "\t" );
 
 					final int frame = (int)Double.parseDouble( split[ 0 ] );
-					final double length = Double.parseDouble( split[ 1 ] );
+					final double length = Double.parseDouble( split[ 2 ] );
 					final int seedID = (int)Double.parseDouble( split[ 3 ] );
 
 					FLSobject statobject = new FLSobject(frame, seedID, length);
@@ -104,7 +104,10 @@ public class Tracking
 			}
 		} );
 
-		return points;
+		if (points.size() > 0)
+			return points;
+			
+			else return null;
 	}
 	
 	public static double[] loadCalibration(final File file)
@@ -189,7 +192,10 @@ public class Tracking
 			}
 		} );
 
+		if (points.size() > 0)
 		return points;
+		
+		else return null;
 	}
 
 	
@@ -272,6 +278,19 @@ public class Tracking
 
 		return series;
 	}
+	
+	
+	public static XYSeries drawexpFunction( final interpolation.Polynomial polynomial, final double from, final double to, final double step, final String name )
+	{
+		XYSeries series = new XYSeries( name );
+
+		for ( double x = from; x <= to; x = x + step )
+			series.add( x, Math.exp(polynomial.predict( x )) );
+
+		return series;
+	}
+	
+	
 	
 	public static XYSeries drawFunction( final Polynomial< ?, Point > polynomial, final double from, final double to, final double step, final double minY, final double maxY, final String name )
 	{

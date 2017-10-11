@@ -298,7 +298,7 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 		
 			if (dist!=Double.NaN){
 			if (Math.abs(dist) > maxdist ) {
-				IJ.log("Collision mistake detected, activating TCASM layer" + oldstartpoint[0] + " " + oldstartpoint[1]);
+				IJ.log("Miss Assingment detected, activating TCASM layer at " + " " +  oldstartpoint[0] + " " + oldstartpoint[1]);
 				paramnextframestart = Userframe.get(index);
 				newstartpoint = oldstartpoint;
 				newstartslope = Userframe.get(index).slope;

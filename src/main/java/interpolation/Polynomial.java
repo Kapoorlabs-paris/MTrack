@@ -19,8 +19,8 @@ public class Polynomial extends AbstractFunction<Polynomial> {
 	final int minNumPoints;
 	int degree;
 	
-	private double SSE;
-	private double SST;
+	public double SSE;
+	public double SST;
 	public final double[] coeff;
 
 	public Polynomial(final int degree) {

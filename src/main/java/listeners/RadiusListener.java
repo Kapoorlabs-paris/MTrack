@@ -27,34 +27,13 @@ final Interactive_MTDoubleChannel parent;
 	
 		final TextComponent tc = (TextComponent)e.getSource();
 		    String s = tc.getText();
-		   
-			 tc.addKeyListener(new KeyListener(){
-				 @Override
-				    public void keyTyped(KeyEvent arg0) {
-					   
-				    }
-
-				    @Override
-				    public void keyReleased(KeyEvent arg0) {
-				    	
-
-				    }
-
-				    @Override
-				    public void keyPressed(KeyEvent arg0) {
-				    	String s = tc.getText();
-				    	if (arg0.getKeyChar() == KeyEvent.VK_ENTER)
-						 {
-							
+		 
+				    
+							if (s.length() > 0)
 				    		parent.radiusfactor = (int)Float.parseFloat(s);
 				    	
 				   				
-				   		  
-				    		
-						 }
-
-				    }
-				});
+				   		
 		    
 		    
 		    

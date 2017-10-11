@@ -120,7 +120,7 @@ public class LengthDistribution {
 			}
 			
 			if (maxvalue!=Integer.MIN_VALUE)
-				counterseries.add(length * calibration[0], maxvalue );
+				counterseries.add(length , maxvalue );
 
 			
 			
@@ -206,11 +206,11 @@ public class LengthDistribution {
 			}
 			
 			if (maxvalue!=Integer.MIN_VALUE){
-				counterseries.add(length * calibration[0], maxvalue );
+				counterseries.add(length , maxvalue );
 
 				if (maxvalue > 0){
-			 Logcounterseries.add((length * calibration[0]), Math.log(maxvalue));
-			 points.add(new Point(new double[]{length * calibration[0], Math.log(maxvalue) }));
+			 Logcounterseries.add((length ), Math.log(maxvalue));
+			 points.add(new Point(new double[]{length , Math.log(maxvalue) }));
 				}
 			
 			}
@@ -238,12 +238,11 @@ public class LengthDistribution {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			 
-			 
+			 dataset.addSeries(Tracking.drawexpFunction(poly, counterseries.getMinX(), counterseries.getMaxX(), 0.5, "Exponential fit"));
 			 NumberFormat nf = NumberFormat.getInstance(Locale.ENGLISH);
 				nf.setMaximumFractionDigits(3);
-			 TextTitle legendText = new TextTitle("Mean Length" 
-		  			 + nf.format(-1.0/poly.getCoefficients(1)));
+			 TextTitle legendText = new TextTitle("Mean Length" + " : "
+		  			 + nf.format(-1.0/poly.getCoefficients(1)) +"  " +  "Standard Deviation" + " : " + nf.format(poly.SSE));
 		  				 legendText.setPosition(RectangleEdge.RIGHT);
 			 
 		  DisplayPoints.display(chart, new Dimension(800, 500));
@@ -252,12 +251,12 @@ public class LengthDistribution {
 		  final JFreeChart logchart =
 				  ChartFactory.createScatterPlot("MT Log length distribution",
 				  "Length (micrometer)", "Number of MT", Logdataset);
-		  DisplayPoints.display(logchart, new Dimension(800, 500));
+	//	  DisplayPoints.display(logchart, new Dimension(800, 500));
 		  for (int i = 1; i >= 0; --i)
 				System.out.println(poly.getCoefficients(i) + "  " + "x" + " X to the power of "  + i );
 		  
 		  
-		  Logdataset.addSeries(Tracking.drawFunction(poly, counterseries.getMinX(), counterseries.getMaxX(), 0.5, "Straight line fit"));
+		//  Logdataset.addSeries(Tracking.drawFunction(poly, counterseries.getMinX(), counterseries.getMaxX(), 0.5, "Straight line fit"));
 		  
 	}
 	

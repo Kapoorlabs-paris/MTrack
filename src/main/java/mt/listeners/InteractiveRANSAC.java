@@ -547,6 +547,8 @@ public class InteractiveRANSAC implements PlugIn {
      		this.mts = Tracking.loadMT(this.inputfiles[trackindex]);
      		this.points = Tracking.toPoints(mts);
      		this.calibrations = Tracking.loadCalibration(this.inputfiles[trackindex]);
+     		
+     		
      		linearlist = new ArrayList<Pair<LinearFunction, ArrayList<PointFunctionMatch>>>();
      		dataset.removeAllSeries();
             this.dataset.addSeries(Tracking.drawPoints(mts, calibrations));
@@ -1094,7 +1096,6 @@ System.out.println("Choice: " + functionChoice);
 		    
 	public static void main(String[] args) {
 		
-		new ImageJ();
 		
 
 		    JFrame frame = new JFrame("");

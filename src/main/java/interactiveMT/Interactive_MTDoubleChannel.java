@@ -187,7 +187,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public boolean analyzekymo = false;
 	public boolean darktobright = false;
 	public boolean displayBitimg = false;
-	public boolean autothreshold = true;
+	public boolean autothreshold = false;
 	public boolean displayWatershedimg = false;
 	public boolean displayoverlay = true;
 	public long minSize = 1;
@@ -2371,7 +2371,6 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	}
 
 	public static void main(String[] args) {
-		new ImageJ();
 
 		JFrame frame = new JFrame("");
 		MainFileChooser panel = new MainFileChooser();

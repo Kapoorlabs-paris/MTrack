@@ -1109,7 +1109,6 @@ public class Interactive_PSFAnalyze implements PlugIn {
 	
 	
 	public static void main(String[] args) {
-		new ImageJ();
 
 		JFrame frame = new JFrame("");
 		BeadFileChooser panel = new BeadFileChooser();
