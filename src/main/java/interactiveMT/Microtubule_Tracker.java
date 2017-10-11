@@ -10,7 +10,6 @@ public class Microtubule_Tracker implements PlugIn {
 	@Override
 	public void run(String arg) {
 		
-			new ImageJ();
 			
 
 			    JFrame frame = new JFrame("");

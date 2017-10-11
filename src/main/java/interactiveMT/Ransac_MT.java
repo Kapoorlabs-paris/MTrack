@@ -12,7 +12,6 @@ public class Ransac_MT implements PlugIn {
 		@Override
 		public void run(String arg) {
 			
-				new ImageJ();
 				
 
 				    JFrame frame = new JFrame("");
