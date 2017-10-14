@@ -197,9 +197,10 @@ public class FireTrigger implements ActionListener {
 
 		final FloatType type = parent.originalimg.randomAccess().get().createVariable();
 		final ImgFactory<FloatType> factory = Util.getArrayOrCellImgFactory(parent.originalimg, type);
-		parent.originalPreprocessedimg = factory.create(parent.originalimg, type);
+		parent.originalPreprocessedimg = parent.originalimg;
 		// Normalize image intnesity
 		Normalize.normalize(Views.iterable(parent.originalimg), parent.minval, parent.maxval);
+		Normalize.normalize(Views.iterable(parent.originalPreprocessedimg), parent.minval, parent.maxval);
 		parent.inputField.setText(parent.chooserB.getSelectedFile().getName().replaceFirst("[.][^.]+$", ""));
 
 		parent.addToName = parent.inputField.getText();
