@@ -452,6 +452,8 @@ public class Tracking
 		{
 			function.ransac( candidates, inliers, 100, maxError, 0, minNumInliers, maxDist );
 
+			if (inliers!=null){
+			
 			if ( inliers.size() >= function.getMinNumPoints() )
 			{
 				function.fit( inliers );
@@ -459,11 +461,13 @@ public class Tracking
 				//System.out.println( inliers.size() + "/" + candidates.size() );
 				//System.out.println( function );
 			}
+			
 			else
 			{
 				//System.out.println( "0/" + candidates.size() );
 				return null;
 			}
+		}
 		}
 		catch ( Exception e )
 		{
@@ -488,6 +492,7 @@ public class Tracking
 		boolean fitted;
 
 		final ArrayList< Point > remainingPoints = new ArrayList< Point >();
+		if (mts!=null){
 		remainingPoints.addAll( mts );
 
 		final ArrayList< Pair< P, ArrayList< PointFunctionMatch > > > segments = new ArrayList< Pair<P,ArrayList<PointFunctionMatch>> >();
@@ -511,9 +516,13 @@ public class Tracking
 				remainingPoints.removeAll( inlierPoints );
 			}
 		}
+		
 		while ( fitted );
-
+		
 		return segments;
+		}
+		
+		else return null;
 	}
 
 	

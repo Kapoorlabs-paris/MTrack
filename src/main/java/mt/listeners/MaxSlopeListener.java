@@ -39,6 +39,7 @@ public class MaxSlopeListener implements AdjustmentListener
 		this.label = label;
 		this.maxSlopeSB = maxSlopeSB;
 		maxSlopeSB.addMouseListener( new StandardMouseListener( parent ) );
+		maxSlopeSB.setBlockIncrement(1);
 	}
 	
 	@Override

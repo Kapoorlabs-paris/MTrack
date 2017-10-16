@@ -37,6 +37,7 @@ public class MaxDistListener implements AdjustmentListener
 		this.parent = parent;
 		this.label = label;
 		bar.addMouseListener( new StandardMouseListener( parent ) );
+		bar.setUnitIncrement(1);
 	}
 	
 	@Override

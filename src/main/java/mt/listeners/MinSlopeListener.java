@@ -39,6 +39,7 @@ public class MinSlopeListener implements AdjustmentListener
 		this.label = label;
 		this.minSlopeSB = minSlopeSB;
 		minSlopeSB.addMouseListener( new StandardMouseListener( parent ) );
+		minSlopeSB.setUnitIncrement(1);
 	}
 	
 	@Override

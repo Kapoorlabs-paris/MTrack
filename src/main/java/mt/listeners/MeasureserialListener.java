@@ -20,6 +20,7 @@
  * #L%
  */
 package mt.listeners;
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
@@ -37,6 +38,8 @@ import javax.swing.JTable;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
+
+import mt.Tracking;
 
 public class MeasureserialListener implements ActionListener {
 
@@ -59,7 +62,7 @@ public class MeasureserialListener implements ActionListener {
 			// disable the "All files" option.
 			//
 			parent.chooserA.setAcceptAllFileFilterUsed(false);
-			FileNameExtensionFilter filter = new FileNameExtensionFilter("Rate Files", "txt");
+			FileNameExtensionFilter filter = new FileNameExtensionFilter("Track Files", "txt");
 
 			parent.chooserA.setFileFilter(filter);
 			parent.chooserA.showOpenDialog(parent.Cardframe);
@@ -73,7 +76,7 @@ public class MeasureserialListener implements ActionListener {
 							&& !filename.contains("All"));
 				}
 			});
-			parent.userTableModel = new DefaultTableModel(new Object[]{"Track File"}, 0) {
+			parent.userTableModel = new DefaultTableModel(new Object[]{"Track File", "Growth rate"}, 0) {
 			    @Override
 			    public boolean isCellEditable(int row, int column) {
 			        return false;
@@ -96,12 +99,18 @@ public class MeasureserialListener implements ActionListener {
 			parent.scrollPane = new JScrollPane(parent.table);
 			parent.scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 			parent.scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		
+			parent.scrollPane.setMinimumSize(new Dimension(300, 200));
+				// scrollPane.setMaximumSize(new Dimension(300, 200));
 			parent.scrollPane.setPreferredSize(new Dimension(300, 200));
+			
             parent.PanelSelectFile.removeAll();
 			parent.Compilepositiverates.clear();
 			parent.Compilenegativerates.clear();
-			parent.PanelSelectFile.add(parent.scrollPane,  new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST,
-					GridBagConstraints.HORIZONTAL, parent.insets, 0, 0));
+			parent.PanelSelectFile.add(parent.scrollPane,  BorderLayout.CENTER);
+					
+					//new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST,
+					//GridBagConstraints.HORIZONTAL, parent.insets, 0, 0));
 			parent.PanelSelectFile.setBorder(parent.selectfile);
 			parent.panelFirst.add(parent.PanelSelectFile, new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
 					GridBagConstraints.RELATIVE, new Insets(10, 10, 0, 10), 0, 0));
@@ -109,6 +118,8 @@ public class MeasureserialListener implements ActionListener {
 			parent.table.addMouseListener(new MouseAdapter() {
 				  public void mouseClicked(MouseEvent e) {
 				    if (e.getClickCount() == 1) {
+				    	if (!parent.jFreeChartFrame.isVisible())
+				    		parent.jFreeChartFrame = Tracking.display(parent.chart, new Dimension(500, 500));
 				      JTable target = (JTable)e.getSource();
 				      parent.row = target.getSelectedRow();
 				      // do some action if appropriate column
