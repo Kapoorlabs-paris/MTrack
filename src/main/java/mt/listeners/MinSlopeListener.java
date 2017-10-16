@@ -27,19 +27,22 @@ import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 import java.text.DecimalFormat;
 
+import javax.swing.JScrollBar;
+
 public class MinSlopeListener implements AdjustmentListener
 {
 	final InteractiveRANSAC parent;
 	final Label label;
-	final Scrollbar minSlopeSB;
+	final JScrollBar minSlopeSB;
 
-	public MinSlopeListener( final InteractiveRANSAC parent, final Scrollbar minSlopeSB, final Label label )
+	public MinSlopeListener( final InteractiveRANSAC parent, final JScrollBar minSlopeSB, final Label label )
 	{
 		this.parent = parent;
 		this.label = label;
 		this.minSlopeSB = minSlopeSB;
 		minSlopeSB.addMouseListener( new StandardMouseListener( parent ) );
 		minSlopeSB.setUnitIncrement(1);
+		minSlopeSB.setBlockIncrement(1);
 	}
 	
 	@Override

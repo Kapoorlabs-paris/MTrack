@@ -21,6 +21,7 @@
  */
 package mt.listeners;
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
@@ -33,11 +34,14 @@ import java.io.File;
 import java.io.FilenameFilter;
 
 import javax.swing.JFileChooser;
+import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
 
 import mt.Tracking;
 
@@ -50,7 +54,21 @@ public class MeasureserialListener implements ActionListener {
 			this.parent = parent;
 
 		}
+		public static class WordWrapCellRenderer extends JTextArea implements TableCellRenderer {
+		    WordWrapCellRenderer() {
+		        setLineWrap(true);
+		        setWrapStyleWord(true);
+		    }
 
+		    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+		        setText(value.toString());
+		        setSize(table.getColumnModel().getColumn(column).getWidth(), getPreferredSize().height);
+		        if (table.getRowHeight(row) != getPreferredSize().height) {
+		            table.setRowHeight(row, getPreferredSize().height);
+		        }
+		        return this;
+		    }
+		}
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
 			parent.chooserA = new JFileChooser();
@@ -76,45 +94,57 @@ public class MeasureserialListener implements ActionListener {
 							&& !filename.contains("All"));
 				}
 			});
-			parent.userTableModel = new DefaultTableModel(new Object[]{"Track File", "Growth rate"}, 0) {
-			    @Override
-			    public boolean isCellEditable(int row, int column) {
-			        return false;
-			    }
-			};
+			
+		
+			
+			Object[] colnames = new Object[]{"Track File", "Growth rate", "Shrink rate", 
+					"Growth events", "Shrink events", "fcat", "fres"};
 			
 			
-					
+			Object[][] rowvalues = new Object[parent.inputfiles.length][colnames.length];
+			
 			
 			for (int i = 0; i < parent.inputfiles.length; ++i) {
 				
-				String[] currenttrack = {(parent.inputfiles[i].getName())};
-				parent.userTableModel.addRow(currenttrack);
+				rowvalues[i][0] = parent.inputfiles[i].getName();
 			}
 			
 			
-			parent.table = new JTable(parent.userTableModel);
+			parent.table = new JTable(rowvalues, colnames);
+			parent.table.setFillsViewportHeight(true);
+			parent.table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+			parent.table.getColumnModel().getColumn(0).setPreferredWidth(100);
+			parent.table.getColumnModel().getColumn(0).setResizable(true);
+			parent.table.setCellSelectionEnabled(true);
 			parent.previousrow = parent.row;
 			System.out.println(parent.row + " Last row");
 			parent.scrollPane = new JScrollPane(parent.table);
-			parent.scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-			parent.scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		
+			parent.scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+			parent.scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+			parent.table.setFillsViewportHeight(true);
+			
+			
+			parent.table.getColumnModel().getColumn(0).setPreferredWidth(200);
+			parent.table.getColumnModel().getColumn(3).setPreferredWidth(100);
+			parent.table.getColumnModel().getColumn(4).setPreferredWidth(100);
+			//parent.table.getColumnModel().getColumn(0).setCellRenderer(new WordWrapCellRenderer());
 			parent.scrollPane.setMinimumSize(new Dimension(300, 200));
-				// scrollPane.setMaximumSize(new Dimension(300, 200));
 			parent.scrollPane.setPreferredSize(new Dimension(300, 200));
+			parent.table.setFillsViewportHeight(true);
+			parent.scrollPane.getViewport().add(parent.table);
+			parent.scrollPane.setAutoscrolls(true);
 			
             parent.PanelSelectFile.removeAll();
 			parent.Compilepositiverates.clear();
 			parent.Compilenegativerates.clear();
 			parent.PanelSelectFile.add(parent.scrollPane,  BorderLayout.CENTER);
 					
-					//new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST,
-					//GridBagConstraints.HORIZONTAL, parent.insets, 0, 0));
+					
 			parent.PanelSelectFile.setBorder(parent.selectfile);
 			parent.panelFirst.add(parent.PanelSelectFile, new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
 					GridBagConstraints.RELATIVE, new Insets(10, 10, 0, 10), 0, 0));
 			
+			if(parent.inputfiles!=null){ 
 			parent.table.addMouseListener(new MouseAdapter() {
 				  public void mouseClicked(MouseEvent e) {
 				    if (e.getClickCount() == 1) {
@@ -130,7 +160,7 @@ public class MeasureserialListener implements ActionListener {
 				    }
 				  }
 				});
-			
+			}
 			parent.PanelSelectFile.validate();
 			parent.panelFirst.validate();
 			parent.Cardframe.validate();

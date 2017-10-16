@@ -47,8 +47,10 @@ import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JViewport;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
@@ -58,6 +60,8 @@ import javax.swing.table.DefaultTableModel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.jfree.util.ShapeUtilities;
+
+import com.google.common.collect.Sets.SetView;
 
 import fit.AbstractFunction2D;
 import fit.PointFunctionMatch;
@@ -79,13 +83,15 @@ import net.imglib2.util.ValuePair;
 
 public class InteractiveRANSAC implements PlugIn {
 	public static int MIN_SLIDER = 0;
-	public static int MAX_SLIDER = 500;
+	public static int MAX_SLIDER = 50;
 
 	public static double MIN_ERROR = 0.0;
 	public static double MAX_ERROR = 30.0;
 
 	public static double MIN_RES = 1.0;
 	public static double MAX_RES = 30.0;
+	
+	
 
 	public static double MAX_ABS_SLOPE = 100.0;
 
@@ -279,7 +285,6 @@ public class InteractiveRANSAC implements PlugIn {
 	public JTable table;
 	JFileChooser chooserA;
 	String choosertitleA;
-	DefaultTableModel userTableModel;
 	public int row;
 	public JScrollPane scrollPane;
 	static final Insets insets = new Insets(10, 0, 0, 0);
@@ -300,28 +305,34 @@ public class InteractiveRANSAC implements PlugIn {
 	public void CardTable() {
 
 		CardLayout cl = new CardLayout();
-		userTableModel = new DefaultTableModel(new Object[] { "Track File" }, 0) {
-			@Override
-			public boolean isCellEditable(int row, int column) {
-				return false;
-			}
-		};
+		Object[] colnames = new Object[]{"Track File", "Growth rate", "Shrink rate", 
+				"Growth events", "Shrink events", "fcat", "fres"};
+		
+		
+		Object[][] rowvalues = new Object[0][colnames.length];
 
 		if (inputfiles != null) {
+			rowvalues = new Object[inputfiles.length][colnames.length];
 			for (int i = 0; i < inputfiles.length; ++i) {
 
-				String[] currenttrack = { (inputfiles[i].getName()) };
-				userTableModel.addRow(currenttrack);
+				rowvalues[i][0] = inputfiles[i].getName();
 			}
 		}
 
-		table = new JTable(userTableModel);
-
+		table = new JTable(rowvalues, colnames);
+		
+		table.setFillsViewportHeight(true);
+		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		scrollPane = new JScrollPane(table);
 		scrollPane.setMinimumSize(new Dimension(300, 200));
-		// scrollPane.setMaximumSize(new Dimension(300, 200));
 		scrollPane.setPreferredSize(new Dimension(300, 200));
-
+		
+	
+		scrollPane.getViewport().add(table);
+		scrollPane.setAutoscrolls(true);
+		
+		
+		
 		// Location
 		panelFirst.setLayout(layout);
 		panelSecond.setLayout(layout);
@@ -347,21 +358,21 @@ public class InteractiveRANSAC implements PlugIn {
 		c.gridy = 1;
 		c.gridx = 0;
 
-		final Scrollbar maxErrorSB = new Scrollbar(Scrollbar.HORIZONTAL, this.maxErrorInt, 1, MIN_SLIDER,
-				MAX_SLIDER + 1);
-		final Scrollbar minInliersSB = new Scrollbar(Scrollbar.HORIZONTAL, this.minInliers, 1, 2, numTimepoints + 1);
-		final Scrollbar maxDistSB = new Scrollbar(Scrollbar.HORIZONTAL, this.maxDist, 1, 0, numTimepoints + 1);
-		final Scrollbar minSlopeSB = new Scrollbar(Scrollbar.HORIZONTAL, this.minSlopeInt, 1, MIN_SLIDER,
-				MAX_SLIDER + 1);
-		final Scrollbar maxSlopeSB = new Scrollbar(Scrollbar.HORIZONTAL, this.maxSlopeInt, 1, MIN_SLIDER,
-				MAX_SLIDER + 1);
+		final JScrollBar maxErrorSB = new JScrollBar(Scrollbar.HORIZONTAL, this.maxErrorInt, 10, MIN_SLIDER,
+				MAX_SLIDER + 10);
+		final JScrollBar minInliersSB = new JScrollBar(Scrollbar.HORIZONTAL, this.minInliers, 10, MIN_SLIDER, MAX_SLIDER + 10);
+		final JScrollBar maxDistSB = new JScrollBar(Scrollbar.HORIZONTAL, this.maxDist, 10, MIN_SLIDER, MAX_SLIDER + 10);
+		final JScrollBar minSlopeSB = new JScrollBar(Scrollbar.HORIZONTAL, this.minSlopeInt, 10, MIN_SLIDER,
+				MAX_SLIDER + 10);
+		final Scrollbar maxSlopeSB = new Scrollbar(Scrollbar.HORIZONTAL, this.maxSlopeInt, 10, MIN_SLIDER,
+				MAX_SLIDER + 10);
 
 		String[] Method = { "Linear Function only", "Linearized Quadratic function", "Linearized Cubic function" };
 		JComboBox<String> ChooseMethod = new JComboBox<String>(Method);
 		this.lambdaSB = new Scrollbar(Scrollbar.HORIZONTAL, this.lambdaInt, 1, MIN_SLIDER, MAX_SLIDER + 1);
 
 		final Label maxErrorLabel = new Label(
-				"Max. Error (pixels) (px)) = " + new DecimalFormat("#.##").format(this.maxError), Label.CENTER);
+				"Max. Error (px) = " + new DecimalFormat("#.##").format(this.maxError), Label.CENTER);
 		final Label minInliersLabel = new Label(
 				"Min. #Points (tp) = " + new DecimalFormat("#.##").format(this.minInliers), Label.CENTER);
 		final Label maxDistLabel = new Label("Max. Gap (tp) = " + new DecimalFormat("#.##").format(this.maxDist),
@@ -377,8 +388,8 @@ public class InteractiveRANSAC implements PlugIn {
 				Label.CENTER);
 
 		final Checkbox findCatastrophe = new Checkbox("Detect Catastrophies", this.detectCatastrophe);
-		final Scrollbar minCatDist = new Scrollbar(Scrollbar.HORIZONTAL, this.minDistCatInt, 1, MIN_SLIDER,
-				MAX_SLIDER + 1);
+		final Scrollbar minCatDist = new Scrollbar(Scrollbar.HORIZONTAL, this.minDistCatInt, 10, MIN_SLIDER,
+				MAX_SLIDER + 10);
 		final Scrollbar maxRes = new Scrollbar(Scrollbar.HORIZONTAL, this.restoleranceInt, 1, MIN_SLIDER,
 				MAX_SLIDER + 1);
 		final Label minCatDistLabel = new Label("Min. Catatastrophy height (tp) = " + this.minDistanceCatastrophe,
@@ -403,8 +414,7 @@ public class InteractiveRANSAC implements PlugIn {
 
 		PanelSelectFile.add(scrollPane, BorderLayout.CENTER);
 
-		// new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST,
-		// GridBagConstraints.HORIZONTAL, insets, 0, 0));
+	
 
 		PanelSelectFile.setBorder(selectfile);
 
@@ -427,6 +437,7 @@ public class InteractiveRANSAC implements PlugIn {
 				GridBagConstraints.RELATIVE, insets, 0, 0));
 
 		PanelParameteroptions.setBorder(selectparam);
+		PanelParameteroptions.setPreferredSize(new Dimension(300, 200));
 		panelFirst.add(PanelParameteroptions, new GridBagConstraints(3, 0, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
 				GridBagConstraints.RELATIVE, new Insets(10, 10, 0, 10), 0, 0));
 
@@ -487,11 +498,11 @@ public class InteractiveRANSAC implements PlugIn {
 		 * panelSecond.add(batch, c);
 		 * 
 		 */
+		if (inputfiles !=null){
 		table.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
 				if (e.getClickCount() == 1) {
-					System.out.println(jFreeChartFrame.isVisible() + " " + jFreeChartFrame.isActive() + " "
-							+ jFreeChartFrame.isDisplayable());
+				
 					if (!jFreeChartFrame.isVisible())
 						jFreeChartFrame = Tracking.display(chart, new Dimension(500, 500));
 					JTable target = (JTable) e.getSource();
@@ -504,6 +515,7 @@ public class InteractiveRANSAC implements PlugIn {
 				}
 			}
 		});
+		}
 
 		maxErrorSB.addAdjustmentListener(new MaxErrorListener(this, maxErrorLabel, maxErrorSB));
 		minInliersSB.addAdjustmentListener(new MinInliersListener(this, minInliersLabel, minInliersSB));

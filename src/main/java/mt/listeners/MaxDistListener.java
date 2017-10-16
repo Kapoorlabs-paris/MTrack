@@ -27,23 +27,27 @@ import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 import java.text.DecimalFormat;
 
+import javax.swing.JScrollBar;
+
 public class MaxDistListener implements AdjustmentListener
 {
 	final InteractiveRANSAC parent;
 	final Label label;
 	
-	public MaxDistListener( final InteractiveRANSAC parent, final Label label, final Scrollbar bar )
+	public MaxDistListener( final InteractiveRANSAC parent, final Label label, final JScrollBar bar )
 	{
 		this.parent = parent;
 		this.label = label;
 		bar.addMouseListener( new StandardMouseListener( parent ) );
 		bar.setUnitIncrement(1);
+		bar.setBlockIncrement(1);
 	}
 	
 	@Override
 	public void adjustmentValueChanged( final AdjustmentEvent event )
 	{
-		parent.maxDist = event.getValue();
+		parent.maxDist = (int) InteractiveRANSAC.computeValueFromScrollbarPosition(event.getValue(), InteractiveRANSAC.MAX_SLIDER,
+				InteractiveRANSAC.MIN_SLIDER, InteractiveRANSAC.MAX_SLIDER);
 
 		label.setText( "Max. Gap (tp) = " + new DecimalFormat("#.##").format(parent.maxDist) );
 	}

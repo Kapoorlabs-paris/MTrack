@@ -189,7 +189,7 @@ public class MainFileChooser extends JPanel {
 		inputFieldT.setText("1");
 		
 		
-		 medianLabelradius = new Label("Enter radius for median filter: ");
+		    medianLabelradius = new Label("Enter radius for median filter: ");
 			medianFieldradius = new TextField(5);
 			medianFieldradius.setText("2");
 		

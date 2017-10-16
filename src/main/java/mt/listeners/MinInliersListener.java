@@ -26,17 +26,20 @@ import java.awt.Scrollbar;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 
+import javax.swing.JScrollBar;
+
 public class MinInliersListener implements AdjustmentListener
 {
 	final InteractiveRANSAC parent;
 	final Label label;
 
-	public MinInliersListener( final InteractiveRANSAC parent, final Label label, final Scrollbar bar )
+	public MinInliersListener( final InteractiveRANSAC parent, final Label label, final JScrollBar bar )
 	{
 		this.parent = parent;
 		this.label = label;
 		bar.addMouseListener( new StandardMouseListener( parent ) );
 		bar.setUnitIncrement(1);
+		bar.setBlockIncrement(1);
 	}
 	
 	@Override
