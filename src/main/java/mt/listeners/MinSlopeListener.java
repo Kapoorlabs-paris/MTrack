@@ -59,6 +59,6 @@ public class MinSlopeListener implements AdjustmentListener
 			minSlopeSB.setValue( InteractiveRANSAC.computeScrollbarPositionValueFromDoubleExp( InteractiveRANSAC.MAX_SLIDER, parent.minSlope, InteractiveRANSAC.MAX_ABS_SLOPE ) );
 		}
 
-		label.setText( "Min. Segment Slope (px/tp) = " + new DecimalFormat("#.##").format(parent.minSlope) );
+		label.setText( "Min. Segment Slope (px/tp) = " + new DecimalFormat("#.#").format(parent.minSlope) );
 	}
 }

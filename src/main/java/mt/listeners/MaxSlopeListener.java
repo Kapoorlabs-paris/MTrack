@@ -40,6 +40,7 @@ public class MaxSlopeListener implements AdjustmentListener
 		this.maxSlopeSB = maxSlopeSB;
 		maxSlopeSB.addMouseListener( new StandardMouseListener( parent ) );
 		maxSlopeSB.setBlockIncrement(1);
+		maxSlopeSB.setUnitIncrement(1);
 	}
 	
 	@Override
@@ -56,6 +57,6 @@ public class MaxSlopeListener implements AdjustmentListener
 			maxSlopeSB.setValue( InteractiveRANSAC.computeScrollbarPositionValueFromDoubleExp( InteractiveRANSAC.MAX_SLIDER, parent.maxSlope, InteractiveRANSAC.MAX_ABS_SLOPE ) );
 		}
 
-		label.setText( "Max. Segment Slope (px/tp) = " + new DecimalFormat("#.##").format(parent.maxSlope) );
+		label.setText( "Max. Segment Slope (px/tp) = " + new DecimalFormat("#.#").format(parent.maxSlope) );
 	}
 }

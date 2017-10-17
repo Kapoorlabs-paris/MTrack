@@ -46,9 +46,8 @@ public class MaxDistListener implements AdjustmentListener
 	@Override
 	public void adjustmentValueChanged( final AdjustmentEvent event )
 	{
-		parent.maxDist = (int) InteractiveRANSAC.computeValueFromScrollbarPosition(event.getValue(), InteractiveRANSAC.MAX_SLIDER,
-				InteractiveRANSAC.MIN_SLIDER, InteractiveRANSAC.MAX_SLIDER);
+		parent.maxDist = event.getValue();
 
-		label.setText( "Max. Gap (tp) = " + new DecimalFormat("#.##").format(parent.maxDist) );
+		label.setText( "Max. Gap (tp) = " + new DecimalFormat("#.#").format(parent.maxDist) );
 	}
 }

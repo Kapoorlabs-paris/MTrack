@@ -25,6 +25,7 @@ import java.awt.Label;
 import java.awt.Scrollbar;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
+import java.text.DecimalFormat;
 
 
 public class MinCatastrophyDistanceListener implements AdjustmentListener
@@ -37,17 +38,19 @@ public class MinCatastrophyDistanceListener implements AdjustmentListener
 		this.parent = parent;
 		this.label = label;
 		bar.addMouseListener( new StandardMouseListener( parent ) );
+		bar.setUnitIncrement(1);
+		bar.setBlockIncrement(1);
 	}
 	
 	@Override
 	public void adjustmentValueChanged( final AdjustmentEvent event )
 	{
-		parent.minDistanceCatastrophe = Math.round(InteractiveRANSAC.computeValueFromScrollbarPosition(
+		parent.minDistanceCatastrophe = (InteractiveRANSAC.computeValueFromScrollbarPosition(
 				event.getValue(),
 				InteractiveRANSAC.MAX_SLIDER,
 				InteractiveRANSAC.MIN_CAT,
 				InteractiveRANSAC.MAX_CAT ));
 
-		label.setText( "Min. Catatastrophy height (tp) = " + parent.minDistanceCatastrophe );
+		label.setText( "Min. Catastrophy height (tp) = " + new DecimalFormat("#.#").format(parent.minDistanceCatastrophe) );
 	}
 }

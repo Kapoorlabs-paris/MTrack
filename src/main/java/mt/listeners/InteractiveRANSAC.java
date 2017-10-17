@@ -26,6 +26,7 @@ import java.awt.Button;
 import java.awt.CardLayout;
 import java.awt.Checkbox;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
@@ -39,13 +40,18 @@ import java.io.File;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
@@ -55,7 +61,11 @@ import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableModel;
 
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.xy.XYSeriesCollection;
@@ -75,6 +85,7 @@ import ij.measure.ResultsTable;
 import ij.plugin.PlugIn;
 import mpicbg.models.Point;
 import mt.Averagerate;
+import mt.MyCellRenderer;
 import mt.RansacFileChooser;
 import mt.Rateobject;
 import mt.Tracking;
@@ -83,13 +94,13 @@ import net.imglib2.util.ValuePair;
 
 public class InteractiveRANSAC implements PlugIn {
 	public static int MIN_SLIDER = 0;
-	public static int MAX_SLIDER = 50;
+	public static int MAX_SLIDER = 100;
 
 	public static double MIN_ERROR = 0.0;
-	public static double MAX_ERROR = 30.0;
+	public static double MAX_ERROR = 100.0;
 
 	public static double MIN_RES = 1.0;
-	public static double MAX_RES = 30.0;
+	public static double MAX_RES = 100.0;
 	
 	
 
@@ -112,7 +123,9 @@ public class InteractiveRANSAC implements PlugIn {
 	ArrayList<Pair<Integer, Double>> mts;
 	ArrayList<Point> points;
 	public final int numTimepoints, minTP, maxTP;
-
+    public static boolean wrongfile = false;
+    public static Pair<Boolean, Integer > wrongfileindex;
+    public static HashMap<Integer, Boolean> wrongfileindexlist;
 	public int previousrow = 0;
 	public int countfile;
 	Scrollbar lambdaSB;
@@ -137,12 +150,14 @@ public class InteractiveRANSAC implements PlugIn {
 	int maxErrorInt, lambdaInt, minSlopeInt, maxSlopeInt, minDistCatInt, restoleranceInt;
 
 	public double maxError = 3.0;
+	
 	public double minSlope = 0.1;
 	public double maxSlope = 100;
+	
 	public double restolerance = 5;
 	public double tptolerance = 2;
 	public int maxDist = 300;
-	public int minInliers = 50;
+	public int minInliers = 10;
 	public boolean detectCatastrophe = true;
 	ArrayList<Pair<Integer, Double>> lifecount;
 	public double minDistanceCatastrophe = 2;
@@ -243,13 +258,18 @@ public class InteractiveRANSAC implements PlugIn {
 		// this.chart.draw(svgchart, new Rectangle2D.Double(0, 0, 500, 500),
 		// null);
 	};
-
+	public void setInitialminInliers(final int value) {
+        minInliers = value;
+        minInliers = computeScrollbarPositionFromValue(MAX_SLIDER, minInliers, 1,
+				200);
+	}
 	@Override
 	public void run(String arg) {
 		/* JFreeChart */
 		allrates = new ArrayList<Rateobject>();
 		averagerates = new ArrayList<Averagerate>();
-
+		wrongfileindexlist = new HashMap<Integer, Boolean>();
+		
 		Compilepositiverates = new HashMap<Integer, ArrayList<Rateobject>>();
 		Compilenegativerates = new HashMap<Integer, ArrayList<Rateobject>>();
 		Compileaverage = new HashMap<Integer, Averagerate>();
@@ -259,6 +279,7 @@ public class InteractiveRANSAC implements PlugIn {
 		countfile = 0;
 		AllMoviesB = new ArrayList<File>();
 
+		setInitialminInliers(minInliers);
 		segments = new ArrayList<Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>>>();
 		indexedsegments = new HashMap<Integer, Pair<Double, Double>>();
 		linearsegments = new HashMap<Integer, LinearFunction>();
@@ -306,7 +327,7 @@ public class InteractiveRANSAC implements PlugIn {
 
 		CardLayout cl = new CardLayout();
 		Object[] colnames = new Object[]{"Track File", "Growth rate", "Shrink rate", 
-				"Growth events", "Shrink events", "fcat", "fres"};
+				"Growth events", "Shrink events", "fcat", "fres", "Pass"};
 		
 		
 		Object[][] rowvalues = new Object[0][colnames.length];
@@ -322,7 +343,9 @@ public class InteractiveRANSAC implements PlugIn {
 		table = new JTable(rowvalues, colnames);
 		
 		table.setFillsViewportHeight(true);
+		
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+		
 		scrollPane = new JScrollPane(table);
 		scrollPane.setMinimumSize(new Dimension(300, 200));
 		scrollPane.setPreferredSize(new Dimension(300, 200));
@@ -388,11 +411,11 @@ public class InteractiveRANSAC implements PlugIn {
 				Label.CENTER);
 
 		final Checkbox findCatastrophe = new Checkbox("Detect Catastrophies", this.detectCatastrophe);
-		final Scrollbar minCatDist = new Scrollbar(Scrollbar.HORIZONTAL, this.minDistCatInt, 10, MIN_SLIDER,
-				MAX_SLIDER + 10);
+		final Scrollbar minCatDist = new Scrollbar(Scrollbar.HORIZONTAL, this.minDistCatInt, 1, MIN_SLIDER,
+				MAX_SLIDER + 1);
 		final Scrollbar maxRes = new Scrollbar(Scrollbar.HORIZONTAL, this.restoleranceInt, 1, MIN_SLIDER,
 				MAX_SLIDER + 1);
-		final Label minCatDistLabel = new Label("Min. Catatastrophy height (tp) = " + this.minDistanceCatastrophe,
+		final Label minCatDistLabel = new Label("Min. Catastrophy height (tp) = " + this.minDistanceCatastrophe,
 				Label.CENTER);
 		final Button done = new Button("Done");
 		final Button batch = new Button("Save Parameters for Batch run");
@@ -437,6 +460,7 @@ public class InteractiveRANSAC implements PlugIn {
 				GridBagConstraints.RELATIVE, insets, 0, 0));
 
 		PanelParameteroptions.setBorder(selectparam);
+		PanelParameteroptions.setMinimumSize(new Dimension(300, 200));
 		PanelParameteroptions.setPreferredSize(new Dimension(300, 200));
 		panelFirst.add(PanelParameteroptions, new GridBagConstraints(3, 0, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
 				GridBagConstraints.RELATIVE, new Insets(10, 10, 0, 10), 0, 0));
@@ -469,7 +493,7 @@ public class InteractiveRANSAC implements PlugIn {
 		Panelslope.add(minCatDistLabel, new GridBagConstraints(0, 6, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
 				GridBagConstraints.RELATIVE, insets, 0, 0));
 		Panelslope.setBorder(selectslope);
-
+		Panelslope.setPreferredSize(new Dimension(300, 300));
 		panelFirst.add(Panelslope, new GridBagConstraints(3, 2, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
 				GridBagConstraints.RELATIVE, new Insets(10, 10, 0, 10), 0, 0));
 
@@ -607,7 +631,7 @@ public class InteractiveRANSAC implements PlugIn {
 
 	public void updateRANSAC() {
 		++updateCount;
-
+		
 		linearsegments.clear();
 		indexedsegments.clear();
 		ArrayList<Rateobject> allrates = new ArrayList<Rateobject>();
@@ -655,6 +679,7 @@ public class InteractiveRANSAC implements PlugIn {
 		ResultsTable rtAll = new ResultsTable();
 
 		sortPoints(points);
+		List<Pair<Float, Float>> starttimerates = new ArrayList<Pair<Float, Float>>();
 		for (final Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>> result : segments) {
 			if (LinearFunction.slopeFits(result.getB(), linear, minSlope, maxSlope)) {
 
@@ -734,7 +759,10 @@ public class InteractiveRANSAC implements PlugIn {
 						rt.addValue("Start time", startX * calibrations[2]);
 						rt.addValue("End time", endX * calibrations[2]);
 						rt.addValue("Growth Rate", linearrate * calibrations[0] / calibrations[2]);
+						
+						Pair<Float, Float> startrate = new ValuePair<Float, Float>((float)startX, (float)linearrate);
 
+						starttimerates.add(startrate);
 					}
 
 					if (linearrate > 0) {
@@ -821,6 +849,10 @@ public class InteractiveRANSAC implements PlugIn {
 										rt.addValue("Start time", startX * calibrations[2]);
 										rt.addValue("End time", endX * calibrations[2]);
 										rt.addValue("Growth Rate", linearrate * calibrations[0] / calibrations[2]);
+										
+										Pair<Float, Float> startrate = new ValuePair<Float, Float>((float)startX, (float)linearrate);
+
+										starttimerates.add(startrate);
 									}
 
 									Rateobject rate = new Rateobject(linearrate * calibrations[0] / calibrations[2],
@@ -887,8 +919,59 @@ public class InteractiveRANSAC implements PlugIn {
 		rtAll.addValue("Catastrophe events", catcount);
 		rtAll.addValue("Rescue Frequency", resfrequ);
 		rtAll.addValue("Rescue events", rescount);
-		rtAll.show("Average Rates and Frequencies (real units)");
+		//rtAll.show("Average Rates and Frequencies (real units)");
 
+		
+		sortTime(starttimerates);
+		
+		
+		for (int index = 0; index < starttimerates.size() - 1; ++index){
+		
+			int prevsign = (int)Math.signum(starttimerates.get(index).getB());
+			int nextsign = (int)Math.signum(starttimerates.get(index + 1).getB());
+				
+				if (nextsign == prevsign)
+				wrongfile = true;
+				else
+				wrongfile = false;	
+				
+				wrongfileindex = new ValuePair<Boolean, Integer>(wrongfile, row);
+				wrongfileindexlist.put(row, wrongfile);
+		}
+		
+		
+	
+		if(wrongfileindexlist.get(row)!=null){
+		table.getModel().setValueAt(new DecimalFormat("#.###").format(averagegrowth), row, 1);
+		table.getModel().setValueAt(new DecimalFormat("#.###").format(averageshrink), row, 2);
+		table.getModel().setValueAt(new DecimalFormat("#").format(count), row, 3);
+		table.getModel().setValueAt(new DecimalFormat("#").format(negcount), row, 4);
+		table.getModel().setValueAt(new DecimalFormat("#.###").format(catfrequ), row, 5);
+		table.getModel().setValueAt(new DecimalFormat("#.###").format(resfrequ), row, 6);
+		table.getModel().setValueAt(wrongfileindexlist.get(row).toString(), row, 7);
+		}
+		table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer(){
+		    @Override
+		    public Component getTableCellRendererComponent(JTable table,
+		            Object value, boolean isSelected, boolean hasFocus, int row, int col) {
+
+		        super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
+
+		        String status = (String)table.getModel().getValueAt(row, 7);
+		        if ("true".equals(status)) {
+		            setBackground(Color.red);
+		            
+		        } else {
+		            setBackground(table.getBackground());
+		        }       
+		        return this;
+		    }   
+		});
+		table.validate();
+		scrollPane.validate();	
+		
+		
+		
 		Averagerate avrate = new Averagerate(averagegrowth, averageshrink, catfrequ, resfrequ, count, negcount,
 				catcount, rescount, this.inputfile);
 		averagerates.add(avrate);
@@ -898,7 +981,9 @@ public class InteractiveRANSAC implements PlugIn {
 
 		--updateCount;
 	}
-
+	
+	
+	
 	protected void sort(final Pair<? extends AbstractFunction2D, ArrayList<PointFunctionMatch>> segment) {
 		Collections.sort(segment.getB(), new Comparator<PointFunctionMatch>() {
 
@@ -916,6 +1001,30 @@ public class InteractiveRANSAC implements PlugIn {
 			}
 		});
 	}
+	protected void sortTime(final List<Pair<Float, Float>> starttimerates) {
+		
+		Collections.sort(starttimerates, new Comparator<Pair<Float, Float>>() {
+
+		
+			
+			
+			@Override
+			public int compare(final Pair<Float, Float> o1, final Pair<Float, Float> o2) {
+				final float t1 = o1.getA();
+				final float t2 = o2.getA();
+
+				if (t1 < t2)
+					return -1;
+				else if (t1 == t2)
+					return 0;
+				else
+					return 1;
+			}
+
+			
+		});
+	}
+	
 
 	public double leastX() {
 

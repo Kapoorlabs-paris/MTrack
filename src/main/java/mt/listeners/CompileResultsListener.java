@@ -21,6 +21,8 @@
  */
 package mt.listeners;
 
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedWriter;
@@ -31,6 +33,9 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
+
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableCellRenderer;
 
 import fit.AbstractFunction2D;
 import fit.PointFunctionMatch;
@@ -63,7 +68,7 @@ public class CompileResultsListener implements ActionListener {
 	
 	public void compileresults() {
 
-
+		
 
 		try {
 			File ratesfile = new File(parent.inputdirectory + "//"  + "AllRates" + ".txt");
@@ -143,6 +148,28 @@ public class CompileResultsListener implements ActionListener {
 
 					+ "\n" + "\n");
 			}
+
+			parent.table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer(){
+			    @Override
+			    public Component getTableCellRendererComponent(JTable table,
+			            Object value, boolean isSelected, boolean hasFocus, int row, int col) {
+
+			        super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
+
+			        String status = (String)table.getModel().getValueAt(row, 7);
+			        if ("true".equals(status)) {
+			            setBackground(Color.red);
+			            
+			        } else {
+			            setBackground(table.getBackground());
+			        } 
+			        return this;
+			    }   
+			});
+			parent.table.validate();
+			parent.scrollPane.validate();	
+			
+			
 			bw.close();
        		fw.close();
 

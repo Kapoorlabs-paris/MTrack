@@ -52,6 +52,6 @@ public class MaxErrorListener implements AdjustmentListener
 				InteractiveRANSAC.MIN_ERROR,
 				InteractiveRANSAC.MAX_ERROR );
 
-		label.setText( "Max. Error (px) = " + new DecimalFormat("#.##").format(parent.maxError) );
+		label.setText( "Max. Error (px) = " + new DecimalFormat("#.#").format(parent.maxError) );
 	}
 }
