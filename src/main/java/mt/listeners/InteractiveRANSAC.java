@@ -941,13 +941,14 @@ public class InteractiveRANSAC implements PlugIn {
 		
 		
 	
-		if(wrongfileindexlist.get(row)!=null){
+	
 		table.getModel().setValueAt(new DecimalFormat("#.###").format(averagegrowth), row, 1);
 		table.getModel().setValueAt(new DecimalFormat("#.###").format(averageshrink), row, 2);
 		table.getModel().setValueAt(new DecimalFormat("#").format(count), row, 3);
 		table.getModel().setValueAt(new DecimalFormat("#").format(negcount), row, 4);
 		table.getModel().setValueAt(new DecimalFormat("#.###").format(catfrequ), row, 5);
 		table.getModel().setValueAt(new DecimalFormat("#.###").format(resfrequ), row, 6);
+		if(wrongfileindexlist.get(row)!=null){
 		table.getModel().setValueAt(wrongfileindexlist.get(row).toString(), row, 7);
 		}
 		table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer(){
