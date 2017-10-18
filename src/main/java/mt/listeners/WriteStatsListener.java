@@ -121,6 +121,13 @@ public class WriteStatsListener implements ActionListener {
 	}
 	
 	
+	public void lengthDistro(final int framenumber){
+		
+		LengthDistribution.GetLengthDistributionArrayatTime(parent.AllMoviesB, parent.calibrations, framenumber);
+		
+		
+		
+	}
         public  void writeStatstofile(){
 			ArrayList<Pair<Integer, ArrayList<Pair<Integer, Double>>>> Alllife = new ArrayList<Pair<Integer, ArrayList<Pair<Integer, Double>>>>();
 

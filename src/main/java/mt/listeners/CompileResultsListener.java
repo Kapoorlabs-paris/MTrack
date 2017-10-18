@@ -61,18 +61,14 @@ public class CompileResultsListener implements ActionListener {
 	public void actionPerformed(final ActionEvent arg0) {
 
 		compileresults();
-		WriteStatsListener stats = new WriteStatsListener(parent);
-		stats.writeStatstofile();
+		
 	}
 
-	
 	public void compileresults() {
 
-		
-
 		try {
-			File ratesfile = new File(parent.inputdirectory + "//"  + "AllRates" + ".txt");
-			File frequfile = new File(parent.inputdirectory + "//"  + "AllAverages" + ".txt");
+			File ratesfile = new File(parent.inputdirectory + "//" + "AllRates" + ".txt");
+			File frequfile = new File(parent.inputdirectory + "//" + "AllAverages" + ".txt");
 
 			FileWriter fw = new FileWriter(ratesfile);
 
@@ -81,54 +77,38 @@ public class CompileResultsListener implements ActionListener {
 			FileWriter fwfrequ = new FileWriter(frequfile);
 
 			BufferedWriter bwfrequ = new BufferedWriter(fwfrequ);
-			
+
 			parent.AllMoviesB.add(parent.inputfile);
 			bw.write("\tStartTime (real)\tEndTime(real)\tLinearRateSlope(real)\tFileName\n");
 			bwfrequ.write(
 					"\tAverageGrowthrate(real)\tAverageShrinkrate(real)\tCatastropheFrequency(real)\tRescueFrequency(real)"
-					+ "\tGrowth events \tShrink events\tRescue events\tCatastrophe events"
-					+ "\tFileName\n");
-			
+							+ "\tGrowth events \tShrink events\tRescue events\tCatastrophe events" + "\tFileName\n");
 
-			for (Map.Entry<Integer, ArrayList<Rateobject>>  allrates: parent.Compilepositiverates.entrySet()){
-				
-				
+			for (Map.Entry<Integer, ArrayList<Rateobject>> allrates : parent.Compilepositiverates.entrySet()) {
+
 				int key = allrates.getKey();
 				ArrayList<Rateobject> rateobject = allrates.getValue();
 				String File = parent.inputfiles[key].getName();
-			
-				for (int index = 0; index < rateobject.size(); ++index){
-				
-                        	  int startX = rateobject.get(index).starttime;
-                        	  int endX = rateobject.get(index).endtime;
-                        	  double linearrate =  rateobject.get(index).rate;
-                        	  
-                        	  
-                        	 
-                        	  
-                        	
-							bw.write("\t" + new DecimalFormat("#.####").format(startX) + "\t" + "\t" + new DecimalFormat("#.####").format(endX) + "\t"
-									+ "\t" + new DecimalFormat("#.####").format(linearrate) + "\t" + "\t" + File   + "\t" + "\t" + "\n");
-							
-							
-							
-							
 
-						}
-				
-			
-				
-				
-				
+				for (int index = 0; index < rateobject.size(); ++index) {
+
+					int startX = rateobject.get(index).starttime;
+					int endX = rateobject.get(index).endtime;
+					double linearrate = rateobject.get(index).rate;
+
+					bw.write("\t" + new DecimalFormat("#.####").format(startX) + "\t" + "\t"
+							+ new DecimalFormat("#.####").format(endX) + "\t" + "\t"
+							+ new DecimalFormat("#.####").format(linearrate) + "\t" + "\t" + File + "\t" + "\t" + "\n");
+
+				}
+
 			}
-			
-				
-			for (Map.Entry<Integer, Averagerate>  allaverage: parent.Compileaverage.entrySet()){
-				
+
+			for (Map.Entry<Integer, Averagerate> allaverage : parent.Compileaverage.entrySet()) {
+
 				Averagerate rateobject = allaverage.getValue();
 				String File = rateobject.file.getName();
-			
-				
+
 				double averagegrowth = rateobject.averagegrowth;
 				double averageshrink = rateobject.averageshrink;
 				double catfrequ = rateobject.catfrequ;
@@ -137,41 +117,41 @@ public class CompileResultsListener implements ActionListener {
 				int shrinkevent = rateobject.shrinkevent;
 				int resevent = rateobject.resevent;
 				int catevent = rateobject.catevent;
-			
 
-			bwfrequ.write("\t" + new DecimalFormat("#.####").format(averagegrowth) + "\t" + "\t" + "\t" + "\t"
-					+ new DecimalFormat("#.####").format(averageshrink) + "\t" + "\t" + "\t" + new DecimalFormat("#.####").format(catfrequ) + "\t" + "\t"
-					+ "\t" + new DecimalFormat("#.####").format(resfrequ) + "\t" + "\t"
-					+ new DecimalFormat("#.####").format(growevent)  + "\t" + "\t" + new DecimalFormat("#.####").format(shrinkevent) + "\t" + "\t"
-					+ "\t" + new DecimalFormat("#.####").format(resevent) + "\t" + "\t" + new DecimalFormat("#.####").format(catevent) + "\t" + "\t"
-							+ File + "\t" + "\t"
+				bwfrequ.write("\t" + new DecimalFormat("#.####").format(averagegrowth) + "\t" + "\t" + "\t" + "\t"
+						+ new DecimalFormat("#.####").format(averageshrink) + "\t" + "\t" + "\t"
+						+ new DecimalFormat("#.####").format(catfrequ) + "\t" + "\t" + "\t"
+						+ new DecimalFormat("#.####").format(resfrequ) + "\t" + "\t"
+						+ new DecimalFormat("#.####").format(growevent) + "\t" + "\t"
+						+ new DecimalFormat("#.####").format(shrinkevent) + "\t" + "\t" + "\t"
+						+ new DecimalFormat("#.####").format(resevent) + "\t" + "\t"
+						+ new DecimalFormat("#.####").format(catevent) + "\t" + "\t" + File + "\t" + "\t"
 
-					+ "\n" + "\n");
+						+ "\n" + "\n");
 			}
 
-			parent.table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer(){
-			    @Override
-			    public Component getTableCellRendererComponent(JTable table,
-			            Object value, boolean isSelected, boolean hasFocus, int row, int col) {
+			parent.table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+				@Override
+				public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+						boolean hasFocus, int row, int col) {
 
-			        super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
+					super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
 
-			        String status = (String)table.getModel().getValueAt(row, 7);
-			        if ("true".equals(status)) {
-			            setBackground(Color.red);
-			            
-			        } else {
-			            setBackground(table.getBackground());
-			        } 
-			        return this;
-			    }   
+					String status = (String) table.getModel().getValueAt(row, 7);
+					if ("true".equals(status)) {
+						setBackground(Color.red);
+
+					} else {
+						setBackground(table.getBackground());
+					}
+					return this;
+				}
 			});
 			parent.table.validate();
-			parent.scrollPane.validate();	
-			
-			
+			parent.scrollPane.validate();
+
 			bw.close();
-       		fw.close();
+			fw.close();
 
 			bwfrequ.close();
 			fwfrequ.close();

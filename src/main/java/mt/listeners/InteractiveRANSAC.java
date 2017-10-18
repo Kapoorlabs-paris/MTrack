@@ -34,6 +34,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Label;
 import java.awt.Scrollbar;
+import java.awt.TextField;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -83,12 +84,14 @@ import fit.polynomial.QuadraticFunction;
 import ij.ImageJ;
 import ij.measure.ResultsTable;
 import ij.plugin.PlugIn;
+import listeners.MedianRadiListener;
 import mpicbg.models.Point;
 import mt.Averagerate;
 import mt.MyCellRenderer;
 import mt.RansacFileChooser;
 import mt.Rateobject;
 import mt.Tracking;
+import mt.listeners.MeasureserialListener.WordWrapCellRenderer;
 import net.imglib2.util.Pair;
 import net.imglib2.util.ValuePair;
 
@@ -102,8 +105,9 @@ public class InteractiveRANSAC implements PlugIn {
 	public static double MIN_RES = 1.0;
 	public static double MAX_RES = 100.0;
 	
-	
-
+	private Label inputLabelT;
+	private Label inputLabelTcont;
+	public TextField inputFieldT;
 	public static double MAX_ABS_SLOPE = 100.0;
 
 	public static double MIN_CAT = 0.0;
@@ -131,6 +135,7 @@ public class InteractiveRANSAC implements PlugIn {
 	Scrollbar lambdaSB;
 	Label lambdaLabel;
 
+	int framenumber = 1;
 	final XYSeriesCollection dataset;
 	final JFreeChart chart;
 	// final SVGGraphics2D svgchart;
@@ -375,7 +380,13 @@ public class InteractiveRANSAC implements PlugIn {
 		c.insets = new Insets(5, 5, 5, 5);
 		c.anchor = GridBagConstraints.BOTH;
 		c.ipadx = 35;
-
+		
+		inputLabelT = new Label("Compute length distribution at time: ");
+		inputLabelTcont = new Label("(Press Enter to start computation) ");
+		inputFieldT = new TextField(5);
+		inputFieldT.setText("1");
+		
+		
 		c.gridwidth = 10;
 		c.gridheight = 10;
 		c.gridy = 1;
@@ -420,11 +431,11 @@ public class InteractiveRANSAC implements PlugIn {
 		final Button done = new Button("Done");
 		final Button batch = new Button("Save Parameters for Batch run");
 		final Button cancel = new Button("Cancel");
-		final Button Compile = new Button("Compile results till current file");
-		final Button AutoCompile = new Button("Auto Fit and compile results");
+		final Button Compile = new Button("Compute rates and freq. till current file");
+		final Button AutoCompile = new Button("Compute average rates and frequencies");
 		final Button Measureserial = new Button("Select directory of MTV tracker generated files");
-
-		final Button WriteStats = new Button("Compute Length and Lifetime distribution");
+		final Button WriteLength = new Button("Compute length distribution at framenumber : ");
+		final Button WriteStats = new Button("Compute lifetime and mean length distribution");
 		final Button WriteAgain = new Button("Save Rates and Frequencies to File");
 		setFunction();
 
@@ -494,14 +505,30 @@ public class InteractiveRANSAC implements PlugIn {
 				GridBagConstraints.RELATIVE, insets, 0, 0));
 		Panelslope.setBorder(selectslope);
 		Panelslope.setPreferredSize(new Dimension(300, 300));
+		
 		panelFirst.add(Panelslope, new GridBagConstraints(3, 2, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
 				GridBagConstraints.RELATIVE, new Insets(10, 10, 0, 10), 0, 0));
 
-		PanelCompileRes.add(Compile, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
+	//	PanelCompileRes.add(Compile, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
+	//			GridBagConstraints.RELATIVE, insets, 0, 0));
+		PanelCompileRes.add(AutoCompile, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
+				GridBagConstraints.HORIZONTAL, insets, 0, 0));
+		
+		
+	 
+		PanelCompileRes.add(WriteLength, new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER,
 				GridBagConstraints.RELATIVE, insets, 0, 0));
-		PanelCompileRes.add(AutoCompile, new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
+		
+		
+		PanelCompileRes.add(inputFieldT, new GridBagConstraints(3, 1, 3, 1, 0.1, 0.0, GridBagConstraints.CENTER,
 				GridBagConstraints.RELATIVE, insets, 0, 0));
-
+		
+		PanelCompileRes.add(WriteStats, new GridBagConstraints(0, 4, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
+				GridBagConstraints.RELATIVE, insets, 0, 0));
+		
+		
+		//PanelCompileRes.setPreferredSize(new Dimension(300, 300));
+		
 		PanelCompileRes.setBorder(compileres);
 
 		panelFirst.add(PanelCompileRes, new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
@@ -554,12 +581,13 @@ public class InteractiveRANSAC implements PlugIn {
 		Measureserial.addActionListener(new MeasureserialListener(this));
 		Compile.addActionListener(new CompileResultsListener(this));
 		AutoCompile.addActionListener(new AutoCompileResultsListener(this, row));
+		WriteLength.addActionListener(new WriteLengthListener(this));
 		WriteStats.addActionListener(new WriteStatsListener(this));
 		WriteAgain.addActionListener(new WriteRatesListener(this));
 		done.addActionListener(new FinishButtonListener(this, false));
 		batch.addActionListener(new RansacBatchmodeListener(this));
 		cancel.addActionListener(new FinishButtonListener(this, true));
-
+		inputFieldT.addTextListener(new LengthdistroListener(this));
 		panelFirst.setVisible(true);
 
 		cl.show(panelCont, "1");

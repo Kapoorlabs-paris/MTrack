@@ -73,6 +73,29 @@ public class LengthDistribution {
 		return maxlength;
 
 	}
+	
+	
+	public static ArrayList<Pair<Integer, Double>> LengthdistroatTime(File file, final int framenumber) {
+
+		ArrayList<FLSobject> currentobject = Tracking.loadMTStat(file);
+
+
+		ArrayList<Pair<Integer, Double>> lengthlist = new ArrayList<Pair<Integer, Double>>();
+
+		if (currentobject != null) {
+			for (int index = 0; index < currentobject.size(); ++index) {
+
+
+				if(currentobject.get(index).Framenumber == framenumber)
+					lengthlist.add (new ValuePair<Integer, Double>(currentobject.get(index).seedID, currentobject.get(index).length));
+
+			}
+
+		}
+
+		return lengthlist;
+
+	}
 
 	public static void GetLengthDistribution(File[] AllMovies,  double[] calibration) {
 
@@ -258,6 +281,130 @@ public class LengthDistribution {
 			} catch (NotEnoughDataPointsException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+			}
+			 dataset.addSeries(Tracking.drawexpFunction(poly, counterseries.getMinX(), counterseries.getMaxX(), 0.5, "Exponential fit"));
+			 NumberFormat nf = NumberFormat.getInstance(Locale.ENGLISH);
+				nf.setMaximumFractionDigits(3);
+			 TextTitle legendText = new TextTitle("Mean Length" + " : "
+		  			 + nf.format(-1.0/poly.getCoefficients(1)) +"  " +  "Standard Deviation" + " : " + nf.format(poly.SSE));
+		  				 legendText.setPosition(RectangleEdge.RIGHT);
+			 
+		  DisplayPoints.display(chart, new Dimension(800, 500));
+		  chart.addSubtitle(legendText);
+		  
+		  final JFreeChart logchart =
+				  ChartFactory.createScatterPlot("MT Log length distribution",
+				  "Length (micrometer)", "Number of MT", Logdataset);
+	//	  DisplayPoints.display(logchart, new Dimension(800, 500));
+		  for (int i = 1; i >= 0; --i)
+				System.out.println(poly.getCoefficients(i) + "  " + "x" + " X to the power of "  + i );
+		  
+		  
+		//  Logdataset.addSeries(Tracking.drawFunction(poly, counterseries.getMinX(), counterseries.getMaxX(), 0.5, "Straight line fit"));
+		  
+	}
+	
+	
+	public static void GetLengthDistributionArrayatTime(ArrayList<File> AllMovies, double[] calibration, final int framenumber) {
+
+		ArrayList<Double> maxlist = new ArrayList<Double>();
+		for (int i = 0; i < AllMovies.size(); ++i) {
+
+			ArrayList<Pair<Integer, Double>> lengthlist = LengthDistribution.LengthdistroatTime(AllMovies.get(i), framenumber);
+
+			for (int index = 0; index < lengthlist.size(); ++index){
+			if (lengthlist.get(index).getB() != Double.NaN && lengthlist.get(index).getB() > 0)
+				maxlist.add(lengthlist.get(index).getB());
+
+		}
+		}
+		Collections.sort(maxlist);
+
+		int min = 0;
+		int max = 0;
+		if(maxlist.size() > 0)
+	    max = (int) Math.round(maxlist.get(maxlist.size() - 1)) + 1;
+		XYSeries counterseries = new XYSeries("MT length distribution");
+		XYSeries Logcounterseries = new XYSeries("MT Log length distribution");
+		final ArrayList<Point> points = new ArrayList<Point>();
+		for (int length = 0; length < max; ++length) {
+
+			HashMap<Integer, Integer> frameseed = new HashMap<Integer, Integer>();
+
+			int count = 0;
+			for (int i = 0; i < AllMovies.size(); ++i) {
+
+				File file = AllMovies.get(i);
+
+				ArrayList<Pair<Integer, Double>> lengthlist = LengthDistribution.LengthdistroatTime(file, framenumber);
+
+				ArrayList<FLSobject> currentobject = Tracking.loadMTStat(file);
+
+
+
+					
+					for (int index = 0; index < currentobject.size(); ++index) {
+						ArrayList<Integer> seedlist = new ArrayList<Integer>();
+						if (currentobject.get(index).length >= length) {
+							seedlist.add(currentobject.get(index).seedID);
+							if (frameseed.get(currentobject.get(index).Framenumber) != null
+									&& frameseed.get(currentobject.get(index).Framenumber) != Double.NaN) {
+
+								int currentcount = frameseed.get(currentobject.get(index).Framenumber);
+								frameseed.put(currentobject.get(index).Framenumber, seedlist.size() + currentcount);
+							} else if (currentobject.get(index) != null)
+								frameseed.put(currentobject.get(index).Framenumber, seedlist.size() );
+
+						}
+
+
+				}
+
+			}
+			
+			
+			// Get maxima length, count
+			int maxvalue = Integer.MIN_VALUE;
+			
+			for (int key: frameseed.keySet()){
+				
+				int Count = frameseed.get(key);
+				
+				if (Count >= maxvalue)
+					maxvalue = Count;
+			}
+			
+			if (maxvalue!=Integer.MIN_VALUE){
+				counterseries.add(length , maxvalue );
+
+				if (maxvalue > 0){
+			 Logcounterseries.add((length ), Math.log(maxvalue));
+			 points.add(new Point(new double[]{length , Math.log(maxvalue) }));
+				}
+			
+			}
+		}
+		
+		final XYSeriesCollection dataset = new XYSeriesCollection();
+		  dataset.addSeries(counterseries); 
+		  final XYSeriesCollection Logdataset = new XYSeriesCollection();
+		  Logdataset.addSeries(Logcounterseries); 
+		  
+		  final JFreeChart chart =
+		  ChartFactory.createScatterPlot("MT length distribution",
+		  "Length (micrometer)", "Number of MT", dataset);
+		  
+		  // Fitting line to log of the length distribution
+		  interpolation.Polynomial poly = new interpolation.Polynomial(1);
+			 try {
+				
+				 
+				 poly.fitFunction(points);
+				
+				 
+				
+			} catch (NotEnoughDataPointsException e) {
+				
 			}
 			 dataset.addSeries(Tracking.drawexpFunction(poly, counterseries.getMinX(), counterseries.getMaxX(), 0.5, "Exponential fit"));
 			 NumberFormat nf = NumberFormat.getInstance(Locale.ENGLISH);
