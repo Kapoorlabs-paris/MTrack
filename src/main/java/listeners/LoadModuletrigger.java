@@ -50,8 +50,7 @@ public class LoadModuletrigger implements ActionListener {
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		final FloatType type = parent.originalimg.randomAccess().get().createVariable();
-		final ImgFactory<FloatType> factory = Util.getArrayOrCellImgFactory(parent.originalimg, type);
+		
 		if (parent.selectedindex == 0)
 		{
 			

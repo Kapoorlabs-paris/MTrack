@@ -30,6 +30,8 @@ import javax.swing.SwingWorker;
 
 import interactiveMT.Interactive_MTDoubleChannel;
 import interactiveMT.Interactive_MTDoubleChannelBasic;
+import interactiveMT.Interactive_MTSingleChannel;
+import interactiveMT.Interactive_MTSingleChannelBasic;
 import interactiveMT.MainFileChooser;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.algorithm.stats.Normalize;
@@ -56,7 +58,7 @@ public class PreprocessMedian extends SwingWorker<Void, Void> {
 	@Override
 	protected Void doInBackground() throws Exception {
 		
-		
+		if (parent.medianradius > 0){
 		parent.frame.add(parent.jpb, BorderLayout.PAGE_END);
 		parent.frame.validate();
 		MedianFilterOnly flatfilter;
@@ -69,8 +71,7 @@ public class PreprocessMedian extends SwingWorker<Void, Void> {
 		parent.originalPreprocessedimg = flatfilter.getResult();
 		
 		
-		System.out.println(parent.medianradius);
-	
+		}
 	
 		
 		return null;
@@ -91,7 +92,59 @@ public class PreprocessMedian extends SwingWorker<Void, Void> {
 			// Normalize image intnesity
 			Normalize.normalize(Views.iterable(parent.originalPreprocessedimg), parent.minval, parent.maxval);
 		
+			if (parent.selectedindex == 0)
+			{
+				
+							
+					
+							if (parent.Simplemode)
+								new Interactive_MTDoubleChannelBasic(new Interactive_MTDoubleChannel(parent.originalimg, parent.originalPreprocessedimg,
+										parent.psf, parent.calibration, parent.userfile, parent.addToName)).run(null);
+							else
+								new Interactive_MTDoubleChannel(parent.originalimg, parent.originalPreprocessedimg, parent.psf, parent.calibration,
+										parent.userfile, parent.addToName).run(null);
+				
+				
+				}
+				
+				
+				
+				
 			
+			
+			
+			if (parent.selectedindex == 1){
+				
+				// Open Reber lab images
+				ImageJFunctions.show(parent.originalPreprocessedimg).setTitle("Preprocessed Movie");
+			
+				if (parent.Simplemode)
+					new Interactive_MTDoubleChannelBasic(new Interactive_MTDoubleChannel(parent.originalimg, parent.originalPreprocessedimg,
+							parent.psf, parent.calibration, parent.userfile, parent.addToName)).run(null);
+				else
+					new Interactive_MTDoubleChannel(parent.originalimg, parent.originalPreprocessedimg, parent.psf, parent.calibration,
+							parent.userfile, parent.addToName).run(null);
+				
+			}
+			
+			
+			if (parent.selectedindex == 2){
+				
+				// Open Surrey lab images
+				
+				ImageJFunctions.show(parent.originalPreprocessedimg).setTitle("Preprocessed Movie");
+
+				if (parent.Simplemode)
+					new Interactive_MTSingleChannelBasic(new Interactive_MTSingleChannel(parent.originalimg, parent.originalPreprocessedimg,
+							parent.psf, parent.calibration, parent.userfile, parent.addToName)).run(null);
+				else
+					new Interactive_MTSingleChannel(parent.originalimg, parent.originalPreprocessedimg, parent.psf, parent.calibration,
+							parent.userfile, parent.addToName).run(null);
+				
+				
+			}
+			
+			parent.frame.dispose();
 			
 		} catch (ExecutionException | InterruptedException e) {
 			e.printStackTrace();
