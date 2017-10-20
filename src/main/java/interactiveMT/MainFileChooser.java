@@ -40,6 +40,7 @@ import listeners.FilenameListener;
 import listeners.FireTrigger;
 import listeners.FirepreTrigger;
 import listeners.FlatfieldTrigger;
+import listeners.FlatfieldTriggerNext;
 import listeners.LoadModuletrigger;
 import listeners.MedianRadiListener;
 import listeners.MedianfilterTrigger;
@@ -122,11 +123,21 @@ public class MainFileChooser extends JPanel {
 	public JPanel Startsec = new JPanel();
 	public JFrame frame = new JFrame("Welcome to MTrack ");
 	public JPanel PreOriginal = new JPanel();
-
+	JPanel controlnext = new JPanel();
 	/* Instantiation */
 	public GridBagLayout layout = new GridBagLayout();
 	public GridBagConstraints c = new GridBagConstraints();
-
+	final JButton FlatFieldNext = new JButton("Next\u22b3 ");
+	
+	JButton ChoosepreImage = new JButton("Load preprocessed movie and go next\u22b3");
+	JLabel ChoosepreImagelabel = new JLabel("Optionally, load your preprocessed movie");
+	
+	final JButton ChooseDirectory = new JButton("Choose Directory to save results in");
+   
+	final Checkbox FlatField = new Checkbox("Do Flat Field Correction");
+	final JButton MedianFilter = new JButton("Next\u22b3 ");
+	JPanel controlprevious = new JPanel();
+	Border runborder = new CompoundBorder(new TitledBorder("1.4 Preprocessing Options"), new EmptyBorder(c.insets));
 	public MainFileChooser() {
 
 		
@@ -160,7 +171,7 @@ public class MainFileChooser extends JPanel {
 
 		Border border = new CompoundBorder(new TitledBorder("1.1 Choose Mode"), new EmptyBorder(c.insets));
 		Border microborder = new CompoundBorder(new TitledBorder("1.3 Microscope Parameters"), new EmptyBorder(c.insets));
-		Border runborder = new CompoundBorder(new TitledBorder("1.4 Preprocessing Options"), new EmptyBorder(c.insets));
+	
 		Border origborder = new CompoundBorder(new TitledBorder("1.2 Open movie and enter filename for results files"), new EmptyBorder(c.insets));
 
 		Border runbordersec = new CompoundBorder(new TitledBorder("1.4.1 Optionally, load your preprocessed movie"), new EmptyBorder(c.insets));
@@ -208,15 +219,9 @@ public class MainFileChooser extends JPanel {
 
 		String[] Imagetype = { "Two channel image as hyperstack", "Concatenated seed image followed by time-lapse images",
 				"Single channel time-lapse images" };
-		JComboBox<String> ChooseImage = new JComboBox<String>(Imagetype);
-		JButton ChoosepreImage = new JButton("Load preprocessed movie and go next\u22b3");
-		JLabel ChoosepreImagelabel = new JLabel("Optionally, load your preprocessed movie");
 		
-		final JButton ChooseDirectory = new JButton("Choose Directory to save results in");
-	   
-		final Checkbox FlatField = new Checkbox("Do Flat Field Correction");
-		final JButton MedianFilter = new JButton("Next\u22b3 ");
-		JPanel controlnext = new JPanel();
+		JComboBox<String> ChooseImage = new JComboBox<String>(Imagetype);
+	
 
 		controlnext.add(new JButton(new AbstractAction("Next\u22b3") {
 
@@ -232,7 +237,7 @@ public class MainFileChooser extends JPanel {
 		}));
 		
 		
-		JPanel controlprevious = new JPanel();
+		
 
 		controlprevious.add(new JButton(new AbstractAction("\u22b2Prev") {
 
@@ -318,39 +323,8 @@ public class MainFileChooser extends JPanel {
 	
 		
 		
-		
-		panelIntro.add(controlnext, new GridBagConstraints(1, 2, 5, 1, 0.0, 0.0, GridBagConstraints.NORTH,
-				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
-		
-		
-		
-		PreOriginal.add(FlatField,  new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
-				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0) );
-		
-		
-		PreOriginal.add(medianLabelradius, new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
-				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
-
-				PreOriginal.add(medianFieldradius, new GridBagConstraints(4, 3, 3, 1, 0.1, 0.0, GridBagConstraints.NORTH,
-				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
-				
-		PreOriginal.add(MedianFilter, new GridBagConstraints(0, 4, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
-				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
-
-
-	
-
-		
-		PreOriginal.add(ChoosepreImage, new GridBagConstraints(0, 5, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
-				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
-
-		panelpreIntro.add(PreOriginal,  new GridBagConstraints(0, 0, 2, 1, 0.0, 0.0, GridBagConstraints.NORTH,
-				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
-		
-		panelpreIntro.add(controlprevious, new GridBagConstraints(0, 6, 5, 1, 0.0, 0.0, GridBagConstraints.CENTER,
-				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
-		PreOriginal.setBorder(runborder);
-		
+		panelIntro.add(FlatFieldNext, new GridBagConstraints(3, 2, 2, 1, 0.0, 0.0, GridBagConstraints.CENTER,
+				GridBagConstraints.RELATIVE, new Insets(10, 10, 0, 10), 0, 0));
 		
 		panelIntro.setVisible(true);
 		panelpreIntro.setVisible(true);
@@ -363,7 +337,7 @@ public class MainFileChooser extends JPanel {
 		ChooseImage.addActionListener(new FireTrigger(this, ChooseImage));
 		FlatField.addItemListener(new FlatfieldTrigger(this));
 		MedianFilter.addActionListener(new MedianfilterTrigger(this));
-		
+		FlatFieldNext.addActionListener(new FlatfieldTriggerNext(this));
 		
 		ChoosepreImage.addActionListener(new FirepreTrigger(this));
 		inputFieldX.addTextListener(new PsfXListener(this));
@@ -521,14 +495,22 @@ public class MainFileChooser extends JPanel {
 
 		@Override
 		public void itemStateChanged(final ItemEvent arg0) {
-
+			
+			
+			
+			
 			if (arg0.getStateChange() == ItemEvent.DESELECTED) {
 				Simplemode = false;
 				Advancedmode = true;
 			} else if (arg0.getStateChange() == ItemEvent.SELECTED) {
 				Simplemode = true;
 				Advancedmode = false;
-
+				
+				panelIntro.add(FlatFieldNext, new GridBagConstraints(3, 2, 2, 1, 0.0, 0.0, GridBagConstraints.CENTER,
+						GridBagConstraints.RELATIVE, new Insets(10, 10, 0, 10), 0, 0));
+				panelIntro.remove(controlnext);
+				panelIntro.repaint();
+				panelIntro.validate();
 			}
 
 		}
@@ -539,13 +521,49 @@ public class MainFileChooser extends JPanel {
 
 		@Override
 		public void itemStateChanged(final ItemEvent arg0) {
-
+			
 			if (arg0.getStateChange() == ItemEvent.DESELECTED) {
 				Advancedmode = false;
 				Simplemode = true;
 			} else if (arg0.getStateChange() == ItemEvent.SELECTED) {
 				Advancedmode = true;
 				Simplemode = false;
+				panelIntro.add(controlnext, new GridBagConstraints(3, 2, 2, 1, 0.0, 0.0, GridBagConstraints.CENTER,
+						GridBagConstraints.RELATIVE, new Insets(10, 10, 0, 10), 0, 0));
+				
+				
+				
+				PreOriginal.add(FlatField,  new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0) );
+				
+				
+				PreOriginal.add(medianLabelradius, new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+
+						PreOriginal.add(medianFieldradius, new GridBagConstraints(4, 3, 3, 1, 0.1, 0.0, GridBagConstraints.NORTH,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+						
+				PreOriginal.add(MedianFilter, new GridBagConstraints(0, 4, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+
+
+			
+
+				
+				PreOriginal.add(ChoosepreImage, new GridBagConstraints(0, 5, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+
+				panelpreIntro.add(PreOriginal,  new GridBagConstraints(0, 0, 2, 1, 0.0, 0.0, GridBagConstraints.NORTH,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+				
+				panelpreIntro.add(controlprevious, new GridBagConstraints(0, 6, 5, 1, 0.0, 0.0, GridBagConstraints.CENTER,
+						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+				PreOriginal.setBorder(runborder);
+				
+			panelIntro.remove(FlatFieldNext);
+			panelIntro.repaint();
+			panelIntro.validate();
+				 
 			}
 
 		}
