@@ -45,12 +45,12 @@ import graphconstructs.Trackproperties;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.ImageStack;
-import ij.Prefs;
 import ij.gui.EllipseRoi;
 import ij.gui.OvalRoi;
 import ij.gui.Overlay;
 import ij.gui.Roi;
 import ij.io.Opener;
+import initialization.LocalPrefs;
 import interactiveMT.BatchMode;
 import interactiveMT.Interactive_MTSingleChannel.ValueChange;
 import interactiveMT.SingleBatchMode;
@@ -191,27 +191,27 @@ public class SplitSingleChannel implements Runnable  {
 
 			parent.userfile = file.getName().replaceFirst("[.][^.]+$", "");
 
-			parent.parent.usefolder = Prefs.get(".Folder.file", IJ.getDirectory("imagej"));
+			parent.parent.usefolder = LocalPrefs.get(".Folder.file", IJ.getDirectory("imagej"));
 
-			parent.parent.FindLinesViaMSER = Prefs.getBoolean(".FindLinesViaMSER.boolean", false);
+			parent.parent.FindLinesViaMSER = LocalPrefs.getBoolean(".FindLinesViaMSER.boolean", false);
 
-			parent.parent.doSegmentation = Prefs.getBoolean(".doSegmentation.boolean", false);
-			parent.parent.doMserSegmentation = Prefs.getBoolean(".doMserSegmentation.boolean", false);
-			parent.parent.FindLinesViaHOUGH = Prefs.getBoolean(".FindLinesViaHough.boolean", false);
-			parent.parent.FindLinesViaMSERwHOUGH = Prefs.getBoolean(".FindLinesViaMSERwHough.boolean", false);
+			parent.parent.doSegmentation = LocalPrefs.getBoolean(".doSegmentation.boolean", false);
+			parent.parent.doMserSegmentation = LocalPrefs.getBoolean(".doMserSegmentation.boolean", false);
+			parent.parent.FindLinesViaHOUGH = LocalPrefs.getBoolean(".FindLinesViaHough.boolean", false);
+			parent.parent.FindLinesViaMSERwHOUGH = LocalPrefs.getBoolean(".FindLinesViaMSERwHough.boolean", false);
 
-			parent.parent.ShowMser = Prefs.getBoolean(".ShowMser.boolean", false);
-			parent.parent.ShowHough = Prefs.getBoolean(".ShowHough.boolean", false);
-			parent.parent.update = Prefs.getBoolean(".update.boolean", false);
-			parent.parent.Canny = Prefs.getBoolean(".Canny.boolean", false);
+			parent.parent.ShowMser = LocalPrefs.getBoolean(".ShowMser.boolean", false);
+			parent.parent.ShowHough = LocalPrefs.getBoolean(".ShowHough.boolean", false);
+			parent.parent.update = LocalPrefs.getBoolean(".update.boolean", false);
+			parent.parent.Canny = LocalPrefs.getBoolean(".Canny.boolean", false);
 
-			parent.parent.showDeterministic = Prefs.getBoolean(".showDeterministic.boolean", true);
-			parent.parent.RoisViaMSER = Prefs.getBoolean(".RoiViaMSER.boolean", false);
-			parent.parent.RoisViaWatershed = Prefs.getBoolean(".RoiViaWatershed.boolean", false);
-			parent.parent.SaveTxt = Prefs.getBoolean(".SaveTxt.boolean", true);
+			parent.parent.showDeterministic = LocalPrefs.getBoolean(".showDeterministic.boolean", true);
+			parent.parent.RoisViaMSER = LocalPrefs.getBoolean(".RoiViaMSER.boolean", false);
+			parent.parent.RoisViaWatershed = LocalPrefs.getBoolean(".RoiViaWatershed.boolean", false);
+			parent.parent.SaveTxt = LocalPrefs.getBoolean(".SaveTxt.boolean", true);
 			parent.calibration = new double[parent.originalimg.numDimensions() - 1];
-			parent.calibration[0] = Prefs.getDouble(".CalibrationX.double", 1);
-			parent.calibration[1] = Prefs.getDouble(".CalibrationY.double", 1);
+			parent.calibration[0] = LocalPrefs.getDouble(".CalibrationX.double", 1);
+			parent.calibration[1] = LocalPrefs.getDouble(".CalibrationY.double", 1);
 			parent.AllSeedrois = new ArrayList<OvalRoi>();
 			parent.newHoughtree = new HashMap<Integer, MserTree<UnsignedByteType>>();
 			parent.Userframe = new ArrayList<Indexedlength>();

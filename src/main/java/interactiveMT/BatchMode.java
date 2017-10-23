@@ -43,10 +43,10 @@ import fiji.tool.SliceListener;
 import fiji.tool.SliceObserver;
 import graphconstructs.Trackproperties;
 import houghandWatershed.WatershedDistimg;
+import ij.IJ;
 import ij.ImageJ;
 import ij.ImagePlus;
 import ij.ImageStack;
-import ij.Prefs;
 import ij.gui.EllipseRoi;
 import ij.gui.GenericDialog;
 import ij.gui.OvalRoi;
@@ -54,6 +54,7 @@ import ij.gui.Overlay;
 import ij.gui.Roi;
 import ij.plugin.PlugIn;
 import ij.process.ColorProcessor;
+import initialization.LocalPrefs;
 import interactiveMT.Interactive_MTDoubleChannel.ValueChange;
 import interactiveMT.Interactive_MTDoubleChannel.Whichend;
 import labeledObjects.CommonOutputHF;
@@ -122,9 +123,9 @@ public class BatchMode implements PlugIn, Runnable {
 
 	public JProgressBar jpb;
 	public JProgressBar jpbpre;
-	public int numgaussians = Prefs.getInt(".Numg.int", 2);
-    public double maxdist = Prefs.getDouble(".Maxdist.double", 20);
-    public boolean autothreshold = Prefs.getBoolean(".autothreshold", true);
+	public int numgaussians = LocalPrefs.getInt(".Numg.int", 2);
+    public double maxdist = LocalPrefs.getDouble(".Maxdist.double", 20);
+    public boolean autothreshold = LocalPrefs.getBoolean(".autothreshold", true);
 	public JLabel label = new JLabel("Progress..");
 	public JFrame frame = new JFrame();
 	public JPanel panel = new JPanel();
@@ -139,8 +140,8 @@ public class BatchMode implements PlugIn, Runnable {
 	public boolean displayWatershedimg = false;
 	public boolean displayoverlay = true;
 
-	public long minSize = (long) Prefs.getDouble(".minSize.double", 1);
-	public long maxSize = (long) Prefs.getDouble(".maxSize.double", 10000);
+	public long minSize = (long) LocalPrefs.getDouble(".minSize.double", 1);
+	public long maxSize = (long) LocalPrefs.getDouble(".maxSize.double", 10000);
 
 	public int selectedSeed = 0;
 	public int displayselectedSeed;
@@ -150,7 +151,7 @@ public class BatchMode implements PlugIn, Runnable {
 	public int thirdDimensionsliderInit = 1;
 	public int timeMin = 1;
 
-	public double modelnumber = Prefs.get(".Model.int", 3);
+	public double modelnumber = LocalPrefs.get(".Model.int", 3);
 
 	public float delta = 1f;
 
@@ -159,12 +160,12 @@ public class BatchMode implements PlugIn, Runnable {
 	public TextField Maxdpixel;
 	private TextField Maxdmicro;
 
-	public double[] psf = new double[] { Prefs.getDouble(".PSFX.double", 1), Prefs.getDouble(".PSFY.double", 1) };
-	public boolean Domask = Prefs.getBoolean(".Domask.boolean", true);
-	public double Intensityratio = Prefs.getDouble(".Intensityratio.double", 0.5);
-	public double Inispacing = Prefs.getDouble(".Inispacing.double", 0.5);
-	public double thetaPerPixel = Prefs.getDouble(".thetaPerPixel.double", 1.0);
-	public double rhoPerPixel = Prefs.getDouble(".rhoPerPixel.double", 1.0);
+	public double[] psf = new double[] { LocalPrefs.getDouble(".PSFX.double", 1), LocalPrefs.getDouble(".PSFY.double", 1) };
+	public boolean Domask = LocalPrefs.getBoolean(".Domask.boolean", true);
+	public double Intensityratio = LocalPrefs.getDouble(".Intensityratio.double", 0.5);
+	public double Inispacing = LocalPrefs.getDouble(".Inispacing.double", 0.5);
+	public double thetaPerPixel = LocalPrefs.getDouble(".thetaPerPixel.double", 1.0);
+	public double rhoPerPixel = LocalPrefs.getDouble(".rhoPerPixel.double", 1.0);
 
 	public String userfile;
 	public int starttimetrack;
@@ -176,10 +177,10 @@ public class BatchMode implements PlugIn, Runnable {
 	public boolean enablerhoPerPixel = false;
 
 	public String batchfolder;
-	public float Unstability_Score = (float) Prefs.getDouble(".Unstability_Score.double", 1);
-	public float minDiversity = (float) Prefs.getDouble(".minDiversity.double", 1);
+	public float Unstability_Score = (float) LocalPrefs.getDouble(".Unstability_Score.double", 1);
+	public float minDiversity = (float) LocalPrefs.getDouble(".minDiversity.double", 1);
 
-	public float thresholdHough = (float) Prefs.getDouble(".thresholdHough.double", 1);
+	public float thresholdHough = (float) LocalPrefs.getDouble(".thresholdHough.double", 1);
 
 	public Color colorDraw = Color.red;
 	public Color colorCurrent = Color.yellow;
@@ -253,8 +254,8 @@ public class BatchMode implements PlugIn, Runnable {
 	public RandomAccessibleInterval<FloatType> Kymoimg;
 	public RandomAccessibleInterval<FloatType> CurrentView;
 	public RandomAccessibleInterval<FloatType> CurrentPreprocessedView;
-	public int inix = Prefs.getInt(".IniX.int", 1);
-	public int iniy = Prefs.getInt(".IniY.int", 1);
+	public int inix = LocalPrefs.getInt(".IniX.int", 1);
+	public int iniy = LocalPrefs.getInt(".IniY.int", 1);
 
 	public double[] calibration;
 	public double radiusfactor = 1;
@@ -344,9 +345,10 @@ public class BatchMode implements PlugIn, Runnable {
 
 	public void goTrack() {
 
+		LocalPrefs.setHomeDir(AllImages[0].getParent());
 		
-		
-		
+		LocalPrefs.load(AllImages[0].getParent(), IJ.getApplet());
+		System.out.println("Local" + " " + LocalPrefs.getHomeDir() + " " +  LocalPrefs.getBoolean(".FindLinesViaMSER.boolean", false) );
 		ProgressBatch startbatch = new ProgressBatch(this);
 		startbatch.execute();
 		

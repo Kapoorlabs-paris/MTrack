@@ -51,45 +51,45 @@ public class CreateINIfile {
 		
 		
 		
-		Prefs.set("PSFX.double", parent.psf[0]);
-		Prefs.set("PSFY.double", parent.psf[1]);
-		Prefs.set("FindLinesViaMSER.boolean", parent.FindLinesViaMSER);
-		Prefs.set("FindLinesViaHough.boolean", parent.FindLinesViaHOUGH);
-		Prefs.set("FindLinesViaMSERwHough.boolean", parent.FindLinesViaMSERwHOUGH);
-		Prefs.set("IniX.int", parent.inix);
-		Prefs.set("IniY.int", parent.iniy);
-		Prefs.set("Numg.int", parent.numgaussians);
-		Prefs.set("CalibrationX.double", parent.calibration[0]);
-		Prefs.set("CalibrationX.double", parent.calibration[1]);
-		Prefs.set("Maxdist.double", parent.maxdist);
+		LocalPrefs.set("PSFX.double", parent.psf[0]);
+		LocalPrefs.set("PSFY.double", parent.psf[1]);
+		LocalPrefs.set("FindLinesViaMSER.boolean", parent.FindLinesViaMSER);
+		LocalPrefs.set("FindLinesViaHough.boolean", parent.FindLinesViaHOUGH);
+		LocalPrefs.set("FindLinesViaMSERwHough.boolean", parent.FindLinesViaMSERwHOUGH);
+		LocalPrefs.set("IniX.int", parent.inix);
+		LocalPrefs.set("IniY.int", parent.iniy);
+		LocalPrefs.set("Numg.int", parent.numgaussians);
+		LocalPrefs.set("CalibrationX.double", parent.calibration[0]);
+		LocalPrefs.set("CalibrationX.double", parent.calibration[1]);
+		LocalPrefs.set("Maxdist.double", parent.maxdist);
 		if (parent.FindLinesViaMSER){
 			
-			Prefs.set("Delta.double", parent.delta);
-			Prefs.set("Unstability_Score.double", parent.Unstability_Score);
-			Prefs.set("minDiversity.double", parent.minDiversity);
-			Prefs.set("minSize.double", parent.minSize);
-			Prefs.set("maxSize.double", parent.maxSize);
+			LocalPrefs.set("Delta.double", parent.delta);
+			LocalPrefs.set("Unstability_Score.double", parent.Unstability_Score);
+			LocalPrefs.set("minDiversity.double", parent.minDiversity);
+			LocalPrefs.set("minSize.double", parent.minSize);
+			LocalPrefs.set("maxSize.double", parent.maxSize);
 			
 		}
 		
 		if (parent.FindLinesViaHOUGH){
 			
-			Prefs.set("thresholdHough.double", parent.thresholdHough);
-			Prefs.set("thetaPerPixel.double", parent.thetaPerPixel);
-			Prefs.set("rhoPerPixel.double", parent.rhoPerPixel);
+			LocalPrefs.set("thresholdHough.double", parent.thresholdHough);
+			LocalPrefs.set("thetaPerPixel.double", parent.thetaPerPixel);
+			LocalPrefs.set("rhoPerPixel.double", parent.rhoPerPixel);
 			
 		}
 		
 		if (parent.FindLinesViaMSERwHOUGH){
 			
-			Prefs.set("Delta.double", parent.delta);
-			Prefs.set("Unstability_Score.double", parent.Unstability_Score);
-			Prefs.set("minDiversity.double", parent.minDiversity);
-			Prefs.set("minSize.double", parent.minSize);
-			Prefs.set("maxSize.double", parent.maxSize);
-			Prefs.set("thresholdHough.double", parent.thresholdHough);
-			Prefs.set("thetaPerPixel.double", parent.thetaPerPixel);
-			Prefs.set("rhoPerPixel.double", parent.rhoPerPixel);
+			LocalPrefs.set("Delta.double", parent.delta);
+			LocalPrefs.set("Unstability_Score.double", parent.Unstability_Score);
+			LocalPrefs.set("minDiversity.double", parent.minDiversity);
+			LocalPrefs.set("minSize.double", parent.minSize);
+			LocalPrefs.set("maxSize.double", parent.maxSize);
+			LocalPrefs.set("thresholdHough.double", parent.thresholdHough);
+			LocalPrefs.set("thetaPerPixel.double", parent.thetaPerPixel);
+			LocalPrefs.set("rhoPerPixel.double", parent.rhoPerPixel);
 			
 		}
 
@@ -98,42 +98,43 @@ public class CreateINIfile {
 		
 		if (parent.userChoiceModel == UserChoiceModel.Line)
 
-		Prefs.set("Model.int", 1);
+		LocalPrefs.set("Model.int", 1);
 		
 		if (parent.userChoiceModel == UserChoiceModel.Splineordersec)
-		Prefs.set("Model.int", 2);
+		LocalPrefs.set("Model.int", 2);
 		
 		if (parent.userChoiceModel == UserChoiceModel.Splineorderthird)
-			Prefs.set("Model.int", 3);
+			LocalPrefs.set("Model.int", 3);
 		
-		Prefs.set("Intensityratio.double", parent.Intensityratio);
-		Prefs.set("Inispacing.double", parent.Inispacing);
-		Prefs.set("Domask.boolean", parent.Domask);
-		Prefs.set("deltadcutoff.double", parent.deltadcutoff);
+		LocalPrefs.set("Intensityratio.double", parent.Intensityratio);
+		LocalPrefs.set("Inispacing.double", parent.Inispacing);
+		LocalPrefs.set("Domask.boolean", parent.Domask);
+		LocalPrefs.set("deltadcutoff.double", parent.deltadcutoff);
 		
-		Prefs.set("Folder.file", parent.usefolder);
+		LocalPrefs.set("Folder.file", parent.usefolder);
 		
-		Prefs.set("ShowMser.boolean", parent.ShowMser);
+		LocalPrefs.set("ShowMser.boolean", parent.ShowMser);
 		
-		Prefs.set("ShowHough.boolean", parent.ShowHough);
+		LocalPrefs.set("ShowHough.boolean", parent.ShowHough);
 		
-        Prefs.set("doSegmentation.boolean", parent.doSegmentation);
+        LocalPrefs.set("doSegmentation.boolean", parent.doSegmentation);
 		
-		Prefs.set("doMserSegmentation.boolean", parent.doMserSegmentation);
+		LocalPrefs.set("doMserSegmentation.boolean", parent.doMserSegmentation);
 		
-		Prefs.set("update.boolean", parent.update);
+		LocalPrefs.set("update.boolean", parent.update);
 		
-		Prefs.set("Canny.boolean", parent.Canny);
+		LocalPrefs.set("Canny.boolean", parent.Canny);
 		
-		Prefs.set("showDeterministic .boolean", parent.showDeterministic);
+		LocalPrefs.set("showDeterministic .boolean", parent.showDeterministic);
 		
-		Prefs.set("RoiViaMSER.boolean", parent.RoisViaMSER);
+		LocalPrefs.set("RoiViaMSER.boolean", parent.RoisViaMSER);
 		
-		Prefs.set("RoiViaWatershed.boolean", parent.RoisViaWatershed);
+		LocalPrefs.set("RoiViaWatershed.boolean", parent.RoisViaWatershed);
 		
-        Prefs.set("autothreshold", parent.autothreshold);
-		
-		Prefs.savePreferences();
+        LocalPrefs.set("autothreshold.boolean", parent.autothreshold);
+        LocalPrefs.setHomeDir(parent.userfile.getParent());
+        System.out.println(LocalPrefs.getHomeDir() + " " + LocalPrefs.getPrefsDir() + " " + Prefs.getHomeDir());
+		LocalPrefs.savePreferences();
 		
 		System.exit(1);
 		

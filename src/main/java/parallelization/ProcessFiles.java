@@ -52,7 +52,6 @@ public class ProcessFiles  {
 			taskexecutor.invokeAll(tasks);
 		} catch (InterruptedException e1) {
 			// TODO Auto-generated catch block
-			e1.printStackTrace();
 		}
 		
 		
@@ -80,7 +79,6 @@ public class ProcessFiles  {
 			taskexecutor.invokeAll(tasks);
 		} catch (InterruptedException e1) {
 			// TODO Auto-generated catch block
-			e1.printStackTrace();
 		}
 		
 		
