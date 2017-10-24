@@ -80,7 +80,6 @@ public class MethodListener implements ActionListener {
 			public void actionPerformed(ActionEvent e) {
 				CardLayout cl = (CardLayout) parent.panelCont.getLayout();
 				cl.next(parent.panelCont);
-				parent.Methodchoice.setVisible(false);
 			}
 		}));
 

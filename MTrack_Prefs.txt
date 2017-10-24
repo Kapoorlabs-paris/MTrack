@@ -1,0 +1,12 @@
+#ImageJ 1.51n Preferences
+#Mon Oct 23 16:50:07 CEST 2017
+div-by-zero=Infinity
+jpeg=85
+prefs.options2=320
+fps=7.0
+roicolor=\#FFFF00
+showcolor=\#00FFFF
+prefs.options=20480
+bcolor=\#000000
+fcolor=\#FFFFFF
+noise.sd=25.0
