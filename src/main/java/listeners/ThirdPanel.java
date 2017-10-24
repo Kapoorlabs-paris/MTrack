@@ -207,7 +207,9 @@ public class ThirdPanel {
 					public void actionPerformed(ActionEvent e) {
 						CardLayout cl = (CardLayout) parent.panelCont.getLayout();
 						cl.previous(parent.panelCont);
-					
+						parent.Mserparam.setLayout(parent.layout);
+						parent.Houghparam.setLayout(parent.layout);
+						parent.MserwHoughparam.setLayout(parent.layout);
 						
 					}
 				}));

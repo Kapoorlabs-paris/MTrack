@@ -301,7 +301,9 @@ public class ProgressSeeds extends SwingWorker<Void, Void> {
 						cl.next(parent.panelCont);
 						
 						
-						
+						parent.Mserparam.setLayout(null);
+						parent.Houghparam.setLayout(null);
+						parent.MserwHoughparam.setLayout(null);
 							
 						ThirdPanel third = new ThirdPanel(parent);
 						 third.Paint();	

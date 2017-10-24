@@ -173,6 +173,9 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 	public JLabel inputradi;
 	public TextField inputFieldradi;
+	
+	public JLabel inputradisec;
+	public TextField inputFieldradisec;
 	// steps per octave
 	public static int standardSensitivity = 4;
 	public int sensitivity = standardSensitivity;
@@ -209,7 +212,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public boolean analyzekymo = false;
 	public boolean darktobright = false;
 	public boolean displayBitimg = false;
-	public boolean autothreshold = false;
+	public boolean autothreshold = true;
 	public boolean displayWatershedimg = false;
 	public boolean displayoverlay = true;
 	public long minSize = 1;
@@ -1178,6 +1181,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public JPanel controlprevious = new JPanel();
 	public JPanel Methodchoice = new JPanel();
 	public JPanel Cannychoice = new JPanel();
+	public JPanel Cannychoicesec = new JPanel();
 	public JPanel Directoryoptions = new JPanel();
 	public JPanel Mserparam = new JPanel();
 	public JPanel MserparamHF = new JPanel();
@@ -1214,6 +1218,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		inputFieldradi.setColumns(10);
 		inputFieldradi.setText(String.valueOf(radiusfactor));
 		
+		
 		final Scrollbar thirdDimensionslider = new Scrollbar(Scrollbar.HORIZONTAL, thirdDimensionsliderInit, 0, 0,
 				thirdDimensionSize);
 		thirdDimensionslider.setBlockIncrement(1);
@@ -1232,6 +1237,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		panelFirst.setLayout(layout);
 		panelNext.setLayout(layout);
 		Cannychoice.setLayout(layout);
+		Cannychoicesec.setLayout(layout);
 		Directoryoptions.setLayout(layout);
 		
 		
@@ -1420,7 +1426,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public void UpdateHough() {
 
 		
-		
+		panelFourth.removeAll();
 		panelNext.removeAll();
 		panelPrevious.removeAll();
 		
@@ -1439,7 +1445,10 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		Border houghborder = new CompoundBorder(new TitledBorder("Watershed and MSER parameters"), new EmptyBorder(c.insets));
 		Border optborder = new CompoundBorder(new TitledBorder("Tracker options"), new EmptyBorder(c.insets));
 		
-		
+		inputradisec = new JLabel("Edge enhancement factor: ");
+		inputFieldradisec = new TextField();
+		inputFieldradisec.setColumns(10);
+		inputFieldradisec.setText(String.valueOf(radiusfactor));
 
 		final Label thresholdText = new Label("thresholdValue = " + thresholdHough, Label.CENTER);
 
@@ -1470,9 +1479,21 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		DefaultModelHF loaddefault = new DefaultModelHF(this);
 		loaddefault.LoadDefault();
 		
+
+		Border cannyborder = new CompoundBorder(new TitledBorder("Edge enhancment (optional)"),
+				new EmptyBorder(c.insets));
 		
+		
+		
+		Cannychoicesec.add(inputradisec, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
+				GridBagConstraints.RELATIVE, insets, 0, 0));
+		
+		Cannychoicesec.add(inputFieldradisec, new GridBagConstraints(3, 0, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
+				GridBagConstraints.RELATIVE, insets, 0, 0));
+		
+		Cannychoicesec.setBorder(cannyborder);
 	
-		panelFourth.add(Cannychoice, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+		panelFourth.add(Cannychoicesec, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 		
 		HoughparamHF.add(thresholdText,  new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
@@ -1579,7 +1600,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		 
 		 
 		 
-		inputFieldradi.addTextListener(new RadiusListener(this));
+		inputFieldradisec.addTextListener(new RadiusListener(this));
 		Finalize.addActionListener(new SkipFramesandTrackendsListener(this));
 		Record.addActionListener(new BatchModeListener(this));
 		AdvancedOptions.addItemListener(new AdvancedTrackerListener(this));
@@ -1630,6 +1651,10 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		MserparamHF.setLayout(layout);
 		Optimize.setLayout(layout);
 		
+		inputradisec = new JLabel("Edge enhancement factor: ");
+		inputFieldradisec = new TextField();
+		inputFieldradisec.setColumns(10);
+		inputFieldradisec.setText(String.valueOf(radiusfactor));
 		Border msborder = new CompoundBorder(new TitledBorder("MSER parameters"), new EmptyBorder(c.insets));
 		Border optborder = new CompoundBorder(new TitledBorder("Tracker options"), new EmptyBorder(c.insets));
 		
@@ -1668,10 +1693,17 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		final Checkbox AdvancedOptions = new Checkbox("Advanced Optimizer Options ", AdvancedChoiceSeeds);
 		DefaultModelHF loaddefault = new DefaultModelHF(this);
 		loaddefault.LoadDefault();
+		Border cannyborder = new CompoundBorder(new TitledBorder("Edge enhancment (optional)"),
+				new EmptyBorder(c.insets));
+		Cannychoicesec.add(inputradisec, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
+				GridBagConstraints.RELATIVE, insets, 0, 0));
 		
+		Cannychoicesec.add(inputFieldradisec, new GridBagConstraints(3, 0, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
+				GridBagConstraints.RELATIVE, insets, 0, 0));
 		
+		Cannychoicesec.setBorder(cannyborder);
 		
-		panelFourth.add(Cannychoice, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+		panelFourth.add(Cannychoicesec, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 		
 		
@@ -1769,7 +1801,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 					new MaxSizeMTListener(this, maxSizeText, maxSizemin, maxSizemax, scrollbarSize, maxSizeS));
 
 
-		inputFieldradi.addTextListener(new RadiusListener(this));
+		inputFieldradisec.addTextListener(new RadiusListener(this));
 		Finalize.addActionListener(new SkipFramesandTrackendsListener(this));
 		Record.addActionListener(new BatchModeListener(this));
 		AdvancedOptions.addItemListener(new AdvancedTrackerListener(this));
