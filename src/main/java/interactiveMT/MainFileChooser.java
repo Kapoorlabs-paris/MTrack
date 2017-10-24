@@ -233,6 +233,8 @@ public class MainFileChooser extends JPanel {
 				CardLayout cl = (CardLayout) panelCont.getLayout();
 
 				cl.next(panelCont);
+				PreOriginal.setVisible(true);
+				panelpreIntro.setVisible(true);
 			}
 		}));
 		
@@ -270,6 +272,8 @@ public class MainFileChooser extends JPanel {
 				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 
 		Modechoice.setBorder(border);
+		Modechoice.setPreferredSize(new Dimension(200,200));
+		Modechoice.setMinimumSize(new Dimension(200,200));
 		panelIntro.add(Modechoice,new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 		
@@ -285,6 +289,8 @@ public class MainFileChooser extends JPanel {
 	
 		Original.setBorder(origborder);
 		
+		Original.setPreferredSize(new Dimension(500,200));
+		Original.setMinimumSize(new Dimension(500,200));
 		panelIntro.add(Original,new GridBagConstraints(3, 0, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 				GridBagConstraints.HORIZONTAL, new Insets(0, 10, 0, 10), 0, 0));
 
@@ -313,7 +319,8 @@ public class MainFileChooser extends JPanel {
 				GridBagConstraints.RELATIVE, insets, 0, 0));
 
 		Microscope.setBorder(microborder);
-
+		Microscope.setPreferredSize(new Dimension(500,200));
+		Microscope.setMinimumSize(new Dimension(500,200));
 		panelIntro.add(Microscope, new GridBagConstraints(1, 1, 5, 1, 0.0, 0.0, GridBagConstraints.CENTER,
 				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 
@@ -327,7 +334,7 @@ public class MainFileChooser extends JPanel {
 				GridBagConstraints.RELATIVE, new Insets(10, 10, 0, 10), 0, 0));
 		
 		panelIntro.setVisible(true);
-		panelpreIntro.setVisible(true);
+		
 		ChooseDirectory.addActionListener(new FileChooserDirectory(this));
 		inputField.addTextListener(new FilenameListener(this));
 		
@@ -528,6 +535,7 @@ public class MainFileChooser extends JPanel {
 			} else if (arg0.getStateChange() == ItemEvent.SELECTED) {
 				Advancedmode = true;
 				Simplemode = false;
+				panelIntro.setPreferredSize(panelIntro.getPreferredSize());
 				panelIntro.add(controlnext, new GridBagConstraints(3, 2, 2, 1, 0.0, 0.0, GridBagConstraints.CENTER,
 						GridBagConstraints.RELATIVE, new Insets(10, 10, 0, 10), 0, 0));
 				
@@ -558,7 +566,12 @@ public class MainFileChooser extends JPanel {
 				
 				panelpreIntro.add(controlprevious, new GridBagConstraints(0, 6, 5, 1, 0.0, 0.0, GridBagConstraints.CENTER,
 						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+				panelpreIntro.setPreferredSize(panelIntro.getPreferredSize());
 				PreOriginal.setBorder(runborder);
+			
+				PreOriginal.setVisible(false);
+				panelpreIntro.setVisible(false);
+				
 				
 			panelIntro.remove(FlatFieldNext);
 			panelIntro.repaint();

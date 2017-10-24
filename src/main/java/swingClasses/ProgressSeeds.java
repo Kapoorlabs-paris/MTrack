@@ -25,15 +25,23 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
+import java.awt.Label;
 import java.awt.Rectangle;
+import java.awt.Scrollbar;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JPanel;
+import javax.swing.JScrollBar;
 import javax.swing.SwingWorker;
+import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
 
 import LineModels.UseLineModel.UserChoiceModel;
 import ij.IJ;
@@ -47,13 +55,18 @@ import lineFinder.FindlinesVia;
 import lineFinder.LinefinderInteractiveHough;
 import lineFinder.LinefinderInteractiveMSER;
 import lineFinder.LinefinderInteractiveMSERwHough;
+import listeners.EndtimeListener;
 import listeners.SecondPanel;
+import listeners.SegMethodListener;
+import listeners.StarttimeListener;
 import listeners.ThirdPanel;
+import listeners.TimeListener;
 import mpicbg.imglib.util.Util;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.util.Pair;
 import net.imglib2.util.ValuePair;
+import updateListeners.DefaultModelHF;
 
 public class ProgressSeeds extends SwingWorker<Void, Void> {
 
@@ -256,7 +269,6 @@ public class ProgressSeeds extends SwingWorker<Void, Void> {
 				parent.controlnext.removeAll();
 				parent.controlprevious.removeAll();
 				
-				
 				parent.controlnext.add(new JButton(new AbstractAction("\u22b2Prev") {
 
 					/**
@@ -271,34 +283,45 @@ public class ProgressSeeds extends SwingWorker<Void, Void> {
 						cl.previous(parent.panelCont);
 					}
 				}));
-
+			
+				
+				
 				parent.controlnext.add(new JButton(new AbstractAction("Next\u22b3") {
 
 					/**
 					 * 
 					 */
 					private static final long serialVersionUID = 1L;
-
 					@Override
 					public void actionPerformed(ActionEvent e) {
+						
+						
+						
 						CardLayout cl = (CardLayout) parent.panelCont.getLayout();
 						cl.next(parent.panelCont);
+						
+						
+						
+							
+						ThirdPanel third = new ThirdPanel(parent);
+						 third.Paint();	
+						
+							
+						
 					}
 				}));
 
-				parent.controlnext.revalidate();
-				parent.controlnext.repaint();
+				 
 				parent.panelNext.add(parent.controlnext, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0,
 						GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 
 
 				parent.panelSecond.add(parent.panelNext, new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0,
 						GridBagConstraints.EAST, GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
-				parent.panelSecond.revalidate();
+				
 				parent.panelSecond.repaint();
+				parent.panelSecond.validate();
 				
-				
-
 				JPanel controlprevpanel = new JPanel();
 				JPanel prevpanel = new JPanel();
 				controlprevpanel.add(new JButton(new AbstractAction("Next\u22b3") {
@@ -312,7 +335,7 @@ public class ProgressSeeds extends SwingWorker<Void, Void> {
 					public void actionPerformed(ActionEvent e) {
 						CardLayout cl = (CardLayout) parent.panelCont.getLayout();
 						cl.next(parent.panelCont);
-					    
+						 
 					}
 				}));
 
@@ -321,19 +344,14 @@ public class ProgressSeeds extends SwingWorker<Void, Void> {
 
 				controlprevpanel.setVisible(true);
 
-			
 				
 				
 				parent.panelFirst.add(prevpanel, new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 				 parent.panelFirst.repaint();
 				parent.panelFirst.validate();
-               
+              
 				
-				ThirdPanel paintthird = new ThirdPanel(parent);
-				paintthird.Paint();
-			
-
 			}
 			final int maxSeed = parent.PrevFrameparam.getA().get(parent.PrevFrameparam.getA().size() - 1).seedLabel;
 			parent.nextseed = maxSeed;
@@ -351,5 +369,6 @@ public class ProgressSeeds extends SwingWorker<Void, Void> {
 		}
 
 	}
+
 
 }

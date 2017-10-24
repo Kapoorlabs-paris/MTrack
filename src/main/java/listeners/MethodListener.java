@@ -80,6 +80,7 @@ public class MethodListener implements ActionListener {
 			public void actionPerformed(ActionEvent e) {
 				CardLayout cl = (CardLayout) parent.panelCont.getLayout();
 				cl.next(parent.panelCont);
+				parent.Methodchoice.setVisible(false);
 			}
 		}));
 
@@ -93,10 +94,10 @@ public class MethodListener implements ActionListener {
 		parent.controlnext.setVisible(true);
 		parent.panelFirst.add(parent.panelNext,  new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
-		parent.panelFirst.revalidate();
+	
 		parent.panelFirst.repaint();
 	
-		
+		parent.panelFirst.validate();
 		
 		if (selectedindex == 0){
 			
@@ -225,8 +226,10 @@ public class MethodListener implements ActionListener {
 			AdvancedOptions.addItemListener(new AdvancedSeedListener(parent));
 			FindLinesListener.addActionListener(new FindLinesListener(parent));
 			FindLinesbatchListener.addActionListener(new FindLinesbatchListener(parent));
-			parent.panelSecond.validate();
+			
 			parent.panelSecond.repaint();
+			parent.panelSecond.validate();
+			
 			parent.Cardframe.pack();
 			parent.updatePreview(ValueChange.SHOWMSER);
 		}
@@ -344,8 +347,9 @@ public class MethodListener implements ActionListener {
 			Dowatershed.addActionListener(new DowatershedListener(parent));
 			AdvancedOptions.addItemListener(new AdvancedSeedListener(parent));
 			FindLinesListener.addActionListener(new FindLinesListener(parent));
-			parent.panelSecond.revalidate();
+			
 			parent.panelSecond.repaint();
+			parent.panelSecond.validate();
             parent.Cardframe.pack();
             parent.updatePreview(ValueChange.SHOWHOUGH);
             
@@ -521,9 +525,9 @@ public class MethodListener implements ActionListener {
 			rhoSize.addAdjustmentListener(
 					new RhoSizeHoughListener(parent, rhoText, parent.rhoPerPixelMin, parent.rhoPerPixelMax, parent.scrollbarSize, rhoSize));
 			AdvancedOptions.addItemListener(new AdvancedSeedListener(parent));
-			parent.panelSecond.revalidate();
+			
 			parent.panelSecond.repaint();
-
+			parent.panelSecond.validate();
 			
 			parent.Cardframe.pack();
 			parent.updatePreview(ValueChange.SHOWMSER);

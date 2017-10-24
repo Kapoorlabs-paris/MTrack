@@ -111,6 +111,7 @@ import listeners.ShowautoListener;
 import listeners.ShowwatershedimgMTListener;
 import listeners.SkipFramesandTrackendsListener;
 import listeners.StarttimeListener;
+import listeners.ThirdPanel;
 import listeners.ThresholdHoughHFListener;
 import listeners.TimeListener;
 import listeners.Unstability_ScoreHoughListener;
@@ -242,7 +243,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public int minSizeInit = 10;
 	public int maxSizeInit = 5000;
 
-	public float thresholdHoughInit = new Float(0.1);
+	public float thresholdHoughInit = new Float(0.5);
 	public float rhoPerPixelInit = new Float(1);
 	public float thetaPerPixelInit = new Float(1);
 	public JLabel inputMaxdpixel;
@@ -1184,7 +1185,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public JPanel HoughparamHF = new JPanel();
 	public JPanel MserwHoughparam = new JPanel();
 	public JPanel Optimize = new JPanel();
-	
+	public JComboBox<String> ChooseMethod;
 	
 	private static final Insets insets = new Insets(10, 0, 0, 0);
 	
@@ -1224,7 +1225,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		
 
 		String[] Method = { "MSER", "HOUGH","MSERwHOUGH" };
-		JComboBox<String> ChooseMethod = new JComboBox<String>(Method);
+		ChooseMethod = new JComboBox<String>(Method);
 
 		panelFirst.removeAll();
 		
@@ -1412,11 +1413,14 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 */
 	}
 
+	
+	
+	
+	
 	public void UpdateHough() {
 
 		
 		
-		panelFourth.removeAll();
 		panelNext.removeAll();
 		panelPrevious.removeAll();
 		
@@ -1555,6 +1559,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 					CardLayout cl = (CardLayout) panelCont.getLayout();
 
 					cl.previous(panelCont);
+					
 				}
 			}));
 		 
@@ -1613,7 +1618,6 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 	public void UpdateMser() {
 	
-		
 		panelFourth.removeAll();
 		FindLinesViaMSER = true;
 		FindLinesViaHOUGH = false;

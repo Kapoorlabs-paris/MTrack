@@ -25,6 +25,7 @@ import java.awt.Button;
 import java.awt.CardLayout;
 import java.awt.Checkbox;
 import java.awt.CheckboxGroup;
+import java.awt.Color;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
@@ -48,9 +49,10 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
 import interactiveMT.Interactive_MTDoubleChannel;
-import listeners.SecondPanel.FinishedButtonListener;
-import listeners.SecondPanel.FrameListener;
+import interactiveMT.Interactive_MTDoubleChannel.ValueChange;
+
 import updateListeners.BatchModeListener;
+import updateListeners.DefaultModel;
 import updateListeners.DefaultModelHF;
 import updateListeners.FinalPoint;
 
@@ -65,6 +67,7 @@ public class ThirdPanel {
 		
 		this.parent = parent;
 		
+		
 	}
 	
 	
@@ -74,8 +77,8 @@ public class ThirdPanel {
 		
 		
 		// Panel Third
-		parent.panelThird.removeAll();
-	
+	    parent.panelPrevious.removeAll();
+	    parent.controlprevious.removeAll();
 		parent.Deselect.setLayout(parent.layout);
 		parent.Timeselect.setLayout(parent.layout);
 		parent.Segselect.setLayout(parent.layout);
@@ -204,31 +207,31 @@ public class ThirdPanel {
 					public void actionPerformed(ActionEvent e) {
 						CardLayout cl = (CardLayout) parent.panelCont.getLayout();
 						cl.previous(parent.panelCont);
+					
+						
 					}
 				}));
 				
 				parent.panelPrevious.add(parent.controlprevious,  new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER,
 						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 			
-				parent.controlprevious.setVisible(true);
 				
 				parent.panelThird.add(parent.panelPrevious,  new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 			
 				
-				parent.panelThird.revalidate();
 				parent.panelThird.repaint();
+				parent.panelThird.validate();
 				
-			
-
-			
+				
 				
 				parent.Cardframe.pack();
 	
+			
 		
 	}
 	
-	
+
 
 	
 	protected class FinishedButtonListener implements ActionListener {

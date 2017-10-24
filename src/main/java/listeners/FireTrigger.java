@@ -68,88 +68,9 @@ public class FireTrigger implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		
 		int selectedindex = choice.getSelectedIndex();
-	
-		if(selectedindex == 0){
-			
-			
-			parent.selectedindex = selectedindex;
-			parent.panelIntro.validate();
-			parent.frame.pack();
-			
-		}
-		
-		if (selectedindex == 1){
-			
-			parent.selectedindex = selectedindex;
-			BufferedImage img = null;
-			try {
-			    img = ImageIO.read(new File("images/smallseed.png"));
-			} catch (IOException eee) {
-			   
-			}
-			
-			BufferedImage imgsec = null;
-			try {
-			    imgsec = ImageIO.read(new File("images/smallseedmoves.png"));
-			} catch (IOException ee) {
-			   
-			}
-			
-			BufferedImage imgthird = null;
-			try {
-			    imgthird = ImageIO.read(new File("images/smallseedmove2.png"));
-			} catch (IOException ee) {
-			    
-			}
-			
-			int scale = 100;
-			if (img !=null && imgsec!=null && imgthird!=null){
-			Image dimg = img.getScaledInstance(scale, scale,
-			        Image.SCALE_SMOOTH);
-			
-			ImageIcon image = new ImageIcon(dimg);
-			JLabel seedimage = new JLabel("", image, JLabel.CENTER);
-			
-			
-			Image dimgsec = imgsec.getScaledInstance(scale, scale,
-			        Image.SCALE_SMOOTH);
-			
-			ImageIcon imagesec = new ImageIcon(dimgsec);
-			JLabel dynamicimage = new JLabel("", imagesec, JLabel.CENTER);
-			
-			
-			
-			Image dimgthird = imgthird.getScaledInstance(scale, scale,
-			        Image.SCALE_SMOOTH);
-			
-			ImageIcon imagethird = new ImageIcon(dimgthird);
-			JLabel dynamicimagesec = new JLabel("", imagethird, JLabel.CENTER);
-			
-			
-			
-			parent.panelIntro.add(seedimage,new GridBagConstraints(1, 4, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER,
-					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
-			
-			parent.panelIntro.add(dynamicimage,new GridBagConstraints(2, 4, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER,
-					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
-			parent.panelIntro.add(dynamicimagesec,new GridBagConstraints(3, 4, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER,
-					GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
-			
-			parent.panelIntro.validate();
-			
-			parent.frame.pack();
-			}
-		}
-		
-		
-		if(selectedindex == 2){
-			
-			parent.selectedindex = selectedindex;
-			parent.panelIntro.validate();
-			parent.frame.pack();
-			
-		}
-		
+		parent.selectedindex = selectedindex;
+		parent.panelIntro.validate();
+		parent.frame.pack();
 		
 		
 		
