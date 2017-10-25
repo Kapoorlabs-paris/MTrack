@@ -259,6 +259,12 @@ final Interactive_MTSingleChannelBasic child;
 					public void actionPerformed(ActionEvent e) {
 						CardLayout cl = (CardLayout) parent.panelCont.getLayout();
 						cl.next(parent.panelCont);
+						
+						parent.Mserparam.setLayout(null);
+						parent.Houghparam.setLayout(null);
+						parent.MserwHoughparam.setLayout(null);
+						SingleThirdPanel paintthird = new SingleThirdPanel(parent);
+						paintthird.Paint();
 					}
 				}));
 
@@ -296,8 +302,7 @@ final Interactive_MTSingleChannelBasic child;
 				parent.panelFirst.add(prevpanel,  new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 						GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 				parent.panelFirst.validate();
-			SingleThirdPanel paintthird = new SingleThirdPanel(parent);
-			paintthird.Paint();
+		
 			
 			
 			

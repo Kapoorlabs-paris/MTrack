@@ -88,7 +88,7 @@ public class MainFileChooser extends JPanel {
 	public JFileChooser chooserB;
 	public String choosertitleB;
 	public double[] calibration = new double[3];
-	public int medianradius = 2;
+	public int medianradius = 0;
 	float frametosec;
 	public JProgressBar jpb;
 	public String addToName = "MTTrack";

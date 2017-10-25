@@ -152,6 +152,9 @@ public class SingleSegMethodListener implements ActionListener {
 				CardLayout cl = (CardLayout) parent.panelCont.getLayout();
 
 				cl.previous(parent.panelCont);
+				parent.Mserparam.setLayout(parent.layout);
+				parent.Houghparam.setLayout(parent.layout);
+				parent.MserwHoughparam.setLayout(parent.layout);
 			}
 		}));
 	 
@@ -164,6 +167,7 @@ public class SingleSegMethodListener implements ActionListener {
 			public void actionPerformed(ActionEvent e) {
 				CardLayout cl = (CardLayout) parent.panelCont.getLayout();
 				cl.next(parent.panelCont);
+				
 			}
 		}));
 
@@ -176,7 +180,50 @@ public class SingleSegMethodListener implements ActionListener {
 				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 	
 		parent.panelThird.validate();
+		JPanel controlprevpanel = new JPanel();
+		JPanel prevpanel = new JPanel();
+		controlprevpanel.add(new JButton(new AbstractAction("\u22b2Prev") {
+
+			
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				CardLayout cl = (CardLayout) parent.panelCont.getLayout();
+
+				cl.previous(parent.panelCont);
+			
+			}
+		}));
+	 
+		controlprevpanel.add(new JButton(new AbstractAction("Next\u22b3") {
+
+			
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				CardLayout cl = (CardLayout) parent.panelCont.getLayout();
+				cl.next(parent.panelCont);
+				parent.Mserparam.setLayout(null);
+				parent.Houghparam.setLayout(null);
+				parent.MserwHoughparam.setLayout(null);
+			}
+		}));
+
+		prevpanel.add(controlprevpanel,  new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER,
+				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+	
+		controlprevpanel.setVisible(true);
+		
+		parent.panelSecond.add(prevpanel,  new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+		parent.panelSecond.validate();
+		
+		
 		parent.Cardframe.pack();
+		
+		
 		
 		
 		

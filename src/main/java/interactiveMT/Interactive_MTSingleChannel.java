@@ -149,6 +149,10 @@ public class Interactive_MTSingleChannel implements PlugIn {
 	public double maxdist = 20;
 	public JLabel inputradi;
 	public TextField inputFieldradi;
+	
+	
+	public JLabel inputradisec;
+	public TextField inputFieldradisec;
 	// steps per octave
 	public static int standardSensitivity = 4;
 	public int sensitivity = standardSensitivity;
@@ -1134,7 +1138,10 @@ public class Interactive_MTSingleChannel implements PlugIn {
 	public JPanel panelSecond = new JPanel();
 	public JPanel panelThird = new JPanel();
 	public JPanel panelFourth = new JPanel();
-	
+
+	public JPanel Deselect = new JPanel();
+	public JPanel Timeselect = new JPanel();
+	public JPanel Segselect = new JPanel();
 
 	
 	
@@ -1143,6 +1150,7 @@ public class Interactive_MTSingleChannel implements PlugIn {
 	public JPanel controlprevious = new JPanel();
 	private JPanel Methodchoice = new JPanel();
 	private JPanel Cannychoice = new JPanel();
+	private JPanel Cannychoicesec = new JPanel();
 	private JPanel Directoryoptions = new JPanel();
 	public JPanel Mserparam = new JPanel();
 	public JPanel MserparamHF = new JPanel();
@@ -1205,6 +1213,7 @@ private static final Insets insets = new Insets(10, 0, 0, 0);
 		        panelThird.setLayout(layout);
 				panelNext.setLayout(layout);
 				Cannychoice.setLayout(layout);
+				Cannychoicesec.setLayout(layout);
 				Directoryoptions.setLayout(layout);
 				
 				
@@ -1221,12 +1230,12 @@ private static final Insets insets = new Insets(10, 0, 0, 0);
 				Border methodborder = new CompoundBorder(new TitledBorder("Object recognition methods"),
 						new EmptyBorder(c.insets));
 
-				
+				Border dirborder = new CompoundBorder(new TitledBorder("File name"),
+						new EmptyBorder(c.insets));
 				Border cannyborder = new CompoundBorder(new TitledBorder("Edge enhancment (optional)"),
 						new EmptyBorder(c.insets));
 				
-				Border dirborder = new CompoundBorder(new TitledBorder("File name"),
-						new EmptyBorder(c.insets));
+				
 				
 				Cannychoice.add(inputradi, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
 						GridBagConstraints.RELATIVE, insets, 0, 0));
@@ -1408,15 +1417,19 @@ private static final Insets insets = new Insets(10, 0, 0, 0);
 
 	public void UpdateHough() {
 
-panelFourth.removeAll();
-FindLinesViaMSERwHOUGH = false;
-panelNext.removeAll();
-panelPrevious.removeAll();
+		panelFourth.removeAll();
+		panelNext.removeAll();
+		panelPrevious.removeAll();
+		
+		
 		FindLinesViaMSER = false;
 		FindLinesViaHOUGH = true;
 		FindLinesViaMSERwHOUGH = false;
 		
-
+		inputradisec = new JLabel("Edge enhancement factor: ");
+		inputFieldradisec = new TextField();
+		inputFieldradisec.setColumns(10);
+		inputFieldradisec.setText(String.valueOf(radiusfactor));
 		final Button Record = new Button("Save program parameters for batch mode");
 		final JButton Finalize = new JButton("Start tracking");
 		panelFourth.setLayout(layout);
@@ -1458,9 +1471,20 @@ panelPrevious.removeAll();
 		SingleDefaultModelHF loaddefault = new SingleDefaultModelHF(this);
 		loaddefault.LoadDefault();
 		
+		Border cannyborder = new CompoundBorder(new TitledBorder("Edge enhancment (optional)"),
+				new EmptyBorder(c.insets));
 		
+		
+		
+		Cannychoicesec.add(inputradisec, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
+				GridBagConstraints.RELATIVE, insets, 0, 0));
+		
+		Cannychoicesec.add(inputFieldradisec, new GridBagConstraints(3, 0, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
+				GridBagConstraints.RELATIVE, insets, 0, 0));
+		
+		Cannychoicesec.setBorder(cannyborder);
 	
-		panelFourth.add(Cannychoice, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+		panelFourth.add(Cannychoicesec, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 		
 		HoughparamHF.add(thresholdText,  new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
@@ -1555,7 +1579,7 @@ panelPrevious.removeAll();
 		 
 		 
 		 
-		inputFieldradi.addTextListener(new SingleRadiusListener(this));
+		inputFieldradisec.addTextListener(new SingleRadiusListener(this));
 		Finalize.addActionListener(new SingleSkipFramesandTrackendsListener(this, starttime, endtime));
 		Record.addActionListener(new SingleBatchModeListener(this));
 		AdvancedOptions.addItemListener(new SingleAdvancedTrackerListener(this));
@@ -1594,12 +1618,11 @@ panelPrevious.removeAll();
 	public void UpdateMser() {
 		
 		panelFourth.removeAll();
-		FindLinesViaMSERwHOUGH = false;
-		panelNext.removeAll();
-		panelPrevious.removeAll();
 		FindLinesViaMSER = true;
 		FindLinesViaHOUGH = false;
 		FindLinesViaMSERwHOUGH = false;
+		panelNext.removeAll();
+		panelPrevious.removeAll();
 		
 		final Button Record = new Button("Save program parameters for batch mode");
 		final JButton Finalize = new JButton("Start tracking");
@@ -1646,9 +1669,23 @@ panelPrevious.removeAll();
 		SingleDefaultModelHF loaddefault = new SingleDefaultModelHF(this);
 		loaddefault.LoadDefault();
 		
+		Border cannyborder = new CompoundBorder(new TitledBorder("Edge enhancment (optional)"),
+				new EmptyBorder(c.insets));
 		
+		inputradisec = new JLabel("Edge enhancement factor: ");
+		inputFieldradisec = new TextField();
+		inputFieldradisec.setColumns(10);
+		inputFieldradisec.setText(String.valueOf(radiusfactor));
 		
-		panelFourth.add(Cannychoice, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+		Cannychoicesec.add(inputradisec, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
+				GridBagConstraints.RELATIVE, insets, 0, 0));
+		
+		Cannychoicesec.add(inputFieldradisec, new GridBagConstraints(3, 0, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
+				GridBagConstraints.RELATIVE, insets, 0, 0));
+		
+		Cannychoicesec.setBorder(cannyborder);
+		
+		panelFourth.add(Cannychoicesec, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 		
 		
@@ -1740,7 +1777,7 @@ panelPrevious.removeAll();
 					new SingleMaxSizeListener(this, maxSizeText, maxSizemin, maxSizemax, scrollbarSize, maxSizeS));
 
 
-		inputFieldradi.addTextListener(new SingleRadiusListener(this));
+		inputFieldradisec.addTextListener(new SingleRadiusListener(this));
 		Finalize.addActionListener(new SingleSkipFramesandTrackendsListener(this, starttime, endtime));
 		Record.addActionListener(new SingleBatchModeListener(this));
 		AdvancedOptions.addItemListener(new SingleAdvancedTrackerListener(this));
