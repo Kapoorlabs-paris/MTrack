@@ -332,7 +332,7 @@ public class InteractiveRANSAC implements PlugIn {
 
 		CardLayout cl = new CardLayout();
 		Object[] colnames = new Object[]{"Track File", "Growth rate", "Shrink rate", 
-				"Growth events", "Shrink events", "fcat", "fres", "Pass"};
+				"Growth events", "Shrink events", "fcat", "fres", "Error"};
 		
 		
 		Object[][] rowvalues = new Object[0][colnames.length];
@@ -608,6 +608,7 @@ public class InteractiveRANSAC implements PlugIn {
 		this.inputfile = this.inputfiles[trackindex];
 		this.inputdirectory = this.inputfiles[trackindex].getParent();
 		this.mts = Tracking.loadMT(this.inputfiles[trackindex]);
+		if(mts!=null){
 		this.points = Tracking.toPoints(mts);
 		this.calibrations = Tracking.loadCalibration(this.inputfiles[trackindex]);
 
@@ -620,6 +621,7 @@ public class InteractiveRANSAC implements PlugIn {
 		setFunction();
 		updateRANSAC();
 		compile.compileresults();
+		}
 
 	}
 

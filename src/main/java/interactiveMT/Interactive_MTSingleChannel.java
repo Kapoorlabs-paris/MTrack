@@ -193,6 +193,7 @@ public class Interactive_MTSingleChannel implements PlugIn {
 	public boolean autothreshold = false;
 	public boolean displayWatershedimg = false;
 	public boolean displayoverlay = true;
+	public boolean displaytrackoverlay = false;
 	public long minSize = 1;
 	public long maxSize = 1000;
 	public long minSizemin = 0;
@@ -2283,7 +2284,7 @@ private static final Insets insets = new Insets(10, 0, 0, 0);
 		gd.addChoice("Choose your model: ", LineModel, LineModel[indexmodel]);
 
 		gd.addCheckbox("Do Gaussian Mask Fits", Domask);
-		gd.addCheckbox("DisplayRoi stack (after tracking)", displayoverlay);
+		gd.addCheckbox("DisplayRoi stack (after tracking)", displaytrackoverlay);
 		gd.addNumericField(
 				"Initial guess for Min Pixel Intensity (MinPI) belonging to MT (  R =  MinPI / MaxPI), R (enter 0.2 to 0.9) = ",
 				Intensityratio, 2);
@@ -2297,7 +2298,7 @@ private static final Insets insets = new Insets(10, 0, 0, 0);
 		gd.showDialog();
 		indexmodel = gd.getNextChoiceIndex();
 		Domask = gd.getNextBoolean();
-		displayoverlay = gd.getNextBoolean();
+		displaytrackoverlay = gd.getNextBoolean();
 
 		if (indexmodel == 0)
 			userChoiceModel = UserChoiceModel.Line;

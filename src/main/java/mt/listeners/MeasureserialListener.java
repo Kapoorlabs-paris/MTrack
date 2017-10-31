@@ -98,7 +98,7 @@ public class MeasureserialListener implements ActionListener {
 		
 			
 			Object[] colnames = new Object[]{"Track File", "Growth rate", "Shrink rate", 
-					"Growth events", "Shrink events", "fcat", "fres", "Pass"};
+					"Growth events", "Shrink events", "fcat", "fres", "Error"};
 			
 			
 			Object[][] rowvalues = new Object[parent.inputfiles.length][colnames.length];

@@ -198,13 +198,10 @@ public class Interactive_MTDoubleChannelBasic implements PlugIn {
 		Roi roi = parent.preprocessedimp.getRoi();
 
 		if (roi == null) {
-			parent.preprocessedimp.setRoi(parent.standardRectangle);
 			roi = parent.preprocessedimp.getRoi();
 		}
 
-		if (roi.getType() != Roi.RECTANGLE) {
-			return;
-		}
+		
 
 		// copy the ImagePlus into an ArrayImage<FloatType> for faster access
 		// displaySliders();
