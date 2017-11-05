@@ -50,14 +50,13 @@ final Interactive_MTSingleChannel parent;
 	
 		this.parent = parent;
 	}
-	
-	public void markendnew(){
+public void markendnew(){
 		
 		parent.preprocessedimp.getCanvas().addMouseListener(parent.ml = new MouseListener() {
 			final ImageCanvas canvas = parent.preprocessedimp.getWindow().getCanvas();
-		
+			
 			@Override
-public void mouseClicked(MouseEvent e) {
+			public void mouseClicked(MouseEvent e) {
 				
 				if(SwingUtilities.isLeftMouseButton(e) && e.isShiftDown() == false && e.isAltDown() == false){
 					
@@ -83,43 +82,51 @@ public void mouseClicked(MouseEvent e) {
 						for (int index = 0; index < parent.Userframe.size(); ++index){
 							
 							if(nearestRoiCurr.getStrokeColor()==parent.colorUser   && parent.Userframe.get(index).roi == nearestRoiCurr ){
-								
+								nearestRoiCurr.setStrokeColor(parent.colorUnselectUser);
+								o.add(nearestRoiCurr);
 							parent.Userframe.remove(index);
 							
-							--index;
-							nearestRoiCurr.setStrokeColor(parent.colorUnselectUser);
-							o.add(nearestRoiCurr);
-						}
 							
-						
-						
-					}
-						for (int index = 0; index < parent.ClickedPoints.size(); ++index){
 							
-							if (parent.ClickedPoints.get(index).getB() == nearestRoiCurr){
-								parent.ClickedPoints.remove(index);
 							--index;
+							
+							
+							for (int indexx = 0; indexx < parent.ClickedPoints.size(); ++indexx){
+								
+								if (parent.ClickedPoints.get(indexx).getB() == nearestRoiCurr){
+									parent.ClickedPoints.remove(indexx);
+								--indexx;
+								}
+								
 							}
 							
 						}
+							
+                 
 						
-						parent.AllSeedrois.remove(nearestRoiCurr);
+					}
+					
 						
 					
 					
 				}
 				
+					if (nearestRoiCurr!=null){
 					Rectangle rect = nearestRoiCurr.getBounds();
 
 					double newx = rect.x + rect.width / 2.0;
 					double newy = rect.y + rect.height / 2.0;
 					OvalRoi Bigroi = nearestRoiCurr;
 					
+					
+					
 					if (nearestRoiCurr.getStrokeColor() == parent.colorConfirm){
 					
 					Bigroi.setStrokeColor(parent.colorUnselect);
 					o.add(Bigroi);
 					
+					
+			
 					
 					for (int index = 0; index < parent.ClickedPoints.size(); ++index){
 						
@@ -130,6 +137,7 @@ public void mouseClicked(MouseEvent e) {
 						
 					}
 					}
+				
 					else if(nearestRoiCurr.getStrokeColor()==parent.colorUnselect){
 						Bigroi.setStrokeColor(parent.colorConfirm);
 						o.add(Bigroi);
@@ -145,6 +153,7 @@ public void mouseClicked(MouseEvent e) {
 					
 					
 				  System.out.println("You deleted: " + newx + "," + newy);
+					}
 			}
 				
 				if(SwingUtilities.isLeftMouseButton(e) && e.isShiftDown()){
@@ -161,8 +170,8 @@ public void mouseClicked(MouseEvent e) {
 						parent.preprocessedimp.setOverlay(o);
 
 					}
-					
-					
+				
+						
 					final OvalRoi Bigroi = new OvalRoi(Util.round(x - parent.radiusseed),
 							Util.round(y - parent.radiusseed), Util.round(2 * parent.radiusseed), Util.round(2 * parent.radiusseed));
 					Bigroi.setStrokeColor(parent.colorUser);
@@ -174,15 +183,16 @@ public void mouseClicked(MouseEvent e) {
 					
 					
 					Indexedlength userseed = newseed.UserSeed(new double[]{x, y}, parent.nextseed, Bigroi);
-					
+						
 					parent.Userframe.add(userseed);
 					parent.nextseed++;
 					
 					parent.ClickedPoints.add(newpoint);
 					parent.AllSeedrois.add(Bigroi);
+				
 					
-					System.out.println("User clicked: " + x + " ," + y);
 					
+					System.out.println("User clicked: " + x + " ," + y + " " + "Seed ID:" + parent.nextseed);
 					
 					
 				}
@@ -210,6 +220,7 @@ public void mouseClicked(MouseEvent e) {
 			}
 			
 		});
+		
+		
 	}
-
 }

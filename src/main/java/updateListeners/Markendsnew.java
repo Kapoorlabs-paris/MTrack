@@ -89,6 +89,16 @@ public class Markendsnew {
 							
 							--index;
 							
+							
+							for (int indexx = 0; indexx < parent.ClickedPoints.size(); ++indexx){
+								
+								if (parent.ClickedPoints.get(indexx).getB() == nearestRoiCurr){
+									parent.ClickedPoints.remove(indexx);
+								--indexx;
+								}
+								
+							}
+							
 						}
 							
                  
@@ -126,6 +136,7 @@ public class Markendsnew {
 						
 					}
 					}
+				
 					else if(nearestRoiCurr.getStrokeColor()==parent.colorUnselect){
 						Bigroi.setStrokeColor(parent.colorConfirm);
 						o.add(Bigroi);

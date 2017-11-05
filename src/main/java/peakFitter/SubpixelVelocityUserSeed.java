@@ -225,11 +225,14 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 
 			percent = (Math.round(100 * (index + 1) / (Userframe.size())));
 
-			if (framenumber == startframe + 1) {
+			if (framenumber >= startframe + 1  ) {
 
 				originalslope = Userframe.get(index).slope;
 				originalintercept = Userframe.get(index).intercept;
 			}
+			
+			
+			
 			final Point linepoint = new Point(ndims);
 			linepoint.setPosition(new long[] { (long) Userframe.get(index).currentpos[0],
 					(long) Userframe.get(index).currentpos[1] });
@@ -260,7 +263,7 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 				double distmin = Distance(currentposini, previouspos);
 
 				if (labelstart.size() > 1) {
-					for (int j = 0; j < labelstart.size(); ++j) {
+					for (int j = 1; j < labelstart.size(); ++j) {
 						System.out.println("Fitting multiple Labels" + "User defined");
 						Indexedlength test = Getfinaltrackparam(Userframe.get(index), labelstart.get(j), psf,
 								startframe);
@@ -297,7 +300,7 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 			double[] newstartpoint = paramnextframestart.currentpos;
 			double newstartslope = paramnextframestart.slope;
 			double newstartintercept = paramnextframestart.intercept;
-			if (framenumber > startframe + 1|| Math.abs(newstartslope)!=Double.NaN){
+			if (framenumber > startframe + 1 && Math.abs(newstartslope)!=Double.NaN){
 			double oldslope = (Userframe.get(index).currentpos[1] -  Userframe.get(index).fixedpos[1])
 					/(Userframe.get(index).currentpos[0] -  Userframe.get(index).fixedpos[0]);
 			

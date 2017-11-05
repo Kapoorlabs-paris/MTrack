@@ -725,7 +725,9 @@ public class FitterUtils {
 
 			double distline = Math.abs(outcursor.getDoublePosition(1) - slope * outcursor.getDoublePosition(0) - intercept) / Math.sqrt(1 + slope * slope);
 			
-			if (framenumber > startframe + 1){
+			
+			
+			if (Math.abs(slope)!=Double.NaN ){
             if (distline < cutoff){	
 			
 					if (outcursor.getDoublePosition(0) <= minVal[0]
@@ -742,9 +744,8 @@ public class FitterUtils {
 					}
 					
             }
-            }
-			
-			else
+            
+            if (minVal[0] == Double.MAX_VALUE)
 			{
 				if (outcursor.getDoublePosition(0) <= minVal[0]
 						&& outcursor.get().get() / maxintensityline > Intensityratio) {
@@ -761,12 +762,38 @@ public class FitterUtils {
 				
 			}
 
+            
+            
+            
+            }
+			else {
+				
+				 
+						if (outcursor.getDoublePosition(0) <= minVal[0]
+								&& outcursor.get().get() / maxintensityline > Intensityratio) {
+							minVal[0] = outcursor.getDoublePosition(0);
+							minVal[1] = outcursor.getDoublePosition(1);
+						}
+
+						if (outcursor.getDoublePosition(0) >= maxVal[0]
+								&& outcursor.get().get() / maxintensityline > Intensityratio) {
+							maxVal[0] = outcursor.getDoublePosition(0);
+							maxVal[1] = outcursor.getDoublePosition(1);
+
+						}
+						
+						System.out.println("here");
+					}
+				
+			
+			
+			
 				
 		}
 		
 		
 		
-		
+		System.out.println(minVal[0]);
 		
 		Pair<double[], double[]> minmaxpair = new ValuePair<double[], double[]>(minVal, maxVal);
 

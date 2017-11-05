@@ -265,7 +265,7 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 					double distminend = Distance(currentposiniend, previousposiniend);
 
 					if (labelstart.size() > 1) {
-						for (int j = 0; j < labelstart.size(); ++j) {
+						for (int j = 1; j < labelstart.size(); ++j) {
 							System.out.println("Fitting multiple Labels");
 							Indexedlength teststart = Getfinaltrackparam(PrevFrameparamstart.get(index),
 									labelstart.get(j), psf, framenumber, StartorEnd.Start);
@@ -288,7 +288,7 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 						}
 					}
 					if (labelend.size() > 1) {
-						for (int j = 0; j < labelend.size(); ++j) {
+						for (int j = 1; j < labelend.size(); ++j) {
 							System.out.println("Fitting multiple Labels");
 							Indexedlength testend = Getfinaltrackparam(PrevFrameparamend.get(index),
 									labelend.get(j), psf, framenumber, StartorEnd.End);

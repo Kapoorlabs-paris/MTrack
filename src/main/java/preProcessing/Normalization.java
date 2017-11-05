@@ -39,8 +39,8 @@ public class Normalization {
 		
 		new ImageJ();
 
-		String filepath = "/Users/varunkapoor/Google Drive/9MicroMolar/2017-06-07_trop_cy5bovineseeds_cy3_9uMfast/"
-				+ "2017-06-07_trop_cy5bovineseeds_cy3_9uMfast.tif";
+		String filepath = "/Users/varunkapoor/Google Drive/9MicroMolar/DRIFT2017-05-24_trops_cy5bovineseeds_cy3_9uM/"
+				+ "CORRECTED2017-05-24_trops_cy5bovineseeds_cy3_9uM.tif";
 		ImagePlus impA = new ImagePlus( filepath );
 		RandomAccessibleInterval<FloatType> img = ImageJFunctions.convertFloat(impA);
 		new Normalize();

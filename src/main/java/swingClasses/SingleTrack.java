@@ -130,7 +130,6 @@ public  class SingleTrack {
 					parent.returnVector = SingleFindlinesVia.LinefindingMethodHF(groundframe, groundframepre, parent.PrevFrameparam,
 							 parent.thirdDimension, parent.psf, newlineMser, parent.userChoiceModel, parent.Domask, parent.Intensityratio,
 							parent.Inispacing, parent.seedmap, parent.jpb, parent.starttime, parent.endtime, parent.maxdist, parent.numgaussians);
-					parent.Accountedframes.add(FindlinesVia.getAccountedframes());
 					
 					
 					if(parent.Userframe.size() > 0){
@@ -160,7 +159,6 @@ public  class SingleTrack {
 							 parent.thirdDimension, parent.psf, newlineHough, parent.userChoiceModel,parent.Domask, parent.Intensityratio,
 							parent.Inispacing, parent.seedmap, parent.jpb, parent.starttime, parent.endtime, parent.maxdist, parent.numgaussians);
 
-					parent.Accountedframes.add(FindlinesVia.getAccountedframes());
 					
 	                          if(parent.Userframe.size() > 0){
 	                        	// Remove Duplicates
@@ -188,7 +186,6 @@ public  class SingleTrack {
 							 parent.thirdDimension, parent.psf, newlineMserwHough, parent.userChoiceModel, parent.Domask, parent.Intensityratio,
 							parent.Inispacing, parent.seedmap, parent.jpb, parent.starttime, parent.endtime, parent.maxdist, parent.numgaussians);
 
-					parent.Accountedframes.add(FindlinesVia.getAccountedframes());
 					
                        if(parent.Userframe.size() > 0){
                     	// Remove Duplicates

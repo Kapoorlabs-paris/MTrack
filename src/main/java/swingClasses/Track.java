@@ -126,7 +126,6 @@ public class Track {
 						parent.PrevFrameparam, parent.thirdDimension, parent.psf, newlineMser, parent.userChoiceModel,
 						parent.Domask, parent.Intensityratio, parent.Inispacing, parent.seedmap, parent.jpb,
 						parent.endtime, parent.maxdist, next, parent.numgaussians);
-				parent.Accountedframes.add(FindlinesVia.getAccountedframes());
 
 				if (parent.Userframe.size() > 0) {
 		// Remove Duplicates
@@ -153,7 +152,6 @@ public class Track {
 						parent.Domask, parent.Intensityratio, parent.Inispacing, parent.seedmap, parent.jpb,
 						parent.endtime, parent.maxdist, next, parent.numgaussians);
 
-				parent.Accountedframes.add(FindlinesVia.getAccountedframes());
 
 				if (parent.Userframe.size() > 0) {
 
@@ -184,7 +182,6 @@ public class Track {
 						parent.userChoiceModel, parent.Domask, parent.Intensityratio, parent.Inispacing, parent.seedmap,
 						parent.jpb, parent.endtime, parent.maxdist, next, parent.numgaussians);
 
-				parent.Accountedframes.add(FindlinesVia.getAccountedframes());
 
 				if (parent.Userframe.size() > 0) {
 		// Remove Duplicates
