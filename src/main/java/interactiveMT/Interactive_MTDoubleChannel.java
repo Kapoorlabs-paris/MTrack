@@ -2429,7 +2429,6 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	}
 
 	public static void main(String[] args) {
-
 		JFrame frame = new JFrame("");
 		MainFileChooser panel = new MainFileChooser();
 

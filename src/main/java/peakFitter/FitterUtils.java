@@ -443,13 +443,20 @@ public class FitterUtils {
 
 					EllipseRoi roi = imgs.get(indexx).Allrois.get(i);
 
-					if (roi.contains(fixedpoint.getIntPosition(0), fixedpoint.getIntPosition(1))) {
+					java.awt.Point[] Allpoints = roi.getContainedPoints();
+					
+					for (int pointindex = 0; pointindex < Allpoints.length; ++pointindex){
+						
+						if (fixedpoint.getIntPosition(0) == Allpoints[pointindex].x && fixedpoint.getIntPosition(1) == Allpoints[pointindex].y ){
+							
+							finallabel = imgs.get(indexx).roilabel;
 
-						finallabel = imgs.get(indexx).roilabel;
-
-						alllabels.add(finallabel);
-
+							alllabels.add(finallabel);
+							
+						}
+						
 					}
+					
 
 				}
 			}
