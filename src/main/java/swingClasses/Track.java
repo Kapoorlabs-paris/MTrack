@@ -45,6 +45,7 @@ import ij.plugin.frame.RoiManager;
 import interactiveMT.Interactive_MTDoubleChannel;
 import interactiveMT.Interactive_MTDoubleChannel.ValueChange;
 import interactiveMT.Interactive_MTDoubleChannel.Whichend;
+import labeledObjects.Indexedlength;
 import labeledObjects.PlusMinusSeed;
 import lineFinder.FindlinesVia;
 import lineFinder.LinefinderInteractiveHFHough;
@@ -68,6 +69,32 @@ public class Track {
 	public Track(final Interactive_MTDoubleChannel parent) {
 
 		this.parent = parent;
+	}
+	
+	
+	public void RemoveDuplicates(ArrayList<Indexedlength> list){
+		
+		int j = 0;
+
+		for (int i = 0; i < list.size(); ++i) {
+
+			j = i + 1;
+			while (j < list.size()) {
+
+				if (list.get(i).fixedpos[0] == list.get(j)
+						.fixedpos[0]) {
+
+					list.remove(j);
+
+				}
+
+				else {
+					++j;
+				}
+
+			}
+
+		}
 	}
 
 	public void Trackobject(final int next) {
@@ -102,7 +129,9 @@ public class Track {
 				parent.Accountedframes.add(FindlinesVia.getAccountedframes());
 
 				if (parent.Userframe.size() > 0) {
-
+		// Remove Duplicates
+					
+					RemoveDuplicates(parent.Userframe);
 					parent.returnVectorUser = FindlinesVia.LinefindingMethodHFUser(groundframe, groundframepre,
 							parent.Userframe, parent.thirdDimension, parent.psf, newlineMser, parent.userChoiceModel,
 							parent.Domask, parent.Intensityratio, parent.Inispacing, parent.jpb, parent.endtime,
@@ -128,6 +157,13 @@ public class Track {
 
 				if (parent.Userframe.size() > 0) {
 
+					// Remove Duplicates
+					
+					RemoveDuplicates(parent.Userframe);
+				
+					
+					
+					
 					parent.returnVectorUser = FindlinesVia.LinefindingMethodHFUser(groundframe, groundframepre,
 							parent.Userframe, parent.thirdDimension, parent.psf, newlineHough, parent.userChoiceModel,
 							parent.Domask, parent.Intensityratio, parent.Inispacing, parent.jpb, parent.endtime,
@@ -151,7 +187,9 @@ public class Track {
 				parent.Accountedframes.add(FindlinesVia.getAccountedframes());
 
 				if (parent.Userframe.size() > 0) {
-
+		// Remove Duplicates
+					
+					RemoveDuplicates(parent.Userframe);
 					parent.returnVectorUser = FindlinesVia.LinefindingMethodHFUser(groundframe, groundframepre,
 							parent.Userframe, parent.thirdDimension, parent.psf, newlineMserwHough,
 							parent.userChoiceModel, parent.Domask, parent.Intensityratio, parent.Inispacing, parent.jpb,

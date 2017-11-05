@@ -81,15 +81,17 @@ public class Markendsnew {
 						for (int index = 0; index < parent.Userframe.size(); ++index){
 							
 							if(nearestRoiCurr.getStrokeColor()==parent.colorUser   && parent.Userframe.get(index).roi == nearestRoiCurr ){
-								
+								nearestRoiCurr.setStrokeColor(parent.colorUnselectUser);
+								o.add(nearestRoiCurr);
 							parent.Userframe.remove(index);
 							
+							
+							
 							--index;
-							nearestRoiCurr.setStrokeColor(parent.colorUnselectUser);
-							o.add(nearestRoiCurr);
+							
 						}
 							
-						
+                 
 						
 					}
 					
@@ -98,17 +100,22 @@ public class Markendsnew {
 					
 				}
 				
+					if (nearestRoiCurr!=null){
 					Rectangle rect = nearestRoiCurr.getBounds();
 
 					double newx = rect.x + rect.width / 2.0;
 					double newy = rect.y + rect.height / 2.0;
 					OvalRoi Bigroi = nearestRoiCurr;
 					
+					
+					
 					if (nearestRoiCurr.getStrokeColor() == parent.colorConfirm){
 					
 					Bigroi.setStrokeColor(parent.colorUnselect);
 					o.add(Bigroi);
 					
+					
+			
 					
 					for (int index = 0; index < parent.ClickedPoints.size(); ++index){
 						
@@ -134,6 +141,7 @@ public class Markendsnew {
 					
 					
 				  System.out.println("You deleted: " + newx + "," + newy);
+					}
 			}
 				
 				if(SwingUtilities.isLeftMouseButton(e) && e.isShiftDown()){
@@ -150,8 +158,8 @@ public class Markendsnew {
 						parent.preprocessedimp.setOverlay(o);
 
 					}
-					
-					
+				
+						
 					final OvalRoi Bigroi = new OvalRoi(Util.round(x - parent.radiusseed),
 							Util.round(y - parent.radiusseed), Util.round(2 * parent.radiusseed), Util.round(2 * parent.radiusseed));
 					Bigroi.setStrokeColor(parent.colorUser);
@@ -163,15 +171,16 @@ public class Markendsnew {
 					
 					
 					Indexedlength userseed = newseed.UserSeed(new double[]{x, y}, parent.nextseed, Bigroi);
-					
+						
 					parent.Userframe.add(userseed);
 					parent.nextseed++;
 					
 					parent.ClickedPoints.add(newpoint);
 					parent.AllSeedrois.add(Bigroi);
+				
+					
 					
 					System.out.println("User clicked: " + x + " ," + y + " " + "Seed ID:" + parent.nextseed);
-					
 					
 					
 				}
