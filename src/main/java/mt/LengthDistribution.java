@@ -86,8 +86,11 @@ public class LengthDistribution {
 			for (int index = 0; index < currentobject.size(); ++index) {
 
 
-				if(currentobject.get(index).Framenumber == framenumber)
+				if(currentobject.get(index).Framenumber == framenumber){
 					lengthlist.add (new ValuePair<Integer, Double>(currentobject.get(index).seedID, currentobject.get(index).length));
+				System.out.println(file + " " + framenumber + " " + currentobject.get(index).length);	
+					
+				}
 
 			}
 
@@ -336,7 +339,6 @@ public class LengthDistribution {
 
 				File file = AllMovies.get(i);
 
-				ArrayList<Pair<Integer, Double>> lengthlist = LengthDistribution.LengthdistroatTime(file, framenumber);
 
 				ArrayList<FLSobject> currentobject = Tracking.loadMTStat(file);
 
@@ -345,14 +347,14 @@ public class LengthDistribution {
 					
 					for (int index = 0; index < currentobject.size(); ++index) {
 						ArrayList<Integer> seedlist = new ArrayList<Integer>();
-						if (currentobject.get(index).length >= length) {
+						if (currentobject.get(index).length >= length && currentobject.get(index).Framenumber == framenumber) {
 							seedlist.add(currentobject.get(index).seedID);
-							if (frameseed.get(currentobject.get(index).Framenumber) != null
+							if (frameseed.get(currentobject.get(index).Framenumber) != null 
 									&& frameseed.get(currentobject.get(index).Framenumber) != Double.NaN) {
 
 								int currentcount = frameseed.get(currentobject.get(index).Framenumber);
 								frameseed.put(currentobject.get(index).Framenumber, seedlist.size() + currentcount);
-							} else if (currentobject.get(index) != null)
+							} else if (currentobject.get(index) != null )
 								frameseed.put(currentobject.get(index).Framenumber, seedlist.size() );
 
 						}
@@ -378,6 +380,8 @@ public class LengthDistribution {
 				counterseries.add(length , maxvalue );
 
 				if (maxvalue > 0){
+					
+					System.out.println("Max " + maxvalue);
 			 Logcounterseries.add((length ), Math.log(maxvalue));
 			 points.add(new Point(new double[]{length , Math.log(maxvalue) }));
 				}
@@ -416,6 +420,7 @@ public class LengthDistribution {
 		  DisplayPoints.display(chart, new Dimension(800, 500));
 		  chart.addSubtitle(legendText);
 		  
+		  System.out.println("Series count" + dataset.getSeriesCount());
 		  final JFreeChart logchart =
 				  ChartFactory.createScatterPlot("MT Log length distribution",
 				  "Length (micrometer)", "Number of MT", Logdataset);
