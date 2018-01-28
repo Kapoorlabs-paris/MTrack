@@ -69,7 +69,7 @@ public class MinSizeMTListener implements AdjustmentListener {
 
 		minsizeScrollbar.setValue(parent.computeScrollbarPositionFromValue(parent.minSize, min, max, scrollbarSize));
 
-		label.setText("Min size of Ellipses = " + parent.minSize);
+		label.setText("Min size = " + parent.minSize);
 
 		
 	}

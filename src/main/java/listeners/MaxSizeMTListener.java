@@ -70,7 +70,7 @@ else{
 
 		maxsizeScrollbar.setValue(parent.computeScrollbarPositionFromValue(parent.maxSize, min, max, scrollbarSize));
 
-		label.setText("Max size of Ellipses = "+ parent.maxSize);
+		label.setText("Max size = "+ parent.maxSize);
 
 	}
 }
