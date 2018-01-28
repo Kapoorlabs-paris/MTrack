@@ -39,14 +39,16 @@ public class Normalization {
 		
 		new ImageJ();
 
-		String filepath = "/Users/varunkapoor/Google Drive/9MicroMolar/DRIFT2017-05-24_trops_cy5bovineseeds_cy3_9uM/"
-				+ "CORRECTED2017-05-24_trops_cy5bovineseeds_cy3_9uM.tif";
+		String filepath = "/Users/aimachine/Google Drive/JLMData/IlastikTraining/LabelONEHyperstack_ML7-10T7ZBoundaryTrain.tif";
 		ImagePlus impA = new ImagePlus( filepath );
 		RandomAccessibleInterval<FloatType> img = ImageJFunctions.convertFloat(impA);
 		new Normalize();
 		FloatType minval = new FloatType(0);
 		FloatType maxval = new FloatType(1);
 		Normalize.normalize(Views.iterable(img), minval, maxval); 
+		
+		
+		
 		
 		ImageJFunctions.show(img);
 	

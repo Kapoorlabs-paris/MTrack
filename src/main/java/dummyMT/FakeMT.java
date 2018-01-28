@@ -62,6 +62,89 @@ public class FakeMT {
 	}
 	
 	
+	
+	public static void MakeSeeds(RandomAccessibleInterval<FloatType> outimg, double dist, double[] sigma) {
+		
+		
+		final int n = outimg.numDimensions();
+		
+		double startpos[] = new double[n];
+		double endpos[] = new double[n];
+		double[] startline = new double[n];
+		double[] endline = new double[n];
+		final Random rnd = new Random();
+		final double MaxLength = 10;
+		final double randomslope = 2;
+		
+		for (int d = 0; d < outimg.numDimensions(); ++d) {
+			startpos[d] = 150 +  (rnd.nextDouble() * (outimg.max(d) - outimg.min(d)) + outimg.min(d));
+			
+		}
+		
+		endpos[0] =  startpos[0] + MaxLength * Math.sqrt(1.0/(1 + randomslope * randomslope) );
+		endpos[1] = startpos[1] + randomslope * (endpos[0] - startpos[0]);
+		final double[] tmppos = new double[n];
+		double slope = (endpos[1] - startpos[1]) / (endpos[0] - startpos[0]);
+		double intercept = startpos[1] - slope * startpos[0];
+		final double[] minVal = new double[n];
+		final double[] maxVal = new double[n];
+		for (int d = 0; d < n; ++d) {
+
+			final double locationdiff = startpos[d] - endpos[d];
+			final boolean minsearch = locationdiff >= 0;
+			tmppos[d] = startpos[d];
+
+			minVal[d] = minsearch ? endpos[d] : startpos[d];
+			maxVal[d] = minsearch ? tmppos[d] : endpos[d];
+
+		}
+
+		if (slope >= 0) {
+			for (int d = 0; d < n; ++d) {
+
+				startline[d] = (minVal[d]);
+				endline[d] = (maxVal[d]);
+			}
+
+		}
+
+		if (slope < 0) {
+
+			startline[0] = minVal[0];
+			startline[1] =  maxVal[1];
+			endline[0] =  maxVal[0];
+			endline[1] = minVal[1];
+
+		}
+		
+		
+		
+		
+		final double stepsize =   sigma[0] ;
+		double steppos[] = {startline[0], startline[1]};
+		double dx = stepsize / Math.sqrt(1 + slope * slope);
+		double dy = slope * dx;
+
+	
+		AddGaussian.addGaussian(outimg, steppos, sigma);
+
+		while (true) {
+			steppos[0] += dx;
+			steppos[1] += dy;
+			
+			AddGaussian.addGaussian(outimg, steppos, sigma);
+			
+		
+			
+			if (Distance(startline, steppos) >= MaxLength)
+				break;
+			
+			
+		
+		}
+	}
+	
+	
 	public static double[] GetSeeds(RandomAccessibleInterval<FloatType> outimg,
 
 			final Interval range, final int numlines, final double[] sigma, final Random rnd, final double randomslope) throws IncompatibleTypeException {
