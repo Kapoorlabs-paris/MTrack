@@ -31,25 +31,23 @@ import java.util.List;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import net.imglib2.util.ValuePair;
+
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.plot.Plot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.StandardXYBarPainter;
 import org.jfree.chart.renderer.xy.XYBarRenderer;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
-import org.jfree.data.category.CategoryDataset;
-import org.jfree.data.category.DefaultCategoryDataset;
+import org.jfree.chart.util.ShapeUtils;
 import org.jfree.data.xy.IntervalXYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-import org.jfree.util.ShapeUtilities;
 
-import net.imglib2.util.ValuePair;
 import psf_Tookit.GaussianFitParam;
 import psf_Tookit.GaussianLineFitParam;
 
@@ -305,7 +303,7 @@ public class DrawPoints {
 	{
 		final XYPlot plot = chart.getXYPlot();
 		final XYItemRenderer renderer = plot.getRenderer();
-		renderer.setSeriesShape( seriesIndex, ShapeUtilities.createUpTriangle( 0.5f ) );
+		renderer.setSeriesShape( seriesIndex, ShapeUtils.createUpTriangle( 0.5f ) );
 	}
 
 	public static void setDisplayType( final JFreeChart chart, final int seriesIndex, final boolean line, final boolean shape )

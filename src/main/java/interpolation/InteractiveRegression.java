@@ -21,63 +21,34 @@
  */
 package interpolation;
 
+import ij.ImageJ;
+import ij.plugin.PlugIn;
+
 import java.awt.BorderLayout;
-import java.awt.Button;
 import java.awt.CardLayout;
-import java.awt.Checkbox;
-import java.awt.Choice;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Label;
 import java.awt.Scrollbar;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.FilenameFilter;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Locale;
-import java.util.Set;
 
-import javax.swing.AbstractAction;
-import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartPanel;
-import org.jfree.chart.JFreeChart;
-import org.jfree.data.xy.XYSeries;
-import org.jfree.data.xy.XYSeriesCollection;
-import org.jfree.util.ShapeUtilities;
-
-import fit.AbstractFunction2D;
-import fit.PointFunctionMatch;
-import fit.polynomial.HigherOrderPolynomialFunction;
-import fit.polynomial.InterpolatedPolynomial;
-import fit.polynomial.LinearFunction;
-import fit.polynomial.Polynomial;
-import fit.polynomial.QuadraticFunction;
-import ij.ImageJ;
-import ij.plugin.PlugIn;
-import mpicbg.models.Point;
-import mt.DisplayPoints;
-import mt.FLSobject;
-import mt.LengthCounter;
-import mt.LengthDistribution;
-import mt.Tracking;
 import net.imglib2.util.Pair;
 import net.imglib2.util.ValuePair;
+
+import org.jfree.chart.JFreeChart;
+import org.jfree.data.xy.XYSeriesCollection;
+
+import mt.Tracking;
 
 public class InteractiveRegression implements PlugIn {
 	public static int MIN_SLIDER = 0;

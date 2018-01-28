@@ -24,17 +24,9 @@ package mt;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Rectangle;
 import java.awt.Shape;
-import java.awt.Stroke;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Arc2D;
-import java.awt.geom.PathIterator;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -43,30 +35,25 @@ import java.util.List;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import net.imglib2.util.Pair;
+import net.imglib2.util.ValuePair;
+
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.chart.plot.ValueMarker;
 import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.renderer.xy.XYDotRenderer;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
-import org.jfree.chart.resources.JFreeChartResources;
+import org.jfree.chart.util.ShapeUtils;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-import org.jfree.util.ShapeUtilities;
 
 import fit.AbstractFunction2D;
 import fit.PointFunctionMatch;
-import fit.polynomial.HigherOrderPolynomialFunction;
-import fit.polynomial.InterpolatedPolynomial;
 import fit.polynomial.LinearFunction;
 import fit.polynomial.Polynomial;
-import mpicbg.models.NotEnoughDataPointsException;
 import mpicbg.models.Point;
-import net.imglib2.util.Pair;
-import net.imglib2.util.ValuePair;
 
 public class Tracking
 {
@@ -368,7 +355,7 @@ public class Tracking
 	{
 		final XYPlot plot = chart.getXYPlot();
 		final XYItemRenderer renderer = plot.getRenderer();
-		renderer.setSeriesShape( seriesIndex, ShapeUtilities.createUpTriangle( 0.5f ) );
+		renderer.setSeriesShape( seriesIndex, ShapeUtils.createUpTriangle( 0.5f ) );
 	}
 
 	public static void setDisplayType( final JFreeChart chart, final int seriesIndex, final boolean line, final boolean shape )

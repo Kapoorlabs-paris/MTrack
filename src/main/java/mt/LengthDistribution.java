@@ -26,24 +26,21 @@ import java.io.File;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Locale;
-import java.util.Set;
+
+import net.imglib2.util.Pair;
+import net.imglib2.util.ValuePair;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.title.TextTitle;
+import org.jfree.chart.ui.RectangleEdge;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-import org.jfree.ui.RectangleEdge;
 
-import fit.polynomial.Polynomial;
 import mpicbg.models.NotEnoughDataPointsException;
 import mpicbg.models.Point;
-import net.imglib2.util.Pair;
-import net.imglib2.util.ValuePair;
 
 public class LengthDistribution {
 	

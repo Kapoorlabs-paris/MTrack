@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.scijava</groupId>
 		<artifactId>pom-scijava</artifactId>
-		<version>17.1.1</version>
+		<version>18.1.0</version>
 		<relativePath />
 	</parent>
 
@@ -157,10 +157,6 @@
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi</artifactId>
 			<version>${poi.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.jfree</groupId>
-			<artifactId>jcommon</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.jfree</groupId>
