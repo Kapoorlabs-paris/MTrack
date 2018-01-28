@@ -21,6 +21,9 @@
  */
 package mt.listeners;
 
+import ij.measure.ResultsTable;
+import ij.plugin.PlugIn;
+
 import java.awt.BorderLayout;
 import java.awt.Button;
 import java.awt.CardLayout;
@@ -41,38 +44,31 @@ import java.io.File;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JViewport;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableColumnModel;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableModel;
+
+import net.imglib2.util.Pair;
+import net.imglib2.util.ValuePair;
 
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.util.ShapeUtils;
 import org.jfree.data.xy.XYSeriesCollection;
-import org.jfree.util.ShapeUtilities;
-
-import com.google.common.collect.Sets.SetView;
 
 import fit.AbstractFunction2D;
 import fit.PointFunctionMatch;
@@ -81,19 +77,11 @@ import fit.polynomial.InterpolatedPolynomial;
 import fit.polynomial.LinearFunction;
 import fit.polynomial.Polynomial;
 import fit.polynomial.QuadraticFunction;
-import ij.ImageJ;
-import ij.measure.ResultsTable;
-import ij.plugin.PlugIn;
-import listeners.MedianRadiListener;
 import mpicbg.models.Point;
 import mt.Averagerate;
-import mt.MyCellRenderer;
 import mt.RansacFileChooser;
 import mt.Rateobject;
 import mt.Tracking;
-import mt.listeners.MeasureserialListener.WordWrapCellRenderer;
-import net.imglib2.util.Pair;
-import net.imglib2.util.ValuePair;
 
 public class InteractiveRANSAC implements PlugIn {
 	public static int MIN_SLIDER = 0;
@@ -899,7 +887,7 @@ public class InteractiveRANSAC implements PlugIn {
 
 									Tracking.setColor(chart, i, new Color(0, 0, 255));
 									Tracking.setDisplayType(chart, i, false, true);
-									Tracking.setShape(chart, i, ShapeUtilities.createDownTriangle(4f));
+									Tracking.setShape(chart, i, ShapeUtils.createDownTriangle(4f));
 
 									++i;
 									++segment;
