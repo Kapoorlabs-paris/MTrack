@@ -15,7 +15,7 @@
 
 	<name>Microtubule Tracker</name>
 	<description>Microtubule tracker.</description>
-	<url>https://github.com/PreibischLab/MTrack</url>
+	<url>https://github.com/kapoorLab/MTrack</url>
 	<inceptionYear>2017</inceptionYear>
 	<organization>
 		<name>Preibisch Lab</name>
@@ -61,10 +61,10 @@
 	</mailingLists>
 
 	<scm>
-		<connection>scm:git:git://github.com/PreibischLab/MTrack</connection>
-		<developerConnection>scm:git:git@github.com:PreibischLab/MTrack</developerConnection>
+		<connection>scm:git:git://github.com/kapoorLab/MTrack</connection>
+		<developerConnection>scm:git:git@github.com/kapoorLab/MTrack</developerConnection>
 		<tag>HEAD</tag>
-		<url>https://github.com/PreibischLab/MTrack</url>
+		<url>https://github.com/kapoorLab/MTrack</url>
 	</scm>
 	<issueManagement>
 		<system>GitHub Issues</system>
