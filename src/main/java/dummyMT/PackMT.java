@@ -372,9 +372,9 @@ public class PackMT {
 		
 		
 		if(distlist.size()%2 == 0)
-			return distlist.get(distlist.size() / 2);
+			return distlist.get(distlist.size() / 2.0);
 		else
-			return distlist.get((distlist.size() - 1) / 2 ) + distlist.get((distlist.size() + 1) / 2 );
+			return (distlist.get((distlist.size() - 1) / 2 ) + distlist.get((distlist.size() + 1) / 2 )) / 2.0;
 		
 		
 		
