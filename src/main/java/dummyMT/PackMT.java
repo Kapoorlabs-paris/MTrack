@@ -7,9 +7,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
+import ch.qos.logback.core.db.dialect.MySQLDialect;
 import drawandOverlay.AddGaussian;
 import ij.ImageJ;
 import ij.ImagePlus;
@@ -29,10 +31,10 @@ import net.imglib2.exception.IncompatibleTypeException;
 import net.imglib2.img.array.ArrayImgFactory;
 import net.imglib2.img.display.imagej.ImageJFunctions;
 import net.imglib2.type.numeric.real.FloatType;
+import net.imglib2.util.Intervals;
 import net.imglib2.view.Views;
 import poissonSimulator.Poissonprocess;
 import preProcessing.Kernels;
-
 
 public class PackMT {
 
@@ -54,164 +56,154 @@ public class PackMT {
 	}
 
 	public static ArrayList<PackMT> SimulateRandomMT(final RandomAccessibleInterval<FloatType> source, double[] sigma,
-			int numlines, int SNR, ArrayList<PackMT> MTlist, int random) {
+			int numlines, int SNR, int random) {
 
 		final int n = source.numDimensions();
-		double startpos[] = new double[n];
-		double endpos[] = new double[n];
-
+		
 		Random rnd = new Random(random);
-
-		for (int d = 0; d < source.numDimensions(); ++d) {
-			startpos[d] = rnd.nextDouble() * ((source.max(d) - source.min(d))) + source.min(d);
-
-		}
-		double length = MinLength + rnd.nextDouble() * (MaxLength - MinLength);
-
-		double angle = Math.toRadians(rnd.nextDouble() * 360);
-		endpos[0] = startpos[0] + length * Math.cos(angle);
-		endpos[1] = startpos[1] + length * Math.sin(angle);
-
-		double signedslope = (endpos[1] - startpos[1]) / (endpos[0] - startpos[0]);
-		double signedintercept = startpos[1] - signedslope * startpos[0];
-
-		PackMT pass = new PackMT(startpos, endpos, signedslope, signedintercept);
-
-		MTlist.add(pass);
+		
+		ArrayList<PackMT> MTlist = new ArrayList<PackMT>();
 
 		int iter = 0;
 		for (int i = 0; i < numlines; ++i) {
 
-			double startposnew[] = new double[n];
-			double endposnew[] = new double[n];
-			for (int d = 0; d < source.numDimensions(); ++d)
-				startposnew[d] = rnd.nextDouble() * (source.max(d) - source.min(d)) + source.min(d);
+		
+		
 
-			// Look for the end point
-
-			length = MinLength + rnd.nextDouble() * (MaxLength - MinLength);
-
-			angle = Math.toRadians(rnd.nextDouble() * 360);
-
-			endposnew[0] = startposnew[0] + length * Math.cos(angle);
-			endposnew[1] = startposnew[1] + length * Math.sin(angle);
-			signedslope = (endposnew[1] - startposnew[1]) / (endposnew[0] - startposnew[0]);
-			double currentintercept = startposnew[1] - signedslope * startposnew[0];
-
-			// Determine if the lines intersect
-			double[] currentlineparam = new double[] { signedslope, currentintercept };
 
 			System.out.println("Drawing Line" + i);
 			iter = 0;
-			for (PackMT pack : MTlist) {
-				iter = 0;
+			// Determine if the lines intersect
+			boolean repeat = false;
+			PackMT pack = null;
+			
+			if(MTlist.size() == 0) {
+				
+				double startposnew[] = new double[n];
+				double endposnew[] = new double[n];
+				for (int d = 0; d < source.numDimensions(); ++d)
+					startposnew[d] = (rnd.nextDouble() * (source.max(d) - source.min(d)) + source.min(d)) ;
 
-				double[] lineparam = new double[] { pack.slope, pack.intercept };
-				double[] posintersect = Intersectionpoint(lineparam, currentlineparam, n);
+				// Look for the end point
 
-				if (posintersect != null && posintersect[0] > 0 && posintersect[1] > 0) {
-					double xi = posintersect[0];
-					double yi = posintersect[1];
-					if (pack.slope > 0) {
+				double length = MinLength + rnd.nextDouble() * (MaxLength - MinLength);
 
-						do {
-							for (int d = 0; d < source.numDimensions(); ++d)
-								startposnew[d] = (rnd.nextDouble() * (source.max(d) - source.min(d)) + source.min(d));
+				double angle = Math.toRadians(rnd.nextDouble() * 360);
 
-							// Look for the end point
+				endposnew[0] = startposnew[0] + length * Math.cos(angle);
+				endposnew[1] = startposnew[1] + length * Math.sin(angle);
+				double signedslope = (endposnew[1] - startposnew[1]) / (endposnew[0] - startposnew[0]);
+				double currentintercept = startposnew[1] - signedslope * startposnew[0];
+			
+				
+			  pack = new PackMT(startposnew, endposnew, signedslope, currentintercept);
+			  MTlist.add(pack);
+				
+			}
+			
+			if(MTlist.size() > 0) {
+				double startposnew[] = new double[n];
+				double endposnew[] = new double[n];
+			do {
+				
+				for (int d = 0; d < source.numDimensions(); ++d)
+					startposnew[d] = (rnd.nextDouble() * (source.max(d) - source.min(d)) + source.min(d)) ;
 
-							length = MinLength + rnd.nextDouble() * (MaxLength - MinLength);
+				// Look for the end point
 
-							angle = Math.toRadians(rnd.nextDouble() * 360);
+				double length = MinLength + rnd.nextDouble() * (MaxLength - MinLength);
 
-							endposnew[0] = startposnew[0] + length * Math.cos(angle);
-							endposnew[1] = startposnew[1] + length * Math.sin(angle);
-							signedslope = (endposnew[1] - startposnew[1]) / (endposnew[0] - startposnew[0]);
-							currentintercept = startposnew[1] - signedslope * startposnew[0];
+				double angle = Math.toRadians(rnd.nextDouble() * 360);
 
-							// Determine if the lines intersect
-							currentlineparam = new double[] { signedslope, currentintercept };
-							posintersect = Intersectionpoint(lineparam, currentlineparam, n);
-							xi = posintersect[0];
-							yi = posintersect[1];
+				endposnew[0] = startposnew[0] + length * Math.cos(angle);
+				endposnew[1] = startposnew[1] + length * Math.sin(angle);
+				double signedslope = (endposnew[1] - startposnew[1]) / (endposnew[0] - startposnew[0]);
+				double currentintercept = startposnew[1] - signedslope * startposnew[0];
+				
+				
+				repeat = Check(MTlist, endposnew, startposnew, source);
 
-							iter++;
-							System.out.println(iter);
-							if (iter > maxiter)
-
-								break;
-						} while (xi >= 0 && xi <= source.dimension(0) && yi >= 0 && yi <= source.dimension(1));
-
-					} else {
-
-						do {
-
-							for (int d = 0; d < source.numDimensions(); ++d)
-								startposnew[d] = (rnd.nextDouble() * (source.max(d) - source.min(d)) + source.min(d));
-
-							// Look for the end point
-
-							length = MinLength + rnd.nextDouble() * (MaxLength - MinLength);
-
-							angle = Math.toRadians(rnd.nextDouble() * 360);
-
-							endposnew[0] = startposnew[0] + length * Math.cos(angle);
-							endposnew[1] = startposnew[1] + length * Math.sin(angle);
-							signedslope = (endposnew[1] - startposnew[1]) / (endposnew[0] - startposnew[0]);
-							currentintercept = startposnew[1] - signedslope * startposnew[0];
-							// Determine if the lines intersect
-							currentlineparam = new double[] { signedslope, currentintercept };
-							posintersect = Intersectionpoint(lineparam, currentlineparam, n);
-							xi = posintersect[0];
-							yi = posintersect[1];
-
-							iter++;
-							System.out.println(iter);
-							if (iter > maxiter)
-
-								break;
-						} while (xi >= 0 && xi <= source.dimension(0) && yi >= 0 && yi <= source.dimension(1));
-					}
-
+				iter++;
+				if(iter >= maxiter - 1) 
+				System.out.println("Iteration:  " + iter + " " + repeat);
+				
+			 
+				
+				if(!repeat) {
+				System.out.println("Iteration:  " + iter + " " + "No intersecting lines");
+				System.out.println(startposnew[0] + " " + startposnew[1] + " " + endposnew[0] + " " + endposnew[1] );
+				 pack = new PackMT(startposnew, endposnew, signedslope, currentintercept);
 				}
+				
+				
+				if (iter > maxiter)
 
+					break;
+
+			} while (repeat);
+
+		
 			}
 
-			PackMT pack = new PackMT(startposnew, endposnew, signedslope, signedintercept);
-
-			MTlist.add(pack);
+		
+		
+			if(pack!=null)
+				MTlist.add(pack);
+			
 		}
-		Draw(source, sigma, MTlist, length);
+
+
+	
 
 		return MTlist;
 	}
 
-	public static void Draw(RandomAccessibleInterval<FloatType> source, double[] sigma, ArrayList<PackMT> MTlist,
-			double length) {
+	public static Boolean Check(ArrayList<PackMT> MTlist, double[] endposnew, double[] startposnew, RandomAccessibleInterval<FloatType> source) {
+
+		double signedslope = (endposnew[1] - startposnew[1]) / (endposnew[0] - startposnew[0]);
+		double currentintercept = startposnew[1] - signedslope * startposnew[0];
+
+		// Determine if the lines intersect
+		double[] currentlineparam = new double[] { signedslope, currentintercept };
+
+		int truecount = 0;
+		Boolean repeat = true;
+
+		for (PackMT pack : MTlist) {
+
+			double[] lineparam = new double[] { pack.slope, pack.intercept };
+
+			FinalInterval interval = Intervals.createMinMax((long) pack.endpos[0], (long) pack.endpos[1],
+					(long) pack.startpos[0], (long) pack.startpos[1]);
+
+			double[] posintersect = Intersectionpoint(lineparam, currentlineparam, endposnew.length);
+
+			if (posintersect[0] >= interval.min(0)/2 && posintersect[0] <= interval.max(0)*2 && posintersect[1] >= interval.min(1)/2
+					&& posintersect[1] <= interval.max(1)*2) {
+				truecount++;
+			}
+		}
+
+		
+		if (truecount >= 1)
+			repeat = true;
+		else
+			repeat = false;
+
+		return repeat;
+
+	}
+
+	public static void Draw(RandomAccessibleInterval<FloatType> source, double[] sigma, ArrayList<PackMT> MTlist) {
 
 		for (PackMT pack : MTlist) {
 			final int n = source.numDimensions();
-			System.out.println(pack.startpos[0] + " " + pack.startpos[1] + " " + pack.endpos[0] + " " + pack.endpos[1]
-					+ " " + pack.slope);
 
 			double[] startline = new double[n];
 			double[] endline = new double[n];
 
-			double[] tmppos = new double[n];
-
-			double[] minVal = new double[n];
-			double[] maxVal = new double[n];
-
-			for (int d = 0; d < n; ++d) {
-
-				final double locationdiff = pack.startpos[d] - pack.endpos[d];
-				final boolean minsearch = locationdiff >= 0;
-				tmppos[d] = pack.startpos[d];
-
-				minVal[d] = minsearch ? pack.endpos[d] : pack.startpos[d];
-				maxVal[d] = minsearch ? tmppos[d] : pack.endpos[d];
-
-			}
+		
+		
 
 			for (int d = 0; d < n; ++d) {
 
@@ -221,27 +213,25 @@ public class PackMT {
 
 			double stepsize = sigma[0];
 			double steppos[] = { startline[0], startline[1] };
-			double slope = (pack.endpos[1] - pack.startpos[1]) / (pack.endpos[0] - pack.startpos[0]);
+			double slope = (endline[1] - startline[1]) / (endline[0] - startline[0]);
 			double dx = stepsize / Math.sqrt(1 + slope * slope);
 			double dy = Math.abs(slope) * dx;
 
 			AddGaussian.addGaussian(source, steppos, sigma);
-
 			while (true) {
 
-				if (pack.endpos[0] > pack.startpos[0])
+				if (pack.endpos[0] >= pack.startpos[0])
 					steppos[0] += dx;
 				else
 					steppos[0] -= dx;
 
-				if (pack.endpos[1] > pack.startpos[1])
+				if (pack.endpos[1] >= pack.startpos[1])
 					steppos[1] += dy;
 				else
 					steppos[1] -= dy;
 
 				AddGaussian.addGaussian(source, steppos, sigma);
-
-				if (Math.abs(steppos[0] - endline[0]) <= 2 && Math.abs(steppos[1] - endline[1]) <= 2)
+				if (Distance(endline, steppos) <= 2 *sigma[0])
 					break;
 
 			}
@@ -267,10 +257,10 @@ public class PackMT {
 
 	}
 
-	public static RandomAccessibleInterval<FloatType> MakeNoisy(final RandomAccessibleInterval<FloatType> source) {
+	public static RandomAccessibleInterval<FloatType> MakeNoisy(final RandomAccessibleInterval<FloatType> source,
+			int SNR) {
 		FloatType minval = new FloatType(0);
 		FloatType maxval = new FloatType(1);
-		int SNR = 10;
 		Normalize.normalize(Views.iterable(source), minval, maxval);
 		Kernels.addBackground(Views.iterable(source), 0.2);
 		RandomAccessibleInterval<FloatType> noisylines = Poissonprocess.poissonProcess(source, SNR);
@@ -292,94 +282,91 @@ public class PackMT {
 	}
 
 	public static ArrayList<Double> getNearestRois(ArrayList<PackMT> MTList) {
-		
-	
-		
+
 		ArrayList<PackMT> MTListcopy = new ArrayList<PackMT>();
-		
-			MTListcopy.addAll(MTList);
+
+		MTListcopy.addAll(MTList);
 		RealPoint targetPack = null;
 		RealPoint secondtargetPack = null;
 		ArrayList<Double> distanceList = new ArrayList<Double>();
 		for (int index = 0; index < MTListcopy.size(); ++index) {
-			
+
 			PackMT clicked = MTListcopy.get(index);
-			
+
 			MTListcopy.remove(clicked);
-			
+
 			final List<RealPoint> targetCoords = new ArrayList<RealPoint>(MTListcopy.size());
-			final List<util.FlagNode<RealPoint>> targetNodes = new ArrayList<util.FlagNode<RealPoint>>(MTListcopy.size());
-		
-		for(PackMT pack: MTListcopy) {
-			
-			targetCoords.add(new RealPoint(pack.startpos));
-			targetCoords.add(new RealPoint(pack.endpos));
-			targetNodes.add(new util.FlagNode<RealPoint>(new RealPoint(pack.startpos)));
-			targetNodes.add(new util.FlagNode<RealPoint>(new RealPoint(pack.endpos)));
-			
-			
+			final List<util.FlagNode<RealPoint>> targetNodes = new ArrayList<util.FlagNode<RealPoint>>(
+					MTListcopy.size());
+
+			for (PackMT pack : MTListcopy) {
+
+				targetCoords.add(new RealPoint(pack.startpos));
+				targetCoords.add(new RealPoint(pack.endpos));
+				targetNodes.add(new util.FlagNode<RealPoint>(new RealPoint(pack.startpos)));
+				targetNodes.add(new util.FlagNode<RealPoint>(new RealPoint(pack.endpos)));
+
+			}
+			if (targetCoords.size() > 0) {
+
+				final KDTree<util.FlagNode<RealPoint>> Tree = new KDTree<util.FlagNode<RealPoint>>(targetNodes,
+						targetCoords);
+				final util.NNFlagsearchKDtree<RealPoint> Search = new util.NNFlagsearchKDtree<RealPoint>(Tree);
+				final double[] source = clicked.startpos;
+				final double[] secondsource = clicked.endpos;
+
+				final RealPoint sourceCoords = new RealPoint(source);
+				Search.search(sourceCoords);
+				final util.FlagNode<RealPoint> targetNode = Search.getSampler().get();
+
+				targetPack = targetNode.getValue();
+				double distance = Distance(
+						new double[] { targetPack.getDoublePosition(0), targetPack.getDoublePosition(1) },
+						clicked.startpos);
+				distanceList.add(distance);
+
+				final RealPoint secondsourceCoords = new RealPoint(secondsource);
+				Search.search(secondsourceCoords);
+				final util.FlagNode<RealPoint> secondtargetNode = Search.getSampler().get();
+
+				secondtargetPack = secondtargetNode.getValue();
+				double seconddistance = Distance(
+						new double[] { secondtargetPack.getDoublePosition(0), secondtargetPack.getDoublePosition(1) },
+						clicked.startpos);
+				distanceList.add(seconddistance);
+			}
+			MTListcopy.add(clicked);
+
 		}
-		if(targetCoords.size() > 0) {
-			
-			final KDTree<util.FlagNode<RealPoint>> Tree = new KDTree<util.FlagNode<RealPoint>>(targetNodes, targetCoords);
-			final util.NNFlagsearchKDtree<RealPoint> Search = new util.NNFlagsearchKDtree<RealPoint>(Tree);
-			final double[] source = clicked.startpos;
-			final double[] secondsource = clicked.endpos;
-			
-			final RealPoint sourceCoords = new RealPoint(source);
-			Search.search(sourceCoords);
-			final util.FlagNode<RealPoint> targetNode = Search.getSampler().get();
-			
-			targetPack = targetNode.getValue();
-			double distance = Distance(new double[] {targetPack.getDoublePosition(0), targetPack.getDoublePosition(1)}, clicked.startpos);
-			distanceList.add(distance);
-			
-			
-			final RealPoint secondsourceCoords = new RealPoint(secondsource);
-			Search.search(secondsourceCoords);
-			final util.FlagNode<RealPoint> secondtargetNode = Search.getSampler().get();
-			
-			secondtargetPack = secondtargetNode.getValue();
-			double seconddistance = Distance(new double[] {secondtargetPack.getDoublePosition(0), secondtargetPack.getDoublePosition(1)}, clicked.startpos);
-			distanceList.add(seconddistance);
-		}
-	     
-		
-		}
-		
+
 		Collections.sort(distanceList);
-		
-		
+
 		return distanceList;
 	}
-	
+
 	public static double getMeanList(ArrayList<Double> distlist) {
-		
+
 		double mean = 0;
-		
+
 		for (int index = 0; index < distlist.size(); ++index) {
-			
+
 			mean += distlist.get(index);
-			
+
 		}
-		
+
 		return mean / distlist.size();
-		
+
 	}
 
 	public static double getMedianList(ArrayList<Double> distlist) {
-		
-		
-		
-		if(distlist.size()%2 == 0)
-			return distlist.get(distlist.size() / 2.0);
+
+		if (distlist.size() % 2 == 0)
+			return distlist.get(distlist.size() / 2);
 		else
-			return (distlist.get((distlist.size() - 1) / 2 ) + distlist.get((distlist.size() + 1) / 2 )) / 2.0;
-		
-		
-		
+			return (distlist.get((distlist.size() - 1) / 2) + distlist.get((distlist.size() + 1) / 2)) / 2.0;
+
 	}
-	
+
 	public static void main(String args[]) throws IncompatibleTypeException, IOException {
 
 		new ImageJ();
@@ -388,9 +375,9 @@ public class PackMT {
 		final double[] sigma = { 2, 2 };
 
 		int SNR = 10;
-		int numlines = 5;
-		int numsims = 100;
-		int min = -1000;
+		int numlines = 10;
+		int numsims = 2;
+		int min = 3893;
 		int[] random = new int[numsims];
 
 		Random randomNum = new Random(min);
@@ -400,33 +387,34 @@ public class PackMT {
 
 		for (int i = 0; i < numsims; ++i) {
 
-			random[i] = min + randomNum.nextInt();
+			random[i] = randomNum.nextInt();
 
+			System.out.println("Simulation number" + " " + i);
 			RandomAccessibleInterval<FloatType> source = new ArrayImgFactory<FloatType>().create(range,
 					new FloatType());
 
-			ArrayList<PackMT> MTlist = new ArrayList<PackMT>();
+			
 
-			ArrayList<PackMT> MTlistfinal = SimulateRandomMT(source, sigma, numlines, SNR, MTlist, random[i]);
-			
+			ArrayList<PackMT> MTlistfinal = SimulateRandomMT(source, sigma, numlines, SNR, random[i]);
+			Draw(source, sigma, MTlistfinal);
 			ArrayList<Double> distlist = getNearestRois(MTlistfinal);
-			
+
 			try {
 				File filedist = new File(
-						"/Users/aimachine/Downloads/MTrackStuff/All_SeedsSNR10DIST" + "Run" + i + ".txt");
+						"/Users/aimachine/Downloads/MTrackStuff/All_SeedsSNR10DIST" + numlines + "Run" + i + ".txt");
 
 				FileWriter fwdist = new FileWriter(filedist);
 				BufferedWriter bwdist = new BufferedWriter(fwdist);
 				bwdist.write("\tminDist \tmaxDist \tMedianDist \tMeanDist  \n");
-			
-				bwdist.write(distlist.get(0) + " " + distlist.get(distlist.size() - 1) + " " + getMeanList(distlist)  + " " + getMedianList(distlist));
-				
+
+				bwdist.write(distlist.get(0) + " " + distlist.get(distlist.size() - 1) + " " + getMeanList(distlist)
+						+ " " + getMedianList(distlist));
+
 				bwdist.close();
 				fwdist.close();
 			} catch (IOException te) {
 			}
-			
-			
+
 			try {
 				File file = new File(
 						"/Users/aimachine/Downloads/MTrackStuff/All_SeedsSNR10Number" + numlines + "Run" + i + ".txt");
@@ -443,15 +431,14 @@ public class PackMT {
 				fw.close();
 			} catch (IOException te) {
 			}
-
-			RandomAccessibleInterval<FloatType> sourcenoise = MakeNoisy(source);
+			
+			RandomAccessibleInterval<FloatType> sourcenoise = MakeNoisy(source, SNR);
 
 			resultimp = ImageJFunctions.show(sourcenoise);
 			prestack.addSlice(resultimp.getImageStack().getProcessor(i));
 
 			resultimp.hide();
-
-		}
+			}
 
 		new ImagePlus("Simulation", prestack).show();
 
