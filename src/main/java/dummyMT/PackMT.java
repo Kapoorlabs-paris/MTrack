@@ -82,7 +82,7 @@ public class PackMT {
 				double startposnew[] = new double[n];
 				double endposnew[] = new double[n];
 				for (int d = 0; d < source.numDimensions(); ++d)
-					startposnew[d] = (rnd.nextDouble() * (source.max(d) - source.min(d)) + source.min(d)) ;
+					startposnew[d] = (rnd.nextFloat()  * (source.max(d) - source.min(d))  + source.min(d)) ;
 
 				// Look for the end point
 
@@ -107,7 +107,7 @@ public class PackMT {
 			do {
 				
 				for (int d = 0; d < source.numDimensions(); ++d)
-					startposnew[d] = (rnd.nextDouble() * (source.max(d) - source.min(d)) + source.min(d)) ;
+					startposnew[d] = (rnd.nextFloat() * (source.max(d) - source.min(d)) + rnd.nextInt(iter + 1) * source.min(d)) ;
 
 				// Look for the end point
 
@@ -131,7 +131,6 @@ public class PackMT {
 				
 				if(!repeat) {
 				System.out.println("Iteration:  " + iter + " " + "No intersecting lines");
-				System.out.println(startposnew[0] + " " + startposnew[1] + " " + endposnew[0] + " " + endposnew[1] );
 				 pack = new PackMT(startposnew, endposnew, signedslope, currentintercept);
 				}
 				
@@ -375,9 +374,10 @@ public class PackMT {
 		final double[] sigma = { 2, 2 };
 
 		int SNR = 10;
-		int numlines = 10;
-		int numsims = 2;
-		int min = 3893;
+		int numlines = 5;
+		int numsims = 100;
+		//3893
+		int min = -100;
 		int[] random = new int[numsims];
 
 		Random randomNum = new Random(min);
