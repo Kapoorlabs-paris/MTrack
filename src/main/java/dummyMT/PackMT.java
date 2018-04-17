@@ -382,6 +382,12 @@ public class PackMT {
 				
 				double distanceline = DistanceLine(source , slopetarget, intercepttarget, startpos, endpos);
 				
+				double distancesecline = DistanceLine(targetPack.startpos , clicked.slope, clicked.intercept, source, secondsource);
+				
+				double distancesecsecline = DistanceLine(targetPack.endpos , clicked.slope, clicked.intercept, source, secondsource);
+				
+				double revdist = Math.min(distancesecline, distancesecsecline);
+				
 				double minpointfinaldist = Math.min(minpointdist, distanceline);
 				
 				double seconddistance = Distance(
@@ -395,12 +401,14 @@ public class PackMT {
 				double seconddistanceline = DistanceLine(secondsource , slopetarget, intercepttarget, startpos, endpos);
 				
 				
+				
+				
 				double minlinedist = Math.min(minpointdistsec, seconddistanceline);
 				
 				//System.out.println(minpointdist + " " + minlinedist + " " + slopetarget);
 			
-				
-				distanceList.add(Math.min(minlinedist, minpointfinaldist));
+				double veryfinaldist = Math.min(revdist, minlinedist);
+				distanceList.add(Math.min(veryfinaldist, minpointfinaldist));
 
 				
 			
@@ -490,7 +498,7 @@ public class PackMT {
 		final double[] sigma = { 2, 2 };
 
 		int SNR = 10;
-		int numlines = 65;
+		int numlines = 15;
 		int numsims = 100;
 		//3893
 		int min = 1000;
@@ -515,9 +523,12 @@ public class PackMT {
 			Draw(source, sigma, MTlistfinal);
 			ArrayList<Double> distlist = getNearestRois(MTlistfinal);
 
+		
+
+			
 			try {
 				File filedist = new File(
-						"/Users/aimachine/Documents/MTrack+Mser/New/Density65/All_SeedsSNR10DIST" + numlines + "Run" + i + ".txt");
+						"/Users/aimachine/Documents/MTrack+Mser/New/Density15/All_SeedsSNR10DIST" + numlines + "Run" + i + ".txt");
 
 				FileWriter fwdist = new FileWriter(filedist);
 				BufferedWriter bwdist = new BufferedWriter(fwdist);
@@ -533,7 +544,7 @@ public class PackMT {
 
 			try {
 				File file = new File(
-						"/Users/aimachine/Documents/MTrack+Mser/New/Density65/All_SeedsSNR10Number" + numlines + "Run" + i + ".txt");
+						"/Users/aimachine/Documents/MTrack+Mser/New/Density15/All_SeedsSNR10Number" + numlines + "Run" + i + ".txt");
 
 				FileWriter fw = new FileWriter(file);
 				BufferedWriter bw = new BufferedWriter(fw);
