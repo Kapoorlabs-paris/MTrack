@@ -84,7 +84,7 @@ public class PackMT {
 				double startposnew[] = new double[n];
 				double endposnew[] = new double[n];
 				for (int d = 0; d < source.numDimensions(); ++d)
-					startposnew[d] = (rnd.nextFloat()  * (source.max(d) - 50)  + 50) ;
+					startposnew[d] = (rnd.nextFloat()  * (source.max(d) - source.min(d) - 10)  + source.min(d) + 10) ;
 
 				// Look for the end point
 
@@ -109,7 +109,7 @@ public class PackMT {
 			do {
 				
 				for (int d = 0; d < source.numDimensions(); ++d)
-					startposnew[d] = (rnd.nextFloat() * (source.max(d) - 50)   +  50) ;
+					startposnew[d] = (rnd.nextFloat() * (source.max(d) - source.min(d) - 10)   +  source.min(d) + 10) ;
 
 				// Look for the end point
 
@@ -173,21 +173,23 @@ public class PackMT {
 
 			double[] lineparam = new double[] { pack.slope, pack.intercept };
 
-			FinalInterval interval = Intervals.createMinMax((long) endposnew[0], (long)endposnew[1],
-					(long) startposnew[0], (long) startposnew[1]);
-
-			FinalInterval secinterval = Intervals.createMinMax((long) pack.endpos[0], (long)pack.endpos[1],
-					(long) pack.startpos[0], (long) pack.startpos[1]);
+	
+			
+			double bigx = pack.startpos[0] > pack.endpos[0] ? pack.startpos[0]:pack.endpos[0];
+			double smallx = pack.startpos[0] > pack.endpos[0] ? pack.endpos[0]:pack.startpos[0];
+			
+			double bigy = pack.startpos[1] > pack.endpos[1] ? pack.startpos[1]:pack.endpos[1];
+			double smally = pack.startpos[1] > pack.endpos[1] ? pack.endpos[1]:pack.startpos[1];
+			
 			double[] posintersect = Intersectionpoint(lineparam, currentlineparam, endposnew.length);
 
-			if (posintersect[0] >= interval.min(0) / 2 && posintersect[0] <= interval.max(0) * 2 && posintersect[1] >= interval.min(1) / 2
-					&& posintersect[1] <= interval.max(1) * 2 ) {
+			if (posintersect[0]>= smallx && posintersect[0] <= bigx && posintersect[1] >= smally
+					&& posintersect[1] <= bigy ) {
 				truecount++;
 			}
-			if ( posintersect[0] >= secinterval.min(0)/ 2 && posintersect[0] <= secinterval.max(0) * 2 && posintersect[1] >= secinterval.min(1)/ 2
-					&& posintersect[1] <= secinterval.max(1) * 2 ) {
-				truecount++;
-			}
+			
+			
+			
 			
 		}
 
@@ -288,14 +290,36 @@ public class PackMT {
 		return Math.sqrt(distance);
 	}
 	
-	public static double DistanceLine(double[] cordone, double slope, double intercept) {
+	public static double DistanceLine(double[] cordone, double slope, double intercept, double[] startpos, double[] endpos) {
 
 		
 
+		boolean outside = false;
 		double distance = Math.abs(cordone[1] - slope * cordone[0] - intercept) / (Math.sqrt(1.0 + slope *slope));
 
+		double xintersect = (cordone[0] + slope * (cordone[1] -intercept)) / (1 + slope * slope);
+		double yintersect = slope * xintersect + intercept;
+		
+		double bigx = startpos[0] > endpos[0] ? startpos[0]:endpos[0];
+		double smallx = startpos[0] > endpos[0] ? endpos[0]:startpos[0];
+		
+		double bigy = startpos[1] > endpos[1] ? startpos[1]:endpos[1];
+		double smally = startpos[1] > endpos[1] ? endpos[1]:startpos[1];
+		
+		
+		if (xintersect >= smallx - 5 && xintersect <= bigx + 5 && yintersect >= smally - 5 && yintersect <= bigy + 5)
+			outside = false;
+		else
+			outside = true;
+		
 
-		return distance;
+		double returndistance;
+		if (!outside)
+                  returndistance = distance;		
+		else
+			returndistance = Double.MAX_VALUE;
+			
+		return returndistance;
 	}
 
 	public static ArrayList<Double> getNearestRois(ArrayList<PackMT> MTList) {
@@ -344,6 +368,8 @@ public class PackMT {
 				
 				double slopetarget =  targetPack.slope;
 				double intercepttarget = targetPack.intercept; 
+				double[] startpos = targetPack.startpos;
+				double[] endpos = targetPack.endpos;
 				
 				double distance = Distance(
 						targetPack.startpos,
@@ -354,7 +380,7 @@ public class PackMT {
 						source);
 				double minpointdist = Math.min(distance, distancesec);
 				
-				double distanceline = DistanceLine(source , slopetarget, intercepttarget);
+				double distanceline = DistanceLine(source , slopetarget, intercepttarget, startpos, endpos);
 				
 				double minpointfinaldist = Math.min(minpointdist, distanceline);
 				
@@ -366,7 +392,7 @@ public class PackMT {
 						secondsource);
 				double minpointdistsec = Math.min(seconddistance, seconddistancesec);
 				
-				double seconddistanceline = DistanceLine(secondsource , slopetarget, intercepttarget);
+				double seconddistanceline = DistanceLine(secondsource , slopetarget, intercepttarget, startpos, endpos);
 				
 				
 				double minlinedist = Math.min(minpointdistsec, seconddistanceline);
@@ -430,6 +456,23 @@ public class PackMT {
 		return Math.sqrt(stdev / distlist.size() );
 
 	}
+	public static double getSTDminList(ArrayList<Double> distlist) {
+
+		double min = distlist.get(0);
+		double stdev = 0;
+
+		
+		
+		for (int index = 0; index < distlist.size(); ++index) {
+		
+			stdev+= (distlist.get(index) - min) * (distlist.get(index) - min);
+			
+		}
+
+		return Math.sqrt(stdev / distlist.size() );
+
+	}
+	
 	public static double getMedianList(ArrayList<Double> distlist) {
 
 		if (distlist.size() % 2 == 0)
@@ -447,7 +490,7 @@ public class PackMT {
 		final double[] sigma = { 2, 2 };
 
 		int SNR = 10;
-		int numlines = 15;
+		int numlines = 65;
 		int numsims = 100;
 		//3893
 		int min = 1000;
@@ -474,14 +517,14 @@ public class PackMT {
 
 			try {
 				File filedist = new File(
-						"/Users/aimachine/Documents/MTrack+Mser/New/Density15/All_SeedsSNR10DIST" + numlines + "Run" + i + ".txt");
+						"/Users/aimachine/Documents/MTrack+Mser/New/Density65/All_SeedsSNR10DIST" + numlines + "Run" + i + ".txt");
 
 				FileWriter fwdist = new FileWriter(filedist);
 				BufferedWriter bwdist = new BufferedWriter(fwdist);
-				bwdist.write("\tminDist \tSTDDist \tMedianDist \tMeanDist  \n");
+				bwdist.write("\tminDist \tSTDDist \tMeanDist \tMedianDist \tSTDminDist \n");
 
 				bwdist.write(distlist.get(0) + " " + getSTDList(distlist) + " " + getMeanList(distlist)
-						+ " " + getMedianList(distlist));
+						+ " " + getMedianList(distlist) + " " + getSTDminList(distlist));
 
 				bwdist.close();
 				fwdist.close();
@@ -490,7 +533,7 @@ public class PackMT {
 
 			try {
 				File file = new File(
-						"/Users/aimachine/Documents/MTrack+Mser/New/Density15/All_SeedsSNR10Number" + numlines + "Run" + i + ".txt");
+						"/Users/aimachine/Documents/MTrack+Mser/New/Density65/All_SeedsSNR10Number" + numlines + "Run" + i + ".txt");
 
 				FileWriter fw = new FileWriter(file);
 				BufferedWriter bw = new BufferedWriter(fw);
