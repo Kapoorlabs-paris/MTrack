@@ -25,6 +25,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Rectangle;
 import java.io.File;
+import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -76,8 +77,7 @@ public class Split implements Runnable  {
 
 	private final File file;
 	final BatchMode parent;
-	final int fileindex;
-
+	final int fileindex; 
 	public Split(File file, BatchMode parent, final int fileindex) {
 
 		this.file = file;
@@ -114,6 +114,8 @@ public class Split implements Runnable  {
 			
 			parent.parent.addToName = file.getName().replaceFirst("[.][^.]+$", "");
 			System.out.println(parent.parent.addToName);
+			System.out.println(parent.batchfolder);
+			
 			double percent = Math.round(100 * (fileindex + 1) / (parent.AllImages.length - 1));
 
 			FitterUtils.SetProgressBarTime(fileprogress, percent, (fileindex + 1), (parent.AllImages.length), "Processing File (please wait)");
@@ -209,9 +211,8 @@ public class Split implements Runnable  {
 			parent.parent.RoisViaMSER = LocalPrefs.getBoolean(".RoiViaMSER.boolean", false);
 			parent.parent.RoisViaWatershed = LocalPrefs.getBoolean(".RoiViaWatershed.boolean", false);
 			
-			parent.calibration = new double[parent.originalimg.numDimensions() - 1];
-			parent.calibration[0] = LocalPrefs.getDouble(".CalibrationX.double", 1);
-			parent.calibration[1] = LocalPrefs.getDouble(".CalibrationY.double", 1);
+			parent.calibrationX = LocalPrefs.getDouble(".CalibrationX.double", 1);
+			parent.calibrationY= LocalPrefs.getDouble(".CalibrationY.double", 1);
 			parent.AllSeedrois = new ArrayList<OvalRoi>();
 			parent.newHoughtree = new HashMap<Integer, MserTree<UnsignedByteType>>();
 			parent.Userframe = new ArrayList<Indexedlength>();

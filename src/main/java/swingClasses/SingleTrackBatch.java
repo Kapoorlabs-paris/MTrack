@@ -237,11 +237,11 @@ public  class SingleTrackBatch {
 								final double[] newpoint = thirdDimension.get(frameindex).newpoint;
 								final double[] oldpoint = thirdDimension.get(frameindex).oldpoint;
 								final double[] newpointCal = new double[] {
-										thirdDimension.get(frameindex).newpoint[0] * parent.calibration[0],
-										thirdDimension.get(frameindex).newpoint[1] * parent.calibration[1] };
+										thirdDimension.get(frameindex).newpoint[0] * parent.calibrationX,
+										thirdDimension.get(frameindex).newpoint[1] * parent.calibrationY };
 								final double[] oldpointCal = new double[] {
-										thirdDimension.get(frameindex).oldpoint[0] * parent.calibration[0],
-										thirdDimension.get(frameindex).oldpoint[1] * parent.calibration[1] };
+										thirdDimension.get(frameindex).oldpoint[0] * parent.calibrationX,
+										thirdDimension.get(frameindex).oldpoint[1] * parent.calibrationY };
 
 								final double lengthrealperframe = util.Boundingboxes.Distance(newpointCal, oldpointCal);
 								final double lengthpixelperframe = util.Boundingboxes.Distance(newpoint, oldpoint);
@@ -275,8 +275,8 @@ public  class SingleTrackBatch {
 
 								double[] currentlocationreal = new double[parent.ndims];
 
-								currentlocationreal = new double[] { currentlocationpixel[0] * parent.calibration[0],
-										currentlocationpixel[1] * parent.calibration[1] };
+								currentlocationreal = new double[] { currentlocationpixel[0] * parent.calibrationX,
+										currentlocationpixel[1] * parent.calibrationY };
 
 								ResultsMT startMT = new ResultsMT(framenumber, startlengthpixel, startlengthreal, seedID,
 										currentlocationpixel, currentlocationreal, lengthpixelperframe, lengthrealperframe);
@@ -347,11 +347,11 @@ public  class SingleTrackBatch {
 									final double[] oldpoint = thirdDimension.get(frameindex).oldpoint;
 
 									final double[] newpointCal = new double[] {
-											thirdDimension.get(frameindex).newpoint[0] * parent.calibration[0],
-											thirdDimension.get(frameindex).newpoint[1] * parent.calibration[1] };
+											thirdDimension.get(frameindex).newpoint[0] * parent.calibrationX,
+											thirdDimension.get(frameindex).newpoint[1] * parent.calibrationY };
 									final double[] oldpointCal = new double[] {
-											thirdDimension.get(frameindex).oldpoint[0] * parent.calibration[0],
-											thirdDimension.get(frameindex).oldpoint[1] * parent.calibration[1] };
+											thirdDimension.get(frameindex).oldpoint[0] * parent.calibrationX,
+											thirdDimension.get(frameindex).oldpoint[1] * parent.calibrationY };
 
 									final double lengthrealperframe = util.Boundingboxes.Distance(newpointCal, oldpointCal);
 									final double lengthpixelperframe = util.Boundingboxes.Distance(newpoint, oldpoint);
@@ -389,8 +389,8 @@ public  class SingleTrackBatch {
 
 									double[] currentlocationreal = new double[parent.ndims];
 
-									currentlocationreal = new double[] { currentlocationpixel[0] * parent.calibration[0],
-											currentlocationpixel[1] * parent.calibration[1] };
+									currentlocationreal = new double[] { currentlocationpixel[0] * parent.calibrationX,
+											currentlocationpixel[1] * parent.calibrationY };
 
 									ResultsMT endMT = new ResultsMT(framenumber, endlengthpixel, endlengthreal, seedID,
 											currentlocationpixel, currentlocationreal, lengthpixelperframe,
@@ -492,7 +492,7 @@ public  class SingleTrackBatch {
 						
 							try {
 								File fichier = new File(
-										parent.parent.usefolder + "//" + parent.parent.addToName + "SeedLabel" + currentseed + plusminusendlist.get(j).plusorminus + ".txt");
+										parent.batchfolder+ "//" + parent.parent.addToName + "SeedLabel" + currentseed + plusminusendlist.get(j).plusorminus + ".txt");
 
 								FileWriter fw = new FileWriter(fichier);
 								BufferedWriter bw = new BufferedWriter(fw);
@@ -510,6 +510,7 @@ public  class SingleTrackBatch {
 												&& parent.endlengthlist.get(index).currentpointpixel[1] != parent.endlengthlist
 														.get(index - 1).currentpointpixel[1])
 
+											
 											bw.write("\t" + parent.nf.format(parent.endlengthlist.get(index).framenumber) + "\t" + "\t"
 													+ parent.nf.format(parent.endlengthlist.get(index).totallengthpixel) + "\t"+ "\t"
 													+ "\t"+ "\t" + parent.nf.format(parent.endlengthlist.get(index).totallengthreal)
@@ -527,11 +528,11 @@ public  class SingleTrackBatch {
 													+ "\t" + "\t"
 													+ parent.nf.format(parent.endlengthlist.get(index).lengthrealperframe)
 													+ "\t" + "\t"
-													+ parent.nf.format(parent.calibration[0])  
+													+ parent.nf.format(parent.calibrationX)  
 													+ "\t" + "\t"
-													+ parent.nf.format(parent.calibration[1])  
+													+ parent.nf.format(parent.calibrationY)  
 													+ "\t" + "\t"
-													+ parent.nf.format(parent.calibration[2]) + 
+													+ parent.nf.format(parent.calibrationZ) + 
 													
 													"\n");
 
@@ -590,7 +591,7 @@ public  class SingleTrackBatch {
 								if (plusminusstartlist.get(j).seedid == currentseed){
 
 									try {
-										File fichier = new File(parent.parent.usefolder + "//" + parent.parent.addToName + "SeedLabel" + currentseed
+										File fichier = new File(parent.batchfolder+ "//" + parent.parent.addToName + "SeedLabel" + currentseed
 												+ plusminusstartlist.get(j).plusorminus + ".txt");
 
 										FileWriter fw = new FileWriter(fichier);
@@ -640,11 +641,11 @@ public  class SingleTrackBatch {
 																	+ parent.nf.format(
 																			parent.startlengthlist.get(index).lengthrealperframe)
 																	+ "\t" + "\t"
-																	+  parent.nf.format(parent.calibration[0])  
+																	+  parent.nf.format(parent.calibrationX)  
 																	+ "\t" + "\t"
-																	+ parent.nf.format(parent.calibration[1])  
+																	+ parent.nf.format(parent.calibrationY)  
 																	+ "\t" + "\t"
-																	+ parent.nf.format(parent.calibration[2]) + 
+																	+ parent.nf.format(parent.calibrationZ) + 
 																	
 															
 															"\n");
@@ -693,11 +694,11 @@ public  class SingleTrackBatch {
 								final double[] newpoint = thirdDimension.get(frameindex).newpoint;
 								final double[] oldpoint = thirdDimension.get(frameindex).oldpoint;
 								final double[] newpointCal = new double[] {
-										thirdDimension.get(frameindex).newpoint[0] * parent.calibration[0],
-										thirdDimension.get(frameindex).newpoint[1] * parent.calibration[1] };
+										thirdDimension.get(frameindex).newpoint[0] * parent.calibrationX,
+										thirdDimension.get(frameindex).newpoint[1] * parent.calibrationY };
 								final double[] oldpointCal = new double[] {
-										thirdDimension.get(frameindex).oldpoint[0] * parent.calibration[0],
-										thirdDimension.get(frameindex).oldpoint[1] * parent.calibration[1] };
+										thirdDimension.get(frameindex).oldpoint[0] * parent.calibrationX,
+										thirdDimension.get(frameindex).oldpoint[1] * parent.calibrationY };
 
 								final double lengthrealperframe = util.Boundingboxes.Distance(newpointCal, oldpointCal);
 								final double lengthpixelperframe = util.Boundingboxes.Distance(newpoint, oldpoint);
@@ -730,8 +731,8 @@ public  class SingleTrackBatch {
 
 								double[] currentlocationreal = new double[parent.ndims];
 
-								currentlocationreal = new double[] { currentlocationpixel[0] * parent.calibration[0],
-										currentlocationpixel[1] * parent.calibration[1] };
+								currentlocationreal = new double[] { currentlocationpixel[0] * parent.calibrationX,
+										currentlocationpixel[1] * parent.calibrationY };
 
 								ResultsMT startMT = new ResultsMT(framenumber, startlengthpixel, startlengthreal, seedID,
 										currentlocationpixel, currentlocationreal, lengthpixelperframe, lengthrealperframe);
@@ -768,7 +769,7 @@ public  class SingleTrackBatch {
 					
 
 						try {
-							File fichier = new File(parent.parent.usefolder + "//" + parent.parent.addToName + "SeedLabel" + seedID
+							File fichier = new File(parent.batchfolder + "//" + parent.parent.addToName + "SeedLabel" + seedID
 									+ "-Zeroend" + ".txt");
 
 							FileWriter fw = new FileWriter(fichier);
@@ -806,11 +807,11 @@ public  class SingleTrackBatch {
 												+ "\t" + "\t"
 												+ parent.nf.format(parent.userlengthlist.get(index).lengthrealperframe)
 												+ "\t" + "\t"
-												+ parent.nf.format(parent.calibration[0])  
+												+ parent.nf.format(parent.calibrationX)  
 												+ "\t" + "\t"
-												+ parent.nf.format(parent.calibration[1])  
+												+ parent.nf.format(parent.calibrationY)  
 												+ "\t" + "\t"
-												+ parent.nf.format(parent.calibration[2]) + 
+												+ parent.nf.format(parent.calibrationZ) + 
 												
 												"\n");
 

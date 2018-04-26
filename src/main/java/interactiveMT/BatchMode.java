@@ -257,7 +257,10 @@ public class BatchMode implements PlugIn, Runnable {
 	public int inix = LocalPrefs.getInt(".IniX.int", 1);
 	public int iniy = LocalPrefs.getInt(".IniY.int", 1);
 
-	public double[] calibration;
+	public double calibrationX = LocalPrefs.getDouble(".CalibrationX.double", 0.156);
+	public double calibrationY = LocalPrefs.getDouble(".CalibrationY.double", 0.156);
+	public double calibrationZ = LocalPrefs.getDouble(".CalibrationZ.double", 1);;
+	
 	public double radiusfactor = 1;
 	public MserTree<UnsignedByteType> newtree;
 
@@ -345,10 +348,10 @@ public class BatchMode implements PlugIn, Runnable {
 
 	public void goTrack() {
 
-		LocalPrefs.setHomeDir(AllImages[0].getParent());
 		
+		LocalPrefs.setHomeDir(AllImages[0].getParent());
+		parent.usefolder = batchfolder;
 		LocalPrefs.load(AllImages[0].getParent(), IJ.getApplet());
-		System.out.println("Local" + " " + LocalPrefs.getHomeDir() + " " +  LocalPrefs.getBoolean(".FindLinesViaMSER.boolean", false) );
 		ProgressBatch startbatch = new ProgressBatch(this);
 		startbatch.execute();
 		

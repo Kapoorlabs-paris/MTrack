@@ -386,7 +386,7 @@ public class MainFileChooser extends JPanel {
 
 			panelIntro.setLayout(layout);
 
-			final JFrame frame = new JFrame("Welcome to MTV Tracker (Batch Mode)");
+			final JFrame frame = new JFrame("Welcome to MTrack (Batch Mode)");
 			Batchmoderun = true;
 			Kymomode = false;
 			Simplemode = true;
@@ -452,7 +452,6 @@ public class MainFileChooser extends JPanel {
 
 			chooserB.setFileFilter(filter);
 			chooserB.showOpenDialog(parent);
-
 			AllMovies = chooserB.getSelectedFile().listFiles(new FilenameFilter() {
 				
 				@Override
