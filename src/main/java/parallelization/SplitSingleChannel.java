@@ -78,7 +78,6 @@ public class SplitSingleChannel implements Runnable  {
 	private final File file;
 	final SingleBatchMode parent;
 	final int fileindex;
-
 	public SplitSingleChannel(File file, SingleBatchMode parent, final int fileindex) {
 
 		this.file = file;
@@ -209,9 +208,10 @@ public class SplitSingleChannel implements Runnable  {
 			parent.parent.RoisViaMSER = LocalPrefs.getBoolean(".RoiViaMSER.boolean", false);
 			parent.parent.RoisViaWatershed = LocalPrefs.getBoolean(".RoiViaWatershed.boolean", false);
 			parent.parent.SaveTxt = LocalPrefs.getBoolean(".SaveTxt.boolean", true);
-			parent.calibration = new double[parent.originalimg.numDimensions() - 1];
-			parent.calibration[0] = LocalPrefs.getDouble(".CalibrationX.double", 1);
-			parent.calibration[1] = LocalPrefs.getDouble(".CalibrationY.double", 1);
+			parent.calibrationX = LocalPrefs.getDouble(".CalibrationX.double", 0.156);
+			parent.calibrationY = LocalPrefs.getDouble(".CalibrationY.double", 0.156);
+			parent.calibrationZ = LocalPrefs.getDouble(".CalibrationZ.double", 1);;
+			
 			parent.AllSeedrois = new ArrayList<OvalRoi>();
 			parent.newHoughtree = new HashMap<Integer, MserTree<UnsignedByteType>>();
 			parent.Userframe = new ArrayList<Indexedlength>();

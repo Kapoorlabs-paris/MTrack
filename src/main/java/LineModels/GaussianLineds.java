@@ -154,9 +154,7 @@ public static double numdiff(double[] x, double[] a, int dim, double[] b) {
 		double[] dxvector = { ds / Math.sqrt( 1 + slope * slope) , slope * ds/ Math.sqrt( 1 + slope * slope)  };
 		double[] dxvectorderiv = { 1/ Math.sqrt( 1 + slope * slope) , slope/ Math.sqrt( 1 + slope * slope)  };
 
-		double sigmaX = 1/ Math.sqrt(b[0]);
-		double sigmaY = 1/ Math.sqrt(b[1]);
-		double radius = Math.sqrt(sigmaX*sigmaX + sigmaY*sigmaY);
+		
 		
 	double sumofgaussians = 0;
 		
@@ -228,9 +226,7 @@ public static double numdiff(double[] x, double[] a, int dim, double[] b) {
 		double sum = 0;
 		double sumofgaussians = 0;
 		double di;
-		double sigmaX = 1/ Math.sqrt(b[0]);
-		double sigmaY = 1/ Math.sqrt(b[1]);
-		double radius = Math.sqrt(sigmaX*sigmaX + sigmaY*sigmaY);
+	
 		
 		double ds = Math.abs(a[2 * ndims]);
 

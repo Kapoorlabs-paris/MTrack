@@ -254,10 +254,12 @@ public class SingleBatchMode implements PlugIn, Runnable {
 	public int iniy = LocalPrefs.getInt(".IniY.int", 1);
 
 	public int numgaussians = LocalPrefs.getInt(".Numg.int", 2);
-	public double[] calibration;
 	public double radiusfactor = 1;
 	public MserTree<UnsignedByteType> newtree;
-
+	public double calibrationX = LocalPrefs.getDouble(".CalibrationX.double", 0.156);
+	public double calibrationY = LocalPrefs.getDouble(".CalibrationY.double", 0.156);
+	public double calibrationZ = LocalPrefs.getDouble(".CalibrationZ.double", 1);;
+	
 	public HashMap<Integer, MserTree<UnsignedByteType>> newHoughtree;
 
 	public ArrayList<MserTree<UnsignedByteType>> Alllocaltree;
@@ -342,6 +344,7 @@ public class SingleBatchMode implements PlugIn, Runnable {
 		
 		LocalPrefs.load(AllImages[0].getParent(), IJ.getApplet());
 		LocalPrefs.setHomeDir(AllImages[0].getParent());
+		parent.usefolder = batchfolder;
 		SingleProgressBatch startbatch = new SingleProgressBatch(this);
 		startbatch.execute();
 		
