@@ -423,7 +423,8 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	// first and last slice to process
 	int endStack;
 	public int thirdDimension;
-
+	public ImagePlus impImg; 
+	public ImageStack stackimg;
 	public static enum Whichend {
 
 		start, end, both, none, user;
@@ -683,7 +684,8 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 	@Override
 	public void run(String arg) {
-
+		impImg = IJ.getImage();
+		stackimg = new ImageStack( (int) originalimg.dimension( 0 ), (int) originalimg.dimension( 1 ) );
 		
 		System.out.println(addToName + " " + userfile);
 		
@@ -1066,6 +1068,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		}
 
 		if (change == ValueChange.SHOWMSER) {
+			
 			long[] min = { (long) standardRectangle.getMinX(), (long) standardRectangle.getMinY() };
 			long[] max = { (long) standardRectangle.getMaxX(), (long) standardRectangle.getMaxY() };
 			interval = new FinalInterval(min, max);
@@ -1077,8 +1080,21 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 			newimg = util.CopyUtils.copytoByteImage(Kernels.CannyEdgeandMean(currentPreprocessedimg, Cannyradius),
 					standardRectangle);
 
+			// For displaying the component tree in the advanced mode in double channel mode
+		
+			
 			newtree = MserTree.buildMserTree(newimg, delta, minSize, maxSize, Unstability_Score, minDiversity,
 					darktobright);
+			
+			/*
+			new ImageJ();
+			impImg = IJ.getImage();
+			stackimg = new ImageStack( (int) originalimg.dimension( 0 ), (int) originalimg.dimension( 1 ) );
+			
+			util.DrawingUtils.visualise(newtree, null, impImg, stackimg);
+			final ImagePlus impImg = new ImagePlus("components", stackimg);
+			impImg.show();
+			*/
 			Rois = util.DrawingUtils.getcurrentRois(newtree, AllmeanCovar);
 
 			AllMSERrois.put(thirdDimension, Rois);
@@ -2432,6 +2448,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		JFrame frame = new JFrame("");
 		MainFileChooser panel = new MainFileChooser();
 
+		new ImageJ();
 		frame.getContentPane().add(panel, "Center");
 		frame.setSize(panel.getPreferredSize());
 	}

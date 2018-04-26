@@ -80,7 +80,6 @@ import updateListeners.FinalPoint;
 public class ProgressBatch extends SwingWorker<Void, Void> {
 
 	final BatchMode parent;
-
 	public ProgressBatch(final BatchMode parent) {
 
 		this.parent = parent;
@@ -106,8 +105,7 @@ public class ProgressBatch extends SwingWorker<Void, Void> {
 			parent.jpb.setIndeterminate(false);
 			get();
 			parent.frame.dispose();
-			JOptionPane.showMessageDialog(parent.jpb.getParent(), "Success", "Success",
-					JOptionPane.INFORMATION_MESSAGE);
+		
 		} catch (ExecutionException | InterruptedException e) {
 			e.printStackTrace();
 		}

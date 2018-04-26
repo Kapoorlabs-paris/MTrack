@@ -60,7 +60,8 @@ public class CreateINIfile {
 		LocalPrefs.set("IniY.int", parent.iniy);
 		LocalPrefs.set("Numg.int", parent.numgaussians);
 		LocalPrefs.set("CalibrationX.double", parent.calibration[0]);
-		LocalPrefs.set("CalibrationX.double", parent.calibration[1]);
+		LocalPrefs.set("CalibrationY.double", parent.calibration[1]);
+		LocalPrefs.set("CalibrationZ.double", parent.calibration[2]);
 		LocalPrefs.set("Maxdist.double", parent.maxdist);
 		if (parent.FindLinesViaMSER){
 			

@@ -48,7 +48,8 @@ public class StarttimeListener implements AdjustmentListener {
 		this.scrollbarSize = scrollbarSize;
         this.parent = parent;
 		this.deltaScrollbar = deltaScrollbar;
-
+		deltaScrollbar.setBlockIncrement(parent.computeScrollbarPositionFromValue(2, min, max, scrollbarSize));
+		deltaScrollbar.setUnitIncrement(parent.computeScrollbarPositionFromValue(2, min, max, scrollbarSize));
 	}
 
 	@Override

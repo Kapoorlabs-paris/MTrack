@@ -50,7 +50,8 @@ public class EndtimeListener implements AdjustmentListener {
 		this.scrollbarSize = scrollbarSize;
 
 		this.deltaScrollbar = deltaScrollbar;
-
+		deltaScrollbar.setBlockIncrement(parent.computeScrollbarPositionFromValue(2, min, max, scrollbarSize));
+		deltaScrollbar.setUnitIncrement(parent.computeScrollbarPositionFromValue(2, min, max, scrollbarSize));
 	}
 
 	@Override

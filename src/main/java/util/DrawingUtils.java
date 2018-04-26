@@ -30,15 +30,20 @@ import java.util.Iterator;
 import java.util.List;
 
 import graphconstructs.Trackproperties;
+import ij.ImagePlus;
+import ij.ImageStack;
 import ij.gui.EllipseRoi;
 import ij.gui.Line;
 import ij.gui.OvalRoi;
 import ij.gui.Overlay;
 import ij.gui.PointRoi;
 import ij.gui.Roi;
+import ij.process.ByteProcessor;
+import ij.process.FloatProcessor;
 import labeledObjects.Indexedlength;
 import mpicbg.imglib.util.Util;
 import net.imglib2.KDTree;
+import net.imglib2.Localizable;
 import net.imglib2.Point;
 import net.imglib2.RandomAccess;
 import net.imglib2.RandomAccessibleInterval;
@@ -46,12 +51,14 @@ import net.imglib2.RealPoint;
 import net.imglib2.algorithm.componenttree.mser.Mser;
 import net.imglib2.algorithm.componenttree.mser.MserTree;
 import net.imglib2.algorithm.localextrema.RefinedPeak;
+import net.imglib2.type.numeric.IntegerType;
 import net.imglib2.type.numeric.integer.IntType;
 import net.imglib2.type.numeric.integer.UnsignedByteType;
+import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.util.Pair;
 import peakFitter.SortListbyproperty;
 
-public class DrawingUtils {
+public class DrawingUtils  {
 
 	
 	
@@ -74,8 +81,87 @@ public class DrawingUtils {
 		return Allrois;
 
 	}
-
 	
+	public static void visualiseThresh( MserTree<UnsignedByteType> newtree, final ImagePlus imp,  final ImageStack stack ) {
+		int w = imp.getWidth();
+		int h = imp.getHeight();
+		final FloatProcessor floatProcessor = new FloatProcessor(w, h);
+		final float[] pixels = (float[])floatProcessor.getPixels();
+		
+		Iterator<Mser<UnsignedByteType>> iter = newtree.iterator();
+		
+		while(iter.hasNext()) {
+			
+			Mser<UnsignedByteType> mser = iter.next();
+			
+			
+		}
+		
+		
+	}
+	
+	/**
+	 * Visualise MSER. Add a 3sigma ellipse overlay to {@link #imp} in the given
+	 * color. Add a slice to {@link #stack} showing binary mask of MSER region.
+	 */
+	public static void visualiseFloat ( final Mser< UnsignedByteType > mser, final Color color, final ImagePlus imp,  final ImageStack stack )
+	{
+		
+		int w = imp.getWidth();
+		int h = imp.getHeight();
+		Overlay ov = new Overlay();
+		imp.setOverlay( ov );
+		final FloatProcessor floatProcessor = new FloatProcessor( w, h );
+		final float[] pixels = ( float[] )floatProcessor.getPixels();
+		for ( final Localizable l : mser )
+		{
+			final int x = l.getIntPosition( 0 );
+			final int y = l.getIntPosition( 1 );
+			pixels[ y * w + x ] = (byte)(255 & 0xff);
+		}
+		final String label = "" + mser.value();
+		stack.addSlice( label, floatProcessor );
+
+		final EllipseRoi ellipse = createEllipse( mser.mean(), mser.cov(), 3 );
+		ellipse.setStrokeColor( color );
+		ov.add( ellipse );
+	}
+	
+	/**
+	 * Visualise MSER. Add a 3sigma ellipse overlay to {@link #imp} in the given
+	 * color. Add a slice to {@link #stack} showing binary mask of MSER region.
+	 */
+	public static void visualise ( final Mser< UnsignedByteType > mser, final Color color, final ImagePlus imp,  final ImageStack stack )
+	{
+		
+		int w = imp.getWidth();
+		int h = imp.getHeight();
+		Overlay ov = new Overlay();
+		imp.setOverlay( ov );
+		final ByteProcessor byteProcessor = new ByteProcessor( w, h );
+		final byte[] pixels = ( byte[] )byteProcessor.getPixels();
+		for ( final Localizable l : mser )
+		{
+			final int x = l.getIntPosition( 0 );
+			final int y = l.getIntPosition( 1 );
+			pixels[ y * w + x ] = (byte)(255 & 0xff);
+		}
+		final String label = "" + mser.value();
+		stack.addSlice( label, byteProcessor );
+
+		final EllipseRoi ellipse = createEllipse( mser.mean(), mser.cov(), 3 );
+		ellipse.setStrokeColor( color );
+		ov.add( ellipse );
+	}
+
+	/**
+	 * Visualize all MSER in a tree. {@see #visualise(Mser, Color)}.
+	 */
+	public static void visualise( final MserTree< UnsignedByteType > tree, final Color color, final ImagePlus imp,  final ImageStack stack  )
+	{
+		for ( final Mser< UnsignedByteType > mser : tree )
+			visualise( mser, color, imp, stack );
+	}
 	/**
 	 * 2D correlated Gaussian
 	 * 
