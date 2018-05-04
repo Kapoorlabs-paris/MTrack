@@ -473,23 +473,24 @@ public  class SingleTrack {
 					
 						}
 						
-
+					}
 						
-						// Compare seed maps to ascribe plus minus or zero label
+					 Iterator itend = endseedmap.entrySet().iterator();
 						
-						Iterator it = startseedmap.entrySet().iterator();
-						
-						while(it.hasNext()){
+						while(itend.hasNext()){
 							
-							Map.Entry<Integer, Double> pair = (Map.Entry<Integer, Double>) it.next();
+							Map.Entry<Integer, Double> pair = (Map.Entry<Integer, Double>) itend.next();
 							
 							int key = pair.getKey();
 							double endrate = 0;
+							double startrate = 0;
 						
-							if(endseedmap.containsKey(key))
+							if(endseedmap.containsKey(key) && endseedmap!=null)
 							 endrate = endseedmap.get(key);
+							if(startseedmap.containsKey(key) && startseedmap!=null)
+							startrate = startseedmap.get(key);
 							
-							double startrate = startseedmap.get(key);
+							
 							String plusorminusend = (startrate > endrate) ? "Minus" : "Plus" ;
 							String plusorminusstart = (startrate > endrate) ? "Plus" : "Minus" ;
 							if (parent.seedmap.get(key) == Whichend.start || parent.seedmap.get(key) == Whichend.end && parent.seedmap.get(key) != Whichend.both ){
@@ -498,39 +499,35 @@ public  class SingleTrack {
 							}
 							
 							PlusMinusSeed pmseedEndB = new PlusMinusSeed(key, plusorminusend);
-							if(endseedmap.containsKey(key))
-							plusminusendlist.add(pmseedEndB);
-							PlusMinusSeed pmseedEndA = new PlusMinusSeed(key, plusorminusstart);
-							plusminusstartlist.add(pmseedEndA);
-						}
-						
-						
-						
-		               Iterator itend = endseedmap.entrySet().iterator();
-						
-						while(itend.hasNext()){
-							
-							Map.Entry<Integer, Double> pair = (Map.Entry<Integer, Double>) itend.next();
-							
-							double startrate = 0;
-							int key = pair.getKey();
-							double endrate = endseedmap.get(key);
-							if (startseedmap.containsKey(key))
-							startrate = startseedmap.get(key);
-							String plusorminusstart = (startrate > endrate) ? "Minus" : "Plus" ;
-							String plusorminusend = (startrate > endrate) ? "Plus" : "Minus" ;
-							if (parent.seedmap.get(key) == Whichend.start || parent.seedmap.get(key) == Whichend.end && parent.seedmap.get(key) != Whichend.both ){
-								plusorminusend = "Zeroend";
-								plusorminusstart = "Zeroend";
+							if(plusminusendlist.size() > 0) {
+							for(int i = 0; i < plusminusendlist.size(); ++i) {
+								
+								if(plusminusendlist.get(i).seedid !=key)
+									plusminusendlist.add(pmseedEndB);
 							}
+							}
+							else
+								plusminusendlist.add(pmseedEndB);
 							
-							PlusMinusSeed pmseedEndB = new PlusMinusSeed(key, plusorminusend);
-							plusminusendlist.add(pmseedEndB);
+							System.out.println(plusorminusend);
+							
 							PlusMinusSeed pmseedEndA = new PlusMinusSeed(key, plusorminusstart);
-							if(startseedmap.containsKey(key))
-							plusminusstartlist.add(pmseedEndA);
+							if(plusminusstartlist.size() > 0) {
+		                      for(int i = 0; i < plusminusstartlist.size(); ++i) {
+								
+								if(plusminusstartlist.get(i).seedid !=key)
+									plusminusstartlist.add(pmseedEndA);
+							}
 						}
 						
+						else
+							plusminusstartlist.add(pmseedEndA);
+							
+						}
+							
+							
+						
+		              
 						
 						
 						
@@ -542,11 +539,6 @@ public  class SingleTrack {
 							MinSeedLabel = parent.Allend.get(0).get(0).seedlabel;
 							
 							for (int currentseed = MinSeedLabel; currentseed < MaxSeedLabel + 1; ++currentseed) {
-
-					
-					
-						
-					
 
 			                for (int j = 0; j < plusminusendlist.size(); ++j){
 							
@@ -609,6 +601,7 @@ public  class SingleTrack {
 			}
 			
 							}
+						}
 						
 					
 					for (int index = 0; index < parent.endlengthlist.size(); ++index) {
@@ -632,8 +625,8 @@ public  class SingleTrack {
 					}
 
 					
-			}
-					}
+			
+					
 				
 				
 					if (parent.Allstart.get(0).size() > 0) {
@@ -908,10 +901,9 @@ public  class SingleTrack {
 
 			}
 
-			
 			rtAll.show("Start and End of MT");
 			if (parent.lengthtimestart != null)
-				parent.lengthtime =parent. lengthtimestart;
+				parent.lengthtime = parent.lengthtimestart;
 			else
 				parent.lengthtime = parent.lengthtimeend;
 			if (parent.analyzekymo) {
@@ -933,7 +925,8 @@ public  class SingleTrack {
 								if ((int) parent.lengthKymo.get(secindex)[1] == time
 										&& parent.Accountedframes.get(accountindex) == time) {
 
-									float delta = (float) (parent.lengthtimestart.get(index)[0] - parent.lengthKymo.get(secindex)[0]);
+									float delta = (float) (parent.lengthtimestart.get(index)[0]
+											- parent.lengthKymo.get(secindex)[0]);
 									float[] cudeltadeltaLstart = { delta, time };
 									parent.deltadstart.add(cudeltadeltaLstart);
 
@@ -944,8 +937,8 @@ public  class SingleTrack {
 					}
 
 					/********
-					 * The part below removes the duplicate entries in the array
-					 * dor the time co-ordinate
+					 * The part below removes the duplicate entries in the array dor
+					 * the time co-ordinate
 					 ********/
 
 					int j = 0;
@@ -1016,8 +1009,8 @@ public  class SingleTrack {
 						}
 					}
 					/********
-					 * The part below removes the duplicate entries in the array
-					 * dor the time co-ordinate
+					 * The part below removes the duplicate entries in the array dor
+					 * the time co-ordinate
 					 ********/
 
 					int j = 0;
@@ -1104,37 +1097,38 @@ public  class SingleTrack {
 					parent.redo = false;
 
 			}
-		if (parent.Kymoimg != null) {
-			ImagePlus newimp = parent.Kymoimp.duplicate();
-			for (int index = 0; index < parent.lengthtime.size() - 1; ++index) {
+			if (parent.Kymoimg != null) {
+				ImagePlus newimp = parent.Kymoimp.duplicate();
+				for (int index = 0; index < parent.lengthtime.size() - 1; ++index) {
 
-				Overlay overlay = parent.Kymoimp.getOverlay();
-				if (overlay == null) {
-					overlay = new Overlay();
+					Overlay overlay = parent.Kymoimp.getOverlay();
+					if (overlay == null) {
+						overlay = new Overlay();
+						parent.Kymoimp.setOverlay(overlay);
+					}
+					Line newline = new Line(parent.lengthtime.get(index)[0], parent.lengthtime.get(index)[1],
+							parent.lengthtime.get(index + 1)[0], parent.lengthtime.get(index + 1)[1]);
+					newline.setFillColor(parent.colorDraw);
+
+					overlay.add(newline);
+
 					parent.Kymoimp.setOverlay(overlay);
+					RoiManager roimanager = RoiManager.getInstance();
+
+					roimanager.addRoi(newline);
+
 				}
-				Line newline = new Line(parent.lengthtime.get(index)[0], parent.lengthtime.get(index)[1],
-						parent.lengthtime.get(index + 1)[0], parent.lengthtime.get(index + 1)[1]);
-				newline.setFillColor(parent.colorDraw);
 
-				overlay.add(newline);
-
-				parent.Kymoimp.setOverlay(overlay);
-				RoiManager roimanager = RoiManager.getInstance();
-
-				roimanager.addRoi(newline);
-
+				parent.Kymoimp.show();
+			}
+			parent.displaystack();
+			if (parent.displayoverlay) {
+				parent.prestack.deleteLastSlice();
+				new ImagePlus(parent.addToName + "Overlays", parent.prestack).show();
 			}
 
-			parent.Kymoimp.show();
+			DisplayID.displayseeds(parent.addToName,Views.hyperSlice(parent.originalimg, 2, 0), parent.IDALL);
 		}
-		parent.displaystack();
-		if (parent.displayoverlay) {
-			parent.prestack.deleteLastSlice();
-			new ImagePlus(parent.addToName + "Overlays", parent.prestack).show();
-		}
-		DisplayID.displayseeds(parent.addToName,Views.hyperSlice(parent.originalimg, 2, 0), parent.IDALL);
-	}
 
 
 }

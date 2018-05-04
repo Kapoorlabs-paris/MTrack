@@ -270,7 +270,6 @@ public class TrackBatch {
 							ResultsMT startMT = new ResultsMT(framenumber, startlengthpixel, startlengthreal, seedID,
 									currentlocationpixel, currentlocationreal, lengthpixelperframe, lengthrealperframe);
 
-							System.out.println(seedID + "" + "Adding seed");
 							parent.startlengthlist.add(startMT);
 
 							startseedmap.put(seedID, growratestart);
@@ -370,7 +369,7 @@ public class TrackBatch {
 					}
 
 				
-				
+					}
 				
 				
 				
@@ -379,70 +378,90 @@ public class TrackBatch {
 
 					
 
-					// Compare seed maps to ascribe plus minus or zero label
+				
+				// Compare seed maps to ascribe plus minus or zero label
+				
+				
+				
+				
+				
+				Iterator it = startseedmap.entrySet().iterator();
+				
+				while(it.hasNext()){
 					
-					Iterator it = startseedmap.entrySet().iterator();
+					Map.Entry<Integer, Double> pair = (Map.Entry<Integer, Double>) it.next();
 					
-					while(it.hasNext()){
-						
-						Map.Entry<Integer, Double> pair = (Map.Entry<Integer, Double>) it.next();
-						
-						int key = pair.getKey();
-						double endrate = 0;
-					
-						if(endseedmap.containsKey(key))
-						 endrate = endseedmap.get(key);
-						
-						double startrate = startseedmap.get(key);
-						String plusorminusend = (startrate > endrate) ? "Minus" : "Plus" ;
-						String plusorminusstart = (startrate > endrate) ? "Plus" : "Minus" ;
-						if (parent.seedmap.get(key) == Whichend.start || parent.seedmap.get(key) == Whichend.end && parent.seedmap.get(key) != Whichend.both ){
-							plusorminusend = "Zeroend";
-							plusorminusstart = "Zeroend";
-						}
-						
-						PlusMinusSeed pmseedEndB = new PlusMinusSeed(key, plusorminusend);
-						if(endseedmap.containsKey(key))
-						plusminusendlist.add(pmseedEndB);
-						
-						
-						PlusMinusSeed pmseedEndA = new PlusMinusSeed(key, plusorminusstart);
-						plusminusstartlist.add(pmseedEndA);
+					int key = pair.getKey();
+					double endrate = 0;
+					double startrate = 0;
+				
+					if(endseedmap.containsKey(key) && endseedmap!=null)
+					 endrate = endseedmap.get(key);
+					if(startseedmap.containsKey(key) && startseedmap!=null)
+					startrate = startseedmap.get(key);
+					String plusorminusend = (startrate > endrate) ? "Minus" : "Plus" ;
+					String plusorminusstart = (startrate > endrate) ? "Plus" : "Minus" ;
+					if (parent.seedmap.get(key) == Whichend.start || parent.seedmap.get(key) == Whichend.end && parent.seedmap.get(key) != Whichend.both ){
+						plusorminusend = "Zeroend";
+						plusorminusstart = "Zeroend";
 					}
 					
+					PlusMinusSeed pmseedEndB = new PlusMinusSeed(key, plusorminusend);
+					plusminusendlist.add(pmseedEndB);
 					
 					
-	               Iterator itend = endseedmap.entrySet().iterator();
+					PlusMinusSeed pmseedEndA = new PlusMinusSeed(key, plusorminusstart);
+					plusminusstartlist.add(pmseedEndA);
+				}
+				
+               Iterator itend = endseedmap.entrySet().iterator();
+				
+				while(itend.hasNext()){
 					
-					while(itend.hasNext()){
-						
-						Map.Entry<Integer, Double> pair = (Map.Entry<Integer, Double>) itend.next();
-						
-						double startrate = 0;
-						int key = pair.getKey();
-						double endrate = endseedmap.get(key);
-						if (startseedmap.containsKey(key))
-						startrate = startseedmap.get(key);
-						String plusorminusstart = (startrate > endrate) ? "Minus" : "Plus" ;
-						String plusorminusend = (startrate > endrate) ? "Plus" : "Minus" ;
-						if (parent.seedmap.get(key) == Whichend.start || parent.seedmap.get(key) == Whichend.end && parent.seedmap.get(key) != Whichend.both ){
-							plusorminusend = "Zeroend";
-							plusorminusstart = "Zeroend";
-						}
-						
-						PlusMinusSeed pmseedEndB = new PlusMinusSeed(key, plusorminusend);
-						plusminusendlist.add(pmseedEndB);
-						PlusMinusSeed pmseedEndA = new PlusMinusSeed(key, plusorminusstart);
-						if(startseedmap.containsKey(key))
-						plusminusstartlist.add(pmseedEndA);
+					Map.Entry<Integer, Double> pair = (Map.Entry<Integer, Double>) itend.next();
+					
+					int key = pair.getKey();
+					double endrate = 0;
+					double startrate = 0;
+				
+					if(endseedmap.containsKey(key) && endseedmap!=null)
+					 endrate = endseedmap.get(key);
+					if(startseedmap.containsKey(key) && startseedmap!=null)
+					startrate = startseedmap.get(key);
+					
+					
+					String plusorminusend = (startrate > endrate) ? "Minus" : "Plus" ;
+					String plusorminusstart = (startrate > endrate) ? "Plus" : "Minus" ;
+					if (parent.seedmap.get(key) == Whichend.start || parent.seedmap.get(key) == Whichend.end && parent.seedmap.get(key) != Whichend.both ){
+						plusorminusend = "Zeroend";
+						plusorminusstart = "Zeroend";
 					}
 					
+					PlusMinusSeed pmseedEndB = new PlusMinusSeed(key, plusorminusend);
+					if(plusminusendlist.size() > 0) {
+					for(int i = 0; i < plusminusendlist.size(); ++i) {
+						
+						if(plusminusendlist.get(i).seedid !=key)
+							plusminusendlist.add(pmseedEndB);
+					}
+					}
+					else
+						plusminusendlist.add(pmseedEndB);
 					
-					System.out.println(plusminusstartlist.size() +" minus");
-					System.out.println(plusminusendlist.size() +" minus end" + parent.Allend.get(0).size() + parent.batchfolder);
 					
+					PlusMinusSeed pmseedEndA = new PlusMinusSeed(key, plusorminusstart);
+					if(plusminusstartlist.size() > 0) {
+                      for(int i = 0; i < plusminusstartlist.size(); ++i) {
+						
+						if(plusminusstartlist.get(i).seedid !=key)
+							plusminusstartlist.add(pmseedEndA);
+					}
+				}
+				
+				else
+					plusminusstartlist.add(pmseedEndA);
 					
-					
+				}
 					if (parent.Allend.get(0).size() > 0) {
 
 						MaxSeedLabel = parent.Allend.get(0).get(parent.Allend.get(0).size() - 1).seedlabel;
@@ -460,6 +479,9 @@ public class TrackBatch {
 						if (plusminusendlist.get(j).seedid == currentseed){
 					
 						try {
+							
+						
+							
 							File fichier = new File(
 									parent.batchfolder + "//" + parent.parent.addToName + "SeedLabel" + currentseed + plusminusendlist.get(j).plusorminus + ".txt");
 
@@ -524,7 +546,7 @@ public class TrackBatch {
 
 				
 		}
-				}
+				
 			
 			
 				if (parent.Allstart.get(0).size() > 0) {
