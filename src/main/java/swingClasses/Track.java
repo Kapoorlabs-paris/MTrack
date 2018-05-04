@@ -463,66 +463,90 @@ public class Track {
 				
 					}
 					
-
+				}
 					
-					// Compare seed maps to ascribe plus minus or zero label
+				
+				Iterator it = startseedmap.entrySet().iterator();
+				
+				while(it.hasNext()){
 					
-					Iterator it = startseedmap.entrySet().iterator();
+					Map.Entry<Integer, Double> pair = (Map.Entry<Integer, Double>) it.next();
 					
-					while(it.hasNext()){
-						
-						Map.Entry<Integer, Double> pair = (Map.Entry<Integer, Double>) it.next();
-						
-						int key = pair.getKey();
-						double endrate = 0;
-					
-						if(endseedmap.containsKey(key))
-						 endrate = endseedmap.get(key);
-						
-						double startrate = startseedmap.get(key);
-						String plusorminusend = (startrate > endrate) ? "Minus" : "Plus" ;
-						String plusorminusstart = (startrate > endrate) ? "Plus" : "Minus" ;
-						if (parent.seedmap.get(key) == Whichend.start || parent.seedmap.get(key) == Whichend.end && parent.seedmap.get(key) != Whichend.both ){
-							plusorminusend = "Zeroend";
-							plusorminusstart = "Zeroend";
-						}
-						
-						PlusMinusSeed pmseedEndB = new PlusMinusSeed(key, plusorminusend);
-						if(endseedmap.containsKey(key))
-						plusminusendlist.add(pmseedEndB);
-						
-						
-						PlusMinusSeed pmseedEndA = new PlusMinusSeed(key, plusorminusstart);
-						plusminusstartlist.add(pmseedEndA);
+					int key = pair.getKey();
+					double endrate = 0;
+					double startrate = 0;
+				
+					if(endseedmap.containsKey(key) && endseedmap!=null)
+					 endrate = endseedmap.get(key);
+					if(startseedmap.containsKey(key) && startseedmap!=null)
+					startrate = startseedmap.get(key);
+					String plusorminusend = (startrate > endrate) ? "Minus" : "Plus" ;
+					String plusorminusstart = (startrate > endrate) ? "Plus" : "Minus" ;
+					if (parent.seedmap.get(key) == Whichend.start || parent.seedmap.get(key) == Whichend.end && parent.seedmap.get(key) != Whichend.both ){
+						plusorminusend = "Zeroend";
+						plusorminusstart = "Zeroend";
 					}
 					
+					PlusMinusSeed pmseedEndB = new PlusMinusSeed(key, plusorminusend);
+					plusminusendlist.add(pmseedEndB);
 					
 					
-	               Iterator itend = endseedmap.entrySet().iterator();
+					PlusMinusSeed pmseedEndA = new PlusMinusSeed(key, plusorminusstart);
+					plusminusstartlist.add(pmseedEndA);
+				}
+				
+               Iterator itend = endseedmap.entrySet().iterator();
+				
+				while(itend.hasNext()){
 					
-					while(itend.hasNext()){
-						
-						Map.Entry<Integer, Double> pair = (Map.Entry<Integer, Double>) itend.next();
-						
-						double startrate = 0;
-						int key = pair.getKey();
-						double endrate = endseedmap.get(key);
-						if (startseedmap.containsKey(key))
-						startrate = startseedmap.get(key);
-						String plusorminusstart = (startrate > endrate) ? "Minus" : "Plus" ;
-						String plusorminusend = (startrate > endrate) ? "Plus" : "Minus" ;
-						if (parent.seedmap.get(key) == Whichend.start || parent.seedmap.get(key) == Whichend.end && parent.seedmap.get(key) != Whichend.both ){
-							plusorminusend = "Zeroend";
-							plusorminusstart = "Zeroend";
-						}
-						
-						PlusMinusSeed pmseedEndB = new PlusMinusSeed(key, plusorminusend);
-						plusminusendlist.add(pmseedEndB);
-						PlusMinusSeed pmseedEndA = new PlusMinusSeed(key, plusorminusstart);
-						if(startseedmap.containsKey(key))
-						plusminusstartlist.add(pmseedEndA);
+					Map.Entry<Integer, Double> pair = (Map.Entry<Integer, Double>) itend.next();
+					
+					int key = pair.getKey();
+					double endrate = 0;
+					double startrate = 0;
+				
+					if(endseedmap.containsKey(key) && endseedmap!=null)
+					 endrate = endseedmap.get(key);
+					if(startseedmap.containsKey(key) && startseedmap!=null)
+					startrate = startseedmap.get(key);
+					
+					
+					String plusorminusend = (startrate > endrate) ? "Minus" : "Plus" ;
+					String plusorminusstart = (startrate > endrate) ? "Plus" : "Minus" ;
+					if (parent.seedmap.get(key) == Whichend.start || parent.seedmap.get(key) == Whichend.end && parent.seedmap.get(key) != Whichend.both ){
+						plusorminusend = "Zeroend";
+						plusorminusstart = "Zeroend";
 					}
 					
+					PlusMinusSeed pmseedEndB = new PlusMinusSeed(key, plusorminusend);
+					if(plusminusendlist.size() > 0) {
+					for(int i = 0; i < plusminusendlist.size(); ++i) {
+						
+						if(plusminusendlist.get(i).seedid !=key)
+							plusminusendlist.add(pmseedEndB);
+					}
+					}
+					else
+						plusminusendlist.add(pmseedEndB);
+					
+					
+					PlusMinusSeed pmseedEndA = new PlusMinusSeed(key, plusorminusstart);
+					if(plusminusstartlist.size() > 0) {
+                      for(int i = 0; i < plusminusstartlist.size(); ++i) {
+						
+						if(plusminusstartlist.get(i).seedid !=key)
+							plusminusstartlist.add(pmseedEndA);
+					}
+				}
+				
+				else
+					plusminusstartlist.add(pmseedEndA);
+					
+				}
+					
+					
+					
+	              
 					
 					
 					
@@ -534,11 +558,6 @@ public class Track {
 						MinSeedLabel = parent.Allend.get(0).get(0).seedlabel;
 						
 						for (int currentseed = MinSeedLabel; currentseed < MaxSeedLabel + 1; ++currentseed) {
-
-				
-				
-					
-				
 
 		                for (int j = 0; j < plusminusendlist.size(); ++j){
 						
@@ -601,6 +620,7 @@ public class Track {
 		}
 		
 						}
+					}
 					
 				
 				for (int index = 0; index < parent.endlengthlist.size(); ++index) {
@@ -624,8 +644,8 @@ public class Track {
 				}
 
 				
-		}
-				}
+		
+				
 			
 			
 				if (parent.Allstart.get(0).size() > 0) {

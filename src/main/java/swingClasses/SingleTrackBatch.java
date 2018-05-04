@@ -295,33 +295,8 @@ public  class SingleTrackBatch {
 			
 			}
 			}
-				for (int index = 0; index < parent.startlengthlist.size(); ++index) {
+				
 
-					double[] landt = { parent.startlengthlist.get(index).totallengthpixel,
-							parent.startlengthlist.get(index).framenumber, parent.startlengthlist.get(index).seedid };
-					parent.lengthtimestart.add(landt);
-
-					rtAll.incrementCounter();
-					rtAll.addValue("FrameNumber", parent.startlengthlist.get(index).framenumber);
-					rtAll.addValue("Total Length (pixel)", parent.startlengthlist.get(index).totallengthpixel);
-					rtAll.addValue("Total Length (real)", parent.startlengthlist.get(index).totallengthreal);
-					rtAll.addValue("Track iD", parent.startlengthlist.get(index).seedid);
-					rtAll.addValue("CurrentPosition X (px units)",
-							parent.startlengthlist.get(index).currentpointpixel[0]);
-					rtAll.addValue("CurrentPosition Y (px units)",
-							parent.startlengthlist.get(index).currentpointpixel[1]);
-					rtAll.addValue("CurrentPosition X (real units)",
-							parent.startlengthlist.get(index).currentpointreal[0]);
-					rtAll.addValue("CurrentPosition Y (real units)",
-							parent.startlengthlist.get(index).currentpointreal[1]);
-					rtAll.addValue("Length per frame (px units)",
-							parent.startlengthlist.get(index).lengthpixelperframe);
-					rtAll.addValue("Length per frame (real units)",
-							parent.startlengthlist.get(index).lengthrealperframe);
-
-				}
-
-		
 			
 
 					if (parent.Allend.get(0).size() > 0) {
@@ -405,7 +380,7 @@ public  class SingleTrackBatch {
 						}
 
 					
-					
+						}
 					
 					
 					
@@ -413,21 +388,23 @@ public  class SingleTrackBatch {
 						
 
 						
-						// Compare seed maps to ascribe plus minus or zero label
+
+					 Iterator itend = endseedmap.entrySet().iterator();
 						
-						Iterator it = startseedmap.entrySet().iterator();
-						
-						while(it.hasNext()){
+						while(itend.hasNext()){
 							
-							Map.Entry<Integer, Double> pair = (Map.Entry<Integer, Double>) it.next();
+							Map.Entry<Integer, Double> pair = (Map.Entry<Integer, Double>) itend.next();
 							
 							int key = pair.getKey();
 							double endrate = 0;
+							double startrate = 0;
 						
-							if(endseedmap.containsKey(key))
+							if(endseedmap.containsKey(key) && endseedmap!=null)
 							 endrate = endseedmap.get(key);
+							if(startseedmap.containsKey(key) && startseedmap!=null)
+							startrate = startseedmap.get(key);
 							
-							double startrate = startseedmap.get(key);
+							
 							String plusorminusend = (startrate > endrate) ? "Minus" : "Plus" ;
 							String plusorminusstart = (startrate > endrate) ? "Plus" : "Minus" ;
 							if (parent.seedmap.get(key) == Whichend.start || parent.seedmap.get(key) == Whichend.end && parent.seedmap.get(key) != Whichend.both ){
@@ -436,42 +413,32 @@ public  class SingleTrackBatch {
 							}
 							
 							PlusMinusSeed pmseedEndB = new PlusMinusSeed(key, plusorminusend);
-							if(endseedmap.containsKey(key))
-							plusminusendlist.add(pmseedEndB);
-							PlusMinusSeed pmseedEndA = new PlusMinusSeed(key, plusorminusstart);
-							plusminusstartlist.add(pmseedEndA);
-						}
-						
-						
-						
-		               Iterator itend = endseedmap.entrySet().iterator();
-						
-						while(itend.hasNext()){
-							
-							Map.Entry<Integer, Double> pair = (Map.Entry<Integer, Double>) itend.next();
-							
-							double startrate = 0;
-							int key = pair.getKey();
-							double endrate = endseedmap.get(key);
-							if (startseedmap.containsKey(key))
-							startrate = startseedmap.get(key);
-							String plusorminusstart = (startrate > endrate) ? "Minus" : "Plus" ;
-							String plusorminusend = (startrate > endrate) ? "Plus" : "Minus" ;
-							if (parent.seedmap.get(key) == Whichend.start || parent.seedmap.get(key) == Whichend.end && parent.seedmap.get(key) != Whichend.both ){
-								plusorminusend = "Zeroend";
-								plusorminusstart = "Zeroend";
+							if(plusminusendlist.size() > 0) {
+							for(int i = 0; i < plusminusendlist.size(); ++i) {
+								
+								if(plusminusendlist.get(i).seedid !=key)
+									plusminusendlist.add(pmseedEndB);
 							}
+							}
+							else
+								plusminusendlist.add(pmseedEndB);
 							
-							PlusMinusSeed pmseedEndB = new PlusMinusSeed(key, plusorminusend);
-							plusminusendlist.add(pmseedEndB);
+							
 							PlusMinusSeed pmseedEndA = new PlusMinusSeed(key, plusorminusstart);
-							if(startseedmap.containsKey(key))
-							plusminusstartlist.add(pmseedEndA);
+							if(plusminusstartlist.size() > 0) {
+		                      for(int i = 0; i < plusminusstartlist.size(); ++i) {
+								
+								if(plusminusstartlist.get(i).seedid !=key)
+									plusminusstartlist.add(pmseedEndA);
+							}
 						}
 						
-						
-						
-						
+						else
+							plusminusstartlist.add(pmseedEndA);
+							
+						}
+							
+							
 						
 						
 						if (parent.Allend.get(0).size() > 0) {
@@ -492,7 +459,7 @@ public  class SingleTrackBatch {
 						
 							try {
 								File fichier = new File(
-										parent.batchfolder+ "//" + parent.parent.addToName + "SeedLabel" + currentseed + plusminusendlist.get(j).plusorminus + ".txt");
+										parent.batchfolder + "//" + parent.parent.addToName + "SeedLabel" + currentseed + plusminusendlist.get(j).plusorminus + ".txt");
 
 								FileWriter fw = new FileWriter(fichier);
 								BufferedWriter bw = new BufferedWriter(fw);
@@ -504,13 +471,14 @@ public  class SingleTrackBatch {
 								for (int index = 0; index < parent.endlengthlist.size(); ++index) {
 
 									if (parent.endlengthlist.get(index).seedid == currentseed) {
+										
 										if (index > 0
 												&& parent.endlengthlist.get(index).currentpointpixel[0] != parent.endlengthlist
 														.get(index - 1).currentpointpixel[0]
 												&& parent.endlengthlist.get(index).currentpointpixel[1] != parent.endlengthlist
 														.get(index - 1).currentpointpixel[1])
-
 											
+
 											bw.write("\t" + parent.nf.format(parent.endlengthlist.get(index).framenumber) + "\t" + "\t"
 													+ parent.nf.format(parent.endlengthlist.get(index).totallengthpixel) + "\t"+ "\t"
 													+ "\t"+ "\t" + parent.nf.format(parent.endlengthlist.get(index).totallengthreal)
@@ -534,7 +502,7 @@ public  class SingleTrackBatch {
 													+ "\t" + "\t"
 													+ parent.nf.format(parent.calibrationZ) + 
 													
-													"\n");
+												"\n");
 
 									}
 
@@ -550,29 +518,11 @@ public  class SingleTrackBatch {
 							}
 						
 					
-					for (int index = 0; index < parent.endlengthlist.size(); ++index) {
-
-						double[] landt = { parent.endlengthlist.get(index).totallengthpixel,
-								parent.endlengthlist.get(index).framenumber, parent.endlengthlist.get(index).seedid };
-						parent.lengthtimestart.add(landt);
-
-						rtAll.incrementCounter();
-						rtAll.addValue("FrameNumber", parent.endlengthlist.get(index).framenumber);
-						rtAll.addValue("Total Length (pixel)", parent.endlengthlist.get(index).totallengthpixel);
-						rtAll.addValue("Total Length (real)", parent.endlengthlist.get(index).totallengthreal);
-						rtAll.addValue("Track iD", parent.endlengthlist.get(index).seedid);
-						rtAll.addValue("CurrentPosition X (px units)", parent.endlengthlist.get(index).currentpointpixel[0]);
-						rtAll.addValue("CurrentPosition Y (px units)", parent.endlengthlist.get(index).currentpointpixel[1]);
-						rtAll.addValue("CurrentPosition X (real units)", parent.endlengthlist.get(index).currentpointreal[0]);
-						rtAll.addValue("CurrentPosition Y (real units)", parent.endlengthlist.get(index).currentpointreal[1]);
-						rtAll.addValue("Length per frame (px units)", parent.endlengthlist.get(index).lengthpixelperframe);
-						rtAll.addValue("Length per frame (real units)", parent.endlengthlist.get(index).lengthrealperframe);
-
-					}
+				
 
 					
 			}
-					}
+					
 				
 				
 					if (parent.Allstart.get(0).size() > 0) {
@@ -588,10 +538,13 @@ public  class SingleTrackBatch {
 
 							for (int j = 0; j < plusminusstartlist.size(); ++j){
 								
-								if (plusminusstartlist.get(j).seedid == currentseed){
+							if (plusminusstartlist.get(j).seedid == currentseed){
+								
+								
+							
 
 									try {
-										File fichier = new File(parent.batchfolder+ "//" + parent.parent.addToName + "SeedLabel" + currentseed
+										File fichier = new File(parent.batchfolder + "//" + parent.parent.addToName + "SeedLabel" + currentseed
 												+ plusminusstartlist.get(j).plusorminus + ".txt");
 
 										FileWriter fw = new FileWriter(fichier);
@@ -604,7 +557,7 @@ public  class SingleTrackBatch {
 										for (int index = 0; index < parent.startlengthlist.size(); ++index) {
 
 											if (parent.startlengthlist.get(index).seedid == currentseed) {
-
+												
 												if (index > 0
 														&& parent.startlengthlist
 																.get(index).currentpointpixel[0] != parent.startlengthlist
@@ -612,6 +565,8 @@ public  class SingleTrackBatch {
 														&& parent.startlengthlist
 																.get(index).currentpointpixel[1] != parent.startlengthlist
 																		.get(index - 1).currentpointpixel[1])
+												
+													
 
 													bw.write(
 															"\t" + parent.nf.format(parent.startlengthlist.get(index).framenumber) + "\t" + "\t"
@@ -669,411 +624,22 @@ public  class SingleTrackBatch {
 					
 					
 					
-					
-			if (parent.returnVectorUser != null && parent.AllUser.get(0).size() > 0) {
-				final ArrayList<Trackproperties> first = parent.AllUser.get(0);
-				MaxSeedLabel = first.get(first.size() - 1).seedlabel;
-				MinSeedLabel = first.get(0).seedlabel;
-				Collections.sort(first, parent.Seedcomparetrack);
 			
-				for (int currentseed = MinSeedLabel; currentseed < MaxSeedLabel + 1; ++currentseed) {
-					double startlengthreal = 0;
-					double startlengthpixel = 0;
-					for (int index = 0; index < parent.AllUser.size(); ++index) {
-
-						final ArrayList<Trackproperties> thirdDimension = parent.AllUser.get(index);
-
-						for (int frameindex = 0; frameindex < thirdDimension.size(); ++frameindex) {
-
-							final Integer seedID = thirdDimension.get(frameindex).seedlabel;
-							final int framenumber = thirdDimension.get(frameindex).Framenumber;
-							if (seedID == currentseed) {
-								
-								final Integer[] FrameID = { framenumber, seedID };
-								final double[] originalpoint = thirdDimension.get(frameindex).originalpoint;
-								final double[] newpoint = thirdDimension.get(frameindex).newpoint;
-								final double[] oldpoint = thirdDimension.get(frameindex).oldpoint;
-								final double[] newpointCal = new double[] {
-										thirdDimension.get(frameindex).newpoint[0] * parent.calibrationX,
-										thirdDimension.get(frameindex).newpoint[1] * parent.calibrationY };
-								final double[] oldpointCal = new double[] {
-										thirdDimension.get(frameindex).oldpoint[0] * parent.calibrationX,
-										thirdDimension.get(frameindex).oldpoint[1] * parent.calibrationY };
-
-								final double lengthrealperframe = util.Boundingboxes.Distance(newpointCal, oldpointCal);
-								final double lengthpixelperframe = util.Boundingboxes.Distance(newpoint, oldpoint);
-								final double seedtocurrent = util.Boundingboxes.Distancesq(originalpoint, newpoint);
-								final double seedtoold = util.Boundingboxes.Distancesq(originalpoint, oldpoint);
-								final boolean shrink = seedtoold > seedtocurrent ? true : false;
-								final boolean growth = seedtoold > seedtocurrent ? false : true;
-
-								if (shrink) {
-									// MT shrank
-
-									startlengthreal -= lengthrealperframe;
-									startlengthpixel -= lengthpixelperframe;
-
-								}
-								if (growth) {
-
-									// MT grew
-									startlengthreal += lengthrealperframe;
-									startlengthpixel += lengthpixelperframe;
-
-								}
-
-								double[] currentlocationpixel = new double[parent.ndims];
-
-								if (framenumber == parent.thirdDimensionsliderInit)
-									currentlocationpixel = originalpoint;
-								else
-									currentlocationpixel = newpoint;
-
-								double[] currentlocationreal = new double[parent.ndims];
-
-								currentlocationreal = new double[] { currentlocationpixel[0] * parent.calibrationX,
-										currentlocationpixel[1] * parent.calibrationY };
-
-								ResultsMT startMT = new ResultsMT(framenumber, startlengthpixel, startlengthreal, seedID,
-										currentlocationpixel, currentlocationreal, lengthpixelperframe, lengthrealperframe);
-
-								parent.userlengthlist.add(startMT);
-
-							}
-						}
-					}
-					
-					
-					
-					
-					
-					
-				}
-
-				for (int seedID = MinSeedLabel; seedID <= MaxSeedLabel; ++seedID) {
-					double count = 0;
-					for (int index = 0; index < parent.userlengthlist.size(); ++index) {
-						if (parent.userlengthlist.get(index).seedid == seedID) {
-
-							if (index > 0
-									&& parent.userlengthlist.get(index).currentpointpixel[0] != parent.userlengthlist
-											.get(index - 1).currentpointpixel[0]
-									&& parent.userlengthlist.get(index).currentpointpixel[1] != parent.userlengthlist
-											.get(index - 1).currentpointpixel[1])
-								count++;
-
-						}
-					}
-					
-
-					
-
-						try {
-							File fichier = new File(parent.batchfolder + "//" + parent.parent.addToName + "SeedLabel" + seedID
-									+ "-Zeroend" + ".txt");
-
-							FileWriter fw = new FileWriter(fichier);
-							BufferedWriter bw = new BufferedWriter(fw);
-
-							bw.write(
-									"\tFrame\tLength (px)\tLength (real)\tiD\tCurrentPosX (px)\tCurrentPosY (px)\tCurrentPosX (real)\tCurrentPosY (real)"
-											+ "\tdeltaL (px) \tdeltaL (real) \tCalibrationX  \tCalibrationY  \tFrametoSec \n");
-
-							for (int index = 0; index < parent.userlengthlist.size(); ++index) {
-								if (parent.userlengthlist.get(index).seedid == seedID) {
-
-									if (index > 0
-											&& parent.userlengthlist
-													.get(index).currentpointpixel[0] != parent.userlengthlist
-															.get(index - 1).currentpointpixel[0]
-											&& parent.userlengthlist
-													.get(index).currentpointpixel[1] != parent.userlengthlist
-															.get(index - 1).currentpointpixel[1])
-
-										bw.write("\t" + parent.nf.format(parent.userlengthlist.get(index).framenumber) + "\t" + "\t"
-												+ parent.nf.format(parent.userlengthlist.get(index).totallengthpixel) + "\t"+ "\t"
-												+ "\t" + "\t"+ parent.nf.format(parent.userlengthlist.get(index).totallengthreal)
-												+ "\t" + "\t" + parent.nf.format(parent.userlengthlist.get(index).seedid)
-												+ "\t" + "\t"
-												+ parent.nf.format(parent.userlengthlist.get(index).currentpointpixel[0])
-												+ "\t" + "\t"
-												+ parent.nf.format(parent.userlengthlist.get(index).currentpointpixel[1])
-												+ "\t" + "\t"
-												+ parent.nf.format(parent.userlengthlist.get(index).currentpointreal[0])
-												+ "\t" + "\t"
-												+ parent.nf.format(parent.userlengthlist.get(index).currentpointreal[1])
-												+ "\t" + "\t"
-												+ parent.nf.format(parent.userlengthlist.get(index).lengthpixelperframe)
-												+ "\t" + "\t"
-												+ parent.nf.format(parent.userlengthlist.get(index).lengthrealperframe)
-												+ "\t" + "\t"
-												+ parent.nf.format(parent.calibrationX)  
-												+ "\t" + "\t"
-												+ parent.nf.format(parent.calibrationY)  
-												+ "\t" + "\t"
-												+ parent.nf.format(parent.calibrationZ) + 
-												
-												"\n");
-
-								}
-
-							}
-							bw.close();
-							fw.close();
-
-						} catch (IOException e) {
-						}
-					}
-				
-				for (int index = 0; index < parent.userlengthlist.size(); ++index) {
-
-					double[] landt = { parent.userlengthlist.get(index).totallengthpixel,
-							parent.userlengthlist.get(index).framenumber, parent.userlengthlist.get(index).seedid };
-					parent.lengthtimeuser.add(landt);
-
-					rtAll.incrementCounter();
-					rtAll.addValue("FrameNumber", parent.userlengthlist.get(index).framenumber);
-					rtAll.addValue("Total Length (pixel)", parent.userlengthlist.get(index).totallengthpixel);
-					rtAll.addValue("Total Length (real)", parent.userlengthlist.get(index).totallengthreal);
-					rtAll.addValue("Track iD", parent.userlengthlist.get(index).seedid);
-					rtAll.addValue("CurrentPosition X (px units)", parent.userlengthlist.get(index).currentpointpixel[0]);
-					rtAll.addValue("CurrentPosition Y (px units)", parent.userlengthlist.get(index).currentpointpixel[1]);
-					rtAll.addValue("CurrentPosition X (real units)", parent.userlengthlist.get(index).currentpointreal[0]);
-					rtAll.addValue("CurrentPosition Y (real units)", parent.userlengthlist.get(index).currentpointreal[1]);
-					rtAll.addValue("Length per frame (px units)", parent.userlengthlist.get(index).lengthpixelperframe);
-					rtAll.addValue("Length per frame (real units)", parent.userlengthlist.get(index).lengthrealperframe);
-
-				}
-
-			}
-			
-			//rtAll.show("Start and End of MT");
 			if (parent.lengthtimestart != null)
-				parent.lengthtime =parent. lengthtimestart;
+				parent.lengthtime = parent.lengthtimestart;
 			else
 				parent.lengthtime = parent.lengthtimeend;
-			if (parent.analyzekymo) {
-				double lengthcheckstart = 0;
-				double lengthcheckend = 0;
-				if (parent.lengthtimestart != null) {
-
-					parent.lengthtime = parent.lengthtimestart;
-					for (int index = 0; index < parent.lengthtimestart.size(); ++index) {
-
-						int time = (int) parent.lengthtimestart.get(index)[1];
-
-						lengthcheckstart += parent.lengthtimestart.get(index)[0];
-
-						for (int secindex = 0; secindex < parent.lengthKymo.size(); ++secindex) {
-
-							for (int accountindex = 0; accountindex < parent.Accountedframes.size(); ++accountindex) {
-
-								if ((int) parent.lengthKymo.get(secindex)[1] == time
-										&& parent.Accountedframes.get(accountindex) == time) {
-
-									float delta = (float) (parent.lengthtimestart.get(index)[0] - parent.lengthKymo.get(secindex)[0]);
-									float[] cudeltadeltaLstart = { delta, time };
-									parent.deltadstart.add(cudeltadeltaLstart);
-
-								}
-							}
-
-						}
-					}
-
-					/********
-					 * The part below removes the duplicate entries in the array
-					 * dor the time co-ordinate
-					 ********/
-
-					int j = 0;
-
-					for (int index = 0; index < parent.deltadstart.size() - 1; ++index) {
-
-						j = index + 1;
-
-						while (j < parent.deltadstart.size()) {
-
-							if (parent.deltadstart.get(index)[1] == parent.deltadstart.get(j)[1]) {
-
-								parent.deltadstart.remove(index);
-							}
-
-							else {
-								++j;
-
-							}
-
-						}
-					}
-
-					for (int index = 0; index < parent.deltadstart.size(); ++index) {
-
-						for (int secindex = 0; secindex < parent.Accountedframes.size(); ++secindex) {
-
-							if ((int) parent.deltadstart.get(index)[1] == parent.Accountedframes.get(secindex)) {
-
-								parent.parent.netdeltadstart += Math.abs(parent.deltadstart.get(index)[0]);
-
-							}
-
-						}
-
-					}
-					parent.deltad = parent.deltadstart;
-
-				}
-
-				if (parent.lengthtimeend != null) {
-					parent.lengthtime = parent.lengthtimeend;
-					for (int index = 0; index < parent.lengthtimeend.size(); ++index) {
-
-						int time = (int) parent.lengthtimeend.get(index)[1];
-
-						lengthcheckend += parent.lengthtimeend.get(index)[0];
-
-						for (int secindex = 0; secindex < parent.lengthKymo.size(); ++secindex) {
-
-							for (int accountindex = 0; accountindex < parent.Accountedframes.size(); ++accountindex) {
-
-								if ((int) parent.lengthKymo.get(secindex)[1] == time
-										&& parent.Accountedframes.get(accountindex) == time) {
-
-									if ((int) parent.lengthKymo.get(secindex)[1] == time
-											&& parent.Accountedframes.get(accountindex) == time) {
-
-										float delta = (float) (parent.lengthtimeend.get(index)[0]
-												- parent.lengthKymo.get(secindex)[0]);
-										float[] cudeltadeltaLend = { delta, time };
-										parent.deltadend.add(cudeltadeltaLend);
-									}
-								}
-
-							}
-
-						}
-					}
-					/********
-					 * The part below removes the duplicate entries in the array
-					 * dor the time co-ordinate
-					 ********/
-
-					int j = 0;
-
-					for (int index = 0; index < parent.deltadend.size() - 1; ++index) {
-
-						j = index + 1;
-
-						while (j < parent.deltadend.size()) {
-
-							if (parent.deltadend.get(index)[1] == parent.deltadend.get(j)[1]) {
-
-								parent.deltadend.remove(index);
-							}
-
-							else {
-								++j;
-
-							}
-
-						}
-					}
-
-					for (int index = 0; index < parent.deltadend.size(); ++index) {
-
-						for (int secindex = 0; secindex < parent.Accountedframes.size(); ++secindex) {
-
-							if ((int) parent.deltadend.get(index)[1] == parent.Accountedframes.get(secindex)) {
-
-								parent.parent.netdeltadend += Math.abs(parent.deltadend.get(index)[0]);
-
-							}
-
-						}
-
-					}
-
-					parent.deltad = parent.deltadend;
-				}
-
-				FileWriter deltaw;
-				File fichierKydel = new File(parent.batchfolder + "//" + "Batch_Processed" + parent.parent.addToName + "MTtracker-deltad" + ".txt");
-
-				try {
-					deltaw = new FileWriter(fichierKydel);
-					BufferedWriter bdeltaw = new BufferedWriter(deltaw);
-
-					bdeltaw.write("\ttime\tDeltad(pixel units)\n");
-
-					for (int index = 0; index < parent.deltad.size(); ++index) {
-						bdeltaw.write("\t" + parent.deltad.get(index)[1] + "\t" + parent.deltad.get(index)[0] + "\n");
-
-					}
-
-					bdeltaw.close();
-					deltaw.close();
-				}
-
-				catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-
-				for (int index = 0; index < parent.deltad.size(); ++index) {
-
-					for (int secindex = 0; secindex < parent.Accountedframes.size(); ++secindex) {
-
-						if ((int) parent.deltad.get(index)[1] == parent.Accountedframes.get(secindex)) {
-
-							parent.netdeltad += Math.abs(parent.deltad.get(index)[0]);
-
-						}
-
-					}
-
-				}
-				parent.netdeltad /= parent.deltad.size();
-
-				if (parent.netdeltad > parent.deltadcutoff) {
-
-					parent.redo = true;
-
-				} else
-					parent.redo = false;
-
-			}
-		if (parent.Kymoimg != null) {
-			ImagePlus newimp = parent.parent.Kymoimp.duplicate();
-			for (int index = 0; index < parent.lengthtime.size() - 1; ++index) {
-
-				Overlay overlay = parent.parent.Kymoimp.getOverlay();
-				if (overlay == null) {
-					overlay = new Overlay();
-					parent.parent.Kymoimp.setOverlay(overlay);
-				}
-				Line newline = new Line(parent.lengthtime.get(index)[0], parent.lengthtime.get(index)[1],
-						parent.lengthtime.get(index + 1)[0], parent.lengthtime.get(index + 1)[1]);
-				newline.setFillColor(parent.colorDraw);
-
-				overlay.add(newline);
-
-				parent.parent.Kymoimp.setOverlay(overlay);
-				RoiManager roimanager = RoiManager.getInstance();
-
-				roimanager.addRoi(newline);
-
+			
+
+			parent.displaystack();
+			if (parent.displayoverlay) {
+				parent.prestack.deleteLastSlice();
+				new ImagePlus(parent.parent.addToName, parent.prestack).show();
 			}
 
-			parent.parent.Kymoimp.show();
+			parent.frame.dispose();
+			DisplayID.displayseeds(parent.parent.addToName,Views.hyperSlice(parent.originalimg, 2, 0), parent.IDALL);
 		}
-		parent.displaystack();
-		if (parent.displayoverlay) {
-			parent.prestack.deleteLastSlice();
-			new ImagePlus(parent.parent.addToName, parent.prestack).show();
-		}
-		parent.frame.dispose();
-		DisplayID.displayseeds(parent.parent.addToName,Views.hyperSlice(parent.originalimg, 2, 0), parent.IDALL);
-	}
 
 
 }
