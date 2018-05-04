@@ -40,6 +40,7 @@ import java.awt.Scrollbar;
 import java.awt.TextField;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -69,7 +70,8 @@ import net.imglib2.util.ValuePair;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.util.ShapeUtils;
 import org.jfree.data.xy.XYSeriesCollection;
-
+import org.jfree.graphics2d.svg.SVGGraphics2D; 
+import org.jfree.graphics2d.svg.SVGUtils; 
 import fit.AbstractFunction2D;
 import fit.PointFunctionMatch;
 import fit.polynomial.HigherOrderPolynomialFunction;
@@ -126,7 +128,7 @@ public class InteractiveRANSAC implements PlugIn {
 	int framenumber = 1;
 	final XYSeriesCollection dataset;
 	final JFreeChart chart;
-	// final SVGGraphics2D svgchart;
+	final SVGGraphics2D svgchart;
 	int updateCount = 0;
 	public ArrayList<Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>>> segments;
 	public HashMap<Integer, Pair<Double, Double>> indexedsegments;
@@ -206,11 +208,11 @@ public class InteractiveRANSAC implements PlugIn {
 		this.maxSlope = computeValueFromDoubleExpScrollbarPosition(this.maxSlopeInt, MAX_SLIDER, MAX_ABS_SLOPE);
 		this.dataset = new XYSeriesCollection();
 		this.chart = Tracking.makeChart(dataset, "Microtubule Length Plot", "Timepoint", "MT Length");
-		// this.svgchart = new SVGGraphics2D(500, 500);
+		 this.svgchart = new SVGGraphics2D(500, 500);
 		this.jFreeChartFrame = Tracking.display(chart, new Dimension(500, 500));
 
-		// this.chart.draw(svgchart, new Rectangle2D.Double(0, 0, 500, 500),
-		// null);
+		 this.chart.draw(svgchart, new Rectangle2D.Double(0, 0, 500, 500),
+		 null);
 	};
 
 	public InteractiveRANSAC(final int minTP, final int maxTP, final double maxError, final double minSlope,
@@ -246,10 +248,10 @@ public class InteractiveRANSAC implements PlugIn {
 		this.maxSlope = computeValueFromDoubleExpScrollbarPosition(this.maxSlopeInt, MAX_SLIDER, MAX_ABS_SLOPE);
 		this.dataset = new XYSeriesCollection();
 		this.chart = Tracking.makeChart(dataset, "Microtubule Length Plot", "Timepoint", "MT Length");
-		// this.svgchart = new SVGGraphics2D(500, 500);
+		 this.svgchart = new SVGGraphics2D(500, 500);
 		this.jFreeChartFrame = Tracking.display(chart, new Dimension(500, 500));
-		// this.chart.draw(svgchart, new Rectangle2D.Double(0, 0, 500, 500),
-		// null);
+		 this.chart.draw(svgchart, new Rectangle2D.Double(0, 0, 500, 500),
+		 null);
 	};
 	public void setInitialminInliers(final int value) {
         minInliers = value;
