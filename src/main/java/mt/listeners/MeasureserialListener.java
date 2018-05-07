@@ -128,8 +128,8 @@ public class MeasureserialListener implements ActionListener {
 			parent.table.getColumnModel().getColumn(3).setPreferredWidth(100);
 			parent.table.getColumnModel().getColumn(4).setPreferredWidth(100);
 			//parent.table.getColumnModel().getColumn(0).setCellRenderer(new WordWrapCellRenderer());
-			parent.scrollPane.setMinimumSize(new Dimension(300, 200));
-			parent.scrollPane.setPreferredSize(new Dimension(300, 200));
+			parent.scrollPane.setMinimumSize(new Dimension(parent.SizeX, parent.SizeY));
+			parent.scrollPane.setPreferredSize(new Dimension(parent.SizeX, parent.SizeY));
 			parent.table.setFillsViewportHeight(true);
 			parent.scrollPane.getViewport().add(parent.table);
 			parent.scrollPane.setAutoscrolls(true);
