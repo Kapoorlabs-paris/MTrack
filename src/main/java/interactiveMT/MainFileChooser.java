@@ -201,7 +201,7 @@ public class MainFileChooser extends JPanel {
 		inputFieldcalY.setText("1");
 		
 		
-	    inputLabelT = new Label("Enter time frame to second conversion: ");
+	    inputLabelT = new Label("Enter Seconds per frame: ");
 		inputFieldT = new TextField(5);
 		inputFieldT.setText("1");
 		
@@ -217,7 +217,7 @@ public class MainFileChooser extends JPanel {
 		calibration[1] = Float.parseFloat(inputFieldcalY.getText());
 		calibration[2] = Float.parseFloat(inputFieldT.getText());
 
-		String[] Imagetype = { "Two channel image as hyperstack", "Concatenated seed image followed by time-lapse images",
+		String[] Imagetype = { " " , "Two channel image as hyperstack", "Concatenated seed image followed by time-lapse images",
 				"Single channel time-lapse images" };
 		
 		JComboBox<String> ChooseImage = new JComboBox<String>(Imagetype);

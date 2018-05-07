@@ -11,7 +11,7 @@
 
 	<groupId>net.kapoor</groupId>
 	<artifactId>MTV_Tracker</artifactId>
-	<version>1.1.5</version>
+	<version>1.1.6</version>
 
 	<name>Microtubule Tracker</name>
 	<description>Microtubule tracker.</description>

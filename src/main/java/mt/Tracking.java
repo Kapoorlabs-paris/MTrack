@@ -554,6 +554,7 @@ public class Tracking
 
 		return new ValuePair< LinearFunction, ArrayList< PointFunctionMatch > >( function, inliers );
 	}
+	@SuppressWarnings("deprecation")
 	public static < P extends AbstractFunction2D< P > > Pair<P, ArrayList<PointFunctionMatch>> findFunction(
 			final ArrayList< Point > mts,
 			final P function,

@@ -128,7 +128,7 @@ public class InteractiveRANSAC implements PlugIn {
 	int framenumber = 1;
 	final XYSeriesCollection dataset;
 	final JFreeChart chart;
-	final SVGGraphics2D svgchart;
+	//final SVGGraphics2D svgchart;
 	int updateCount = 0;
 	public ArrayList<Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>>> segments;
 	public HashMap<Integer, Pair<Double, Double>> indexedsegments;
@@ -208,11 +208,11 @@ public class InteractiveRANSAC implements PlugIn {
 		this.maxSlope = computeValueFromDoubleExpScrollbarPosition(this.maxSlopeInt, MAX_SLIDER, MAX_ABS_SLOPE);
 		this.dataset = new XYSeriesCollection();
 		this.chart = Tracking.makeChart(dataset, "Microtubule Length Plot", "Timepoint", "MT Length");
-		 this.svgchart = new SVGGraphics2D(500, 500);
+		// this.svgchart = new SVGGraphics2D(500, 500);
 		this.jFreeChartFrame = Tracking.display(chart, new Dimension(500, 500));
 
-		 this.chart.draw(svgchart, new Rectangle2D.Double(0, 0, 500, 500),
-		 null);
+		// this.chart.draw(svgchart, new Rectangle2D.Double(0, 0, 500, 500),
+		// null);
 	};
 
 	public InteractiveRANSAC(final int minTP, final int maxTP, final double maxError, final double minSlope,
@@ -248,10 +248,10 @@ public class InteractiveRANSAC implements PlugIn {
 		this.maxSlope = computeValueFromDoubleExpScrollbarPosition(this.maxSlopeInt, MAX_SLIDER, MAX_ABS_SLOPE);
 		this.dataset = new XYSeriesCollection();
 		this.chart = Tracking.makeChart(dataset, "Microtubule Length Plot", "Timepoint", "MT Length");
-		 this.svgchart = new SVGGraphics2D(500, 500);
+		// this.svgchart = new SVGGraphics2D(500, 500);
 		this.jFreeChartFrame = Tracking.display(chart, new Dimension(500, 500));
-		 this.chart.draw(svgchart, new Rectangle2D.Double(0, 0, 500, 500),
-		 null);
+	//	 this.chart.draw(svgchart, new Rectangle2D.Double(0, 0, 500, 500),
+		 //null);
 	};
 	public void setInitialminInliers(final int value) {
         minInliers = value;
@@ -434,7 +434,7 @@ public class InteractiveRANSAC implements PlugIn {
 
 		PanelDirectory.setBorder(selectdirectory);
 		panelFirst.add(PanelDirectory, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
-				GridBagConstraints.RELATIVE, new Insets(10, 10, 0, 10), 0, 0));
+				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 
 		PanelSelectFile.add(scrollPane, BorderLayout.CENTER);
 
@@ -443,78 +443,78 @@ public class InteractiveRANSAC implements PlugIn {
 		PanelSelectFile.setBorder(selectfile);
 
 		panelFirst.add(PanelSelectFile, new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
-				GridBagConstraints.RELATIVE, new Insets(10, 10, 0, 10), 0, 0));
+				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 
 		PanelParameteroptions.add(maxErrorSB, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
-				GridBagConstraints.RELATIVE, insets, 0, 0));
+				GridBagConstraints.HORIZONTAL, insets, 0, 0));
 		PanelParameteroptions.add(maxErrorLabel, new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
-				GridBagConstraints.RELATIVE, insets, 0, 0));
+				GridBagConstraints.HORIZONTAL, insets, 0, 0));
 
 		PanelParameteroptions.add(minInliersSB, new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
-				GridBagConstraints.RELATIVE, insets, 0, 0));
+				GridBagConstraints.HORIZONTAL, insets, 0, 0));
 
 		PanelParameteroptions.add(minInliersLabel, new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0,
-				GridBagConstraints.NORTH, GridBagConstraints.RELATIVE, insets, 0, 0));
+				GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL, insets, 0, 0));
 		PanelParameteroptions.add(maxDistSB, new GridBagConstraints(0, 4, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
-				GridBagConstraints.RELATIVE, insets, 0, 0));
+				GridBagConstraints.HORIZONTAL, insets, 0, 0));
 		PanelParameteroptions.add(maxDistLabel, new GridBagConstraints(0, 5, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
-				GridBagConstraints.RELATIVE, insets, 0, 0));
+				GridBagConstraints.HORIZONTAL, insets, 0, 0));
 
 		PanelParameteroptions.setBorder(selectparam);
-		PanelParameteroptions.setMinimumSize(new Dimension(300, 200));
-		PanelParameteroptions.setPreferredSize(new Dimension(300, 200));
+	//	PanelParameteroptions.setMinimumSize(new Dimension(300, 200));
+	//	PanelParameteroptions.setPreferredSize(new Dimension(300, 200));
 		panelFirst.add(PanelParameteroptions, new GridBagConstraints(3, 0, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
-				GridBagConstraints.RELATIVE, new Insets(10, 10, 0, 10), 0, 0));
+				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 
 		Panelfunction.add(ChooseMethod, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
-				GridBagConstraints.RELATIVE, insets, 0, 0));
+				GridBagConstraints.HORIZONTAL, insets, 0, 0));
 
 		Panelfunction.add(lambdaSB, new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER,
-				GridBagConstraints.RELATIVE, insets, 0, 0));
+				GridBagConstraints.HORIZONTAL, insets, 0, 0));
 		Panelfunction.add(lambdaLabel, new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER,
-				GridBagConstraints.RELATIVE, insets, 0, 0));
+				GridBagConstraints.HORIZONTAL, insets, 0, 0));
 
 		Panelfunction.setBorder(selectfunction);
 		panelFirst.add(Panelfunction, new GridBagConstraints(3, 1, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
-				GridBagConstraints.RELATIVE, new Insets(10, 10, 0, 10), 0, 0));
+				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 
 		Panelslope.add(minSlopeSB, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
-				GridBagConstraints.RELATIVE, insets, 0, 0));
+				GridBagConstraints.HORIZONTAL, insets, 0, 0));
 		Panelslope.add(minSlopeLabel, new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
-				GridBagConstraints.RELATIVE, insets, 0, 0));
+				GridBagConstraints.HORIZONTAL, insets, 0, 0));
 		Panelslope.add(maxSlopeSB, new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
-				GridBagConstraints.RELATIVE, insets, 0, 0));
+				GridBagConstraints.HORIZONTAL, insets, 0, 0));
 		Panelslope.add(maxSlopeLabel, new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
-				GridBagConstraints.RELATIVE, insets, 0, 0));
+				GridBagConstraints.HORIZONTAL, insets, 0, 0));
 
 		Panelslope.add(findCatastrophe, new GridBagConstraints(0, 4, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
-				GridBagConstraints.RELATIVE, insets, 0, 0));
+				GridBagConstraints.HORIZONTAL, insets, 0, 0));
 		Panelslope.add(minCatDist, new GridBagConstraints(0, 5, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
-				GridBagConstraints.RELATIVE, insets, 0, 0));
+				GridBagConstraints.HORIZONTAL, insets, 0, 0));
 		Panelslope.add(minCatDistLabel, new GridBagConstraints(0, 6, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
-				GridBagConstraints.RELATIVE, insets, 0, 0));
+				GridBagConstraints.HORIZONTAL, insets, 0, 0));
 		Panelslope.setBorder(selectslope);
-		Panelslope.setPreferredSize(new Dimension(300, 300));
+	//	Panelslope.setPreferredSize(new Dimension(300, 300));
 		
 		panelFirst.add(Panelslope, new GridBagConstraints(3, 2, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
-				GridBagConstraints.RELATIVE, new Insets(10, 10, 0, 10), 0, 0));
+				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 
 	//	PanelCompileRes.add(Compile, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
-	//			GridBagConstraints.RELATIVE, insets, 0, 0));
+	//			GridBagConstraints.HORIZONTAL, insets, 0, 0));
 		PanelCompileRes.add(AutoCompile, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
 				GridBagConstraints.HORIZONTAL, insets, 0, 0));
 		
 		
 	 
 		PanelCompileRes.add(WriteLength, new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER,
-				GridBagConstraints.RELATIVE, insets, 0, 0));
+				GridBagConstraints.HORIZONTAL, insets, 0, 0));
 		
 		
 		PanelCompileRes.add(inputFieldT, new GridBagConstraints(3, 1, 3, 1, 0.1, 0.0, GridBagConstraints.CENTER,
-				GridBagConstraints.RELATIVE, insets, 0, 0));
+				GridBagConstraints.HORIZONTAL, insets, 0, 0));
 		
 		PanelCompileRes.add(WriteStats, new GridBagConstraints(0, 4, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
-				GridBagConstraints.RELATIVE, insets, 0, 0));
+				GridBagConstraints.HORIZONTAL, insets, 0, 0));
 		
 		
 		//PanelCompileRes.setPreferredSize(new Dimension(300, 300));
@@ -649,6 +649,10 @@ public class InteractiveRANSAC implements PlugIn {
 		}
 	}
 
+	int negcount = 0;
+	double negtimediff = 0;
+	double averageshrink = 0;
+	int i = 1, segment = 1;
 	public void updateRANSAC() {
 		++updateCount;
 		
@@ -667,22 +671,22 @@ public class InteractiveRANSAC implements PlugIn {
 			return;
 		}
 
-		// sort the segments according to time relative to each other and the
+		// sort the segments according to time HORIZONTAL to each other and the
 		// PointFunctionMatches internally
 		sort(segments);
 
 		final LinearFunction linear = new LinearFunction();
-		int i = 1, segment = 1, linearcount = 1;
+		int linearcount = 1;
 
 		int count = 0;
-		int negcount = 0;
+		
 		int rescount = 0;
 		int catcount = 0;
 		double timediff = 0;
 		double restimediff = 0;
-		double negtimediff = 0;
+		
 		double averagegrowth = 0;
-		double averageshrink = 0;
+		
 		double growthrate = 0;
 		double shrinkrate = 0;
 
@@ -700,6 +704,7 @@ public class InteractiveRANSAC implements PlugIn {
 
 		sortPoints(points);
 		List<Pair<Float, Float>> starttimerates = new ArrayList<Pair<Float, Float>>();
+		List<Pair<Float, Float>> catstarttimerates = new ArrayList<Pair<Float, Float>>();
 		for (final Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>> result : segments) {
 			if (LinearFunction.slopeFits(result.getB(), linear, minSlope, maxSlope)) {
 
@@ -747,8 +752,7 @@ public class InteractiveRANSAC implements PlugIn {
 
 				}
 
-				System.out.println("Global start and end" + points.get(points.size() - 1).getW()[0] + " "
-						+ points.get(0).getW()[0]);
+				
 				// Ignore tiny start events
 
 				if (endX - points.get(0).getW()[0] >= tptolerance) {
@@ -808,9 +812,14 @@ public class InteractiveRANSAC implements PlugIn {
 		}
 
 		if (this.detectCatastrophe) {
+			
+			
+			
+			
+			
 			if (segments.size() < 2) {
-				System.out.println(
-						"We have only " + segments.size() + " segments, need at least two to detect catastrophies.");
+				catstarttimerates = ManualCat(segments,allrates ,shrinkrate,  rt);
+			
 			} else {
 				for (int catastrophy = 0; catastrophy < segments.size() - 1; ++catastrophy) {
 					final Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>> start = segments.get(catastrophy);
@@ -828,11 +837,6 @@ public class InteractiveRANSAC implements PlugIn {
 						if (p.getL()[0] >= tStart && p.getL()[0] <= tEnd)
 							catastropyPoints.add(p);
 
-					/*
-					 * System.out.println( "\ncatastropy" ); for ( final Point p
-					 * : catastropyPoints) System.out.println( p.getL()[ 0 ] +
-					 * ", " + p.getL()[ 1 ] );
-					 */
 
 					if (catastropyPoints.size() > 2) {
 						if (Math.abs(lStart - lEnd) >= this.minDistanceCatastrophe) {
@@ -895,17 +899,25 @@ public class InteractiveRANSAC implements PlugIn {
 									++segment;
 								} else {
 									System.out.println("Slope not negative: " + fit.getA());
+									catstarttimerates = ManualCat(segments,allrates,shrinkrate, rt);
+									
 								}
 							} else {
 								System.out.println("No function found.");
+								catstarttimerates = ManualCat(segments,allrates, shrinkrate,  rt);
+								
 							}
 						} else {
 							System.out.println("Catastrophy height not sufficient " + Math.abs(lStart - lEnd) + " < "
 									+ this.minDistanceCatastrophe);
+							catstarttimerates = ManualCat(segments,allrates, shrinkrate,  rt);
+							
 						}
 					} else {
 						System.out.println("We have only " + catastropyPoints.size()
 								+ " points, need at least three to detect this catastrophy.");
+						catstarttimerates = ManualCat(segments,allrates,shrinkrate, rt);
+						
 					}
 				}
 			}
@@ -941,12 +953,13 @@ public class InteractiveRANSAC implements PlugIn {
 		rtAll.addValue("Rescue events", rescount);
 		//rtAll.show("Average Rates and Frequencies (real units)");
 
-		
+		starttimerates.addAll(catstarttimerates);
 		sortTime(starttimerates);
 		
 		
 		for (int index = 0; index < starttimerates.size() - 1; ++index){
 		
+			System.out.println(starttimerates.get(index).getA() + " " + starttimerates.get(index + 1).getA());
 			int prevsign = (int)Math.signum(starttimerates.get(index).getB());
 			int nextsign = (int)Math.signum(starttimerates.get(index + 1).getB());
 				
@@ -1003,7 +1016,92 @@ public class InteractiveRANSAC implements PlugIn {
 		--updateCount;
 	}
 	
+	public List<Pair<Float, Float>> ManualCat(ArrayList<Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>>>  segments, ArrayList<Rateobject> allrates,
+			double shrinkrate, ResultsTable rt) {
+		
+		List<Pair<Float, Float>> catstarttimerates = new ArrayList<Pair<Float, Float>>();
+		System.out.println("Overriding Ransac, Detecting without fiting a function" );
+		
+		for (int catastrophy = 0; catastrophy < segments.size() - 1; ++catastrophy) {
+			
+		final Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>> start = segments.get(catastrophy);
+		final Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>> end = segments.get(catastrophy + 1);
+		
+		
+		double tStart = start.getB().get(start.getB().size() - 1).getP1().getL()[0];
+		double tEnd = end.getB().get(0).getP1().getL()[0];
+
+		final double lStart = start.getB().get(start.getB().size() - 1).getP1().getL()[1];
+		final double lEnd = end.getB().get(0).getP1().getL()[1];
+		
+		if (Math.abs(lStart - lEnd) >= this.minDistanceCatastrophe) {
+		
+		
 	
+		
+		final double slope = (lEnd - lStart) / (tEnd - tStart);
+		final double intercept = lEnd - slope * tEnd;
+		
+		LinearFunction linearfunc = new LinearFunction(slope, intercept);
+		dataset.addSeries(Tracking.drawFunction((Polynomial) linearfunc, tStart,
+				tEnd, 0.1, lStart, lEnd, "C " + catastrophy));
+		
+		double startX = tStart;
+		double endX = tEnd;
+
+		
+		double linearrate = linearfunc.getCoefficient(1);
+		
+		if (linearrate < 0) {
+
+			negcount++;
+			negtimediff += endX - startX;
+
+			shrinkrate = linearrate;
+			averageshrink += linearrate;
+
+			rt.incrementCounter();
+			rt.addValue("Start time", startX * calibrations[2]);
+			rt.addValue("End time", endX * calibrations[2]);
+			rt.addValue("Growth Rate", linearrate * calibrations[0] / calibrations[2]);
+			Pair<Float, Float> startrate = new ValuePair<Float, Float>((float)startX, (float)linearrate);
+
+			catstarttimerates.add(startrate);
+		}
+
+		Rateobject rate = new Rateobject(linearrate * calibrations[0] / calibrations[2],
+				(int) (startX * calibrations[2]), (int) (endX * calibrations[2]));
+		allrates.add(rate);
+		
+
+		++i;
+		
+		ArrayList<PointFunctionMatch> p = new ArrayList<PointFunctionMatch>();
+		
+		p.add(new PointFunctionMatch(new Point(new double[] {tStart, lStart})));
+		p.add(new PointFunctionMatch(new Point(new double[] {tEnd, lEnd})));
+		
+		Tracking.setColor(chart, i, new Color(255, 0, 255));
+		Tracking.setDisplayType(chart, i, true, false);
+		Tracking.setStroke(chart, i, 2f);
+		
+		++i;
+		dataset.addSeries(Tracking.drawPoints(Tracking.toPairList(p), calibrations,
+				"C(inl) " + catastrophy));
+
+		
+		Tracking.setColor(chart, i, new Color(255, 0, 255));
+		Tracking.setDisplayType(chart, i, false, true);
+		Tracking.setShape(chart, i, ShapeUtils.createDownTriangle(4f));
+		
+		
+		++i;
+		++segment;
+		
+		}
+		}
+		return catstarttimerates;
+	}
 	
 	protected void sort(final Pair<? extends AbstractFunction2D, ArrayList<PointFunctionMatch>> segment) {
 		Collections.sort(segment.getB(), new Comparator<PointFunctionMatch>() {
