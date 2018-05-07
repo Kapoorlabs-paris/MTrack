@@ -29,14 +29,14 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
 
-public class CatastrophyCheckBoxListener implements ItemListener
+public class ManualCatastrophyCheckBoxListener implements ItemListener
 {
 	final InteractiveRANSAC parent;
 	final Checkbox checkbox;
 	final Label label;
 	final Scrollbar scrollbar;
 
-	public CatastrophyCheckBoxListener(
+	public ManualCatastrophyCheckBoxListener(
 			final InteractiveRANSAC parent,
 			final Checkbox checkbox,
 			final Label label,
@@ -53,7 +53,7 @@ public class CatastrophyCheckBoxListener implements ItemListener
 	@Override
 	public void itemStateChanged( final ItemEvent e )
 	{
-		boolean state = parent.detectCatastrophe;
+		boolean state = parent.detectmanualCatastrophe;
 		enableDisable( checkbox.getState() );
 
 		if ( checkbox.getState() != state )
@@ -72,16 +72,15 @@ public class CatastrophyCheckBoxListener implements ItemListener
 	{
 		label.setEnabled( state );
 		
-		boolean actualstate = true;
-		
-		
-		
+		boolean otherstate = parent.detectCatastrophe;
+        boolean actualstate = true;
+			
 		scrollbar.setEnabled( actualstate );
 
-		if ( state )
+		if ( state ) 
 			label.setForeground( Color.black );
-		else
+		else 
 			label.setForeground( Color.GRAY );
-		parent.detectCatastrophe = state;
+		parent.detectmanualCatastrophe = state;
 	}
 }
