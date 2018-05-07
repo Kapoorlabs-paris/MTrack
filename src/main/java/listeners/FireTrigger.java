@@ -72,8 +72,7 @@ public class FireTrigger implements ActionListener {
 		parent.panelIntro.validate();
 		parent.frame.pack();
 		
-		
-		
+		if (selectedindex!=0) {
 		parent.chooserB = new JFileChooser();
 		if (parent.chooserA != null)
 			parent.chooserB.setCurrentDirectory(parent.chooserA.getCurrentDirectory());
@@ -95,9 +94,13 @@ public class FireTrigger implements ActionListener {
 		ImagePlus impB = new Opener().openImage(parent.chooserB.getSelectedFile().getPath());
 		// Tracking is done with imageA measurment is performed on
 		// imageB
+		double frameinterval = 1;
+		if (impB.getCalibration().frameInterval != 0)
+			frameinterval = impB.getCalibration().frameInterval;
+		
 		parent.inputFieldcalX.setText(String.valueOf(new DecimalFormat("#.###").format(impB.getCalibration().pixelWidth)));
 		parent.inputFieldcalY.setText(String.valueOf(new DecimalFormat("#.###").format(impB.getCalibration().pixelHeight)));
-		parent.inputFieldT.setText(String.valueOf(new DecimalFormat("#.###").format(impB.getCalibration().pixelDepth)));
+		parent.inputFieldT.setText(String.valueOf(new DecimalFormat("#.###").format(frameinterval)));
 		parent.inputFieldX.setText(String.valueOf(new DecimalFormat("#.###").format(parent.psf[0])));
 		parent.inputFieldY.setText(String.valueOf(new DecimalFormat("#.###").format(parent.psf[1])));
 	
@@ -106,12 +109,7 @@ public class FireTrigger implements ActionListener {
 				"Image read: " + parent.chooserB.getSelectedFile());
 		LoadtrackText.setColumns(30);
 		new Normalize();
-		/*
-		parent.panelIntro.add(LoadtrackText, new GridBagConstraints(0, 4, 20, 1, 0.0, 0.0, GridBagConstraints.CENTER,
-				GridBagConstraints.HORIZONTAL, new Insets(0, 10, 0, 10), 0, 0));
-		parent.panelIntro.validate();
-		parent.frame.pack();
-		*/
+		
 		
 		
 		parent.originalimg = ImageJFunctions.convertFloat(impB);
@@ -128,9 +126,10 @@ public class FireTrigger implements ActionListener {
 		parent.userfile = parent.chooserB.getSelectedFile();
 		parent.panelIntro.validate();
 		
-	//	LoadtrackText.addTextListener(new InputListener(this, parent));
-		if (selectedindex == 0)
+		if (selectedindex == 1)
 		{
+			
+			
 			// Open Hyperstack images
 			
 			// Do concetation
@@ -158,7 +157,7 @@ public class FireTrigger implements ActionListener {
 			parent.originalimg = totalimg;
 			
 			
-			
+		}
 		}
 		
 		
