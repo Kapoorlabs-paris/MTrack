@@ -40,7 +40,6 @@ import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.view.Views;
 import peakFitter.FitterUtils;
 import preProcessing.FlatFieldCorrection;
-import preProcessing.FlatFieldOnly;
 import preProcessing.MedianFilterOnly;
 
 public class PreprocessMedian extends SwingWorker<Void, Void> {
@@ -92,7 +91,7 @@ public class PreprocessMedian extends SwingWorker<Void, Void> {
 			// Normalize image intnesity
 			Normalize.normalize(Views.iterable(parent.originalPreprocessedimg), parent.minval, parent.maxval);
 		
-			if (parent.selectedindex == 0)
+			if (parent.selectedindex == 1)
 			{
 				
 							
@@ -113,7 +112,7 @@ public class PreprocessMedian extends SwingWorker<Void, Void> {
 			
 			
 			
-			if (parent.selectedindex == 1){
+			if (parent.selectedindex == 2){
 				
 				// Open Reber lab images
 				ImageJFunctions.show(parent.originalPreprocessedimg).setTitle("Preprocessed Movie");
@@ -128,7 +127,7 @@ public class PreprocessMedian extends SwingWorker<Void, Void> {
 			}
 			
 			
-			if (parent.selectedindex == 2){
+			if (parent.selectedindex == 3){
 				
 				// Open Surrey lab images
 				

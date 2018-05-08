@@ -185,7 +185,7 @@ public class InteractiveRANSAC implements PlugIn {
 		this.minTP = minTP;
 		this.maxTP = maxTP;
 		this.numTimepoints = maxTP - minTP + 1;
-		this.functionChoice = functionChoice;
+		this.functionChoice = functionChoice; 
 		this.lambda = lambda;
 		this.mts = mts;
 		this.points = Tracking.toPoints(mts);
@@ -1002,7 +1002,7 @@ public class InteractiveRANSAC implements PlugIn {
 	}
 
 	public List<Pair<Float, Float>> ManualCat(
-			ArrayList<Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>>> segments, ArrayList<Rateobject> allrates,
+			ArrayList<Pair<AbstractFunction2D,ArrayList<PointFunctionMatch>>> segments, ArrayList<Rateobject> allrates,
 			double shrinkrate, ResultsTable rt) {
 
 		

@@ -248,7 +248,7 @@ public class SecondPanel {
 
 				Record.addActionListener(new BatchModeListener(parent));
 
-				timeslider.addAdjustmentListener(new TimeListener(parent, timeText,timestring, parent.thirdDimensionsliderInit , parent.thirdDimensionSize, parent.scrollbarSize,timeslider));
+				timeslider.addAdjustmentListener(new MTimeListener(parent, timeText,timestring, parent.thirdDimensionsliderInit , parent.thirdDimensionSize, parent.scrollbarSize,timeslider));
 				starttimeslider.addAdjustmentListener(new StarttimeListener(parent, timeTextstart, starttimestring, parent.thirdDimensionsliderInit, parent.thirdDimensionSize, parent.scrollbarSize,starttimeslider));
 				endtimeslider.addAdjustmentListener(new EndtimeListener(parent, timeTextend, endtimestring, parent.thirdDimensionsliderInit, parent.thirdDimensionSize, parent.scrollbarSize,endtimeslider));
 			

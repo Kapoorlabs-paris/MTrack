@@ -58,7 +58,7 @@ import peakFitter.FitterUtils;
  * @param <FloatType>
  *            the type of the source image.
  */
-public class FlatFieldOnly extends BenchmarkAlgorithm implements OutputAlgorithm< RandomAccessibleInterval< FloatType >>
+public class FlatFieldAlone extends BenchmarkAlgorithm implements OutputAlgorithm< RandomAccessibleInterval< FloatType >>
 {
 	private static final String BASE_ERROR_MSG = "[FlatField2D] ";
 
@@ -82,7 +82,7 @@ public class FlatFieldOnly extends BenchmarkAlgorithm implements OutputAlgorithm
 	 *            determines the size of the neighborhood. In 2D or 3D, a radius
 	 *            of 1 will generate a 3x3 neighborhood.
 	 */
-	public FlatFieldOnly( final RandomAccessibleInterval<FloatType> source, final int radius, final double[] psf )
+	public FlatFieldAlone( final RandomAccessibleInterval<FloatType> source, final int radius, final double[] psf )
 	{
 		this.source = source;
 		this.radius = radius;
@@ -90,7 +90,7 @@ public class FlatFieldOnly extends BenchmarkAlgorithm implements OutputAlgorithm
 	}
 	
 	
-	public FlatFieldOnly( final RandomAccessibleInterval<FloatType> source, final int radius, final JProgressBar jpb, final double[] psf  )
+	public FlatFieldAlone( final RandomAccessibleInterval<FloatType> source, final int radius, final JProgressBar jpb, final double[] psf  )
 	{
 		this.source = source;
 		this.radius = radius;
