@@ -22,7 +22,10 @@
 package mt;
 
 import java.awt.Dimension;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -85,7 +88,6 @@ public class LengthDistribution {
 
 				if(currentobject.get(index).Framenumber == framenumber){
 					lengthlist.add (new ValuePair<Integer, Double>(currentobject.get(index).seedID, currentobject.get(index).length));
-				System.out.println(file + " " + framenumber + " " + currentobject.get(index).length);	
 					
 				}
 
@@ -97,90 +99,6 @@ public class LengthDistribution {
 
 	}
 
-	public static void GetLengthDistribution(File[] AllMovies,  double[] calibration) {
-
-		ArrayList<Double> maxlist = new ArrayList<Double>();
-		for (int i = 0; i < AllMovies.length; ++i) {
-
-			double maxlength = LengthDistribution.Lengthdistro(AllMovies[i]);
-
-			if (maxlength != Double.NaN && maxlength > 0)
-				maxlist.add(maxlength);
-
-		}
-		Collections.sort(maxlist);
-
-		int min = 0;
-		int max = (int) Math.round(maxlist.get(maxlist.size() - 1)) + 1;
-		XYSeries counterseries = new XYSeries("MT length distribution");
-
-		for (int length = 0; length < max; ++length) {
-
-			HashMap<Integer, Integer> frameseed = new HashMap<Integer, Integer>();
-
-			int count = 0;
-			for (int i = 0; i < AllMovies.length; ++i) {
-
-				File file = AllMovies[i];
-
-				double currentlength = LengthDistribution.Lengthdistro(file);
-
-				ArrayList<FLSobject> currentobject = Tracking.loadMTStat(file);
-
-				if (currentlength > length) {
-
-
-					
-					for (int index = 0; index < currentobject.size(); ++index) {
-						ArrayList<Integer> seedlist = new ArrayList<Integer>();
-						if (currentobject.get(index).length >= length) {
-							seedlist.add(currentobject.get(index).seedID);
-							if (frameseed.get(currentobject.get(index).Framenumber) != null
-									&& frameseed.get(currentobject.get(index).Framenumber) != Double.NaN) {
-
-								int currentcount = frameseed.get(currentobject.get(index).Framenumber);
-								frameseed.put(currentobject.get(index).Framenumber, seedlist.size() + currentcount);
-							} else if (currentobject.get(index) != null)
-								frameseed.put(currentobject.get(index).Framenumber, seedlist.size() );
-
-						}
-
-					}
-
-				}
-
-			}
-			
-			
-			// Get maxima length, count
-			int maxvalue = Integer.MIN_VALUE;
-			
-			for (int key: frameseed.keySet()){
-				
-				int Count = frameseed.get(key);
-				
-				if (Count >= maxvalue)
-					maxvalue = Count;
-			}
-			
-			if (maxvalue!=Integer.MIN_VALUE)
-				counterseries.add(length , maxvalue );
-
-			
-			
-			  
-			 
-
-		}
-		
-		final XYSeriesCollection dataset = new XYSeriesCollection();
-		  dataset.addSeries(counterseries); 
-		  final JFreeChart chart =
-		  ChartFactory.createScatterPlot("MT length distribution",
-		  "Length (micrometer)", "Number of MT", dataset);
-		  
-		  DisplayPoints.display(chart, new Dimension(800, 500));
-	}
 	
 	public static void GetLengthDistributionArray(ArrayList<File> AllMovies, double[] calibration) {
 
@@ -261,13 +179,19 @@ public class LengthDistribution {
 		}
 		
 		final XYSeriesCollection dataset = new XYSeriesCollection();
+		final XYSeriesCollection nofitdataset = new XYSeriesCollection();
 		  dataset.addSeries(counterseries); 
+		  nofitdataset.addSeries(counterseries); 
 		  final XYSeriesCollection Logdataset = new XYSeriesCollection();
 		  Logdataset.addSeries(Logcounterseries); 
 		  
 		  final JFreeChart chart =
 		  ChartFactory.createScatterPlot("MT length distribution",
-		  "Length (micrometer)", "Number of MT", dataset);
+		  "Number of MT","Length (micrometer)",  dataset);
+		  
+		  final JFreeChart nofitchart =
+				  ChartFactory.createScatterPlot("MT length distribution",
+				  "Number of MT","Length (micrometer)",  nofitdataset);
 		  
 		  // Fitting line to log of the length distribution
 		  interpolation.Polynomial poly = new interpolation.Polynomial(1);
@@ -282,6 +206,7 @@ public class LengthDistribution {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			 DisplayPoints.display(nofitchart, new Dimension(800, 500));
 			 dataset.addSeries(Tracking.drawexpFunction(poly, counterseries.getMinX(), counterseries.getMaxX(), 0.5, "Exponential fit"));
 			 NumberFormat nf = NumberFormat.getInstance(Locale.ENGLISH);
 				nf.setMaximumFractionDigits(3);
@@ -294,7 +219,7 @@ public class LengthDistribution {
 		  
 		  final JFreeChart logchart =
 				  ChartFactory.createScatterPlot("MT Log length distribution",
-				  "Length (micrometer)", "Number of MT", Logdataset);
+						  "Number of MT","Length (micrometer)", Logdataset);
 	//	  DisplayPoints.display(logchart, new Dimension(800, 500));
 		  for (int i = 1; i >= 0; --i)
 				System.out.println(poly.getCoefficients(i) + "  " + "x" + " X to the power of "  + i );
@@ -302,6 +227,59 @@ public class LengthDistribution {
 		  
 		//  Logdataset.addSeries(Tracking.drawFunction(poly, counterseries.getMinX(), counterseries.getMaxX(), 0.5, "Straight line fit"));
 		  
+		  WriteLengthdistroFile(AllMovies, counterseries, 0);
+		  
+	}
+	
+	public static void WriteLengthdistroFile(ArrayList<File> AllMovies, XYSeries counterseries, int framenumber) {
+		
+
+			try {
+				
+				
+				File ratesfile = new File(AllMovies.get(0).getParentFile() +  "//" + "Length-Distribution At T " + " = " + framenumber + ".txt");
+
+				if (framenumber == 0)
+					ratesfile = new File(AllMovies.get(0).getParentFile()  + "//" + "Mean Length-Distribution" + ".txt");
+					
+				
+				FileWriter fw = new FileWriter(ratesfile);
+
+				BufferedWriter bw = new BufferedWriter(fw);
+
+
+
+				bw.write("\tLength(real units) \tCount\n");
+				
+
+				
+	                          for (int index =  0; index < counterseries.getItems().size(); ++index){
+	                        	  
+	                        	  double Count = counterseries.getX(index).doubleValue();
+	                        	  double Length = counterseries.getY(index).doubleValue();
+	                        	  
+	                        	  
+								bw.write("\t" + Length+ "\t" + "\t" + Count  + "\t" + "\n");
+								
+
+							}
+
+					
+
+					
+			
+				bw.close();
+				fw.close();
+
+			
+			}
+
+			catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		
 	}
 	
 	
@@ -341,7 +319,7 @@ public class LengthDistribution {
 
 
 
-					
+					if (currentobject!=null)
 					for (int index = 0; index < currentobject.size(); ++index) {
 						ArrayList<Integer> seedlist = new ArrayList<Integer>();
 						if (currentobject.get(index).length >= length && currentobject.get(index).Framenumber == framenumber) {
@@ -387,14 +365,18 @@ public class LengthDistribution {
 		}
 		
 		final XYSeriesCollection dataset = new XYSeriesCollection();
+		final XYSeriesCollection nofitdataset = new XYSeriesCollection();
 		  dataset.addSeries(counterseries); 
+		  nofitdataset.addSeries(counterseries); 
 		  final XYSeriesCollection Logdataset = new XYSeriesCollection();
 		  Logdataset.addSeries(Logcounterseries); 
 		  
 		  final JFreeChart chart =
 		  ChartFactory.createScatterPlot("MT length distribution",
-		  "Length (micrometer)", "Number of MT", dataset);
-		  
+				  "Number of MT","Length (micrometer)",  dataset);
+		  final JFreeChart nofitchart =
+				  ChartFactory.createScatterPlot("MT length distribution",
+				  "Number of MT","Length (micrometer)",  nofitdataset);
 		  // Fitting line to log of the length distribution
 		  interpolation.Polynomial poly = new interpolation.Polynomial(1);
 			 try {
@@ -407,6 +389,7 @@ public class LengthDistribution {
 			} catch (NotEnoughDataPointsException e) {
 				
 			}
+			 DisplayPoints.display(nofitchart, new Dimension(800, 500));
 			 dataset.addSeries(Tracking.drawexpFunction(poly, counterseries.getMinX(), counterseries.getMaxX(), 0.5, "Exponential fit"));
 			 NumberFormat nf = NumberFormat.getInstance(Locale.ENGLISH);
 				nf.setMaximumFractionDigits(3);
@@ -427,7 +410,7 @@ public class LengthDistribution {
 		  
 		  
 		//  Logdataset.addSeries(Tracking.drawFunction(poly, counterseries.getMinX(), counterseries.getMaxX(), 0.5, "Straight line fit"));
-		  
+		  WriteLengthdistroFile(AllMovies, counterseries, framenumber);
 	}
 	
 }
