@@ -899,20 +899,27 @@ public class InteractiveRANSAC implements PlugIn {
 
 						}
 					}
+					
+					else 	if (this.detectmanualCatastrophe) {
+
+						
+					    catindex++;
+						catstarttimerates = ManualCat(segments, allrates, shrinkrate, rt);
+
+				}
 				}
 
 			}
 		}
 
-		System.out.println(detectmanualCatastrophe);
-		
-		if (this.detectmanualCatastrophe) {
+		if (this.detectmanualCatastrophe && !this.detectCatastrophe) {
 
 			
-			    catindex++;
-				catstarttimerates = ManualCat(segments, allrates, shrinkrate, rt);
+		    catindex++;
+			catstarttimerates = ManualCat(segments, allrates, shrinkrate, rt);
 
-		}
+	}
+	
 		
 		if (count > 0)
 			averagegrowth /= count;
@@ -1029,13 +1036,7 @@ public class InteractiveRANSAC implements PlugIn {
 				final double intercept = lEnd - slope * tEnd;
 
 				LinearFunction linearfunc = new LinearFunction(slope, intercept);
-				++i;
-				dataset.addSeries(Tracking.drawFunction((Polynomial) linearfunc, tStart, tEnd, 0.1, lStart, lEnd,
-						"CManual " + catindex + catastrophy));
-				Tracking.setColor(chart, i, new Color(255, 192, 255));
-				Tracking.setDisplayType(chart, i, true, false);
-				Tracking.setStroke(chart, i, 2f);
-				++i;
+			
 
 				double startX = tStart;
 				double endX = tEnd;
@@ -1043,7 +1044,13 @@ public class InteractiveRANSAC implements PlugIn {
 				double linearrate = linearfunc.getCoefficient(1);
 
 				if (linearrate < 0) {
-
+					++i;
+					dataset.addSeries(Tracking.drawFunction((Polynomial) linearfunc, tStart, tEnd, 0.1, lStart, lEnd,
+							"CManual " + catindex + catastrophy));
+					Tracking.setColor(chart, i, new Color(255, 192, 255));
+					Tracking.setDisplayType(chart, i, true, false);
+					Tracking.setStroke(chart, i, 2f);
+					++i;
 					negcount++;
 					negtimediff += endX - startX;
 
