@@ -143,7 +143,7 @@ public class MeasureserialListener implements ActionListener {
 			parent.PanelSelectFile.setBorder(parent.selectfile);
 			parent.panelFirst.add(parent.PanelSelectFile, new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
 					GridBagConstraints.RELATIVE, new Insets(10, 10, 0, 10), 0, 0));
-			
+			System.out.println(parent.row);
 			if(parent.inputfiles!=null){ 
 			parent.table.addMouseListener(new MouseAdapter() {
 				  public void mouseClicked(MouseEvent e) {

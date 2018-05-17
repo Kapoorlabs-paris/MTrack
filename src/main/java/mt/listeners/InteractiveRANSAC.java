@@ -185,7 +185,7 @@ public class InteractiveRANSAC implements PlugIn {
 		this.minTP = minTP;
 		this.maxTP = maxTP;
 		this.numTimepoints = maxTP - minTP + 1;
-		this.functionChoice = functionChoice; 
+		this.functionChoice = functionChoice;
 		this.lambda = lambda;
 		this.mts = mts;
 		this.points = Tracking.toPoints(mts);
@@ -321,10 +321,9 @@ public class InteractiveRANSAC implements PlugIn {
 
 	Border selectdirectory = new CompoundBorder(new TitledBorder("Load directory"), new EmptyBorder(c.insets));
 
-	
 	public int SizeX = 500;
 	public int SizeY = 300;
-	
+
 	public void CardTable() {
 
 		CardLayout cl = new CardLayout();
@@ -412,7 +411,8 @@ public class InteractiveRANSAC implements PlugIn {
 				Label.CENTER);
 
 		final Checkbox findCatastrophe = new Checkbox("Detect Catastrophies", this.detectCatastrophe);
-		final Checkbox findmanualCatastrophe = new Checkbox("Detect Catastrophies without fit", this.detectmanualCatastrophe);
+		final Checkbox findmanualCatastrophe = new Checkbox("Detect Catastrophies without fit",
+				this.detectmanualCatastrophe);
 		final Scrollbar minCatDist = new Scrollbar(Scrollbar.HORIZONTAL, this.minDistCatInt, 1, MIN_SLIDER,
 				MAX_SLIDER + 1);
 		final Scrollbar maxRes = new Scrollbar(Scrollbar.HORIZONTAL, this.restoleranceInt, 1, MIN_SLIDER,
@@ -430,7 +430,6 @@ public class InteractiveRANSAC implements PlugIn {
 		final Button WriteAgain = new Button("Save Rates and Frequencies to File");
 		setFunction();
 
-	
 		PanelDirectory.add(Measureserial, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST,
 				GridBagConstraints.HORIZONTAL, insets, 0, 0));
 
@@ -548,8 +547,8 @@ public class InteractiveRANSAC implements PlugIn {
 		maxSlopeSB.addAdjustmentListener(new MaxSlopeListener(this, maxSlopeSB, maxSlopeLabel));
 		findCatastrophe
 				.addItemListener(new CatastrophyCheckBoxListener(this, findCatastrophe, minCatDistLabel, minCatDist));
-		findmanualCatastrophe
-		.addItemListener(new ManualCatastrophyCheckBoxListener(this, findmanualCatastrophe, minCatDistLabel, minCatDist));
+		findmanualCatastrophe.addItemListener(
+				new ManualCatastrophyCheckBoxListener(this, findmanualCatastrophe, minCatDistLabel, minCatDist));
 		minCatDist.addAdjustmentListener(new MinCatastrophyDistanceListener(this, minCatDistLabel, minCatDist));
 		Measureserial.addActionListener(new MeasureserialListener(this));
 		Compile.addActionListener(new CompileResultsListener(this));
@@ -640,7 +639,8 @@ public class InteractiveRANSAC implements PlugIn {
 
 	public void updateRANSAC() {
 		++updateCount;
-
+		dataset.removeAllSeries();
+		this.dataset.addSeries(Tracking.drawPoints(mts, calibrations));
 		linearsegments.clear();
 		indexedsegments.clear();
 		dataset.removeAllSeries();
@@ -800,10 +800,10 @@ public class InteractiveRANSAC implements PlugIn {
 
 		if (this.detectCatastrophe) {
 
+		
 			if (segments.size() < 2) {
-				
+
 				System.out.println("Only two points found");
-				
 
 			} else {
 				for (int catastrophy = 0; catastrophy < segments.size() - 1; ++catastrophy) {
@@ -839,14 +839,14 @@ public class InteractiveRANSAC implements PlugIn {
 
 									final Pair<Double, Double> minMax = Tracking.fromTo(fit.getB());
 
-									dataset.addSeries(Tracking.drawFunction((Polynomial) fit.getA(), minMax.getA() - 1,
-											minMax.getB() + 1, 0.1, minY - 2.5, maxY + 2.5, "CRansac " + catastrophy));
+									
 									double startX = minMax.getA();
 									double endX = minMax.getB();
 
 									double linearrate = fit.getA().getCoefficient(1);
 									if (linearrate < 0) {
-
+										dataset.addSeries(Tracking.drawFunction((Polynomial) fit.getA(), minMax.getA() - 1,
+												minMax.getB() + 1, 0.1, minY - 2.5, maxY + 2.5, "CRansac " + catastrophy));
 										negcount++;
 										negtimediff += endX - startX;
 
@@ -884,29 +884,38 @@ public class InteractiveRANSAC implements PlugIn {
 									}
 								} else {
 									System.out.println("Slope not negative: " + fit.getA());
-								
+									if (this.detectmanualCatastrophe) {
 
+										catindex++;
+										catstarttimerates = ManualCat(segments, allrates, shrinkrate, rt);
+
+									}
 								}
+
 							} else {
 								System.out.println("No function found.");
-								
+								if (this.detectmanualCatastrophe) {
+
+									catindex++;
+									catstarttimerates = ManualCat(segments, allrates, shrinkrate, rt);
+
+								}
 
 							}
 						} else {
 							System.out.println("Catastrophy height not sufficient " + Math.abs(lStart - lEnd) + " < "
 									+ this.minDistanceCatastrophe);
-							
+							if (this.detectmanualCatastrophe) {
+
+								catindex++;
+								catstarttimerates = ManualCat(segments, allrates, shrinkrate, rt);
+
+							}
 
 						}
 					}
-					
-					else 	if (this.detectmanualCatastrophe) {
 
-						
-					    catindex++;
-						catstarttimerates = ManualCat(segments, allrates, shrinkrate, rt);
-
-				}
+				
 				}
 
 			}
@@ -914,13 +923,11 @@ public class InteractiveRANSAC implements PlugIn {
 
 		if (this.detectmanualCatastrophe && !this.detectCatastrophe) {
 
-			
-		    catindex++;
+			catindex++;
 			catstarttimerates = ManualCat(segments, allrates, shrinkrate, rt);
 
-	}
-	
-		
+		}
+
 		if (count > 0)
 			averagegrowth /= count;
 
@@ -1009,16 +1016,13 @@ public class InteractiveRANSAC implements PlugIn {
 	}
 
 	public List<Pair<Float, Float>> ManualCat(
-			ArrayList<Pair<AbstractFunction2D,ArrayList<PointFunctionMatch>>> segments, ArrayList<Rateobject> allrates,
+			ArrayList<Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>>> segments, ArrayList<Rateobject> allrates,
 			double shrinkrate, ResultsTable rt) {
 
-		
 		List<Pair<Float, Float>> catstarttimerates = new ArrayList<Pair<Float, Float>>();
-		
-			
-			System.out.println("Overriding Ransac, Detecting without fiting a function");
-			
-			
+	
+		System.out.println("Overriding Ransac, Detecting without fiting a function");
+
 		for (int catastrophy = 0; catastrophy < segments.size() - 1; ++catastrophy) {
 
 			final Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>> start = segments.get(catastrophy);
@@ -1036,7 +1040,6 @@ public class InteractiveRANSAC implements PlugIn {
 				final double intercept = lEnd - slope * tEnd;
 
 				LinearFunction linearfunc = new LinearFunction(slope, intercept);
-			
 
 				double startX = tStart;
 				double endX = tEnd;
@@ -1044,13 +1047,10 @@ public class InteractiveRANSAC implements PlugIn {
 				double linearrate = linearfunc.getCoefficient(1);
 
 				if (linearrate < 0) {
-					++i;
-					dataset.addSeries(Tracking.drawFunction((Polynomial) linearfunc, tStart, tEnd, 0.1, lStart, lEnd,
-							"CManual " + catindex + catastrophy));
-					Tracking.setColor(chart, i, new Color(255, 192, 255));
-					Tracking.setDisplayType(chart, i, true, false);
-					Tracking.setStroke(chart, i, 2f);
-					++i;
+					
+				
+
+					
 					negcount++;
 					negtimediff += endX - startX;
 
@@ -1075,20 +1075,22 @@ public class InteractiveRANSAC implements PlugIn {
 					allrates.add(rate);
 
 					dataset.addSeries(Tracking.drawPoints(Tracking.toPairList(p), calibrations,
-							"CManual(points) " + catindex + catastrophy));
+							"CManual" + catindex + catastrophy));
 
 					Tracking.setColor(chart, i, new Color(255, 192, 255));
-					Tracking.setDisplayType(chart, i, false, true);
-					Tracking.setShape(chart, i, ShapeUtils.createDiamond(4f));
-
+					Tracking.setDisplayType(chart, i, true, false);
+					Tracking.setStroke(chart, i, 2f);
 					++i;
 					++segment;
+				
+
+					
 				}
 
 			}
 		}
 		return catstarttimerates;
-		
+
 	}
 
 	protected void sort(final Pair<? extends AbstractFunction2D, ArrayList<PointFunctionMatch>> segment) {
