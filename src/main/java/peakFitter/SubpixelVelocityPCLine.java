@@ -54,7 +54,6 @@ import labeledObjects.CommonOutputHF;
 import labeledObjects.Indexedlength;
 import lineFinder.LinefinderHF;
 import mpicbg.imglib.util.Util;
-import mt.listeners.MaxDistListener;
 import net.imglib2.Cursor;
 import net.imglib2.FinalInterval;
 import net.imglib2.Point;
