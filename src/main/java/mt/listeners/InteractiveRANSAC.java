@@ -75,6 +75,8 @@ import org.jfree.graphics2d.svg.SVGUtils;
 
 import comboListeners.ErrorListener;
 import comboListeners.ErrorLocListener;
+import comboListeners.MinInlierListener;
+import comboListeners.MinInlierLocListener;
 import comboListeners.SliderBoxGUI;
 import fit.AbstractFunction2D;
 import fit.PointFunctionMatch;
@@ -95,13 +97,16 @@ public class InteractiveRANSAC implements PlugIn {
 
 	public  float MIN_ERROR = 0.0f;
 	public  float MAX_ERROR = 100.0f;
+	
+	public  float MIN_Inlier = 0.0f;
+	public  float MAX_Inlier = 100.0f;
 
 	public static double MIN_RES = 1.0;
 	public static double MAX_RES = 100.0;
 
 	private Label inputLabelT;
 	private Label inputLabelTcont;
-	public TextField inputFieldT, maxErrorField;
+	public TextField inputFieldT, maxErrorField, minInlierField;
 	public static double MAX_ABS_SLOPE = 100.0;
 
 	public static double MIN_CAT = 0.0;
@@ -324,7 +329,11 @@ public class InteractiveRANSAC implements PlugIn {
 	Border compileres = new CompoundBorder(new TitledBorder("Compile results"), new EmptyBorder(c.insets));
 
 	Border selectdirectory = new CompoundBorder(new TitledBorder("Load directory"), new EmptyBorder(c.insets));
+	
+	
 	public String errorstring = "Maximum Error (px)";
+	public String inlierstring = "Minimum Number of timepoints (tp)";
+	
 	public int SizeX = 500;
 	public int SizeY = 300;
 	public JScrollBar maxErrorSB = new JScrollBar(Scrollbar.HORIZONTAL, this.maxErrorInt, 10, 0, 10 + scrollbarSize);
@@ -379,6 +388,9 @@ public class InteractiveRANSAC implements PlugIn {
 		
 		maxErrorField = new TextField(5);
 		maxErrorField.setText(Double.toString(maxError));
+		
+		minInlierField = new TextField(5);
+		minInlierField.setText(Integer.toString(minInliers));
 		
 		scrollPane = new JScrollPane(table);
 		scrollPane.setMinimumSize(new Dimension(300, 200));
@@ -457,18 +469,22 @@ public class InteractiveRANSAC implements PlugIn {
 
 		panelFirst.add(PanelSelectFile, new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
 				GridBagConstraints.HORIZONTAL, insets, 0, 0));
-		SliderBoxGUI combocutoff = new SliderBoxGUI(errorstring, maxErrorSB, maxErrorField, maxErrorLabel, scrollbarSize, maxError, MAX_ERROR);
+		SliderBoxGUI combomaxerror = new SliderBoxGUI(errorstring, maxErrorSB, maxErrorField, maxErrorLabel, scrollbarSize, maxError, MAX_ERROR);
 		
 		
-		PanelParameteroptions.add(combocutoff.BuildDisplay(), new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
+		PanelParameteroptions.add(combomaxerror.BuildDisplay(), new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
 				GridBagConstraints.HORIZONTAL, insets, 0, 0));
 	
-
-		PanelParameteroptions.add(minInliersSB, new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
+		SliderBoxGUI combomininlier = new SliderBoxGUI(inlierstring, minInliersSB, minInlierField, minInliersLabel, scrollbarSize, minInliers, MAX_Inlier);
+		
+		
+		PanelParameteroptions.add(combomininlier.BuildDisplay(), new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
 				GridBagConstraints.HORIZONTAL, insets, 0, 0));
-
-		PanelParameteroptions.add(minInliersLabel, new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0,
-				GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL, insets, 0, 0));
+		
+		
+		
+		
+		
 		PanelParameteroptions.add(maxDistSB, new GridBagConstraints(0, 4, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
 				GridBagConstraints.HORIZONTAL, insets, 0, 0));
 		PanelParameteroptions.add(maxDistLabel, new GridBagConstraints(0, 5, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
@@ -554,7 +570,9 @@ public class InteractiveRANSAC implements PlugIn {
 
 		maxErrorSB.addAdjustmentListener(new ErrorListener(this,  maxErrorLabel, errorstring, MIN_ERROR,
 				MAX_ERROR, scrollbarSize, maxErrorSB));
-		minInliersSB.addAdjustmentListener(new MinInliersListener(this, minInliersLabel, minInliersSB));
+		
+		minInliersSB.addAdjustmentListener(new MinInlierListener(this,  minInliersLabel, inlierstring, MIN_Inlier,
+				MAX_Inlier, scrollbarSize, minInliersSB));
 		maxDistSB.addAdjustmentListener(new MaxDistListener(this, maxDistLabel, maxDistSB));
 		ChooseMethod.addActionListener(new FunctionItemListener(this, ChooseMethod));
 		lambdaSB.addAdjustmentListener(new LambdaListener(this, lambdaLabel, lambdaSB));
@@ -575,7 +593,10 @@ public class InteractiveRANSAC implements PlugIn {
 		batch.addActionListener(new RansacBatchmodeListener(this));
 		cancel.addActionListener(new FinishButtonListener(this, true));
 		inputFieldT.addTextListener(new LengthdistroListener(this));
+		
+		
 	     maxErrorField.addTextListener(new ErrorLocListener(this, false));
+	     minInlierField.addTextListener(new MinInlierLocListener(this, false));
 		panelFirst.setVisible(true);
 
 		cl.show(panelCont, "1");
