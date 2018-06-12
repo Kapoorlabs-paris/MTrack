@@ -338,7 +338,7 @@ public class InteractiveRANSAC implements PlugIn {
 	public Label maxErrorLabel = new Label("Maximum Error (px) = " + new DecimalFormat("#.##").format(this.maxError) + "      ",
 			Label.CENTER);
 	public Label minInliersLabel = new Label(
-			"Min. #Points (tp) = " + new DecimalFormat("#.##").format(this.minInliers), Label.CENTER);
+			"Minimum Number of timepoints (tp) = " + new DecimalFormat("#.##").format(this.minInliers), Label.CENTER);
 	public Label maxDistLabel = new Label("Maximum Gap (tp) = " + new DecimalFormat("#.##").format(this.maxDist),
 			Label.CENTER);
 	

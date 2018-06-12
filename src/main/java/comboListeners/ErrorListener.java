@@ -32,7 +32,6 @@ public class ErrorListener implements AdjustmentListener {
 
 		deltaScrollbar.addMouseListener( new StandardMouseListener( parent ) );
 		this.deltaScrollbar = deltaScrollbar;
-		deltaScrollbar.setBlockIncrement(1);
 	}
 
 	@Override
@@ -47,8 +46,8 @@ public class ErrorListener implements AdjustmentListener {
 		deltaScrollbar
 				.setValue(utility.Slicer.computeScrollbarPositionFromValue(parent.maxError, min, max, scrollbarSize));
 
-		label.setText(string +  " = "  + Math.round(parent.maxError) + "      ");
-		parent.maxErrorField.setText(Integer.toString(Math.round(parent.maxError)));
+		label.setText(string +  " = "  + parent.nf.format(parent.maxError) + "      ");
+		parent.maxErrorField.setText(Float.toString((parent.maxError)));
 		parent.panelFirst.validate();
 		parent.panelFirst.repaint();
 	
