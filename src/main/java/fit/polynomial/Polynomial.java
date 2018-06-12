@@ -45,4 +45,5 @@ public interface Polynomial < F extends Polynomial< F, P >, P extends Point > ex
 	 * @return - the corresponding y value
 	 */
 	public double predict( final double x );
+	
 }

@@ -63,7 +63,6 @@ public class FunctionItemListener implements ActionListener
 			parent.functionChoice = 1;
 		if (selectedindex == 2)
 			parent.functionChoice = 2;
-		System.out.println(selectedindex);
 		parent.setFunction();
 		parent.updateRANSAC();
 	}
