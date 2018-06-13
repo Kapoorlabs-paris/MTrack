@@ -38,7 +38,7 @@ import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.view.Views;
 import peakFitter.FitterUtils;
 import preProcessing.FlatFieldCorrection;
-import preProcessing.FlatFieldOnly;
+import preProcessing.FlatFieldAlone;
 
 public class PreprocessFlat extends SwingWorker<Void, Void> {
 
@@ -57,7 +57,7 @@ public class PreprocessFlat extends SwingWorker<Void, Void> {
 		
 		
 		
-		final FlatFieldOnly flatfilter = new FlatFieldOnly(parent.originalimg, 2, parent.jpb, parent.psf);
+		final FlatFieldAlone flatfilter = new FlatFieldAlone(parent.originalimg, 2, parent.jpb, parent.psf);
 		flatfilter.process();
 		parent.originalPreprocessedimg = flatfilter.getResult();
 		

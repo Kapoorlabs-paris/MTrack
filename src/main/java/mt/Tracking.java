@@ -89,8 +89,7 @@ public class Tracking
 		}
 		catch ( Exception e )
 		{
-			e.printStackTrace();
-			return null;
+			
 		}
 
 		Collections.sort( points, new Comparator< FLSobject >()

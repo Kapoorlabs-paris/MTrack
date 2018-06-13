@@ -40,7 +40,7 @@ import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.view.Views;
 import peakFitter.FitterUtils;
 import preProcessing.FlatFieldCorrection;
-import preProcessing.FlatFieldOnly;
+import preProcessing.FlatFieldAlone ;
 
 public class PreprocessFlatNext extends SwingWorker<Void, Void> {
 
@@ -59,7 +59,7 @@ public class PreprocessFlatNext extends SwingWorker<Void, Void> {
 		
 		
 		
-		final FlatFieldOnly flatfilter = new FlatFieldOnly(parent.originalimg, 2, parent.jpb, parent.psf);
+		final FlatFieldAlone  flatfilter = new FlatFieldAlone (parent.originalimg, 2, parent.jpb, parent.psf);
 		flatfilter.process();
 		parent.originalPreprocessedimg = flatfilter.getResult();
 		
@@ -87,7 +87,7 @@ public class PreprocessFlatNext extends SwingWorker<Void, Void> {
 			// Normalize image intnesity
 			Normalize.normalize(Views.iterable(parent.originalPreprocessedimg), parent.minval, parent.maxval);
 		
-			if (parent.selectedindex == 0)
+			if (parent.selectedindex == 1)
 			{
 				
 							
@@ -108,7 +108,7 @@ public class PreprocessFlatNext extends SwingWorker<Void, Void> {
 			
 			
 			
-			if (parent.selectedindex == 1){
+			if (parent.selectedindex == 2){
 				
 				// Open Reber lab images
 				ImageJFunctions.show(parent.originalPreprocessedimg).setTitle("Preprocessed Movie");
@@ -123,7 +123,7 @@ public class PreprocessFlatNext extends SwingWorker<Void, Void> {
 			}
 			
 			
-			if (parent.selectedindex == 2){
+			if (parent.selectedindex == 3){
 				
 				// Open Surrey lab images
 				
