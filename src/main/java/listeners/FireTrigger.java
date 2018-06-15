@@ -120,9 +120,9 @@ public class FireTrigger implements ActionListener {
 		// Normalize image intnesity
 		Normalize.normalize(Views.iterable(parent.originalimg), parent.minval, parent.maxval);
 		Normalize.normalize(Views.iterable(parent.originalPreprocessedimg), parent.minval, parent.maxval);
-		parent.inputField.setText(parent.chooserB.getSelectedFile().getName().replaceFirst("[.][^.]+$", ""));
-
-		parent.addToName = parent.inputField.getText();
+		parent.inputField.setText(parent.chooserB.getSelectedFile().getPath());
+         //.replaceFirst("[.][^.]+$", "")
+		parent.addToName = parent.chooserB.getSelectedFile().getName().replaceFirst("[.][^.]+$", "");
 		parent.userfile = parent.chooserB.getSelectedFile();
 		parent.panelIntro.validate();
 		

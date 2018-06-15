@@ -23,6 +23,8 @@ package LineModels;
 
 public class GaussianLineds implements MTFitFunction {
 
+	
+	static double fcteps = 1.0E-30;
 	@Override
 	public double val(double[] x, double[] a, double[] b) {
 		final int ndims = x.length;
@@ -129,7 +131,7 @@ public static double numdiff(double[] x, double[] a, int dim, double[] b) {
 			sum += b[i] * di * di;
 		}
 
-		return Math.exp(-sum);
+		return Exponent.exp(-sum);
 
 	}
 
@@ -146,7 +148,7 @@ public static double numdiff(double[] x, double[] a, int dim, double[] b) {
 			minVal[i] = a[i];
 			maxVal[i] = a[ndims + i];
 		}
-		double slope = (maxVal[1] - minVal[1]) / (maxVal[0] - minVal[0]);
+		double slope = (maxVal[1] - minVal[1]) / (maxVal[0] - minVal[0] + fcteps);
 		
 		
 		double ds = Math.abs(a[2 * ndims]);
@@ -170,15 +172,15 @@ public static double numdiff(double[] x, double[] a, int dim, double[] b) {
 		}
 		
 				
-		sumofgaussians+= count * dsum * Math.exp(-sum);
+		sumofgaussians+= count * dsum * Exponent.exp(-sum);
 		
 		count++;
 		
 		
 		
-		if (minVal[0] > maxVal[0] || minVal[1] > maxVal[1] && slope >= 0 )
+		if (minVal[0] >= maxVal[0] || minVal[1] >= maxVal[1] && slope >= 0 )
 			break;
-		if (minVal[0] > maxVal[0] || minVal[1] < maxVal[1] && slope < 0)
+		if (minVal[0] >= maxVal[0] || minVal[1] <= maxVal[1] && slope < 0)
 			break;
 
 	}
@@ -202,7 +204,7 @@ public static double numdiff(double[] x, double[] a, int dim, double[] b) {
 			sum += b[i] * di * di;
 		}
 
-		return Math.exp(-sum);
+		return Exponent.exp(-sum);
 
 	}
 
@@ -222,7 +224,7 @@ public static double numdiff(double[] x, double[] a, int dim, double[] b) {
 			minVal[i] = a[i];
 			maxVal[i] = a[ndims + i];
 		}
-		double slope = (maxVal[1] - minVal[1]) / (maxVal[0] - minVal[0]);
+		double slope = (maxVal[1] - minVal[1]) / (maxVal[0] - minVal[0] + fcteps);
 		double sum = 0;
 		double sumofgaussians = 0;
 		double di;
@@ -240,7 +242,7 @@ public static double numdiff(double[] x, double[] a, int dim, double[] b) {
 				di = x[i] - minVal[i];
 				sum += b[i] * di * di;
 			}
-			sumofgaussians += Math.exp(-sum);
+			sumofgaussians += Exponent.exp(-sum);
 
 			
 			if (minVal[0] >= maxVal[0] || minVal[1] >= maxVal[1] && slope >= 0)

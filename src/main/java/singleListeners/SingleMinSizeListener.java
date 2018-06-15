@@ -55,7 +55,7 @@ public class SingleMinSizeListener implements AdjustmentListener {
 
 		minsizeScrollbar.setValue(parent.computeScrollbarPositionFromValue(parent.minSize, min, max, scrollbarSize));
 
-		label.setText("Min # of pixels inside MSER Ellipses = " + parent.minSize);
+		label.setText("Min size = " + parent.minSize);
 
 		
 	}

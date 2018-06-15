@@ -84,7 +84,7 @@ public class GaussianLinedsHF implements MTFitFunction {
 			sum += b[i] * di * di;
 		}
 
-		return Math.exp(-sum);
+		return Exponent.exp(-sum);
 
 	}
 
@@ -118,7 +118,7 @@ public class GaussianLinedsHF implements MTFitFunction {
 			sum += b[i] * di * di;
 			dsum += 2 * b[i] * di * dxvectorderiv[i];
 		}
-		double sumofgaussians = dsum * Math.exp(-sum);
+		double sumofgaussians = dsum * Exponent.exp(-sum);
 		
 		double dsumend = 0;
 		double sumend = 0;
@@ -128,7 +128,7 @@ public class GaussianLinedsHF implements MTFitFunction {
 			sumend += b[i] * di * di;
 			dsumend += -2 * b[i] * di * dxvectorderiv[i];
 		}
-		sumofgaussians+= dsumend * Math.exp(-sumend);
+		sumofgaussians+= dsumend * Exponent.exp(-sumend);
 		
 		
 		return    sumofgaussians ;
@@ -146,7 +146,7 @@ public class GaussianLinedsHF implements MTFitFunction {
 			sum += b[i] * di * di;
 		}
 
-		return Math.exp(-sum);
+		return Exponent.exp(-sum);
 
 	}
 
@@ -184,7 +184,7 @@ public class GaussianLinedsHF implements MTFitFunction {
 				di = x[i] - minVal[i];
 				sum += b[i] * di * di;
 			}
-			sumofgaussians += Math.exp(-sum);
+			sumofgaussians += Exponent.exp(-sum);
 
 			
 			if (minVal[0] >= maxVal[0] || minVal[1] >= maxVal[1] && slope > 0)

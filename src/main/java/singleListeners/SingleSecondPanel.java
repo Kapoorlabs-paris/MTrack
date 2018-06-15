@@ -94,7 +94,7 @@ public class SingleSecondPanel {
 		parent.thirdDimension = parent.computeScrollbarPositionFromValue(parent.thirdDimensionsliderInit, parent.thirdDimensionsliderInit, parent.thirdDimensionSize, parent.scrollbarSize);
 		
 		
-		
+		endtimeslider.setValue(parent.computeScrollbarPositionFromValue(parent.endtime, parent.thirdDimensionsliderInit, parent.thirdDimensionSize, parent.scrollbarSize));
 		
 	
 
