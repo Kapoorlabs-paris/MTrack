@@ -103,7 +103,9 @@ public class MeasureserialListener implements ActionListener {
 			
 			Object[][] rowvalues = new Object[parent.inputfiles.length][colnames.length];
 			
-			
+			 parent.PanelDirectory.remove(parent.scrollPane);
+			 parent.PanelDirectory.validate();
+			 parent.PanelDirectory.repaint();
 			for (int i = 0; i < parent.inputfiles.length; ++i) {
 				
 				rowvalues[i][0] = parent.inputfiles[i].getName();
@@ -117,7 +119,6 @@ public class MeasureserialListener implements ActionListener {
 			parent.table.getColumnModel().getColumn(0).setResizable(true);
 			parent.table.setCellSelectionEnabled(true);
 			parent.previousrow = parent.row;
-			System.out.println(parent.row + " Last row");
 			parent.scrollPane = new JScrollPane(parent.table);
 			parent.scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 			parent.scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
@@ -134,14 +135,16 @@ public class MeasureserialListener implements ActionListener {
 			parent.scrollPane.getViewport().add(parent.table);
 			parent.scrollPane.setAutoscrolls(true);
 			
-            parent.PanelSelectFile.removeAll();
+           
 			parent.Compilepositiverates.clear();
 			parent.Compilenegativerates.clear();
-			parent.PanelSelectFile.add(parent.scrollPane,  BorderLayout.CENTER);
+		
+			parent.PanelDirectory.add(parent.scrollPane,  new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST,
+					GridBagConstraints.HORIZONTAL, parent.insets, 0, 0));
 					
 					
-			parent.PanelSelectFile.setBorder(parent.selectfile);
-			parent.panelFirst.add(parent.PanelSelectFile, new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
+			parent.PanelDirectory.setBorder(parent.selectdirectory);
+			parent.panelFirst.add(parent.PanelDirectory, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
 					GridBagConstraints.RELATIVE, new Insets(10, 10, 0, 10), 0, 0));
 			System.out.println(parent.row);
 			if(parent.inputfiles!=null){ 
@@ -161,7 +164,7 @@ public class MeasureserialListener implements ActionListener {
 				  }
 				});
 			}
-			parent.PanelSelectFile.validate();
+			parent.PanelDirectory.validate();
 			parent.panelFirst.validate();
 			parent.Cardframe.validate();
 			

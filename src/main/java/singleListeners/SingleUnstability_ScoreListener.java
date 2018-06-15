@@ -59,7 +59,7 @@ public class SingleUnstability_ScoreListener implements AdjustmentListener {
 
 		Unstability_ScoreScrollbar.setValue(parent.computeScrollbarPositionFromValue((float) parent.Unstability_Score, min, max, scrollbarSize));
 
-		label.setText("Unstability Score = " + parent.Unstability_Score);
+		label.setText("Threshold Difference= " + parent.Unstability_Score);
 
 		
 	}

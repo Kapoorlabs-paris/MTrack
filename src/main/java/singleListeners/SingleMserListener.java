@@ -97,8 +97,8 @@ import updateListeners.SingleDefaultModel;
 				final Label deltaText = new Label("Intensity threshold = " + parent.delta, Label.CENTER);
 				final Label Unstability_ScoreText = new Label("Unstability score = " + parent.Unstability_Score, Label.CENTER);
 				final Label minDiversityText = new Label("minDiversity = " +parent.minDiversity, Label.CENTER);
-				final Label minSizeText = new Label("Min size of ellipses = " + parent.minSize, Label.CENTER);
-				final Label maxSizeText = new Label("Max size of ellipses = " + parent.maxSize, Label.CENTER);
+				final Label minSizeText = new Label("Min size = " + parent.minSize, Label.CENTER);
+				final Label maxSizeText = new Label("Max size = " + parent.maxSize, Label.CENTER);
 
 				
 

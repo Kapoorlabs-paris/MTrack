@@ -123,7 +123,7 @@ public class InteractiveRANSAC implements PlugIn {
 	public NumberFormat nf = NumberFormat.getInstance(Locale.ENGLISH);
 	public ArrayList<Pair<LinearFunction, ArrayList<PointFunctionMatch>>> linearlist;
 	Frame jFreeChartFrame;
-	public int functionChoice = 1; // 0 == Linear, 1 == Quadratic interpolated,
+	public int functionChoice = 0; // 0 == Linear, 1 == Quadratic interpolated,
 									// 2 ==
 									// cubic interpolated
 	AbstractFunction2D function;
@@ -304,7 +304,6 @@ public class InteractiveRANSAC implements PlugIn {
 	public JPanel panelCont = new JPanel();
 	public JPanel panelFirst = new JPanel();
 	public JPanel panelSecond = new JPanel();
-	JPanel PanelSelectFile = new JPanel();
 	JPanel PanelDirectory = new JPanel();
 	private JPanel PanelParameteroptions = new JPanel();
 	private JPanel PanelSavetoFile = new JPanel();
@@ -316,11 +315,10 @@ public class InteractiveRANSAC implements PlugIn {
 	String choosertitleA;
 	public int row;
 	public JScrollPane scrollPane;
-	static final Insets insets = new Insets(10, 0, 0, 0);
+	public Insets insets = new Insets(10, 0, 0, 0);
 
 	public final GridBagLayout layout = new GridBagLayout();
 	public final GridBagConstraints c = new GridBagConstraints();
-	Border selectfile = new CompoundBorder(new TitledBorder("Select file"), new EmptyBorder(c.insets));
 	Border selectparam = new CompoundBorder(new TitledBorder("Select Ransac parameters"), new EmptyBorder(c.insets));
 	Border selectslope = new CompoundBorder(new TitledBorder("Slope constraints"), new EmptyBorder(c.insets));
 
@@ -459,21 +457,21 @@ public class InteractiveRANSAC implements PlugIn {
 		final Button WriteLength = new Button("Compute length distribution at framenumber : ");
 		final Button WriteStats = new Button("Compute lifetime and mean length distribution");
 		final Button WriteAgain = new Button("Save Rates and Frequencies to File");
-		setFunction();
 
 		PanelDirectory.add(Measureserial, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST,
 				GridBagConstraints.HORIZONTAL, insets, 0, 0));
 
+		
+		PanelDirectory.add(scrollPane,  new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST,
+				GridBagConstraints.HORIZONTAL, insets, 0, 0));
 		PanelDirectory.setBorder(selectdirectory);
 		panelFirst.add(PanelDirectory, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
 				GridBagConstraints.HORIZONTAL, insets, 0, 0));
 
-		PanelSelectFile.add(scrollPane, BorderLayout.CENTER);
+		
 
-		PanelSelectFile.setBorder(selectfile);
 
-		panelFirst.add(PanelSelectFile, new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
-				GridBagConstraints.HORIZONTAL, insets, 0, 0));
+		
 		SliderBoxGUI combomaxerror = new SliderBoxGUI(errorstring, maxErrorSB, maxErrorField, maxErrorLabel, scrollbarSize, maxError, MAX_ERROR);
 		
 		
@@ -494,22 +492,22 @@ public class InteractiveRANSAC implements PlugIn {
 				GridBagConstraints.HORIZONTAL, insets, 0, 0));
 		
 		
-		PanelParameteroptions.setPreferredSize(new Dimension(SizeX, SizeY + 10));
+		PanelParameteroptions.setPreferredSize(new Dimension(SizeX, SizeY + 100));
+		
+
+		PanelParameteroptions.add(ChooseMethod, new GridBagConstraints(0, 4, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+				GridBagConstraints.HORIZONTAL, insets, 0, 0));
+
+		PanelParameteroptions.add(lambdaSB, new GridBagConstraints(0, 5, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER,
+				GridBagConstraints.HORIZONTAL, insets, 0, 0));
+		PanelParameteroptions.add(lambdaLabel, new GridBagConstraints(0, 6, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER,
+				GridBagConstraints.HORIZONTAL, insets, 0, 0));
+		
 		PanelParameteroptions.setBorder(selectparam);
 		panelFirst.add(PanelParameteroptions, new GridBagConstraints(3, 0, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
 				GridBagConstraints.HORIZONTAL, insets, 0, 0));
 
-		Panelfunction.add(ChooseMethod, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
-				GridBagConstraints.HORIZONTAL, insets, 0, 0));
-
-		Panelfunction.add(lambdaSB, new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER,
-				GridBagConstraints.HORIZONTAL, insets, 0, 0));
-		Panelfunction.add(lambdaLabel, new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER,
-				GridBagConstraints.HORIZONTAL, insets, 0, 0));
-
-		Panelfunction.setBorder(selectfunction);
-		panelFirst.add(Panelfunction, new GridBagConstraints(3, 1, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
-				GridBagConstraints.HORIZONTAL, insets, 0, 0));
+		
 
 		Panelslope.add(minSlopeSB, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
 				GridBagConstraints.HORIZONTAL, insets, 0, 0));
@@ -531,7 +529,7 @@ public class InteractiveRANSAC implements PlugIn {
 		Panelslope.setBorder(selectslope);
 		Panelslope.setPreferredSize(new Dimension(SizeX, SizeY));
 
-		panelFirst.add(Panelslope, new GridBagConstraints(3, 2, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
+		panelFirst.add(Panelslope, new GridBagConstraints(3, 1, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
 				GridBagConstraints.HORIZONTAL, insets, 0, 0));
 
 		PanelCompileRes.add(AutoCompile, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
@@ -550,7 +548,7 @@ public class InteractiveRANSAC implements PlugIn {
 
 		PanelCompileRes.setBorder(compileres);
 
-		panelFirst.add(PanelCompileRes, new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
+		panelFirst.add(PanelCompileRes, new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 				GridBagConstraints.HORIZONTAL, insets, 0, 0));
 
 		if (inputfiles != null) {
@@ -613,6 +611,7 @@ public class InteractiveRANSAC implements PlugIn {
 
 		Cardframe.add(panelCont, BorderLayout.CENTER);
 
+		setFunction();
 		Cardframe.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		Cardframe.pack();
 		Cardframe.setVisible(true);
@@ -650,7 +649,6 @@ public class InteractiveRANSAC implements PlugIn {
 			this.setLambdaEnabled(false);
 		} else if (functionChoice == 1) {
 			this.setLambdaEnabled(true);
-			// this.function = new QuadraticFunction();
 			this.function = new InterpolatedPolynomial<LinearFunction, QuadraticFunction>(new LinearFunction(),
 					new QuadraticFunction(), 1 - this.lambda);
 		} else {
@@ -1061,6 +1059,7 @@ public class InteractiveRANSAC implements PlugIn {
 		Compileaverage.put(row, avrate);
 
 		--updateCount;
+		
 	}
 
 	public List<Pair<Float, Float>> ManualCat(
@@ -1069,8 +1068,8 @@ public class InteractiveRANSAC implements PlugIn {
 
 		List<Pair<Float, Float>> catstarttimerates = new ArrayList<Pair<Float, Float>>();
 	
-		System.out.println("Overriding Ransac, Detecting without fiting a function");
-
+	
+        sort(segments);
 		for (int catastrophy = 0; catastrophy < segments.size() - 1; ++catastrophy) {
 
 			final Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>> start = segments.get(catastrophy);
@@ -1096,7 +1095,7 @@ public class InteractiveRANSAC implements PlugIn {
 
 				if (linearrate < 0) {
 					
-				
+					System.out.println("Overriding Ransac, Detecting without fiting a function");
 
 					
 					negcount++;

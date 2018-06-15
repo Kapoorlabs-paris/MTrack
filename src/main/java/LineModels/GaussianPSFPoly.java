@@ -113,7 +113,7 @@ private static final double EsigmaX(final double[] x, final double[] a, final do
 			
 		}
 		
-		sumofgaussians+= dsum * Math.exp(-sum);
+		sumofgaussians+= dsum * Exponent.exp(-sum);
 		
 		if (minVal[0] >= maxVal[0] || minVal[1] >= maxVal[1] && slope > 0)
 			break;
@@ -157,7 +157,7 @@ private static final double EsigmaY(final double[] x, final double[] a, final do
 			
 		}
 		
-		sumofgaussians+= dsum * Math.exp(-sum);
+		sumofgaussians+= dsum * Exponent.exp(-sum);
 		
 		if (minVal[0] >= maxVal[0] || minVal[1] >= maxVal[1] && slope > 0)
 			break;
@@ -180,7 +180,7 @@ private static final double EsigmaY(final double[] x, final double[] a, final do
 			sum += a[i + 2 * x.length + 3] * di * di;
 		}
 
-		return Math.exp(-sum);
+		return Exponent.exp(-sum);
 
 	}
 
@@ -214,7 +214,7 @@ private static final double EsigmaY(final double[] x, final double[] a, final do
 			sum += a[i + 2 * x.length + 3] * di * di;
 			dsum += 2 * a[i + 2 * x.length + 3]  * di * dxvectorderiv[i];
 		}
-		double sumofgaussians = dsum * Math.exp(-sum);
+		double sumofgaussians = dsum * Exponent.exp(-sum);
 		
 		double dsumend = 0;
 		double sumend = 0;
@@ -224,7 +224,7 @@ private static final double EsigmaY(final double[] x, final double[] a, final do
 			sumend += a[i + 2 * x.length + 3] * di * di;
 			dsumend += -2 * a[i + 2 * x.length + 3]  * di * dxvectorderiv[i];
 		}
-		sumofgaussians+= dsumend * Math.exp(-sumend);
+		sumofgaussians+= dsumend * Exponent.exp(-sumend);
 		
 		
 		return   sumofgaussians ;
@@ -242,7 +242,7 @@ private static final double EsigmaY(final double[] x, final double[] a, final do
 			sum += a[i + 2 * x.length + 3]  * di * di;
 		}
 
-		return Math.exp(-sum);
+		return Exponent.exp(-sum);
 
 	}
 
@@ -280,7 +280,7 @@ private static final double EsigmaY(final double[] x, final double[] a, final do
 				di = x[i] - minVal[i];
 				sum += a[i + 2 * x.length + 3]  * di * di;
 			}
-			sumofgaussians += Math.exp(-sum);
+			sumofgaussians += Exponent.exp(-sum);
 
 			
 			if (minVal[0] >= maxVal[0] || minVal[1] >= maxVal[1] && slope > 0)

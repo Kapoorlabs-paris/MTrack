@@ -1465,8 +1465,8 @@ private static final Insets insets = new Insets(10, 0, 0, 0);
 		final Label deltaText = new Label("Intensity threshold = " + delta, Label.CENTER);
 		final Label Unstability_ScoreText = new Label("Unstability score = " + Unstability_Score, Label.CENTER);
 		final Label minDiversityText = new Label("minDiversity = " +minDiversity, Label.CENTER);
-		final Label minSizeText = new Label("Min size of ellipses = " + minSize, Label.CENTER);
-		final Label maxSizeText = new Label("Max size of ellipses = " + maxSize, Label.CENTER);
+		final Label minSizeText = new Label("Min size = " + minSize, Label.CENTER);
+		final Label maxSizeText = new Label("Max size = " + maxSize, Label.CENTER);
 
 		final Checkbox AdvancedOptions = new Checkbox("Advanced Optimizer Options ", AdvancedChoiceSeeds);
 		SingleDefaultModelHF loaddefault = new SingleDefaultModelHF(this);
