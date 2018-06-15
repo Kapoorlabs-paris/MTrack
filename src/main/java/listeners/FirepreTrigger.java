@@ -112,7 +112,7 @@ public class FirepreTrigger implements ActionListener {
 		// Normalize image intnesity
 		Normalize.normalize(Views.iterable(parent.originalPreprocessedimg), parent.minval, parent.maxval);
 		
-		if (parent.selectedindex == 0)
+		if (parent.selectedindex == 1)
 		{
 			
 			// Do concetation
@@ -159,7 +159,7 @@ public class FirepreTrigger implements ActionListener {
 		
 		
 		
-		if (parent.selectedindex == 1){
+		if (parent.selectedindex == 2){
 			
 			// Open Reber lab images
 			ImageJFunctions.show(parent.originalPreprocessedimg).setTitle("Preprocessed Movie");
@@ -174,7 +174,7 @@ public class FirepreTrigger implements ActionListener {
 		}
 		
 		
-		if (parent.selectedindex == 2){
+		if (parent.selectedindex == 3){
 			
 			// Open Surrey lab images
 			

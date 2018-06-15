@@ -111,7 +111,7 @@ public class MainFileChooser extends JPanel {
 	boolean Generatepre = false;
 	boolean Batchmoderun = false;
 	public TextField inputField = new TextField();
-	public JLabel inputLabel = new JLabel("Filename:");
+	public JLabel inputLabel = new JLabel("Filename and Default Result Directory:");
 	public FloatType minval = new FloatType(0);
 	public FloatType maxval = new FloatType(1);
 	private static final Insets insets = new Insets(0, 0, 0, 0);
@@ -132,7 +132,7 @@ public class MainFileChooser extends JPanel {
 	JButton ChoosepreImage = new JButton("Load preprocessed movie and go next\u22b3");
 	JLabel ChoosepreImagelabel = new JLabel("Optionally, load your preprocessed movie");
 	
-	final JButton ChooseDirectory = new JButton("Choose Directory to save results in");
+	final JButton ChooseDirectory = new JButton("Change Default Result Directory");
    
 	final Checkbox FlatField = new Checkbox("Do Flat Field Correction");
 	final JButton MedianFilter = new JButton("Next\u22b3 ");

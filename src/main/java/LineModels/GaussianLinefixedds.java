@@ -80,7 +80,7 @@ public class GaussianLinefixedds implements MTFitFunction {
 			sum += b[i] * di * di;
 		}
 
-		return Math.exp(-sum);
+		return Exponent.exp(-sum);
 
 	}
 
@@ -97,7 +97,7 @@ public class GaussianLinefixedds implements MTFitFunction {
 			sum += b[i] * di * di;
 		}
 
-		return Math.exp(-sum);
+		return Exponent.exp(-sum);
 
 	}
 
@@ -135,7 +135,7 @@ public class GaussianLinefixedds implements MTFitFunction {
 				di = x[i] - minVal[i];
 				sum += b[i] * di * di;
 			}
-			sumofgaussians += Math.exp(-sum);
+			sumofgaussians += Exponent.exp(-sum);
 
 			
 			if (minVal[0] >= maxVal[0] || minVal[1] >= maxVal[1] && slope > 0)

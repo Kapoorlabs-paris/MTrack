@@ -84,7 +84,7 @@ public class Gaussiansplinesecfixedds implements MTFitFunction {
 			sum += b[i] * di * di;
 		}
 
-		return Math.exp(-sum);
+		return Exponent.exp(-sum);
 
 	}
 
@@ -129,7 +129,7 @@ public class Gaussiansplinesecfixedds implements MTFitFunction {
 			sum += b[i] * di * di;
 			dsum += 2 * b[i] * di * dxvectorCstart[i];
 		}
-		double sumofgaussians = dsum * Math.exp(-sum);
+		double sumofgaussians = dsum * Exponent.exp(-sum);
 
 		double dsumend = 0;
 		double sumend = 0;
@@ -139,7 +139,7 @@ public class Gaussiansplinesecfixedds implements MTFitFunction {
 			sumend += b[i] * di * di;
 			dsumend += -2 * b[i] * di * dxvectorCend[i];
 		}
-		sumofgaussians += dsumend * Math.exp(-sumend);
+		sumofgaussians += dsumend * Exponent.exp(-sumend);
 
 		return sumofgaussians;
 
@@ -155,7 +155,7 @@ public class Gaussiansplinesecfixedds implements MTFitFunction {
 			sum += b[i] * di * di;
 		}
 
-		return Math.exp(-sum);
+		return Exponent.exp(-sum);
 
 	}
 
@@ -201,7 +201,7 @@ public class Gaussiansplinesecfixedds implements MTFitFunction {
 				di = x[i] - minVal[i];
 				sum += b[i] * di * di;
 			}
-			sumofgaussians += Math.exp(-sum);
+			sumofgaussians += Exponent.exp(-sum);
 
 			if (minVal[0] >= maxVal[0] )
 				break;

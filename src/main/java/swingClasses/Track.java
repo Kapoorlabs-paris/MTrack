@@ -562,18 +562,18 @@ public class Track {
 		                for (int j = 0; j < plusminusendlist.size(); ++j){
 						
 						if (plusminusendlist.get(j).seedid == currentseed){
-					
+							System.out.println(parent.usefolder + " " + parent.addToName);
 						try {
 							File fichier = new File(
 									parent.usefolder + "//" + parent.addToName + "SeedLabel" + currentseed + plusminusendlist.get(j).plusorminus + ".txt");
-
+							
+							
 							FileWriter fw = new FileWriter(fichier);
 							BufferedWriter bw = new BufferedWriter(fw);
 
 							bw.write(
 									"\tFrame\tLength (px)\tLength (real)\tiD\tCurrentPosX (px)\tCurrentPosY (px)\tCurrentPosX (real)\tCurrentPosY (real)"
 											+ "\tdeltaL (px) \tdeltaL (real)  \tCalibrationX  \tCalibrationY  \tCalibrationT \n");
-
 							for (int index = 0; index < parent.endlengthlist.size(); ++index) {
 
 								if (parent.endlengthlist.get(index).seedid == currentseed) {

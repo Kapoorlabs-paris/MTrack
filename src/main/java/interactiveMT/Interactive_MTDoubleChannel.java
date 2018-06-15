@@ -113,7 +113,7 @@ import listeners.SkipFramesandTrackendsListener;
 import listeners.StarttimeListener;
 import listeners.ThirdPanel;
 import listeners.ThresholdHoughHFListener;
-import listeners.TimeListener;
+import listeners.MTimeListener;
 import listeners.Unstability_ScoreHoughListener;
 import mpicbg.imglib.multithreading.SimpleMultiThreading;
 import mpicbg.imglib.util.Util;
@@ -1489,8 +1489,8 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		final Label deltaText = new Label("Intensity threshold = " + delta, Label.CENTER);
 		final Label Unstability_ScoreText = new Label("Unstability score = " + Unstability_Score, Label.CENTER);
 		final Label minDiversityText = new Label("minDiversity = " +minDiversity, Label.CENTER);
-		final Label minSizeText = new Label("Min size of ellipses = " + minSize, Label.CENTER);
-		final Label maxSizeText = new Label("Max size of ellipses = " + maxSize, Label.CENTER);
+		final Label minSizeText = new Label("Min size  = " + minSize, Label.CENTER);
+		final Label maxSizeText = new Label("Max size  = " + maxSize, Label.CENTER);
 
 		final Checkbox AdvancedOptions = new Checkbox("Advanced Optimizer Options ", AdvancedChoiceSeeds);
 		DefaultModelHF loaddefault = new DefaultModelHF(this);

@@ -135,10 +135,6 @@ public class CopyUtils {
 			// move both cursors forward by one pixel
 			cursorOutput.fwd();
 
-			int x = cursorOutput.getIntPosition(0);
-			int y = cursorOutput.getIntPosition(1);
-
-
 				ranac.setPosition(cursorOutput);
 
 				// set the value of this pixel of the output image to the same

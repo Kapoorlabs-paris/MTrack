@@ -43,8 +43,6 @@ public class FilenameListener implements TextListener {
 		final TextComponent tc = (TextComponent)e.getSource();
 	    String s = tc.getText();
 	   
-	    if (s.length() > 0)
-		parent.addToName = s;
 		
 	}
 

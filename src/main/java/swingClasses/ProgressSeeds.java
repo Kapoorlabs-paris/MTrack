@@ -60,7 +60,6 @@ import listeners.SecondPanel;
 import listeners.SegMethodListener;
 import listeners.StarttimeListener;
 import listeners.ThirdPanel;
-import listeners.TimeListener;
 import mpicbg.imglib.util.Util;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.type.numeric.real.FloatType;

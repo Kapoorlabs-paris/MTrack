@@ -89,8 +89,7 @@ public class Tracking
 		}
 		catch ( Exception e )
 		{
-			e.printStackTrace();
-			return null;
+			
 		}
 
 		Collections.sort( points, new Comparator< FLSobject >()
@@ -248,7 +247,6 @@ public class Tracking
 		}
 		for( Pair< Integer, Double> point:points){
 			Pair< Integer, Double> newpoint = new ValuePair< Integer, Double >(point.getA()/ 10 , point.getB() / maxlength );
-			System.out.println(point.getA() + " " + point.getB());
 			normalpoints.add(newpoint);
 		}
 		

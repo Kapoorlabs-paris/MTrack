@@ -146,8 +146,8 @@ final Interactive_MTSingleChannelBasic child;
   				
   			}
               
-			
-			IJ.log("Tracking Done and track files written in the chosen folder");
+  			
+          	IJ.log("Tracking Done and track files written in the chosen folder"  + parent.usefolder);
 
 		} catch (ExecutionException | InterruptedException e) {
 			e.printStackTrace();

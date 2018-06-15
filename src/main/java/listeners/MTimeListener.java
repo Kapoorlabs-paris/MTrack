@@ -33,7 +33,7 @@ import interactiveMT.Interactive_MTDoubleChannel;
 import interactiveMT.Interactive_MTDoubleChannel.ValueChange;
 import updateListeners.Markends;
 
-public class TimeListener implements AdjustmentListener {
+public class MTimeListener implements AdjustmentListener {
 	final Label label;
 	final String string;
 	Interactive_MTDoubleChannel parent;
@@ -42,7 +42,7 @@ public class TimeListener implements AdjustmentListener {
 
 	final JScrollBar deltaScrollbar;
 
-	public TimeListener(final Interactive_MTDoubleChannel parent, final Label label, final String string, final float min, final float max,
+	public MTimeListener(final Interactive_MTDoubleChannel parent, final Label label, final String string, final float min, final float max,
 			final int scrollbarSize, final JScrollBar deltaScrollbar) {
 		this.label = label;
 		this.parent = parent;

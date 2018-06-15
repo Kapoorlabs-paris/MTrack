@@ -248,7 +248,7 @@ public class Interactive_MTDoubleChannelBasic implements PlugIn {
 	
 		final Label deltaText = new Label("Threshold difference = " + parent.delta, Label.CENTER);
 		final Label Unstability_ScoreText = new Label("Unstability Score = " + parent.Unstability_Score, Label.CENTER);
-		final Label minSizeText = new Label("Min size of  ellipses = " + parent.minSize, Label.CENTER);
+		final Label minSizeText = new Label("Min size = " + parent.minSize, Label.CENTER);
 		final Scrollbar deltaS = new Scrollbar(Scrollbar.HORIZONTAL, parent.deltaInit, 10, 0,
 				10 + parent.scrollbarSize);
 		final Scrollbar Unstability_ScoreS = new Scrollbar(Scrollbar.HORIZONTAL, parent.Unstability_ScoreInit, 10, 0,
