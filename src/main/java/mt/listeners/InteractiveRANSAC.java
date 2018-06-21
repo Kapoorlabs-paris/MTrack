@@ -112,7 +112,7 @@ public class InteractiveRANSAC implements PlugIn {
 	private Label inputLabelT;
 	private Label inputLabelTcont;
 	public TextField inputFieldT, maxErrorField, minInlierField, maxGapField;
-	public static double MAX_ABS_SLOPE = 100.0;
+	public double MAX_ABS_SLOPE = 100.0;
 
 	public static double MIN_CAT = 0.0;
 	public static double MAX_CAT = 100.0;
@@ -333,6 +333,8 @@ public class InteractiveRANSAC implements PlugIn {
 	public String errorstring = "Maximum Error (px)";
 	public String inlierstring = "Minimum Number of timepoints (tp)";
 	public String maxgapstring = "Maximum Gap (tp)";
+	public String maxslopestring = "Max. Segment Slope (px/tp)"; 
+	public String minslopestring = "Min. Segment Slope (px/tp)"; 
 	
 	public int SizeX = 500;
 	public int SizeY = 300;
@@ -341,7 +343,7 @@ public class InteractiveRANSAC implements PlugIn {
 			10 + scrollbarSize);
 	public JScrollBar maxDistSB = new JScrollBar(Scrollbar.HORIZONTAL, this.maxDist, 10, 0, 10 + scrollbarSize);
 	public JScrollBar minSlopeSB = new JScrollBar(Scrollbar.HORIZONTAL, this.minSlopeInt, 10, 0, 10 + scrollbarSize);
-	public Scrollbar maxSlopeSB = new Scrollbar(Scrollbar.HORIZONTAL, this.maxSlopeInt, 10, 0, 10 + scrollbarSize);
+	public JScrollBar maxSlopeSB = new JScrollBar(Scrollbar.HORIZONTAL, this.maxSlopeInt, 10, 0, 10 + scrollbarSize);
 	
 	
 	public Label maxErrorLabel = new Label("Maximum Error (px) = " + new DecimalFormat("#.##").format(this.maxError) + "      ",
@@ -582,8 +584,12 @@ public class InteractiveRANSAC implements PlugIn {
 		
 		ChooseMethod.addActionListener(new FunctionItemListener(this, ChooseMethod));
 		lambdaSB.addAdjustmentListener(new LambdaListener(this, lambdaLabel, lambdaSB));
-		minSlopeSB.addAdjustmentListener(new MinSlopeListener(this, minSlopeSB, minSlopeLabel));
-		maxSlopeSB.addAdjustmentListener(new MaxSlopeListener(this, maxSlopeSB, maxSlopeLabel));
+		minSlopeSB.addAdjustmentListener(new MinSlopeListener(this,  minSlopeLabel, minslopestring, (float)minSlope,
+				(float)MAX_ABS_SLOPE, scrollbarSize, minSlopeSB));
+		
+		
+		maxSlopeSB.addAdjustmentListener(new MaxSlopeListener(this,  maxSlopeLabel, maxslopestring, (float)minSlope,
+				(float)MAX_ABS_SLOPE, scrollbarSize, maxSlopeSB));
 		findCatastrophe
 				.addItemListener(new CatastrophyCheckBoxListener(this, findCatastrophe, minCatDistLabel, minCatDist));
 		findmanualCatastrophe.addItemListener(
@@ -890,6 +896,7 @@ public class InteractiveRANSAC implements PlugIn {
 									double endX = minMax.getB();
 
 									double linearrate = fit.getA().getCoefficient(1);
+									
 									if (linearrate < 0) {
 										dataset.addSeries(Tracking.drawFunction((Polynomial) fit.getA(), minMax.getA() - 1,
 												minMax.getB() + 1, 0.1, minY - 2.5, maxY + 2.5, "CRansac " + catastrophy));
