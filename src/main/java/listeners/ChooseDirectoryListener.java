@@ -57,7 +57,6 @@ import interactiveMT.MainFileChooser;
 			chooserA.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 			chooserA.showOpenDialog(parent.panelFirst);
 			parent.usefolder = chooserA.getSelectedFile().getAbsolutePath();
-
 			parent.addToName = filename.getText();
 
 		}

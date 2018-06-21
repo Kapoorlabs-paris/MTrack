@@ -51,14 +51,19 @@ import interactiveMT.MainFileChooser;
 		public void actionPerformed(final ActionEvent arg0) {
 
 			JFileChooser chooserA = new JFileChooser();
+			
+			if(parent.chooserB!=null)
 			chooserA.setCurrentDirectory(parent.chooserB.getCurrentDirectory());
+			else 
+				chooserA.setCurrentDirectory(new java.io.File("."));
 			chooserA.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 			chooserA.showOpenDialog(parent.panelIntro);
 			
 			
-			parent.userfile = parent.chooserB.getSelectedFile();
-
-		
+			parent.userfile = chooserA.getSelectedFile();
+			parent.chooserA = chooserA;
+			parent.chooserB = chooserA;
+			
 
 			
 		}

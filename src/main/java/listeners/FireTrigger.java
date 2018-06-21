@@ -123,7 +123,7 @@ public class FireTrigger implements ActionListener {
 		parent.inputField.setText(parent.chooserB.getSelectedFile().getPath());
          //.replaceFirst("[.][^.]+$", "")
 		parent.addToName = parent.chooserB.getSelectedFile().getName().replaceFirst("[.][^.]+$", "");
-		parent.userfile = parent.chooserB.getSelectedFile();
+		parent.userfile = parent.chooserB.getCurrentDirectory();
 		parent.panelIntro.validate();
 		
 		if (selectedindex == 1)

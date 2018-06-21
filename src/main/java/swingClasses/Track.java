@@ -562,10 +562,10 @@ public class Track {
 		                for (int j = 0; j < plusminusendlist.size(); ++j){
 						
 						if (plusminusendlist.get(j).seedid == currentseed){
-							System.out.println(parent.usefolder + " " + parent.addToName);
+							System.out.println(parent.userfile + " " + parent.addToName);
 						try {
 							File fichier = new File(
-									parent.usefolder + "//" + parent.addToName + "SeedLabel" + currentseed + plusminusendlist.get(j).plusorminus + ".txt");
+									parent.userfile + "//" + parent.addToName + "SeedLabel" + currentseed + plusminusendlist.get(j).plusorminus + ".txt");
 							
 							
 							FileWriter fw = new FileWriter(fichier);
@@ -664,7 +664,7 @@ public class Track {
 							if (plusminusstartlist.get(j).seedid == currentseed){
 
 								try {
-									File fichier = new File(parent.usefolder + "//" + parent.addToName + "SeedLabel" + currentseed
+									File fichier = new File(parent.userfile + "//" + parent.addToName + "SeedLabel" + currentseed
 											+ plusminusstartlist.get(j).plusorminus + ".txt");
 
 									FileWriter fw = new FileWriter(fichier);
@@ -842,7 +842,7 @@ public class Track {
 				
 
 					try {
-						File fichier = new File(parent.usefolder + "//" + parent.addToName + "SeedLabel" + seedID
+						File fichier = new File(parent.userfile + "//" + parent.addToName + "SeedLabel" + seedID
 								+ "-Zeroend" + ".txt");
 
 						FileWriter fw = new FileWriter(fichier);
@@ -1071,7 +1071,7 @@ public class Track {
 			}
 
 			FileWriter deltaw;
-			File fichierKydel = new File(parent.usefolder + "//" + parent.addToName + "MTtracker-deltad" + ".txt");
+			File fichierKydel = new File(parent.userfile + "//" + parent.addToName + "MTtracker-deltad" + ".txt");
 
 			try {
 				deltaw = new FileWriter(fichierKydel);
