@@ -546,7 +546,7 @@ public  class SingleTrack {
 						
 							try {
 								File fichier = new File(
-										parent.usefolder + "//" + parent.addToName + "SeedLabel" + currentseed + plusminusendlist.get(j).plusorminus + ".txt");
+										parent.userfile + "//" + parent.addToName + "SeedLabel" + currentseed + plusminusendlist.get(j).plusorminus + ".txt");
 
 								FileWriter fw = new FileWriter(fichier);
 								BufferedWriter bw = new BufferedWriter(fw);
@@ -645,7 +645,7 @@ public  class SingleTrack {
 								if (plusminusstartlist.get(j).seedid == currentseed){
 
 									try {
-										File fichier = new File(parent.usefolder + "//" + parent.addToName + "SeedLabel" + currentseed
+										File fichier = new File(parent.userfile + "//" + parent.addToName + "SeedLabel" + currentseed
 												+ plusminusstartlist.get(j).plusorminus + ".txt");
 
 										FileWriter fw = new FileWriter(fichier);
@@ -823,7 +823,7 @@ public  class SingleTrack {
 					
 
 						try {
-							File fichier = new File(parent.usefolder + "//" + parent.addToName + "SeedLabel" + seedID
+							File fichier = new File(parent.userfile + "//" + parent.addToName + "SeedLabel" + seedID
 									+ "-Zeroend" + ".txt");
 
 							FileWriter fw = new FileWriter(fichier);
@@ -1052,7 +1052,7 @@ public  class SingleTrack {
 				}
 
 				FileWriter deltaw;
-				File fichierKydel = new File(parent.usefolder + "//" + parent.addToName + "MTtracker-deltad" + ".txt");
+				File fichierKydel = new File(parent.userfile + "//" + parent.addToName + "MTtracker-deltad" + ".txt");
 
 				try {
 					deltaw = new FileWriter(fichierKydel);

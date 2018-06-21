@@ -2448,7 +2448,6 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 		JFrame frame = new JFrame("");
 		MainFileChooser panel = new MainFileChooser();
 
-		new ImageJ();
 		frame.getContentPane().add(panel, "Center");
 		frame.setSize(panel.getPreferredSize());
 	}

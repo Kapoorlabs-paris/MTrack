@@ -146,7 +146,6 @@ public class MeasureserialListener implements ActionListener {
 			parent.PanelDirectory.setBorder(parent.selectdirectory);
 			parent.panelFirst.add(parent.PanelDirectory, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
 					GridBagConstraints.RELATIVE, new Insets(10, 10, 0, 10), 0, 0));
-			System.out.println(parent.row);
 			if(parent.inputfiles!=null){ 
 			parent.table.addMouseListener(new MouseAdapter() {
 				  public void mouseClicked(MouseEvent e) {
@@ -169,7 +168,6 @@ public class MeasureserialListener implements ActionListener {
 			parent.Cardframe.validate();
 			
 		}
-		
 		
 	}
 	
