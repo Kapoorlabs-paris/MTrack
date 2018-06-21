@@ -77,8 +77,11 @@ import comboListeners.ErrorListener;
 import comboListeners.ErrorLocListener;
 import comboListeners.MaxDistListener;
 import comboListeners.MaxDistLocListener;
+import comboListeners.MaxSlopeListener;
+import comboListeners.MaxSlopeLocListener;
 import comboListeners.MinInlierListener;
 import comboListeners.MinInlierLocListener;
+import comboListeners.MinSlopeListener;
 import comboListeners.SliderBoxGUI;
 import fit.AbstractFunction2D;
 import fit.PointFunctionMatch;
@@ -97,23 +100,23 @@ public class InteractiveRANSAC implements PlugIn {
 	public static int MIN_SLIDER = 0;
 	public static int MAX_SLIDER = 100;
 
-	public  float MIN_ERROR = 0.0f;
-	public  float MAX_ERROR = 100.0f;
-	
-	public  float MIN_Inlier = 0.0f;
-	public  float MAX_Inlier = 100.0f;
-	
-	public  float MIN_Gap = 0.0f;
-	public  float MAX_Gap = 1000.0f;
+	public float MIN_ERROR = 0.0f;
+	public float MAX_ERROR = 100.0f;
+
+	public float MIN_Inlier = 0.0f;
+	public float MAX_Inlier = 100.0f;
+
+	public float MIN_Gap = 0.0f;
+	public float MAX_Gap = 1000.0f;
 
 	public static double MIN_RES = 1.0;
 	public static double MAX_RES = 100.0;
 
 	private Label inputLabelT;
 	private Label inputLabelTcont;
-	public TextField inputFieldT, maxErrorField, minInlierField, maxGapField;
+	public TextField inputFieldT, maxErrorField, minInlierField, maxGapField, maxSlopeField, minSlopeField;
 	public double MAX_ABS_SLOPE = 100.0;
-
+	public double MIN_ABS_SLOPE = 0.0;
 	public static double MIN_CAT = 0.0;
 	public static double MAX_CAT = 100.0;
 	public File inputfile;
@@ -194,8 +197,8 @@ public class InteractiveRANSAC implements PlugIn {
 	}
 
 	public InteractiveRANSAC(final ArrayList<Pair<Integer, Double>> mts, final int minTP, final int maxTP,
-			final float maxError, final double minSlope, final double maxSlope, final int maxDist,
-			final int minInliers, final int functionChoice, final double lambda, final File file) {
+			final float maxError, final double minSlope, final double maxSlope, final int maxDist, final int minInliers,
+			final int functionChoice, final double lambda, final File file) {
 		this.minTP = minTP;
 		this.maxTP = maxTP;
 		this.numTimepoints = maxTP - minTP + 1;
@@ -215,13 +218,7 @@ public class InteractiveRANSAC implements PlugIn {
 		if (this.minSlope >= this.maxSlope)
 			this.minSlope = this.maxSlope - 0.1;
 
-		this.maxErrorInt = computeScrollbarPositionFromValue(MAX_SLIDER, this.maxError, MIN_ERROR, MAX_ERROR);
-		this.lambdaInt = computeScrollbarPositionFromValue(MAX_SLIDER, this.lambda, 0.0, 1.0);
-		this.minSlopeInt = computeScrollbarPositionValueFromDoubleExp(MAX_SLIDER, this.minSlope, MAX_ABS_SLOPE);
-		this.maxSlopeInt = computeScrollbarPositionValueFromDoubleExp(MAX_SLIDER, this.maxSlope, MAX_ABS_SLOPE);
-		this.maxError = (float) computeValueFromScrollbarPosition(this.maxErrorInt, MAX_SLIDER, MIN_ERROR, MAX_ERROR);
-		this.minSlope = computeValueFromDoubleExpScrollbarPosition(this.minSlopeInt, MAX_SLIDER, MAX_ABS_SLOPE);
-		this.maxSlope = computeValueFromDoubleExpScrollbarPosition(this.maxSlopeInt, MAX_SLIDER, MAX_ABS_SLOPE);
+	
 		this.dataset = new XYSeriesCollection();
 		this.chart = Tracking.makeChart(dataset, "Microtubule Length Plot", "Timepoint", "MT Length");
 		// this.svgchart = new SVGGraphics2D(500, 500);
@@ -255,14 +252,7 @@ public class InteractiveRANSAC implements PlugIn {
 		if (this.minSlope >= this.maxSlope)
 			this.minSlope = this.maxSlope - 0.1;
 
-		this.maxErrorInt = computeScrollbarPositionFromValue(MAX_SLIDER, this.maxError, MIN_ERROR, MAX_ERROR);
-		this.lambdaInt = computeScrollbarPositionFromValue(MAX_SLIDER, this.lambda, 0.0, 1.0);
-		this.minSlopeInt = computeScrollbarPositionValueFromDoubleExp(MAX_SLIDER, this.minSlope, MAX_ABS_SLOPE);
-		this.maxSlopeInt = computeScrollbarPositionValueFromDoubleExp(MAX_SLIDER, this.maxSlope, MAX_ABS_SLOPE);
-		this.maxError = (float) computeValueFromScrollbarPosition(this.maxErrorInt, MAX_SLIDER, MIN_ERROR, MAX_ERROR);
-		
-		this.minSlope = computeValueFromDoubleExpScrollbarPosition(this.minSlopeInt, MAX_SLIDER, MAX_ABS_SLOPE);
-		this.maxSlope = computeValueFromDoubleExpScrollbarPosition(this.maxSlopeInt, MAX_SLIDER, MAX_ABS_SLOPE);
+	
 		this.dataset = new XYSeriesCollection();
 		this.chart = Tracking.makeChart(dataset, "Microtubule Length Plot", "Timepoint", "MT Length");
 		// this.svgchart = new SVGGraphics2D(500, 500);
@@ -270,8 +260,6 @@ public class InteractiveRANSAC implements PlugIn {
 		// this.chart.draw(svgchart, new Rectangle2D.Double(0, 0, 500, 500),
 		// null);
 	};
-
-
 
 	@Override
 	public void run(String arg) {
@@ -328,31 +316,28 @@ public class InteractiveRANSAC implements PlugIn {
 	Border compileres = new CompoundBorder(new TitledBorder("Compile results"), new EmptyBorder(c.insets));
 
 	Border selectdirectory = new CompoundBorder(new TitledBorder("Load directory"), new EmptyBorder(c.insets));
-	
-	
+
 	public String errorstring = "Maximum Error (px)";
 	public String inlierstring = "Minimum Number of timepoints (tp)";
 	public String maxgapstring = "Maximum Gap (tp)";
-	public String maxslopestring = "Max. Segment Slope (px/tp)"; 
-	public String minslopestring = "Min. Segment Slope (px/tp)"; 
-	
+	public String maxslopestring = "Max. Segment Slope (px/tp)";
+	public String minslopestring = "Min. Segment Slope (px/tp)";
+
 	public int SizeX = 500;
 	public int SizeY = 300;
-	public JScrollBar maxErrorSB = new JScrollBar(Scrollbar.HORIZONTAL, this.maxErrorInt, 10, 0, 10 + scrollbarSize);
-	public JScrollBar minInliersSB = new JScrollBar(Scrollbar.HORIZONTAL, this.minInliers, 10, 0,
-			10 + scrollbarSize);
+	public JScrollBar maxErrorSB = new JScrollBar(Scrollbar.HORIZONTAL, (int)this.maxError, 10, 0, 10 + scrollbarSize);
+	public JScrollBar minInliersSB = new JScrollBar(Scrollbar.HORIZONTAL, this.minInliers, 10, 0, 10 + scrollbarSize);
 	public JScrollBar maxDistSB = new JScrollBar(Scrollbar.HORIZONTAL, this.maxDist, 10, 0, 10 + scrollbarSize);
-	public JScrollBar minSlopeSB = new JScrollBar(Scrollbar.HORIZONTAL, this.minSlopeInt, 10, 0, 10 + scrollbarSize);
-	public JScrollBar maxSlopeSB = new JScrollBar(Scrollbar.HORIZONTAL, this.maxSlopeInt, 10, 0, 10 + scrollbarSize);
-	
-	
-	public Label maxErrorLabel = new Label("Maximum Error (px) = " + new DecimalFormat("#.##").format(this.maxError) + "      ",
-			Label.CENTER);
+	public JScrollBar minSlopeSB = new JScrollBar(Scrollbar.HORIZONTAL, (int)this.minSlope, 10, 0, 10 + scrollbarSize);
+	public JScrollBar maxSlopeSB = new JScrollBar(Scrollbar.HORIZONTAL, (int)this.maxSlope, 10, 0, 10 + scrollbarSize);
+
+	public Label maxErrorLabel = new Label(
+			"Maximum Error (px) = " + new DecimalFormat("#.##").format(this.maxError) + "      ", Label.CENTER);
 	public Label minInliersLabel = new Label(
 			"Minimum Number of timepoints (tp) = " + new DecimalFormat("#.##").format(this.minInliers), Label.CENTER);
 	public Label maxDistLabel = new Label("Maximum Gap (tp) = " + new DecimalFormat("#.##").format(this.maxDist),
 			Label.CENTER);
-	
+
 	public Label minSlopeLabel = new Label(
 			"Min. Segment Slope (px/tp) = " + new DecimalFormat("#.##").format(this.minSlope), Label.CENTER);
 	public Label maxSlopeLabel = new Label(
@@ -360,13 +345,42 @@ public class InteractiveRANSAC implements PlugIn {
 	public Label maxResLabel = new Label(
 			"MT is rescued if the start of event# i + 1 > start of event# i by px =  " + this.restolerance,
 			Label.CENTER);
+
 	public void CardTable() {
+		this.lambdaSB = new Scrollbar(Scrollbar.HORIZONTAL, this.lambdaInt, 1, MIN_SLIDER, MAX_SLIDER + 1);
+
+		maxSlopeSB.setValue(utility.Slicer.computeScrollbarPositionFromValue((float) maxSlope, (float) MIN_ABS_SLOPE,
+				(float) MAX_ABS_SLOPE, scrollbarSize));
+
+		maxDistSB.setValue(utility.Slicer.computeScrollbarPositionFromValue(maxDist, MIN_Gap, MAX_Gap, scrollbarSize));
+
+		minInliersSB.setValue(
+				utility.Slicer.computeScrollbarPositionFromValue(minInliers, MIN_Inlier, MAX_Inlier, scrollbarSize));
+		maxErrorSB.setValue(
+				utility.Slicer.computeScrollbarPositionFromValue(maxError, MIN_ERROR, MAX_ERROR, scrollbarSize));
+		
+	
+		
+		
+		lambdaLabel = new Label("Linearity (fraction) = " + new DecimalFormat("#.##").format(lambda),
+				Label.CENTER);
+		maxErrorLabel = new Label(
+				"Maximum Error (px) = " + new DecimalFormat("#.##").format(maxError) + "      ", Label.CENTER);
+		minInliersLabel = new Label(
+				"Minimum Number of timepoints (tp) = " + new DecimalFormat("#.##").format(minInliers), Label.CENTER);
+		maxDistLabel = new Label("Maximum Gap (tp) = " + new DecimalFormat("#.##").format(maxDist),
+				Label.CENTER);
 
 		
 		
-		this.lambdaLabel = new Label("Linearity (fraction) = " + new DecimalFormat("#.##").format(this.lambda),
-				Label.CENTER);
 		
+		minSlopeLabel = new Label(
+				"Min. Segment Slope (px/tp) = " + new DecimalFormat("#.##").format(minSlope), Label.CENTER);
+		maxSlopeLabel = new Label(
+				"Max. Segment Slope (px/tp) = " + new DecimalFormat("#.##").format(maxSlope), Label.CENTER);
+		maxResLabel = new Label(
+				"MT is rescued if the start of event# i + 1 > start of event# i by px =  " + this.restolerance,
+				Label.CENTER);
 		
 		CardLayout cl = new CardLayout();
 		Object[] colnames = new Object[] { "Track File", "Growth rate", "Shrink rate", "Growth events", "Shrink events",
@@ -387,16 +401,23 @@ public class InteractiveRANSAC implements PlugIn {
 		table.setFillsViewportHeight(true);
 
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-		
+	
+
 		maxErrorField = new TextField(5);
-		maxErrorField.setText(Double.toString(maxError));
-		
+		maxErrorField.setText(Float.toString(maxError));
+
 		minInlierField = new TextField(5);
-		minInlierField.setText(Double.toString(minInliersSB.getValue()));
-		
+		minInlierField.setText(Float.toString(minInliers));
+
 		maxGapField = new TextField(5);
-		maxGapField.setText(Double.toString(maxDistSB.getValue()));
+		maxGapField.setText(Float.toString(maxDist));
+
+		maxSlopeField = new TextField(5);
+		maxSlopeField.setText(Double.toString(maxSlope));
 		
+		minSlopeField = new TextField(5);
+		minSlopeField.setText(Double.toString(minSlope));
+
 		scrollPane = new JScrollPane(table);
 		scrollPane.setMinimumSize(new Dimension(300, 200));
 		scrollPane.setPreferredSize(new Dimension(300, 200));
@@ -433,13 +454,9 @@ public class InteractiveRANSAC implements PlugIn {
 		c.gridheight = 10;
 		c.gridy = 1;
 		c.gridx = 0;
-	
 
 		String[] Method = { "Linear Function only", "Linearized Quadratic function", "Linearized Cubic function" };
 		JComboBox<String> ChooseMethod = new JComboBox<String>(Method);
-		this.lambdaSB = new Scrollbar(Scrollbar.HORIZONTAL, this.lambdaInt, 1, MIN_SLIDER, MAX_SLIDER + 1);
-
-		
 
 		final Checkbox findCatastrophe = new Checkbox("Detect Catastrophies", this.detectCatastrophe);
 		final Checkbox findmanualCatastrophe = new Checkbox("Detect Catastrophies without fit",
@@ -463,39 +480,31 @@ public class InteractiveRANSAC implements PlugIn {
 		PanelDirectory.add(Measureserial, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST,
 				GridBagConstraints.HORIZONTAL, insets, 0, 0));
 
-		
-		PanelDirectory.add(scrollPane,  new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST,
+		PanelDirectory.add(scrollPane, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST,
 				GridBagConstraints.HORIZONTAL, insets, 0, 0));
 		PanelDirectory.setBorder(selectdirectory);
 		panelFirst.add(PanelDirectory, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
 				GridBagConstraints.HORIZONTAL, insets, 0, 0));
 
-		
+		SliderBoxGUI combomaxerror = new SliderBoxGUI(errorstring, maxErrorSB, maxErrorField, maxErrorLabel,
+				scrollbarSize, maxError, MAX_ERROR);
 
+		PanelParameteroptions.add(combomaxerror.BuildDisplay(), new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0,
+				GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, insets, 0, 0));
 
-		
-		SliderBoxGUI combomaxerror = new SliderBoxGUI(errorstring, maxErrorSB, maxErrorField, maxErrorLabel, scrollbarSize, maxError, MAX_ERROR);
-		
-		
-		PanelParameteroptions.add(combomaxerror.BuildDisplay(), new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
-				GridBagConstraints.HORIZONTAL, insets, 0, 0));
-	
-		SliderBoxGUI combomininlier = new SliderBoxGUI(inlierstring, minInliersSB, minInlierField, minInliersLabel, scrollbarSize, minInliers, MAX_Inlier);
-		
-		
-		PanelParameteroptions.add(combomininlier.BuildDisplay(), new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
-				GridBagConstraints.HORIZONTAL, insets, 0, 0));
-		
-		
-        SliderBoxGUI combomaxdist = new SliderBoxGUI(maxgapstring, maxDistSB, maxGapField, maxDistLabel, scrollbarSize, maxDist, MAX_Gap);
-		
-		
-		PanelParameteroptions.add(combomaxdist.BuildDisplay(), new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
-				GridBagConstraints.HORIZONTAL, insets, 0, 0));
-		
-		
+		SliderBoxGUI combomininlier = new SliderBoxGUI(inlierstring, minInliersSB, minInlierField, minInliersLabel,
+				scrollbarSize, minInliers, MAX_Inlier);
+
+		PanelParameteroptions.add(combomininlier.BuildDisplay(), new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0,
+				GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, insets, 0, 0));
+
+		SliderBoxGUI combomaxdist = new SliderBoxGUI(maxgapstring, maxDistSB, maxGapField, maxDistLabel, scrollbarSize,
+				maxDist, MAX_Gap);
+
+		PanelParameteroptions.add(combomaxdist.BuildDisplay(), new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0,
+				GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, insets, 0, 0));
+
 		PanelParameteroptions.setPreferredSize(new Dimension(SizeX, SizeY + 100));
-		
 
 		PanelParameteroptions.add(ChooseMethod, new GridBagConstraints(0, 4, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 				GridBagConstraints.HORIZONTAL, insets, 0, 0));
@@ -504,21 +513,22 @@ public class InteractiveRANSAC implements PlugIn {
 				GridBagConstraints.HORIZONTAL, insets, 0, 0));
 		PanelParameteroptions.add(lambdaLabel, new GridBagConstraints(0, 6, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER,
 				GridBagConstraints.HORIZONTAL, insets, 0, 0));
-		
+
 		PanelParameteroptions.setBorder(selectparam);
 		panelFirst.add(PanelParameteroptions, new GridBagConstraints(3, 0, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
 				GridBagConstraints.HORIZONTAL, insets, 0, 0));
 
-		
+		SliderBoxGUI combominslope = new SliderBoxGUI(minslopestring, minSlopeSB, minSlopeField, minSlopeLabel,
+				scrollbarSize, (float) minSlope, (float) MAX_ABS_SLOPE);
 
-		Panelslope.add(minSlopeSB, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
-				GridBagConstraints.HORIZONTAL, insets, 0, 0));
-		Panelslope.add(minSlopeLabel, new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
-				GridBagConstraints.HORIZONTAL, insets, 0, 0));
-		Panelslope.add(maxSlopeSB, new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
-				GridBagConstraints.HORIZONTAL, insets, 0, 0));
-		Panelslope.add(maxSlopeLabel, new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
-				GridBagConstraints.HORIZONTAL, insets, 0, 0));
+		Panelslope.add(combominslope.BuildDisplay(), new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0,
+				GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, insets, 0, 0));
+
+		SliderBoxGUI combomaxslope = new SliderBoxGUI(maxslopestring, maxSlopeSB, maxSlopeField, maxSlopeLabel,
+				scrollbarSize, (float) maxSlope, (float) MAX_ABS_SLOPE);
+
+		Panelslope.add(combomaxslope.BuildDisplay(), new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0,
+				GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, insets, 0, 0));
 
 		Panelslope.add(findCatastrophe, new GridBagConstraints(0, 4, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
 				GridBagConstraints.HORIZONTAL, insets, 0, 0));
@@ -572,24 +582,22 @@ public class InteractiveRANSAC implements PlugIn {
 			});
 		}
 
-		maxErrorSB.addAdjustmentListener(new ErrorListener(this,  maxErrorLabel, errorstring, MIN_ERROR,
-				MAX_ERROR, scrollbarSize, maxErrorSB));
-		
-		minInliersSB.addAdjustmentListener(new MinInlierListener(this,  minInliersLabel, inlierstring, MIN_Inlier,
+		maxErrorSB.addAdjustmentListener(
+				new ErrorListener(this, maxErrorLabel, errorstring, MIN_ERROR, MAX_ERROR, scrollbarSize, maxErrorSB));
+
+		minInliersSB.addAdjustmentListener(new MinInlierListener(this, minInliersLabel, inlierstring, MIN_Inlier,
 				MAX_Inlier, scrollbarSize, minInliersSB));
-		
-		maxDistSB.addAdjustmentListener(new MaxDistListener(this,  maxDistLabel, maxgapstring, MIN_Gap,
-				MAX_Gap, scrollbarSize, maxDistSB));
-		
-		
+
+		maxDistSB.addAdjustmentListener(
+				new MaxDistListener(this, maxDistLabel, maxgapstring, MIN_Gap, MAX_Gap, scrollbarSize, maxDistSB));
+
 		ChooseMethod.addActionListener(new FunctionItemListener(this, ChooseMethod));
 		lambdaSB.addAdjustmentListener(new LambdaListener(this, lambdaLabel, lambdaSB));
-		minSlopeSB.addAdjustmentListener(new MinSlopeListener(this,  minSlopeLabel, minslopestring, (float)minSlope,
-				(float)MAX_ABS_SLOPE, scrollbarSize, minSlopeSB));
-		
-		
-		maxSlopeSB.addAdjustmentListener(new MaxSlopeListener(this,  maxSlopeLabel, maxslopestring, (float)minSlope,
-				(float)MAX_ABS_SLOPE, scrollbarSize, maxSlopeSB));
+		minSlopeSB.addAdjustmentListener(new MinSlopeListener(this, minSlopeLabel, minslopestring,
+				(float) MIN_ABS_SLOPE, (float) MAX_ABS_SLOPE, scrollbarSize, minSlopeSB));
+
+		maxSlopeSB.addAdjustmentListener(new MaxSlopeListener(this, maxSlopeLabel, maxslopestring,
+				(float) MIN_ABS_SLOPE, (float) MAX_ABS_SLOPE, scrollbarSize, maxSlopeSB));
 		findCatastrophe
 				.addItemListener(new CatastrophyCheckBoxListener(this, findCatastrophe, minCatDistLabel, minCatDist));
 		findmanualCatastrophe.addItemListener(
@@ -605,14 +613,15 @@ public class InteractiveRANSAC implements PlugIn {
 		batch.addActionListener(new RansacBatchmodeListener(this));
 		cancel.addActionListener(new FinishButtonListener(this, true));
 		inputFieldT.addTextListener(new LengthdistroListener(this));
-		
-		
-	     maxErrorField.addTextListener(new ErrorLocListener(this, false));
-	     minInlierField.addTextListener(new MinInlierLocListener(this, false));
-	     maxGapField.addTextListener(new MaxDistLocListener(this, false));
-	     
-		panelFirst.setVisible(true);
 
+		maxSlopeField.addTextListener(new MaxSlopeLocListener(this, false));
+		maxErrorField.addTextListener(new ErrorLocListener(this, false));
+		minInlierField.addTextListener(new MinInlierLocListener(this, false));
+		maxGapField.addTextListener(new MaxDistLocListener(this, false));
+
+		panelFirst.setVisible(true);
+		functionChoice = 0;
+	  
 		cl.show(panelCont, "1");
 
 		Cardframe.add(panelCont, BorderLayout.CENTER);
@@ -852,7 +861,6 @@ public class InteractiveRANSAC implements PlugIn {
 
 		if (this.detectCatastrophe) {
 
-		
 			if (segments.size() < 2) {
 
 				System.out.println("Only two points found");
@@ -891,15 +899,15 @@ public class InteractiveRANSAC implements PlugIn {
 
 									final Pair<Double, Double> minMax = Tracking.fromTo(fit.getB());
 
-									
 									double startX = minMax.getA();
 									double endX = minMax.getB();
 
 									double linearrate = fit.getA().getCoefficient(1);
-									
+
 									if (linearrate < 0) {
-										dataset.addSeries(Tracking.drawFunction((Polynomial) fit.getA(), minMax.getA() - 1,
-												minMax.getB() + 1, 0.1, minY - 2.5, maxY + 2.5, "CRansac " + catastrophy));
+										dataset.addSeries(Tracking.drawFunction((Polynomial) fit.getA(),
+												minMax.getA() - 1, minMax.getB() + 1, 0.1, minY - 2.5, maxY + 2.5,
+												"CRansac " + catastrophy));
 										negcount++;
 										negtimediff += endX - startX;
 
@@ -968,7 +976,6 @@ public class InteractiveRANSAC implements PlugIn {
 						}
 					}
 
-				
 				}
 
 			}
@@ -1066,7 +1073,7 @@ public class InteractiveRANSAC implements PlugIn {
 		Compileaverage.put(row, avrate);
 
 		--updateCount;
-		
+
 	}
 
 	public List<Pair<Float, Float>> ManualCat(
@@ -1074,9 +1081,8 @@ public class InteractiveRANSAC implements PlugIn {
 			double shrinkrate, ResultsTable rt) {
 
 		List<Pair<Float, Float>> catstarttimerates = new ArrayList<Pair<Float, Float>>();
-	
-	
-        sort(segments);
+
+		sort(segments);
 		for (int catastrophy = 0; catastrophy < segments.size() - 1; ++catastrophy) {
 
 			final Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>> start = segments.get(catastrophy);
@@ -1101,10 +1107,9 @@ public class InteractiveRANSAC implements PlugIn {
 				double linearrate = linearfunc.getCoefficient(1);
 
 				if (linearrate < 0) {
-					
+
 					System.out.println("Overriding Ransac, Detecting without fiting a function");
 
-					
 					negcount++;
 					negtimediff += endX - startX;
 
@@ -1136,9 +1141,7 @@ public class InteractiveRANSAC implements PlugIn {
 					Tracking.setStroke(chart, i, 2f);
 					++i;
 					++segment;
-				
 
-					
 				}
 
 			}
