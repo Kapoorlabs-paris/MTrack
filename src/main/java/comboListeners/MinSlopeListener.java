@@ -47,6 +47,7 @@ public class MinSlopeListener implements AdjustmentListener {
 				.setValue(utility.Slicer.computeScrollbarPositionFromValue((float) parent.minSlope, min, max, scrollbarSize));
 
 		label.setText(string +  " = "  + parent.nf.format(parent.minSlope) + "      ");
+		parent.minSlopeField.setText(Integer.toString(Math.round(parent.minSlope)));
 		parent.panelFirst.validate();
 		parent.panelFirst.repaint();
 	

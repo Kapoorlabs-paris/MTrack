@@ -29,14 +29,27 @@ public class MaxSlopeLocListener implements TextListener {
 	public void textValueChanged(TextEvent e) {
 		final TextComponent tc = (TextComponent)e.getSource();
 	 	String s = tc.getText();
+	 	
+	 	if (s.contains("-")) {
+			s.replace("-", "").trim();
+		}
+
+		int neg = 1;
+		if (s.length() > 0 && s.charAt(0) == '-') {
+			s = s.substring(1).trim();
+			neg = -1;
+		}
+
+		
 	 	if(s.length() > 0)
 		parent.maxSlope = Float.parseFloat(s);
+	 	
+	 	parent.maxSlope = neg * parent.maxSlope;
 		parent.maxSlopeLabel.setText(parent.maxslopestring + " = " + parent.nf.format((parent.maxSlope)) + "      ");
-		parent.MAX_ABS_SLOPE = Math.max(parent.maxSlope, parent.MAX_ABS_SLOPE);
-		if(parent.MAX_ABS_SLOPE  > 1.0E5)
-			parent.MAX_ABS_SLOPE  = 100;
-		parent.maxSlopeSB.setValue(utility.Slicer.computeScrollbarPositionFromValue((float)parent.maxSlope, 
-				(float)parent.MIN_ABS_SLOPE, (float)parent.MAX_ABS_SLOPE, parent.scrollbarSize));
+		
+		
+		parent.maxSlopeSB.setValue(utility.Slicer.computeScrollbarPositionFromValue(parent.maxSlope, 
+				parent.MIN_ABS_SLOPE, parent.MAX_ABS_SLOPE, parent.scrollbarSize));
 		 tc.addKeyListener(new KeyListener(){
 			 @Override
 			    public void keyTyped(KeyEvent arg0) {

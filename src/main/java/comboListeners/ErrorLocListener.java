@@ -30,7 +30,7 @@ public class ErrorLocListener implements TextListener {
 		final TextComponent tc = (TextComponent)e.getSource();
 	 	String s = tc.getText();
 	 	if(s.length() > 0)
-		parent.maxError = (int) Float.parseFloat(s);
+		parent.maxError = Float.parseFloat(s);
 		parent.maxErrorLabel.setText("Maximum Error (px) = " + parent.nf.format((parent.maxError)) + "      ");
 		parent.MAX_ERROR = Math.max(parent.maxError, parent.MAX_ERROR);
 		if(parent.MAX_ERROR > 1.0E5)

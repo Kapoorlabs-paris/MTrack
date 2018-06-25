@@ -82,6 +82,7 @@ import comboListeners.MaxSlopeLocListener;
 import comboListeners.MinInlierListener;
 import comboListeners.MinInlierLocListener;
 import comboListeners.MinSlopeListener;
+import comboListeners.MinSlopeLocListener;
 import comboListeners.SliderBoxGUI;
 import fit.AbstractFunction2D;
 import fit.PointFunctionMatch;
@@ -115,8 +116,8 @@ public class InteractiveRANSAC implements PlugIn {
 	private Label inputLabelT;
 	private Label inputLabelTcont;
 	public TextField inputFieldT, maxErrorField, minInlierField, maxGapField, maxSlopeField, minSlopeField;
-	public double MAX_ABS_SLOPE = 100.0;
-	public double MIN_ABS_SLOPE = 0.0;
+	public float MAX_ABS_SLOPE = 100.0f;
+	public float MIN_ABS_SLOPE = -100.0f;
 	public static double MIN_CAT = 0.0;
 	public static double MAX_CAT = 100.0;
 	public File inputfile;
@@ -164,8 +165,8 @@ public class InteractiveRANSAC implements PlugIn {
 
 	public float maxError = 3.0f;
 	public final int scrollbarSize = 1000;
-	public double minSlope = 0.1;
-	public double maxSlope = 100;
+	public float minSlope = 1;
+	public float maxSlope = 100;
 
 	public double restolerance = 5;
 	public double tptolerance = 2;
@@ -182,22 +183,22 @@ public class InteractiveRANSAC implements PlugIn {
 	protected boolean wasCanceled = false;
 
 	public InteractiveRANSAC(final ArrayList<Pair<Integer, Double>> mts, File file) {
-		this(mts, 0, 300, 3.0f, 0.1, 10.0, 10, 50, 1, 0.1, file);
+		this(mts, 0, 300, 3.0f, 0.1f, 10.0f, 10, 50, 1, 0.1, file);
 		nf.setMaximumFractionDigits(5);
 	}
 
 	public InteractiveRANSAC(File[] file) {
-		this(0, 300, 3.0f, 0.1, 10.0, 10, 50, 1, 0.1, file);
+		this(0, 300, 3.0f, 0.1f, 10.0f, 10, 50, 1, 0.1, file);
 		nf.setMaximumFractionDigits(5);
 	}
 
 	public InteractiveRANSAC() {
-		this(0, 300, 3.0f, 0.1, 10.0, 10, 50, 1, 0.1, null);
+		this(0, 300, 3.0f, 0.1f, 10.0f, 10, 50, 1, 0.1, null);
 		nf.setMaximumFractionDigits(5);
 	}
 
 	public InteractiveRANSAC(final ArrayList<Pair<Integer, Double>> mts, final int minTP, final int maxTP,
-			final float maxError, final double minSlope, final double maxSlope, final int maxDist, final int minInliers,
+			final float maxError, final float minSlope, final float maxSlope, final int maxDist, final int minInliers,
 			final int functionChoice, final double lambda, final File file) {
 		this.minTP = minTP;
 		this.maxTP = maxTP;
@@ -216,7 +217,7 @@ public class InteractiveRANSAC implements PlugIn {
 
 		this.serial = false;
 		if (this.minSlope >= this.maxSlope)
-			this.minSlope = this.maxSlope - 0.1;
+			this.minSlope = this.maxSlope - 0.1f;
 
 	
 		this.dataset = new XYSeriesCollection();
@@ -228,8 +229,8 @@ public class InteractiveRANSAC implements PlugIn {
 		// null);
 	};
 
-	public InteractiveRANSAC(final int minTP, final int maxTP, final float maxError, final double minSlope,
-			final double maxSlope, final int maxDist, final int minInliers, final int functionChoice,
+	public InteractiveRANSAC(final int minTP, final int maxTP, final float maxError, final float minSlope,
+			final float maxSlope, final int maxDist, final int minInliers, final int functionChoice,
 			final double lambda, final File[] file) {
 		this.minTP = minTP;
 		this.maxTP = maxTP;
@@ -250,7 +251,7 @@ public class InteractiveRANSAC implements PlugIn {
 
 		this.serial = true;
 		if (this.minSlope >= this.maxSlope)
-			this.minSlope = this.maxSlope - 0.1;
+			this.minSlope = this.maxSlope - 0.1f;
 
 	
 		this.dataset = new XYSeriesCollection();
@@ -360,7 +361,8 @@ public class InteractiveRANSAC implements PlugIn {
 				utility.Slicer.computeScrollbarPositionFromValue(maxError, MIN_ERROR, MAX_ERROR, scrollbarSize));
 		
 	
-		
+		minSlopeSB.setValue(utility.Slicer.computeScrollbarPositionFromValue((float) minSlope, (float) MIN_ABS_SLOPE,
+				(float) MAX_ABS_SLOPE, scrollbarSize));
 		
 		lambdaLabel = new Label("Linearity (fraction) = " + new DecimalFormat("#.##").format(lambda),
 				Label.CENTER);
@@ -413,10 +415,10 @@ public class InteractiveRANSAC implements PlugIn {
 		maxGapField.setText(Float.toString(maxDist));
 
 		maxSlopeField = new TextField(5);
-		maxSlopeField.setText(Double.toString(maxSlope));
+		maxSlopeField.setText(Float.toString(maxSlope));
 		
 		minSlopeField = new TextField(5);
-		minSlopeField.setText(Double.toString(minSlope));
+		minSlopeField.setText(Float.toString(minSlope));
 
 		scrollPane = new JScrollPane(table);
 		scrollPane.setMinimumSize(new Dimension(300, 200));
@@ -539,7 +541,7 @@ public class InteractiveRANSAC implements PlugIn {
 		Panelslope.add(minCatDistLabel, new GridBagConstraints(0, 6, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
 				GridBagConstraints.HORIZONTAL, insets, 0, 0));
 		Panelslope.setBorder(selectslope);
-		Panelslope.setPreferredSize(new Dimension(SizeX, SizeY));
+		Panelslope.setPreferredSize(new Dimension(SizeX + 20, SizeY));
 
 		panelFirst.add(Panelslope, new GridBagConstraints(3, 1, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
 				GridBagConstraints.HORIZONTAL, insets, 0, 0));
@@ -615,6 +617,7 @@ public class InteractiveRANSAC implements PlugIn {
 		inputFieldT.addTextListener(new LengthdistroListener(this));
 
 		maxSlopeField.addTextListener(new MaxSlopeLocListener(this, false));
+		minSlopeField.addTextListener(new MinSlopeLocListener(this, false));
 		maxErrorField.addTextListener(new ErrorLocListener(this, false));
 		minInlierField.addTextListener(new MinInlierLocListener(this, false));
 		maxGapField.addTextListener(new MaxDistLocListener(this, false));
@@ -700,10 +703,8 @@ public class InteractiveRANSAC implements PlugIn {
 	public void updateRANSAC() {
 		++updateCount;
 		dataset.removeAllSeries();
-		this.dataset.addSeries(Tracking.drawPoints(mts, calibrations));
 		linearsegments.clear();
 		indexedsegments.clear();
-		dataset.removeAllSeries();
 		i = 1;
 		segment = 1;
 		negcount = 0;
