@@ -47,7 +47,7 @@ public class ErrorListener implements AdjustmentListener {
 				.setValue(utility.Slicer.computeScrollbarPositionFromValue(parent.maxError, min, max, scrollbarSize));
 
 		label.setText(string +  " = "  + parent.nf.format(parent.maxError) + "      ");
-		parent.maxErrorField.setText(Integer.toString(Math.round(parent.maxError)));
+		parent.maxErrorField.setText(Float.toString(Float.valueOf((parent.maxError))));
 		parent.panelFirst.validate();
 		parent.panelFirst.repaint();
 	

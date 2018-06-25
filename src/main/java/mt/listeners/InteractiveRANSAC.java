@@ -116,8 +116,8 @@ public class InteractiveRANSAC implements PlugIn {
 	private Label inputLabelT;
 	private Label inputLabelTcont;
 	public TextField inputFieldT, maxErrorField, minInlierField, maxGapField, maxSlopeField, minSlopeField;
-	public float MAX_ABS_SLOPE = 100.0f;
-	public float MIN_ABS_SLOPE = -100.0f;
+	public float MAX_ABS_SLOPE = 360.0f;
+	public float MIN_ABS_SLOPE = -360.0f;
 	public static double MIN_CAT = 0.0;
 	public static double MAX_CAT = 100.0;
 	public File inputfile;
@@ -319,7 +319,7 @@ public class InteractiveRANSAC implements PlugIn {
 	Border selectdirectory = new CompoundBorder(new TitledBorder("Load directory"), new EmptyBorder(c.insets));
 
 	public String errorstring = "Maximum Error (px)";
-	public String inlierstring = "Minimum Number of timepoints (tp)";
+	public String inlierstring = "Minimum No. of timepoints (tp)";
 	public String maxgapstring = "Maximum Gap (tp)";
 	public String maxslopestring = "Max. Segment Slope (px/tp)";
 	public String minslopestring = "Min. Segment Slope (px/tp)";
@@ -327,15 +327,18 @@ public class InteractiveRANSAC implements PlugIn {
 	public int SizeX = 500;
 	public int SizeY = 300;
 	public JScrollBar maxErrorSB = new JScrollBar(Scrollbar.HORIZONTAL, (int)this.maxError, 10, 0, 10 + scrollbarSize);
-	public JScrollBar minInliersSB = new JScrollBar(Scrollbar.HORIZONTAL, this.minInliers, 10, 0, 10 + scrollbarSize);
-	public JScrollBar maxDistSB = new JScrollBar(Scrollbar.HORIZONTAL, this.maxDist, 10, 0, 10 + scrollbarSize);
+	public JScrollBar minInliersSB = new JScrollBar(Scrollbar.HORIZONTAL, (int)this.minInliers, 10, 0, 10 + scrollbarSize);
+	public JScrollBar maxDistSB = new JScrollBar(Scrollbar.HORIZONTAL, (int)this.maxDist, 10, 0, 10 + scrollbarSize);
 	public JScrollBar minSlopeSB = new JScrollBar(Scrollbar.HORIZONTAL, (int)this.minSlope, 10, 0, 10 + scrollbarSize);
 	public JScrollBar maxSlopeSB = new JScrollBar(Scrollbar.HORIZONTAL, (int)this.maxSlope, 10, 0, 10 + scrollbarSize);
 
+	
+	
+	
 	public Label maxErrorLabel = new Label(
 			"Maximum Error (px) = " + new DecimalFormat("#.##").format(this.maxError) + "      ", Label.CENTER);
 	public Label minInliersLabel = new Label(
-			"Minimum Number of timepoints (tp) = " + new DecimalFormat("#.##").format(this.minInliers), Label.CENTER);
+			"Minimum No. of timepoints (tp) = " + new DecimalFormat("#.##").format(this.minInliers), Label.CENTER);
 	public Label maxDistLabel = new Label("Maximum Gap (tp) = " + new DecimalFormat("#.##").format(this.maxDist),
 			Label.CENTER);
 
@@ -369,10 +372,12 @@ public class InteractiveRANSAC implements PlugIn {
 		maxErrorLabel = new Label(
 				"Maximum Error (px) = " + new DecimalFormat("#.##").format(maxError) + "      ", Label.CENTER);
 		minInliersLabel = new Label(
-				"Minimum Number of timepoints (tp) = " + new DecimalFormat("#.##").format(minInliers), Label.CENTER);
+				"Minimum No. of timepoints (tp) = " + new DecimalFormat("#.##").format(minInliers), Label.CENTER);
 		maxDistLabel = new Label("Maximum Gap (tp) = " + new DecimalFormat("#.##").format(maxDist),
 				Label.CENTER);
 
+	
+		
 		
 		
 		
@@ -420,6 +425,17 @@ public class InteractiveRANSAC implements PlugIn {
 		minSlopeField = new TextField(5);
 		minSlopeField.setText(Float.toString(minSlope));
 
+		maxErrorSB.setSize(new Dimension(SizeX, 20));
+		minSlopeSB.setSize(new Dimension(SizeX, 20));
+		minInliersSB.setSize(new Dimension(SizeX, 20));
+		maxDistSB.setSize(new Dimension(SizeX, 20));
+		maxSlopeSB.setSize(new Dimension(SizeX, 20));
+		maxErrorField.setSize(new Dimension(SizeX, 20));
+		minInlierField.setSize(new Dimension(SizeX, 20));
+		maxGapField.setSize(new Dimension(SizeX, 20));
+		minSlopeField.setSize(new Dimension(SizeX, 20));
+		maxSlopeField.setSize(new Dimension(SizeX, 20));
+		
 		scrollPane = new JScrollPane(table);
 		scrollPane.setMinimumSize(new Dimension(300, 200));
 		scrollPane.setPreferredSize(new Dimension(300, 200));
@@ -718,7 +734,7 @@ public class InteractiveRANSAC implements PlugIn {
 
 		@SuppressWarnings({ "rawtypes", "unchecked" })
 		final ArrayList<Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>>> segments = Tracking
-				.findAllFunctions(points, function, maxError, minInliers, maxDist);
+				.findAllFunctions(points, function, maxError, (int)minInliers, (int)maxDist);
 
 		if (segments == null || segments.size() == 0) {
 			--updateCount;
