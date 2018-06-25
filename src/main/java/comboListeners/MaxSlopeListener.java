@@ -47,7 +47,7 @@ public class MaxSlopeListener implements AdjustmentListener {
 				.setValue(utility.Slicer.computeScrollbarPositionFromValue((float) parent.maxSlope, min, max, scrollbarSize));
 
 		label.setText(string +  " = "  + parent.nf.format(parent.maxSlope) + "      ");
-		parent.maxSlopeField.setText(Double.toString((parent.maxSlope)));
+		parent.maxSlopeField.setText(Integer.toString(Math.round(parent.maxSlope)));
 		parent.panelFirst.validate();
 		parent.panelFirst.repaint();
 	
