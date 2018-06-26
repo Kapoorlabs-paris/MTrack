@@ -37,13 +37,13 @@ public class MinSlopeLocListener implements TextListener {
 			s = s.substring(1).trim();
 			neg = -1;
 		}
-
+		
 		if (s.length() > 0)
 			parent.minSlope = Float.parseFloat(s);
 		parent.minSlope = neg * parent.minSlope;
 
 		parent.minSlopeLabel.setText(parent.minslopestring + " = " + ((parent.minSlope)) + "      ");
-		parent.minSlopeSB.setValue(utility.Slicer.computeScrollbarPositionFromValue(parent.minSlope,
+		parent.minSlopeSB.setValue(utility.Slicer.computeScrollbarPositionFromValue((float)parent.minSlope,
 				parent.MIN_ABS_SLOPE, parent.MAX_ABS_SLOPE, parent.scrollbarSize));
 		tc.addKeyListener(new KeyListener() {
 			@Override

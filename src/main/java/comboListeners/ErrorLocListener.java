@@ -35,7 +35,7 @@ public class ErrorLocListener implements TextListener {
 		parent.MAX_ERROR = Math.max(parent.maxError, parent.MAX_ERROR);
 		if(parent.MAX_ERROR > 1.0E5)
 			parent.MAX_ERROR = 100;
-		parent.maxErrorSB.setValue(utility.Slicer.computeScrollbarPositionFromValue(parent.maxError, parent.MIN_ERROR, parent.MAX_ERROR, parent.scrollbarSize));
+		parent.maxErrorSB.setValue(utility.Slicer.computeScrollbarPositionFromValue((float)parent.maxError, parent.MIN_ERROR, parent.MAX_ERROR, parent.scrollbarSize));
 		 tc.addKeyListener(new KeyListener(){
 			 @Override
 			    public void keyTyped(KeyEvent arg0) {
