@@ -37,17 +37,18 @@ public class MaxSlopeListener implements AdjustmentListener {
 	@Override
 	public void adjustmentValueChanged(AdjustmentEvent e) {
 		
-		max =  (float) parent.MAX_ABS_SLOPE;
+		max =  parent.MAX_ABS_SLOPE;
 		
 		
 		parent.maxSlope = utility.Slicer.computeValueFromScrollbarPosition(e.getValue(), min, max, scrollbarSize);
 
 	
 		deltaScrollbar
-				.setValue(utility.Slicer.computeScrollbarPositionFromValue((float) parent.maxSlope, min, max, scrollbarSize));
+				.setValue(utility.Slicer.computeScrollbarPositionFromValue(parent.maxSlope, min, max, scrollbarSize));
 
-		label.setText(string +  " = "  + parent.nf.format(parent.maxSlope) + "      ");
-		parent.maxSlopeField.setText(Float.toString(Float.valueOf(parent.maxSlope)));
+		label.setText(string +  " = "  + parent.df.format(parent.maxSlope) + "      ");
+		if(e.getValueIsAdjusting())
+		parent.maxSlopeField.setText(parent.df.format(parent.maxSlope));
 		parent.panelFirst.validate();
 		parent.panelFirst.repaint();
 	

@@ -125,6 +125,7 @@ public class InteractiveRANSAC implements PlugIn {
 	public double[] calibrations;
 	public String inputdirectory;
 	public NumberFormat nf = NumberFormat.getInstance(Locale.ENGLISH);
+	
 	public ArrayList<Pair<LinearFunction, ArrayList<PointFunctionMatch>>> linearlist;
 	Frame jFreeChartFrame;
 	public int functionChoice = 0; // 0 == Linear, 1 == Quadratic interpolated,
@@ -167,7 +168,7 @@ public class InteractiveRANSAC implements PlugIn {
 	public final int scrollbarSize = 1000;
 	public float minSlope = 1;
 	public float maxSlope = 100;
-
+	public DecimalFormat df = new DecimalFormat("#.###");
 	public double restolerance = 5;
 	public double tptolerance = 2;
 	public int maxDist = 300;
@@ -184,17 +185,17 @@ public class InteractiveRANSAC implements PlugIn {
 
 	public InteractiveRANSAC(final ArrayList<Pair<Integer, Double>> mts, File file) {
 		this(mts, 0, 300, 3.0f, 0.1f, 10.0f, 10, 50, 1, 0.1, file);
-		nf.setMaximumFractionDigits(5);
+		nf.setMaximumFractionDigits(3);
 	}
 
 	public InteractiveRANSAC(File[] file) {
 		this(0, 300, 3.0f, 0.1f, 10.0f, 10, 50, 1, 0.1, file);
-		nf.setMaximumFractionDigits(5);
+		nf.setMaximumFractionDigits(3);
 	}
 
 	public InteractiveRANSAC() {
 		this(0, 300, 3.0f, 0.1f, 10.0f, 10, 50, 1, 0.1, null);
-		nf.setMaximumFractionDigits(5);
+		nf.setMaximumFractionDigits(3);
 	}
 
 	public InteractiveRANSAC(final ArrayList<Pair<Integer, Double>> mts, final int minTP, final int maxTP,
@@ -557,7 +558,7 @@ public class InteractiveRANSAC implements PlugIn {
 		Panelslope.add(minCatDistLabel, new GridBagConstraints(0, 6, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
 				GridBagConstraints.HORIZONTAL, insets, 0, 0));
 		Panelslope.setBorder(selectslope);
-		Panelslope.setPreferredSize(new Dimension(SizeX + 20, SizeY));
+		Panelslope.setPreferredSize(new Dimension(SizeX + 50, SizeY));
 
 		panelFirst.add(Panelslope, new GridBagConstraints(3, 1, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
 				GridBagConstraints.HORIZONTAL, insets, 0, 0));
@@ -854,7 +855,27 @@ public class InteractiveRANSAC implements PlugIn {
 
 					starttimerates.add(startrate);
 				}
+				if (linearrate < 0) {
+					
+					negcount++;
+					negtimediff += endX - startX;
 
+					shrinkrate = linearrate;
+					averageshrink += linearrate;
+
+					rt.incrementCounter();
+					rt.addValue("Start time", startX * calibrations[2]);
+					rt.addValue("End time", endX * calibrations[2]);
+					rt.addValue("Growth Rate", linearrate * calibrations[0] / calibrations[2]);
+
+					Pair<Float, Float> startrate = new ValuePair<Float, Float>((float) startX,
+							(float) linearrate);
+
+					starttimerates.add(startrate);
+
+				
+
+				}
 				if (linearrate > 0) {
 					previousendX.add(endX);
 

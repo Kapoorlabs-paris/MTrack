@@ -47,7 +47,8 @@ public class MinInlierListener implements AdjustmentListener {
 				.setValue(utility.Slicer.computeScrollbarPositionFromValue(parent.minInliers, min, max, scrollbarSize));
 
 		label.setText(string +  " = "  + parent.nf.format(parent.minInliers) + "      ");
-		parent.minInlierField.setText(Integer.toString((parent.minInliers)));
+		if(e.getValueIsAdjusting())
+		parent.minInlierField.setText(Float.toString((parent.minInliers)));
 		parent.panelFirst.validate();
 		parent.panelFirst.repaint();
 	
