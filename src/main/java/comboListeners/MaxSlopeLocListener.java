@@ -40,12 +40,11 @@ public class MaxSlopeLocListener implements TextListener {
 			neg = -1;
 		}
 
-		
 	 	if(s.length() > 0)
 		parent.maxSlope = Float.parseFloat(s);
 	 	
 	 	parent.maxSlope = neg * parent.maxSlope;
-		parent.maxSlopeLabel.setText(parent.maxslopestring + " = " + parent.nf.format((parent.maxSlope)) + "      ");
+		parent.maxSlopeLabel.setText(parent.maxslopestring + " = " + parent.df.format((parent.maxSlope)) );
 		
 		
 		parent.maxSlopeSB.setValue(utility.Slicer.computeScrollbarPositionFromValue(parent.maxSlope, 

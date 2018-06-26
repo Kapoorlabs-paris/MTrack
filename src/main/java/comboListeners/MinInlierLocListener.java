@@ -1,5 +1,6 @@
 package comboListeners;
 
+import java.awt.Dimension;
 import java.awt.TextComponent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -31,12 +32,15 @@ public class MinInlierLocListener implements TextListener {
 	 	String s = tc.getText();
 	 	if(s.length() > 0)
 		parent.minInliers = (int) Float.parseFloat(s);
-		parent.minInliersLabel.setText("Minimum Number of timepoints (tp) = " + parent.nf.format((parent.minInliers)) + "      ");
+		parent.minInliersLabel.setText("Minimum No. of timepoints (tp) = " + parent.nf.format((parent.minInliers)) + "      ");
 		parent.MAX_Inlier = Math.max(parent.minInliers, parent.MAX_Inlier);
 		if(parent.MAX_Inlier > 1.0E5)
 			parent.MAX_Inlier = 100;
 		parent.minInliersSB.setValue(utility.Slicer.computeScrollbarPositionFromValue(parent.minInliers, parent.MIN_Inlier, parent.MAX_Inlier, parent.scrollbarSize));
-		 tc.addKeyListener(new KeyListener(){
+		
+
+		
+		tc.addKeyListener(new KeyListener(){
 			 @Override
 			    public void keyTyped(KeyEvent arg0) {
 				   

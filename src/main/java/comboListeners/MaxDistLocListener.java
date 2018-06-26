@@ -31,7 +31,7 @@ public class MaxDistLocListener implements TextListener {
 	 	String s = tc.getText();
 	 	if(s.length() > 0)
 		parent.maxDist = (int) Float.parseFloat(s);
-		parent.maxDistLabel.setText("Maximum Gap (tp) = " + parent.nf.format((parent.maxDist)) + "      ");
+		parent.maxDistLabel.setText("Maximum Gap (tp) = " + parent.df.format((parent.maxDist)) + "      ");
 		parent.MAX_Gap = Math.max(parent.maxDist, parent.MAX_Gap);
 		if(parent.MAX_Gap > 1.0E5)
 			parent.MAX_Gap = 100;

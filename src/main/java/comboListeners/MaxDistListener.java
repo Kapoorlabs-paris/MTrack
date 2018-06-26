@@ -46,8 +46,9 @@ public class MaxDistListener implements AdjustmentListener {
 		deltaScrollbar
 				.setValue(utility.Slicer.computeScrollbarPositionFromValue(parent.maxDist, min, max, scrollbarSize));
 
-		label.setText(string +  " = "  + parent.nf.format(parent.maxDist) + "      ");
-		parent.maxGapField.setText(Integer.toString((parent.maxDist)));
+		label.setText(string +  " = "  + parent.df.format(parent.maxDist) + "      ");
+		if(e.getValueIsAdjusting())
+		parent.maxGapField.setText(Float.toString((parent.maxDist)));
 		parent.panelFirst.validate();
 		parent.panelFirst.repaint();
 	
