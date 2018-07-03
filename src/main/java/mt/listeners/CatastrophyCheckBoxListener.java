@@ -72,7 +72,7 @@ public class CatastrophyCheckBoxListener implements ItemListener
 	{
 		label.setEnabled( state );
 		
-		boolean actualstate = true;
+		boolean actualstate = state;
 		
 		
 		
