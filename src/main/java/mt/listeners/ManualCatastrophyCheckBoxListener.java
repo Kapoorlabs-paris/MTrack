@@ -73,7 +73,7 @@ public class ManualCatastrophyCheckBoxListener implements ItemListener
 		label.setEnabled( state );
 		
 		boolean otherstate = parent.detectCatastrophe;
-        boolean actualstate = true;
+        boolean actualstate = state;
 			
 		scrollbar.setEnabled( actualstate );
 

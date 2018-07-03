@@ -972,7 +972,6 @@ public class InteractiveRANSAC implements PlugIn {
 										Tracking.setDisplayType(chart, i, true, false);
 										Tracking.setStroke(chart, i, 2f);
 
-										++i;
 
 										dataset.addSeries(Tracking.drawPoints(Tracking.toPairList(fit.getB()),
 												calibrations, "C(inl) " + catastrophy));
@@ -1133,9 +1132,12 @@ public class InteractiveRANSAC implements PlugIn {
 			double tStart = start.getB().get(start.getB().size() - 1).getP1().getL()[0];
 			double tEnd = end.getB().get(0).getP1().getL()[0];
 
+		
 			final double lStart = start.getB().get(start.getB().size() - 1).getP1().getL()[1];
 			final double lEnd = end.getB().get(0).getP1().getL()[1];
 
+			if(tEnd > tStart) {
+			
 			if (Math.abs(lStart - lEnd) >= this.minDistanceCatastrophe) {
 
 				final double slope = (lEnd - lStart) / (tEnd - tStart);
@@ -1182,10 +1184,9 @@ public class InteractiveRANSAC implements PlugIn {
 					Tracking.setDisplayType(chart, i, true, false);
 					Tracking.setStroke(chart, i, 2f);
 					++i;
-					++segment;
 
 				}
-
+			}
 			}
 		}
 		return catstarttimerates;
