@@ -98,7 +98,7 @@ public class AutoCompileResultsListener implements ActionListener {
 		            setBackground(Color.red);
 		            
 		        } else {
-		            setBackground(table.getBackground());
+		            setBackground(Color.GRAY);
 		        } 
 		        return this;
 		    }   
