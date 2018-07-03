@@ -478,7 +478,6 @@ public static double[] Growseeds (RandomAccessibleInterval<FloatType> outimg, do
 			Kernels.addBackground(Views.iterable(lineimage), 0.2);
 			noisylines = Poissonprocess.poissonProcess(lineimage, SNR);
 			ImageJFunctions.show(noisylines);
-		
 			
 	       ArrayList<double[]> Allseedgrow = new ArrayList<double[]>();
 	       

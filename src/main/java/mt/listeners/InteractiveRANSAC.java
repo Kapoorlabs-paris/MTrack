@@ -410,6 +410,7 @@ public class InteractiveRANSAC implements PlugIn {
 
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 	
+		table.isOpaque();
 
 		maxErrorField = new TextField(5);
 		maxErrorField.setText(Float.toString(maxError));
@@ -585,7 +586,7 @@ public class InteractiveRANSAC implements PlugIn {
 		if (inputfiles != null) {
 			table.addMouseListener(new MouseAdapter() {
 				public void mouseClicked(MouseEvent e) {
-					if (e.getClickCount() == 1) {
+					if (e.getClickCount() >= 1) {
 
 						if (!jFreeChartFrame.isVisible())
 							jFreeChartFrame = Tracking.display(chart, new Dimension(500, 500));
@@ -658,6 +659,8 @@ public class InteractiveRANSAC implements PlugIn {
 
 	public void displayclicked(final int trackindex) {
 
+		if (!jFreeChartFrame.isVisible())
+			jFreeChartFrame = Tracking.display(chart, new Dimension(500, 500));
 		this.inputfile = this.inputfiles[trackindex];
 		this.inputdirectory = this.inputfiles[trackindex].getParent();
 		this.mts = Tracking.loadMT(this.inputfiles[trackindex]);
@@ -969,7 +972,6 @@ public class InteractiveRANSAC implements PlugIn {
 										Tracking.setDisplayType(chart, i, true, false);
 										Tracking.setStroke(chart, i, 2f);
 
-										++i;
 
 										dataset.addSeries(Tracking.drawPoints(Tracking.toPairList(fit.getB()),
 												calibrations, "C(inl) " + catastrophy));
@@ -1095,12 +1097,13 @@ public class InteractiveRANSAC implements PlugIn {
 					setBackground(Color.red);
 
 				} else {
-					setBackground(Color.white);
+					setBackground(Color.GRAY);
 				}
 				return this;
 			}
 		});
 		table.validate();
+		
 		scrollPane.validate();
 
 		Averagerate avrate = new Averagerate(averagegrowth, averageshrink, catfrequ, resfrequ, count, negcount,
@@ -1129,9 +1132,12 @@ public class InteractiveRANSAC implements PlugIn {
 			double tStart = start.getB().get(start.getB().size() - 1).getP1().getL()[0];
 			double tEnd = end.getB().get(0).getP1().getL()[0];
 
+		
 			final double lStart = start.getB().get(start.getB().size() - 1).getP1().getL()[1];
 			final double lEnd = end.getB().get(0).getP1().getL()[1];
 
+			if(tEnd > tStart) {
+			
 			if (Math.abs(lStart - lEnd) >= this.minDistanceCatastrophe) {
 
 				final double slope = (lEnd - lStart) / (tEnd - tStart);
@@ -1178,10 +1184,9 @@ public class InteractiveRANSAC implements PlugIn {
 					Tracking.setDisplayType(chart, i, true, false);
 					Tracking.setStroke(chart, i, 2f);
 					++i;
-					++segment;
 
 				}
-
+			}
 			}
 		}
 		return catstarttimerates;
