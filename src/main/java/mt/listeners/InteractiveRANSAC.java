@@ -409,7 +409,15 @@ public class InteractiveRANSAC implements PlugIn {
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 	
 		table.isOpaque();
-
+		int size = 100;
+		table.getColumnModel().getColumn(0).setPreferredWidth(size);
+		table.getColumnModel().getColumn(1).setPreferredWidth(size);
+		table.getColumnModel().getColumn(2).setPreferredWidth(size);
+		table.getColumnModel().getColumn(3).setPreferredWidth(size);
+		table.getColumnModel().getColumn(4).setPreferredWidth(size);
+		table.getColumnModel().getColumn(5).setPreferredWidth(size);
+		table.getColumnModel().getColumn(6).setPreferredWidth(size);
+		table.getColumnModel().getColumn(7).setPreferredWidth(size);
 		maxErrorField = new TextField(5);
 		maxErrorField.setText(Float.toString(maxError));
 
@@ -1064,6 +1072,15 @@ public class InteractiveRANSAC implements PlugIn {
 		if (wrongfileindexlist.get(row) != null) {
 			table.getModel().setValueAt(wrongfileindexlist.get(row).toString(), row, 7);
 		}
+		int size = 100;
+		table.getColumnModel().getColumn(0).setPreferredWidth(size);
+		table.getColumnModel().getColumn(1).setPreferredWidth(size);
+		table.getColumnModel().getColumn(2).setPreferredWidth(size);
+		table.getColumnModel().getColumn(3).setPreferredWidth(size);
+		table.getColumnModel().getColumn(4).setPreferredWidth(size);
+		table.getColumnModel().getColumn(5).setPreferredWidth(size);
+		table.getColumnModel().getColumn(6).setPreferredWidth(size);
+		table.getColumnModel().getColumn(7).setPreferredWidth(size);
 		table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
 			@Override
 			public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
