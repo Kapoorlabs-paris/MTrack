@@ -214,7 +214,6 @@ public class InteractiveRANSAC implements PlugIn {
 		this.minSlope = minSlope;
 		this.maxSlope = maxSlope;
 		this.maxDist = Math.min(maxDist, numTimepoints);
-		this.minInliers = Math.min(minInliers, numTimepoints);
 
 		this.serial = false;
 		if (this.minSlope >= this.maxSlope)
@@ -248,7 +247,6 @@ public class InteractiveRANSAC implements PlugIn {
 		this.minSlope = minSlope;
 		this.maxSlope = maxSlope;
 		this.maxDist = Math.min(maxDist, numTimepoints);
-		this.minInliers = Math.min(minInliers, numTimepoints);
 
 		this.serial = true;
 		if (this.minSlope >= this.maxSlope)
@@ -290,7 +288,7 @@ public class InteractiveRANSAC implements PlugIn {
 
 	}
 
-	public JFrame Cardframe = new JFrame("Welcome to Ransac Rate and Statistics Analyzer ");
+	public JFrame Cardframe = new JFrame("Welcome to Ransac velocity and Statistics Analyzer ");
 	public JPanel panelCont = new JPanel();
 	public JPanel panelFirst = new JPanel();
 	public JPanel panelSecond = new JPanel();
@@ -391,7 +389,7 @@ public class InteractiveRANSAC implements PlugIn {
 				Label.CENTER);
 		
 		CardLayout cl = new CardLayout();
-		Object[] colnames = new Object[] { "Track File", "Growth rate", "Shrink rate", "Growth events", "Shrink events",
+		Object[] colnames = new Object[] { "Track File", "Growth velocity", "Shrink velocity", "Growth events", "Shrink events",
 				"fcat", "fres", "Error" };
 
 		Object[][] rowvalues = new Object[0][colnames.length];
@@ -846,13 +844,13 @@ public class InteractiveRANSAC implements PlugIn {
 					averagegrowth += linearrate;
 					lifecount.add(new ValuePair<Integer, Double>(count, lifetime));
 
-					Rateobject rate = new Rateobject(linearrate * calibrations[0] / calibrations[2],
+					Rateobject velocity = new Rateobject(linearrate * calibrations[0] / calibrations[2],
 							(int) (startX * calibrations[2]), (int) (endX * calibrations[2]));
-					allrates.add(rate);
+					allrates.add(velocity);
 					rt.incrementCounter();
 					rt.addValue("Start time", startX * calibrations[2]);
 					rt.addValue("End time", endX * calibrations[2]);
-					rt.addValue("Growth Rate", linearrate * calibrations[0] / calibrations[2]);
+					rt.addValue("Growth velocity", linearrate * calibrations[0] / calibrations[2]);
 
 					Pair<Float, Float> startrate = new ValuePair<Float, Float>((float) startX, (float) linearrate);
 
@@ -869,7 +867,7 @@ public class InteractiveRANSAC implements PlugIn {
 					rt.incrementCounter();
 					rt.addValue("Start time", startX * calibrations[2]);
 					rt.addValue("End time", endX * calibrations[2]);
-					rt.addValue("Growth Rate", linearrate * calibrations[0] / calibrations[2]);
+					rt.addValue("Growth velocity", linearrate * calibrations[0] / calibrations[2]);
 
 					Pair<Float, Float> startrate = new ValuePair<Float, Float>((float) startX,
 							(float) linearrate);
@@ -958,16 +956,16 @@ public class InteractiveRANSAC implements PlugIn {
 										rt.incrementCounter();
 										rt.addValue("Start time", startX * calibrations[2]);
 										rt.addValue("End time", endX * calibrations[2]);
-										rt.addValue("Growth Rate", linearrate * calibrations[0] / calibrations[2]);
+										rt.addValue("Growth velocity", linearrate * calibrations[0] / calibrations[2]);
 
 										Pair<Float, Float> startrate = new ValuePair<Float, Float>((float) startX,
 												(float) linearrate);
 
 										starttimerates.add(startrate);
 
-										Rateobject rate = new Rateobject(linearrate * calibrations[0] / calibrations[2],
+										Rateobject velocity = new Rateobject(linearrate * calibrations[0] / calibrations[2],
 												(int) (startX * calibrations[2]), (int) (endX * calibrations[2]));
-										allrates.add(rate);
+										allrates.add(velocity);
 										Tracking.setColor(chart, i, new Color(0, 0, 255));
 										Tracking.setDisplayType(chart, i, true, false);
 										Tracking.setStroke(chart, i, 2f);
@@ -983,35 +981,16 @@ public class InteractiveRANSAC implements PlugIn {
 										++i;
 										++segment;
 									}
-								} else {
-									System.out.println("Slope not negative: " + fit.getA());
-									if (this.detectmanualCatastrophe) {
-
-										catindex++;
-										catstarttimerates = ManualCat(segments, allrates, shrinkrate, rt);
-
-									}
 								}
-
-							} else {
-								System.out.println("No function found.");
-								if (this.detectmanualCatastrophe) {
-
-									catindex++;
-									catstarttimerates = ManualCat(segments, allrates, shrinkrate, rt);
-
-								}
-
 							}
-						} else {
+							
+							
+						}
+								
+						 else {
 							System.out.println("Catastrophy height not sufficient " + Math.abs(lStart - lEnd) + " < "
 									+ this.minDistanceCatastrophe);
-							if (this.detectmanualCatastrophe) {
-
-								catindex++;
-								catstarttimerates = ManualCat(segments, allrates, shrinkrate, rt);
-
-							}
+							
 
 						}
 					}
@@ -1163,7 +1142,7 @@ public class InteractiveRANSAC implements PlugIn {
 					rt.incrementCounter();
 					rt.addValue("Start time", startX * calibrations[2]);
 					rt.addValue("End time", endX * calibrations[2]);
-					rt.addValue("Growth Rate", linearrate * calibrations[0] / calibrations[2]);
+					rt.addValue("Growth velocity", linearrate * calibrations[0] / calibrations[2]);
 					Pair<Float, Float> startrate = new ValuePair<Float, Float>((float) startX, (float) linearrate);
 
 					catstarttimerates.add(startrate);
@@ -1173,9 +1152,9 @@ public class InteractiveRANSAC implements PlugIn {
 					p.add(new PointFunctionMatch(new Point(new double[] { tStart, lStart })));
 					p.add(new PointFunctionMatch(new Point(new double[] { tEnd, lEnd })));
 
-					Rateobject rate = new Rateobject(linearrate * calibrations[0] / calibrations[2],
+					Rateobject velocity = new Rateobject(linearrate * calibrations[0] / calibrations[2],
 							(int) (startX * calibrations[2]), (int) (endX * calibrations[2]));
-					allrates.add(rate);
+					allrates.add(velocity);
 
 					dataset.addSeries(Tracking.drawPoints(Tracking.toPairList(p), calibrations,
 							"CManual" + catindex + catastrophy));
