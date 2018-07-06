@@ -727,10 +727,8 @@ public class InteractiveRANSAC implements PlugIn {
 	int catindex = 0;
 
 	public void updateRANSAC() {
-		++updateCount;
-		dataset.removeAllSeries();
-		linearsegments.clear();
-		indexedsegments.clear();
+	
+		
 		i = 1;
 		segment = 1;
 		negcount = 0;
@@ -738,15 +736,20 @@ public class InteractiveRANSAC implements PlugIn {
 		averageshrink = 0;
 		catindex = 0;
 
-		this.dataset.addSeries(Tracking.drawPoints(mts, calibrations));
 		ArrayList<Rateobject> allrates = new ArrayList<Rateobject>();
 		ArrayList<Averagerate> averagerates = new ArrayList<Averagerate>();
 
-		@SuppressWarnings({ "rawtypes", "unchecked" })
-		final ArrayList<Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>>> segments = Tracking
-				.findAllFunctions(points, function, maxError, (int)minInliers, (int)maxDist);
+		++updateCount;
 
-		if (segments == null || segments.size() == 0) {
+		for ( int i = dataset.getSeriesCount() - 1; i > 0; --i )
+			dataset.removeSeries( i );
+
+		@SuppressWarnings("unchecked")
+		final ArrayList< Pair< AbstractFunction2D, ArrayList< PointFunctionMatch > > > segments =
+				Tracking.findAllFunctions( points, function, maxError, minInliers, maxDist );
+
+		if ( segments == null || segments.size() == 0 )
+		{
 			--updateCount;
 			return;
 		}
@@ -782,7 +785,6 @@ public class InteractiveRANSAC implements PlugIn {
 		ResultsTable rt = new ResultsTable();
 		ResultsTable rtAll = new ResultsTable();
 
-		sortPoints(points);
 		List<Pair<Float, Float>> starttimerates = new ArrayList<Pair<Float, Float>>();
 		List<Pair<Float, Float>> catstarttimerates = new ArrayList<Pair<Float, Float>>();
 		for (final Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>> result : segments) {
@@ -979,6 +981,7 @@ public class InteractiveRANSAC implements PlugIn {
 										Tracking.setStroke(chart, i, 2f);
 
 
+										++i;
 										dataset.addSeries(Tracking.drawPoints(Tracking.toPairList(fit.getB()),
 												calibrations, "C(inl) " + catastrophy));
 
@@ -987,7 +990,6 @@ public class InteractiveRANSAC implements PlugIn {
 										Tracking.setShape(chart, i, ShapeUtils.createDownTriangle(4f));
 
 										++i;
-										++segment;
 									}
 								}
 							}
@@ -1272,7 +1274,6 @@ public class InteractiveRANSAC implements PlugIn {
 
 		}
 
-		System.out.println(minstartY);
 		return minstartY;
 
 	}
