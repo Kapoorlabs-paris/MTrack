@@ -420,6 +420,7 @@ public class Tracking
 		return findFunction( mts, function, 3.0, function.getMinNumPoints(), 6 );
 	}
 
+	@SuppressWarnings("deprecation")
 	public static < P extends AbstractFunction2D< P > > Pair< P, ArrayList< PointFunctionMatch > > findFunction(
 			final ArrayList< Point > mts,
 			final P function,
@@ -579,6 +580,8 @@ public class Tracking
 			}
 			else
 			{
+				
+				
 				//System.out.println( "0/" + candidates.size() );
 				return null;
 			}
