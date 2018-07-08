@@ -214,7 +214,6 @@ public class InteractiveRANSAC implements PlugIn {
 		this.minSlope = minSlope;
 		this.maxSlope = maxSlope;
 		this.maxDist = Math.min(maxDist, numTimepoints);
-		this.minInliers = Math.min(minInliers, numTimepoints);
 
 		this.serial = false;
 		if (this.minSlope >= this.maxSlope)
@@ -248,7 +247,6 @@ public class InteractiveRANSAC implements PlugIn {
 		this.minSlope = minSlope;
 		this.maxSlope = maxSlope;
 		this.maxDist = Math.min(maxDist, numTimepoints);
-		this.minInliers = Math.min(minInliers, numTimepoints);
 
 		this.serial = true;
 		if (this.minSlope >= this.maxSlope)
@@ -290,7 +288,7 @@ public class InteractiveRANSAC implements PlugIn {
 
 	}
 
-	public JFrame Cardframe = new JFrame("Welcome to Ransac Rate and Statistics Analyzer ");
+	public JFrame Cardframe = new JFrame("Welcome to Ransac velocity and Statistics Analyzer ");
 	public JPanel panelCont = new JPanel();
 	public JPanel panelFirst = new JPanel();
 	public JPanel panelSecond = new JPanel();
@@ -391,7 +389,7 @@ public class InteractiveRANSAC implements PlugIn {
 				Label.CENTER);
 		
 		CardLayout cl = new CardLayout();
-		Object[] colnames = new Object[] { "Track File", "Growth rate", "Shrink rate", "Growth events", "Shrink events",
+		Object[] colnames = new Object[] { "Track File", "Growth velocity", "Shrink velocity", "Growth events", "Shrink events",
 				"fcat", "fres", "Error" };
 
 		Object[][] rowvalues = new Object[0][colnames.length];
@@ -411,7 +409,15 @@ public class InteractiveRANSAC implements PlugIn {
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 	
 		table.isOpaque();
-
+		int size = 100;
+		table.getColumnModel().getColumn(0).setPreferredWidth(size);
+		table.getColumnModel().getColumn(1).setPreferredWidth(size);
+		table.getColumnModel().getColumn(2).setPreferredWidth(size);
+		table.getColumnModel().getColumn(3).setPreferredWidth(size);
+		table.getColumnModel().getColumn(4).setPreferredWidth(size);
+		table.getColumnModel().getColumn(5).setPreferredWidth(size);
+		table.getColumnModel().getColumn(6).setPreferredWidth(size);
+		table.getColumnModel().getColumn(7).setPreferredWidth(size);
 		maxErrorField = new TextField(5);
 		maxErrorField.setText(Float.toString(maxError));
 
@@ -721,10 +727,8 @@ public class InteractiveRANSAC implements PlugIn {
 	int catindex = 0;
 
 	public void updateRANSAC() {
-		++updateCount;
-		dataset.removeAllSeries();
-		linearsegments.clear();
-		indexedsegments.clear();
+	
+		
 		i = 1;
 		segment = 1;
 		negcount = 0;
@@ -732,15 +736,20 @@ public class InteractiveRANSAC implements PlugIn {
 		averageshrink = 0;
 		catindex = 0;
 
-		this.dataset.addSeries(Tracking.drawPoints(mts, calibrations));
 		ArrayList<Rateobject> allrates = new ArrayList<Rateobject>();
 		ArrayList<Averagerate> averagerates = new ArrayList<Averagerate>();
 
-		@SuppressWarnings({ "rawtypes", "unchecked" })
-		final ArrayList<Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>>> segments = Tracking
-				.findAllFunctions(points, function, maxError, (int)minInliers, (int)maxDist);
+		++updateCount;
 
-		if (segments == null || segments.size() == 0) {
+		for ( int i = dataset.getSeriesCount() - 1; i > 0; --i )
+			dataset.removeSeries( i );
+
+		@SuppressWarnings("unchecked")
+		final ArrayList< Pair< AbstractFunction2D, ArrayList< PointFunctionMatch > > > segments =
+				Tracking.findAllFunctions( points, function, maxError, minInliers, maxDist );
+
+		if ( segments == null || segments.size() == 0 )
+		{
 			--updateCount;
 			return;
 		}
@@ -776,7 +785,6 @@ public class InteractiveRANSAC implements PlugIn {
 		ResultsTable rt = new ResultsTable();
 		ResultsTable rtAll = new ResultsTable();
 
-		sortPoints(points);
 		List<Pair<Float, Float>> starttimerates = new ArrayList<Pair<Float, Float>>();
 		List<Pair<Float, Float>> catstarttimerates = new ArrayList<Pair<Float, Float>>();
 		for (final Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>> result : segments) {
@@ -846,13 +854,13 @@ public class InteractiveRANSAC implements PlugIn {
 					averagegrowth += linearrate;
 					lifecount.add(new ValuePair<Integer, Double>(count, lifetime));
 
-					Rateobject rate = new Rateobject(linearrate * calibrations[0] / calibrations[2],
+					Rateobject velocity = new Rateobject(linearrate * calibrations[0] / calibrations[2],
 							(int) (startX * calibrations[2]), (int) (endX * calibrations[2]));
-					allrates.add(rate);
+					allrates.add(velocity);
 					rt.incrementCounter();
 					rt.addValue("Start time", startX * calibrations[2]);
 					rt.addValue("End time", endX * calibrations[2]);
-					rt.addValue("Growth Rate", linearrate * calibrations[0] / calibrations[2]);
+					rt.addValue("Growth velocity", linearrate * calibrations[0] / calibrations[2]);
 
 					Pair<Float, Float> startrate = new ValuePair<Float, Float>((float) startX, (float) linearrate);
 
@@ -869,7 +877,7 @@ public class InteractiveRANSAC implements PlugIn {
 					rt.incrementCounter();
 					rt.addValue("Start time", startX * calibrations[2]);
 					rt.addValue("End time", endX * calibrations[2]);
-					rt.addValue("Growth Rate", linearrate * calibrations[0] / calibrations[2]);
+					rt.addValue("Growth velocity", linearrate * calibrations[0] / calibrations[2]);
 
 					Pair<Float, Float> startrate = new ValuePair<Float, Float>((float) startX,
 							(float) linearrate);
@@ -958,21 +966,22 @@ public class InteractiveRANSAC implements PlugIn {
 										rt.incrementCounter();
 										rt.addValue("Start time", startX * calibrations[2]);
 										rt.addValue("End time", endX * calibrations[2]);
-										rt.addValue("Growth Rate", linearrate * calibrations[0] / calibrations[2]);
+										rt.addValue("Growth velocity", linearrate * calibrations[0] / calibrations[2]);
 
 										Pair<Float, Float> startrate = new ValuePair<Float, Float>((float) startX,
 												(float) linearrate);
 
 										starttimerates.add(startrate);
 
-										Rateobject rate = new Rateobject(linearrate * calibrations[0] / calibrations[2],
+										Rateobject velocity = new Rateobject(linearrate * calibrations[0] / calibrations[2],
 												(int) (startX * calibrations[2]), (int) (endX * calibrations[2]));
-										allrates.add(rate);
+										allrates.add(velocity);
 										Tracking.setColor(chart, i, new Color(0, 0, 255));
 										Tracking.setDisplayType(chart, i, true, false);
 										Tracking.setStroke(chart, i, 2f);
 
 
+										++i;
 										dataset.addSeries(Tracking.drawPoints(Tracking.toPairList(fit.getB()),
 												calibrations, "C(inl) " + catastrophy));
 
@@ -981,37 +990,17 @@ public class InteractiveRANSAC implements PlugIn {
 										Tracking.setShape(chart, i, ShapeUtils.createDownTriangle(4f));
 
 										++i;
-										++segment;
-									}
-								} else {
-									System.out.println("Slope not negative: " + fit.getA());
-									if (this.detectmanualCatastrophe) {
-
-										catindex++;
-										catstarttimerates = ManualCat(segments, allrates, shrinkrate, rt);
-
 									}
 								}
-
-							} else {
-								System.out.println("No function found.");
-								if (this.detectmanualCatastrophe) {
-
-									catindex++;
-									catstarttimerates = ManualCat(segments, allrates, shrinkrate, rt);
-
-								}
-
 							}
-						} else {
+							
+							
+						}
+								
+						 else {
 							System.out.println("Catastrophy height not sufficient " + Math.abs(lStart - lEnd) + " < "
 									+ this.minDistanceCatastrophe);
-							if (this.detectmanualCatastrophe) {
-
-								catindex++;
-								catstarttimerates = ManualCat(segments, allrates, shrinkrate, rt);
-
-							}
+							
 
 						}
 					}
@@ -1085,6 +1074,15 @@ public class InteractiveRANSAC implements PlugIn {
 		if (wrongfileindexlist.get(row) != null) {
 			table.getModel().setValueAt(wrongfileindexlist.get(row).toString(), row, 7);
 		}
+		int size = 100;
+		table.getColumnModel().getColumn(0).setPreferredWidth(size);
+		table.getColumnModel().getColumn(1).setPreferredWidth(size);
+		table.getColumnModel().getColumn(2).setPreferredWidth(size);
+		table.getColumnModel().getColumn(3).setPreferredWidth(size);
+		table.getColumnModel().getColumn(4).setPreferredWidth(size);
+		table.getColumnModel().getColumn(5).setPreferredWidth(size);
+		table.getColumnModel().getColumn(6).setPreferredWidth(size);
+		table.getColumnModel().getColumn(7).setPreferredWidth(size);
 		table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
 			@Override
 			public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
@@ -1163,7 +1161,7 @@ public class InteractiveRANSAC implements PlugIn {
 					rt.incrementCounter();
 					rt.addValue("Start time", startX * calibrations[2]);
 					rt.addValue("End time", endX * calibrations[2]);
-					rt.addValue("Growth Rate", linearrate * calibrations[0] / calibrations[2]);
+					rt.addValue("Growth velocity", linearrate * calibrations[0] / calibrations[2]);
 					Pair<Float, Float> startrate = new ValuePair<Float, Float>((float) startX, (float) linearrate);
 
 					catstarttimerates.add(startrate);
@@ -1173,9 +1171,9 @@ public class InteractiveRANSAC implements PlugIn {
 					p.add(new PointFunctionMatch(new Point(new double[] { tStart, lStart })));
 					p.add(new PointFunctionMatch(new Point(new double[] { tEnd, lEnd })));
 
-					Rateobject rate = new Rateobject(linearrate * calibrations[0] / calibrations[2],
+					Rateobject velocity = new Rateobject(linearrate * calibrations[0] / calibrations[2],
 							(int) (startX * calibrations[2]), (int) (endX * calibrations[2]));
-					allrates.add(rate);
+					allrates.add(velocity);
 
 					dataset.addSeries(Tracking.drawPoints(Tracking.toPairList(p), calibrations,
 							"CManual" + catindex + catastrophy));
@@ -1276,7 +1274,6 @@ public class InteractiveRANSAC implements PlugIn {
 
 		}
 
-		System.out.println(minstartY);
 		return minstartY;
 
 	}
