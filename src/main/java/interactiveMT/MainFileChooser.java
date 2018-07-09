@@ -111,7 +111,7 @@ public class MainFileChooser extends JPanel {
 	boolean Generatepre = false;
 	boolean Batchmoderun = false;
 	public TextField inputField = new TextField();
-	public JLabel inputLabel = new JLabel("Filename and Default Result Directory:");
+	public JLabel inputLabel = new JLabel("Filename and default result directory:");
 	public FloatType minval = new FloatType(0);
 	public FloatType maxval = new FloatType(1);
 	private static final Insets insets = new Insets(0, 0, 0, 0);
@@ -132,7 +132,7 @@ public class MainFileChooser extends JPanel {
 	JButton ChoosepreImage = new JButton("Load preprocessed movie and go next\u22b3");
 	JLabel ChoosepreImagelabel = new JLabel("Optionally, load your preprocessed movie");
 	
-	final JButton ChooseDirectory = new JButton("Change Default Result Directory");
+	final JButton ChooseDirectory = new JButton("default result directory");
    
 	final Checkbox FlatField = new Checkbox("Do Flat Field Correction");
 	final JButton MedianFilter = new JButton("Next\u22b3 ");
@@ -169,8 +169,8 @@ public class MainFileChooser extends JPanel {
 		String[] preimage ={"Load preprocessed movie and begin tracking","Generate preprocessed movie and begin tracking " };
 		
 
-		Border border = new CompoundBorder(new TitledBorder("1.1 Choose Mode"), new EmptyBorder(c.insets));
-		Border microborder = new CompoundBorder(new TitledBorder("1.3 Microscope Parameters"), new EmptyBorder(c.insets));
+		Border border = new CompoundBorder(new TitledBorder("1.1 Choose mode"), new EmptyBorder(c.insets));
+		Border microborder = new CompoundBorder(new TitledBorder("1.3 Microscope parameters"), new EmptyBorder(c.insets));
 	
 		Border origborder = new CompoundBorder(new TitledBorder("1.2 Open movie and enter filename for results files"), new EmptyBorder(c.insets));
 
@@ -182,7 +182,7 @@ public class MainFileChooser extends JPanel {
 		Measure = new JButton("Open Un-preprocessed movie");
 		Kymo = new JButton("Open Kymograph for the MT");
 		Done = new JButton("Done");
-		inputLabelX = new Label("Enter Sigma (X and Y) of PSF (in pixels): ");
+		inputLabelX = new Label("Enter Sigma (X and Y) of PSF (pixels): ");
 		inputFieldX = new TextField(5);
 
 		inputFieldX.setText("2");
@@ -192,7 +192,7 @@ public class MainFileChooser extends JPanel {
 		inputFieldY.setText("2");
 		
 		
-		inputLabelcalX = new Label("Enter pixel calibration in X, Y (micrometers)");
+		inputLabelcalX = new Label("Enter pixel calibration in X, Y (um)");
 		inputFieldcalX = new TextField(5);
 		inputFieldcalX.setText("1");
 		
@@ -201,7 +201,7 @@ public class MainFileChooser extends JPanel {
 		inputFieldcalY.setText("1");
 		
 		
-	    inputLabelT = new Label("Enter Seconds per frame: ");
+	    inputLabelT = new Label("Enter seconds per frame: ");
 		inputFieldT = new TextField(5);
 		inputFieldT.setText("1");
 		
@@ -295,7 +295,7 @@ public class MainFileChooser extends JPanel {
 				GridBagConstraints.HORIZONTAL, new Insets(0, 10, 0, 10), 0, 0));
 
 		Microscope.add(inputLabelX, new GridBagConstraints(0, 4, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
-				GridBagConstraints.RELATIVE, insets, 0, 0));
+				GridBagConstraints.HORIZONTAL, insets, 0, 0));
 		
 		Microscope.add(inputFieldX, new GridBagConstraints(3, 4, 3, 1, 0.1, 0.0, GridBagConstraints.WEST,
 				GridBagConstraints.RELATIVE, insets, 0, 0));
@@ -304,7 +304,7 @@ public class MainFileChooser extends JPanel {
 				GridBagConstraints.RELATIVE, insets, 0, 0));
 		
 		Microscope.add(inputLabelcalX, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
-				GridBagConstraints.RELATIVE, insets, 0, 0));
+				GridBagConstraints.HORIZONTAL, insets, 0, 0));
 		
 		Microscope.add(inputFieldcalX, new GridBagConstraints(3, 0, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
 				GridBagConstraints.RELATIVE, insets, 0, 0));
