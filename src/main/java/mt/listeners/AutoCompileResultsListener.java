@@ -95,7 +95,7 @@ public class AutoCompileResultsListener implements ActionListener {
 
 		        String status = (String)table.getModel().getValueAt(row, 7);
 		        if ("true".equals(status)) {
-		            setBackground(Color.red);
+		            setBackground(Color.GRAY);
 		            
 		        } else {
 		            setBackground(Color.GRAY);
