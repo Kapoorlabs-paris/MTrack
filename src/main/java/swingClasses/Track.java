@@ -511,36 +511,30 @@ public class Track {
 					startrate = startseedmap.get(key);
 					
 					
-					String plusorminusend = (startrate > endrate) ? "Minus" : "Plus" ;
-					String plusorminusstart = (startrate > endrate) ? "Plus" : "Minus" ;
+					String plusorminusend; 
+					String plusorminusstart; 
 					if (parent.seedmap.get(key) == Whichend.start || parent.seedmap.get(key) == Whichend.end && parent.seedmap.get(key) != Whichend.both ){
 						plusorminusend = "Zeroend";
 						plusorminusstart = "Zeroend";
-					}
+					
 					
 					PlusMinusSeed pmseedEndB = new PlusMinusSeed(key, plusorminusend);
-					if(plusminusendlist.size() > 0) {
-					for(int i = 0; i < plusminusendlist.size(); ++i) {
-						
-						if(plusminusendlist.get(i).seedid !=key)
+				
 							plusminusendlist.add(pmseedEndB);
-					}
-					}
-					else
-						plusminusendlist.add(pmseedEndB);
+					
+					
+					
+					
 					
 					
 					PlusMinusSeed pmseedEndA = new PlusMinusSeed(key, plusorminusstart);
-					if(plusminusstartlist.size() > 0) {
-                      for(int i = 0; i < plusminusstartlist.size(); ++i) {
-						
-						if(plusminusstartlist.get(i).seedid !=key)
-							plusminusstartlist.add(pmseedEndA);
-					}
-				}
 				
-				else
-					plusminusstartlist.add(pmseedEndA);
+					
+							plusminusstartlist.add(pmseedEndA);
+					
+				
+				
+					}
 					
 				}
 					
@@ -562,7 +556,6 @@ public class Track {
 		                for (int j = 0; j < plusminusendlist.size(); ++j){
 						
 						if (plusminusendlist.get(j).seedid == currentseed){
-							System.out.println(parent.userfile + " " + parent.addToName);
 						try {
 							File fichier = new File(
 									parent.userfile + "//" + parent.addToName + "SeedLabel" + currentseed + plusminusendlist.get(j).plusorminus + ".txt");
