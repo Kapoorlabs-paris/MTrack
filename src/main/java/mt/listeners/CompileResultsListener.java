@@ -139,10 +139,10 @@ public class CompileResultsListener implements ActionListener {
 
 					String status = (String) table.getModel().getValueAt(row, 7);
 					if ("true".equals(status)) {
-						setBackground(Color.red);
+						setBackground(Color.GRAY);
 
 					} else {
-						setBackground(table.getBackground());
+						setBackground(Color.GRAY);
 					}
 					return this;
 				}

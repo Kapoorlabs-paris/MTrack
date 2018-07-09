@@ -21,6 +21,7 @@
  */
 package mt.listeners;
 
+import ij.IJ;
 import ij.measure.ResultsTable;
 import ij.plugin.PlugIn;
 
@@ -38,6 +39,8 @@ import java.awt.Insets;
 import java.awt.Label;
 import java.awt.Scrollbar;
 import java.awt.TextField;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
@@ -590,7 +593,12 @@ public class InteractiveRANSAC implements PlugIn {
 				GridBagConstraints.HORIZONTAL, insets, 0, 0));
 
 		if (inputfiles != null) {
+		
 			table.addMouseListener(new MouseAdapter() {
+				
+			
+				
+				
 				public void mouseClicked(MouseEvent e) {
 					if (e.getClickCount() >= 1) {
 
@@ -670,7 +678,8 @@ public class InteractiveRANSAC implements PlugIn {
 		this.inputfile = this.inputfiles[trackindex];
 		this.inputdirectory = this.inputfiles[trackindex].getParent();
 		this.mts = Tracking.loadMT(this.inputfiles[trackindex]);
-		if (mts != null) {
+		if (mts != null ) {
+			if(mts.size() > 5) {
 			this.points = Tracking.toPoints(mts);
 			this.calibrations = Tracking.loadCalibration(this.inputfiles[trackindex]);
 
@@ -683,8 +692,24 @@ public class InteractiveRANSAC implements PlugIn {
 			setFunction();
 			updateRANSAC();
 			compile.compileresults();
-		}
+			}
+			else {
+				IJ.log("Warning:  Loading an empty file");
 
+				table.getModel().setValueAt(new DecimalFormat("#.###").format(0), row, 1);
+				table.getModel().setValueAt(new DecimalFormat("#.###").format(0), row, 2);
+				table.getModel().setValueAt(new DecimalFormat("#").format(0), row, 3);
+				table.getModel().setValueAt(new DecimalFormat("#").format(0), row, 4);
+				table.getModel().setValueAt(new DecimalFormat("#.###").format(0), row, 5);
+				table.getModel().setValueAt(new DecimalFormat("#.###").format(0), row, 6);	
+				dataset.removeAllSeries();
+				Tracking.setColor(chart, 0, new Color(64, 64, 64));
+				Tracking.setStroke(chart, 0, 0.2f);
+				
+			}
+		}
+		
+		
 	}
 
 	public void setFunction() {
@@ -813,10 +838,12 @@ public class InteractiveRANSAC implements PlugIn {
 					Tracking.setColor(chart, i, new Color(255, 0, 0));
 					Tracking.setDisplayType(chart, i, true, false);
 					Tracking.setStroke(chart, i, 0.5f);
+					chart.setTitle("Length plot for" + " " + this.inputfiles[row].getName());
 				} else {
 					Tracking.setColor(chart, i, new Color(0, 128, 0));
 					Tracking.setDisplayType(chart, i, true, false);
 					Tracking.setStroke(chart, i, 2f);
+					chart.setTitle("Length plot for" + " " +  this.inputfiles[row].getName());
 				}
 
 				++i;
@@ -913,7 +940,14 @@ public class InteractiveRANSAC implements PlugIn {
 			if (segments.size() < 2) {
 
 				System.out.println("Only two points found");
+				
+					if (this.detectmanualCatastrophe ) {
 
+						catindex++;
+						catstarttimerates = ManualCat(segments, allrates, shrinkrate, rt);
+
+						System.out.println("Come from here");
+					}
 			} else {
 				for (int catastrophy = 0; catastrophy < segments.size() - 1; ++catastrophy) {
 					final Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>> start = segments.get(catastrophy);
@@ -993,7 +1027,13 @@ public class InteractiveRANSAC implements PlugIn {
 									}
 								}
 							}
-							
+							else
+								if (this.detectmanualCatastrophe ) {
+
+									catindex++;
+									catstarttimerates = ManualCat(segments, allrates, shrinkrate, rt);
+
+								}
 							
 						}
 								
@@ -1004,13 +1044,20 @@ public class InteractiveRANSAC implements PlugIn {
 
 						}
 					}
+					else
+					if (this.detectmanualCatastrophe ) {
+
+						catindex++;
+						catstarttimerates = ManualCat(segments, allrates, shrinkrate, rt);
+
+					}
 
 				}
 
 			}
 		}
 
-		if (this.detectmanualCatastrophe && !this.detectCatastrophe) {
+		if (this.detectmanualCatastrophe && !this.detectCatastrophe ) {
 
 			catindex++;
 			catstarttimerates = ManualCat(segments, allrates, shrinkrate, rt);
@@ -1034,7 +1081,7 @@ public class InteractiveRANSAC implements PlugIn {
 		if (resfrequ < 0)
 			resfrequ = 0;
 
-		rt.show("Rates(real units)");
+		rt.show("Rates(real units) for" + " " + this.inputfile.getName());
 		averageshrink *= calibrations[0] / calibrations[2];
 		averagegrowth *= calibrations[0] / calibrations[2];
 		rtAll.incrementCounter();
@@ -1086,13 +1133,13 @@ public class InteractiveRANSAC implements PlugIn {
 		table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
 			@Override
 			public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-					boolean hasFocus, int row, int col) {
+					boolean hasFocus, int rowA, int col) {
 
-				super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
+				super.getTableCellRendererComponent(table, value, isSelected, hasFocus, rowA, col);
 
 				String status = (String) table.getModel().getValueAt(row, 7);
 				if ("true".equals(status)) {
-					setBackground(Color.red);
+					setBackground(Color.GRAY);
 
 				} else {
 					setBackground(Color.GRAY);
@@ -1133,8 +1180,7 @@ public class InteractiveRANSAC implements PlugIn {
 		
 			final double lStart = start.getB().get(start.getB().size() - 1).getP1().getL()[1];
 			final double lEnd = end.getB().get(0).getP1().getL()[1];
-
-			if(tEnd > tStart) {
+			if(tEnd > tStart ) {
 			
 			if (Math.abs(lStart - lEnd) >= this.minDistanceCatastrophe) {
 
@@ -1182,7 +1228,7 @@ public class InteractiveRANSAC implements PlugIn {
 					Tracking.setDisplayType(chart, i, true, false);
 					Tracking.setStroke(chart, i, 2f);
 					++i;
-
+					chart.setTitle("Length plot for" + " " + this.inputfiles[row].getName());
 				}
 			}
 			}
