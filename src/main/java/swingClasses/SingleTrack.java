@@ -479,6 +479,7 @@ public  class SingleTrack {
 						
 						while(itend.hasNext()){
 							
+
 							Map.Entry<Integer, Double> pair = (Map.Entry<Integer, Double>) itend.next();
 							
 							int key = pair.getKey();
@@ -491,38 +492,30 @@ public  class SingleTrack {
 							startrate = startseedmap.get(key);
 							
 							
-							String plusorminusend = (startrate > endrate) ? "Minus" : "Plus" ;
-							String plusorminusstart = (startrate > endrate) ? "Plus" : "Minus" ;
+							String plusorminusend; 
+							String plusorminusstart; 
 							if (parent.seedmap.get(key) == Whichend.start || parent.seedmap.get(key) == Whichend.end && parent.seedmap.get(key) != Whichend.both ){
 								plusorminusend = "Zeroend";
 								plusorminusstart = "Zeroend";
-							}
+							
 							
 							PlusMinusSeed pmseedEndB = new PlusMinusSeed(key, plusorminusend);
-							if(plusminusendlist.size() > 0) {
-							for(int i = 0; i < plusminusendlist.size(); ++i) {
-								
-								if(plusminusendlist.get(i).seedid !=key)
+						
 									plusminusendlist.add(pmseedEndB);
-							}
-							}
-							else
-								plusminusendlist.add(pmseedEndB);
 							
-							System.out.println(plusorminusend);
+							
+							
+							
+							
 							
 							PlusMinusSeed pmseedEndA = new PlusMinusSeed(key, plusorminusstart);
-							if(plusminusstartlist.size() > 0) {
-		                      for(int i = 0; i < plusminusstartlist.size(); ++i) {
-								
-								if(plusminusstartlist.get(i).seedid !=key)
-									plusminusstartlist.add(pmseedEndA);
-							}
-						}
 						
-						else
-							plusminusstartlist.add(pmseedEndA);
 							
+									plusminusstartlist.add(pmseedEndA);
+							
+						
+						
+							}
 						}
 							
 							
