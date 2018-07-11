@@ -639,7 +639,7 @@ public class InteractiveRANSAC implements PlugIn {
 		minCatDist.addAdjustmentListener(new MinCatastrophyDistanceListener(this, minCatDistLabel, minCatDist));
 		Measureserial.addActionListener(new MeasureserialListener(this));
 		Compile.addActionListener(new CompileResultsListener(this));
-		AutoCompile.addActionListener(new AutoCompileResultsListener(this, row));
+		AutoCompile.addActionListener(new AutoCompileResultsListener(this));
 		WriteLength.addActionListener(new WriteLengthListener(this));
 		WriteStats.addActionListener(new WriteStatsListener(this));
 		WriteAgain.addActionListener(new WriteRatesListener(this));
@@ -695,13 +695,14 @@ public class InteractiveRANSAC implements PlugIn {
 			}
 			else {
 				IJ.log("Warning:  Loading an empty file");
-
+/*
 				table.getModel().setValueAt(new DecimalFormat("#.###").format(0), row, 1);
 				table.getModel().setValueAt(new DecimalFormat("#.###").format(0), row, 2);
 				table.getModel().setValueAt(new DecimalFormat("#").format(0), row, 3);
 				table.getModel().setValueAt(new DecimalFormat("#").format(0), row, 4);
 				table.getModel().setValueAt(new DecimalFormat("#.###").format(0), row, 5);
 				table.getModel().setValueAt(new DecimalFormat("#.###").format(0), row, 6);	
+				*/
 				dataset.removeAllSeries();
 				Tracking.setColor(chart, 0, new Color(64, 64, 64));
 				Tracking.setStroke(chart, 0, 0.2f);
@@ -1111,7 +1112,7 @@ public class InteractiveRANSAC implements PlugIn {
 			wrongfileindex = new ValuePair<Boolean, Integer>(wrongfile, row);
 			wrongfileindexlist.put(row, wrongfile);
 		}
-
+System.out.println(averagegrowth);
 		table.getModel().setValueAt(new DecimalFormat("#.###").format(averagegrowth), row, 1);
 		table.getModel().setValueAt(new DecimalFormat("#.###").format(averageshrink), row, 2);
 		table.getModel().setValueAt(new DecimalFormat("#").format(count), row, 3);
