@@ -56,12 +56,10 @@ import net.imglib2.util.ValuePair;
 public class AutoCompileResultsListener implements ActionListener {
 
 	final InteractiveRANSAC parent;
-	final int index;
 	
 
-	public AutoCompileResultsListener(final InteractiveRANSAC parent, final int index) {
+	public AutoCompileResultsListener(final InteractiveRANSAC parent) {
 		this.parent = parent;
-		this.index = index;
 	}
 
 	@Override
@@ -73,7 +71,7 @@ public class AutoCompileResultsListener implements ActionListener {
 		// set up executor service
 		final ExecutorService taskexecutor = Executors.newFixedThreadPool(nThreads);
 		 List<Callable<Object>> tasks = new ArrayList<Callable<Object>>();
-		for (int trackindex = index; trackindex < parent.inputfiles.length; ++trackindex){
+		for (int trackindex = 0; trackindex < parent.inputfiles.length; ++trackindex){
 			
 			tasks.add(Executors.callable(new Split(parent, trackindex)));
 			
@@ -108,7 +106,7 @@ public class AutoCompileResultsListener implements ActionListener {
 		
            parent.table.validate();
            parent.scrollPane.validate();
-
+           
 	}
 
 	
