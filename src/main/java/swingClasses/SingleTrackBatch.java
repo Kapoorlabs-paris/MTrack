@@ -204,8 +204,7 @@ public  class SingleTrackBatch {
 			ResultsTable rtAll = new ResultsTable();
 			int MaxSeedLabel, MinSeedLabel;
 			
-			double growratestart = 0;
-			double growrateend = 0;
+		
 			
 			if (parent.Allstart.get(0).size() > 0) {
 				
@@ -223,6 +222,8 @@ public  class SingleTrackBatch {
 
 					double startlengthreal = 0;
 					double startlengthpixel = 0;
+					double growratestart = 0;
+					double growrateend = 0;
 					for (int index = 0; index < parent.Allstart.size(); ++index) {
 
 						final ArrayList<Trackproperties> thirdDimension = parent.Allstart.get(index);
@@ -307,6 +308,8 @@ public  class SingleTrackBatch {
 						for (int currentseed = MinSeedLabel; currentseed < MaxSeedLabel + 1; ++currentseed) {
 						double endlengthreal = 0;
 						double endlengthpixel = 0;
+						double growratestart = 0;
+						double growrateend = 0;
 						for (int index = 0; index < parent.Allend.size(); ++index) {
 
 							final ArrayList<Trackproperties> thirdDimension = parent.Allend.get(index);
