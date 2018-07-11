@@ -703,7 +703,6 @@ public class InteractiveRANSAC implements PlugIn {
 				table.getModel().setValueAt(new DecimalFormat("#.###").format(0), row, 5);
 				table.getModel().setValueAt(new DecimalFormat("#.###").format(0), row, 6);	
 				dataset.removeAllSeries();
-				updateRANSAC();
 				Tracking.setColor(chart, 0, new Color(64, 64, 64));
 				Tracking.setStroke(chart, 0, 0.2f);
 				
@@ -1425,6 +1424,5 @@ public class InteractiveRANSAC implements PlugIn {
 
 		frame.getContentPane().add(panel, "Center");
 		frame.setSize(panel.getPreferredSize());
-
 	}
 }
