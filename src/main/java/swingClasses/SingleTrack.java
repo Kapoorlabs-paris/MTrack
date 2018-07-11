@@ -266,8 +266,7 @@ public  class SingleTrack {
 			ResultsTable rtAll = new ResultsTable();
 			int MaxSeedLabel, MinSeedLabel;
 			
-			double growratestart = 0;
-			double growrateend = 0;
+		
 			
 			if (parent.Allstart.get(0).size() > 0) {
 				
@@ -285,6 +284,8 @@ public  class SingleTrack {
 
 					double startlengthreal = 0;
 					double startlengthpixel = 0;
+					double growratestart = 0;
+					double growrateend = 0;
 					for (int index = 0; index < parent.Allstart.size(); ++index) {
 
 						final ArrayList<Trackproperties> thirdDimension = parent.Allstart.get(index);
@@ -293,6 +294,7 @@ public  class SingleTrack {
 
 							final Integer seedID = thirdDimension.get(frameindex).seedlabel;
 							final int framenumber = thirdDimension.get(frameindex).Framenumber;
+						
 							if (seedID == currentseed) {
 								final Integer[] FrameID = { framenumber, seedID };
 								final double[] originalpoint = thirdDimension.get(frameindex).originalpoint;
@@ -394,6 +396,8 @@ public  class SingleTrack {
 						for (int currentseed = MinSeedLabel; currentseed < MaxSeedLabel + 1; ++currentseed) {
 						double endlengthreal = 0;
 						double endlengthpixel = 0;
+						double growratestart = 0;
+						double growrateend = 0;
 						for (int index = 0; index < parent.Allend.size(); ++index) {
 
 							final ArrayList<Trackproperties> thirdDimension = parent.Allend.get(index);
