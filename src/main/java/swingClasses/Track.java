@@ -256,8 +256,7 @@ public class Track {
 		ResultsTable rtAll = new ResultsTable();
 		int MaxSeedLabel, MinSeedLabel;
 		
-		double growratestart = 0;
-		double growrateend = 0;
+	
 		
 		if (parent.Allstart.get(0).size() > 0) {
 			
@@ -275,6 +274,8 @@ public class Track {
 
 				double startlengthreal = 0;
 				double startlengthpixel = 0;
+				double growratestart = 0;
+				double growrateend = 0;
 				for (int index = 0; index < parent.Allstart.size(); ++index) {
 
 					final ArrayList<Trackproperties> thirdDimension = parent.Allstart.get(index);
@@ -283,6 +284,8 @@ public class Track {
 
 						final Integer seedID = thirdDimension.get(frameindex).seedlabel;
 						final int framenumber = thirdDimension.get(frameindex).Framenumber;
+						
+						
 						if (seedID == currentseed) {
 							final Integer[] FrameID = { framenumber, seedID };
 							final double[] originalpoint = thirdDimension.get(frameindex).originalpoint;
@@ -384,6 +387,8 @@ public class Track {
 					for (int currentseed = MinSeedLabel; currentseed < MaxSeedLabel + 1; ++currentseed) {
 					double endlengthreal = 0;
 					double endlengthpixel = 0;
+					double growratestart = 0;
+					double growrateend = 0;
 					for (int index = 0; index < parent.Allend.size(); ++index) {
 
 						final ArrayList<Trackproperties> thirdDimension = parent.Allend.get(index);
@@ -392,6 +397,7 @@ public class Track {
 							final int framenumber = thirdDimension.get(frameindex).Framenumber;
 							final Integer seedID = thirdDimension.get(frameindex).seedlabel;
 
+							
 							if (seedID == currentseed) {
 								final Integer[] FrameID = { framenumber, seedID };
 								final double[] originalpoint = thirdDimension.get(frameindex).originalpoint;
@@ -480,8 +486,12 @@ public class Track {
 					 endrate = endseedmap.get(key);
 					if(startseedmap.containsKey(key) && startseedmap!=null)
 					startrate = startseedmap.get(key);
+					
 					String plusorminusend = (startrate > endrate) ? "Minus" : "Plus" ;
 					String plusorminusstart = (startrate > endrate) ? "Plus" : "Minus" ;
+					
+					
+					
 					if (parent.seedmap.get(key) == Whichend.start || parent.seedmap.get(key) == Whichend.end && parent.seedmap.get(key) != Whichend.both ){
 						plusorminusend = "Zeroend";
 						plusorminusstart = "Zeroend";
