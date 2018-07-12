@@ -21,6 +21,7 @@
  */
 package mt.listeners;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Frame;
@@ -40,6 +41,7 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 
@@ -96,13 +98,20 @@ public class MeasureserialListener implements ActionListener {
 			});
 			
 		
-			
-			Object[] colnames = new Object[]{"Track File", "Growth rate", "Shrink rate", 
-					"Growth events", "Shrink events", "fcat", "fres", "Error"};
+			Object[] colnames = new Object[] { "Track File", "Growth velocity", "Shrink velocity", "Growth events", "Shrink events",
+					"fcat", "fres", "Error" };
 			
 			
 			Object[][] rowvalues = new Object[parent.inputfiles.length][colnames.length];
-			
+			int size = 100;
+			parent.table.getColumnModel().getColumn(0).setPreferredWidth(size);
+			parent.table.getColumnModel().getColumn(1).setPreferredWidth(size);
+			parent.table.getColumnModel().getColumn(2).setPreferredWidth(size);
+			parent.table.getColumnModel().getColumn(3).setPreferredWidth(size);
+			parent.table.getColumnModel().getColumn(4).setPreferredWidth(size);
+			parent.table.getColumnModel().getColumn(5).setPreferredWidth(size);
+			parent.table.getColumnModel().getColumn(6).setPreferredWidth(size);
+			parent.table.getColumnModel().getColumn(7).setPreferredWidth(size);
 			 parent.PanelDirectory.remove(parent.scrollPane);
 			 parent.PanelDirectory.validate();
 			 parent.PanelDirectory.repaint();
@@ -123,11 +132,20 @@ public class MeasureserialListener implements ActionListener {
 			parent.scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 			parent.scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
 			parent.table.setFillsViewportHeight(true);
+			parent.table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+				@Override
+				public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+						boolean hasFocus, int rowA, int col) {
+
+					super.getTableCellRendererComponent(table, value, isSelected, hasFocus, rowA, col);
+
+					
+						setBackground(Color.GRAY);
+					
+					return this;
+				}
+			});
 			
-			
-			parent.table.getColumnModel().getColumn(0).setPreferredWidth(200);
-			parent.table.getColumnModel().getColumn(3).setPreferredWidth(100);
-			parent.table.getColumnModel().getColumn(4).setPreferredWidth(100);
 			//parent.table.getColumnModel().getColumn(0).setCellRenderer(new WordWrapCellRenderer());
 			parent.scrollPane.setMinimumSize(new Dimension(parent.SizeX, parent.SizeY));
 			parent.scrollPane.setPreferredSize(new Dimension(parent.SizeX, parent.SizeY));
