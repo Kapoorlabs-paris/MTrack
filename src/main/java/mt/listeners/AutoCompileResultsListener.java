@@ -84,23 +84,6 @@ public class AutoCompileResultsListener implements ActionListener {
 		}
 		
 	
-		parent.table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer(){
-		    @Override
-		    public Component getTableCellRendererComponent(JTable table,
-		            Object value, boolean isSelected, boolean hasFocus, int row, int col) {
-
-		        super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
-
-		        String status = (String)table.getModel().getValueAt(row, 7);
-		        if ("true".equals(status)) {
-		            setBackground(Color.GRAY);
-		            
-		        } else {
-		            setBackground(Color.GRAY);
-		        } 
-		        return this;
-		    }   
-		});
 				
 			
 		
