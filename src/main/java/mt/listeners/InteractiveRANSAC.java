@@ -133,7 +133,7 @@ public class InteractiveRANSAC implements PlugIn {
 	public double[] calibrations;
 	public String inputdirectory;
 	public NumberFormat nf = NumberFormat.getInstance(Locale.ENGLISH);
-	
+
 	public ArrayList<Pair<LinearFunction, ArrayList<PointFunctionMatch>>> linearlist;
 	Frame jFreeChartFrame;
 	public int functionChoice = 0; // 0 == Linear, 1 == Quadratic interpolated,
@@ -151,7 +151,7 @@ public class InteractiveRANSAC implements PlugIn {
 	public int countfile;
 	Scrollbar lambdaSB;
 	Label lambdaLabel;
-	 ArrayList< Pair< LinearFunction, ArrayList< PointFunctionMatch > > > negsegments;
+	ArrayList<Pair<LinearFunction, ArrayList<PointFunctionMatch>>> negsegments;
 	public boolean manualcat = false;
 	int framenumber = 1;
 	final XYSeriesCollection dataset;
@@ -172,7 +172,7 @@ public class InteractiveRANSAC implements PlugIn {
 	// for scrollbars
 	int maxErrorInt, lambdaInt, minSlopeInt, maxSlopeInt, minDistCatInt, restoleranceInt;
 
-	public float maxError = 3.0f;
+	public float maxError = 1.8f;
 	public final int scrollbarSize = 1000;
 	public float minSlope = 1;
 	public float maxSlope = 100;
@@ -218,7 +218,6 @@ public class InteractiveRANSAC implements PlugIn {
 		this.points = Tracking.toPoints(mts);
 		this.inputfile = file;
 		this.inputdirectory = file.getParent();
-		this.maxError = maxError;
 		this.minSlope = minSlope;
 		this.maxSlope = maxSlope;
 		this.maxDist = Math.min(maxDist, numTimepoints);
@@ -227,7 +226,6 @@ public class InteractiveRANSAC implements PlugIn {
 		if (this.minSlope >= this.maxSlope)
 			this.minSlope = this.maxSlope - 0.1f;
 
-	
 		this.dataset = new XYSeriesCollection();
 		this.chart = Tracking.makeChart(dataset, "Microtubule Length Plot", "Timepoint", "MT Length");
 		// this.svgchart = new SVGGraphics2D(500, 500);
@@ -251,7 +249,6 @@ public class InteractiveRANSAC implements PlugIn {
 			this.inputfiles = file;
 			this.inputdirectory = file[0].getParent();
 		}
-		this.maxError = maxError;
 		this.minSlope = minSlope;
 		this.maxSlope = maxSlope;
 		this.maxDist = Math.min(maxDist, numTimepoints);
@@ -260,7 +257,6 @@ public class InteractiveRANSAC implements PlugIn {
 		if (this.minSlope >= this.maxSlope)
 			this.minSlope = this.maxSlope - 0.1f;
 
-	
 		this.dataset = new XYSeriesCollection();
 		this.chart = Tracking.makeChart(dataset, "Microtubule Length Plot", "Timepoint", "MT Length");
 		// this.svgchart = new SVGGraphics2D(500, 500);
@@ -275,7 +271,6 @@ public class InteractiveRANSAC implements PlugIn {
 		allrates = new ArrayList<Rateobject>();
 		averagerates = new ArrayList<Averagerate>();
 		wrongfileindexlist = new HashMap<Integer, Boolean>();
-
 		Compilepositiverates = new HashMap<Integer, ArrayList<Rateobject>>();
 		Compilenegativerates = new HashMap<Integer, ArrayList<Rateobject>>();
 		Compileaverage = new HashMap<Integer, Averagerate>();
@@ -334,15 +329,13 @@ public class InteractiveRANSAC implements PlugIn {
 
 	public int SizeX = 500;
 	public int SizeY = 400;
-	public JScrollBar maxErrorSB = new JScrollBar(Scrollbar.HORIZONTAL, (int)this.maxError, 10, 0, 10 + scrollbarSize);
-	public JScrollBar minInliersSB = new JScrollBar(Scrollbar.HORIZONTAL, (int)this.minInliers, 10, 0, 10 + scrollbarSize);
-	public JScrollBar maxDistSB = new JScrollBar(Scrollbar.HORIZONTAL, (int)this.maxDist, 10, 0, 10 + scrollbarSize);
-	public JScrollBar minSlopeSB = new JScrollBar(Scrollbar.HORIZONTAL, (int)this.minSlope, 10, 0, 10 + scrollbarSize);
-	public JScrollBar maxSlopeSB = new JScrollBar(Scrollbar.HORIZONTAL, (int)this.maxSlope, 10, 0, 10 + scrollbarSize);
+	public JScrollBar maxErrorSB = new JScrollBar(Scrollbar.HORIZONTAL, (int) this.maxError, 10, 0, 10 + scrollbarSize);
+	public JScrollBar minInliersSB = new JScrollBar(Scrollbar.HORIZONTAL, (int) this.minInliers, 10, 0,
+			10 + scrollbarSize);
+	public JScrollBar maxDistSB = new JScrollBar(Scrollbar.HORIZONTAL, (int) this.maxDist, 10, 0, 10 + scrollbarSize);
+	public JScrollBar minSlopeSB = new JScrollBar(Scrollbar.HORIZONTAL, (int) this.minSlope, 10, 0, 10 + scrollbarSize);
+	public JScrollBar maxSlopeSB = new JScrollBar(Scrollbar.HORIZONTAL, (int) this.maxSlope, 10, 0, 10 + scrollbarSize);
 
-	
-	
-	
 	public Label maxErrorLabel = new Label(
 			"Maximum Error (px) = " + new DecimalFormat("#.##").format(this.maxError) + "      ", Label.CENTER);
 	public Label minInliersLabel = new Label(
@@ -370,36 +363,28 @@ public class InteractiveRANSAC implements PlugIn {
 				utility.Slicer.computeScrollbarPositionFromValue(minInliers, MIN_Inlier, MAX_Inlier, scrollbarSize));
 		maxErrorSB.setValue(
 				utility.Slicer.computeScrollbarPositionFromValue(maxError, MIN_ERROR, MAX_ERROR, scrollbarSize));
-		
-	
+
 		minSlopeSB.setValue(utility.Slicer.computeScrollbarPositionFromValue((float) minSlope, (float) MIN_ABS_SLOPE,
 				(float) MAX_ABS_SLOPE, scrollbarSize));
-		
-		lambdaLabel = new Label("Linearity (fraction) = " + new DecimalFormat("#.##").format(lambda),
-				Label.CENTER);
-		maxErrorLabel = new Label(
-				"Maximum Error (px) = " + new DecimalFormat("#.##").format(maxError) + "      ", Label.CENTER);
-		minInliersLabel = new Label(
-				"Minimum No. of timepoints (tp) = " + new DecimalFormat("#.##").format(minInliers), Label.CENTER);
-		maxDistLabel = new Label("Maximum Gap (tp) = " + new DecimalFormat("#.##").format(maxDist),
-				Label.CENTER);
 
-	
-		
-		
-		
-		
-		minSlopeLabel = new Label(
-				"Min. Segment Slope (px/tp) = " + new DecimalFormat("#.##").format(minSlope), Label.CENTER);
-		maxSlopeLabel = new Label(
-				"Max. Segment Slope (px/tp) = " + new DecimalFormat("#.##").format(maxSlope), Label.CENTER);
+		lambdaLabel = new Label("Linearity (fraction) = " + new DecimalFormat("#.##").format(lambda), Label.CENTER);
+		maxErrorLabel = new Label("Maximum Error (px) = " + new DecimalFormat("#.##").format(maxError) + "      ",
+				Label.CENTER);
+		minInliersLabel = new Label("Minimum No. of timepoints (tp) = " + new DecimalFormat("#.##").format(minInliers),
+				Label.CENTER);
+		maxDistLabel = new Label("Maximum Gap (tp) = " + new DecimalFormat("#.##").format(maxDist), Label.CENTER);
+
+		minSlopeLabel = new Label("Min. Segment Slope (px/tp) = " + new DecimalFormat("#.##").format(minSlope),
+				Label.CENTER);
+		maxSlopeLabel = new Label("Max. Segment Slope (px/tp) = " + new DecimalFormat("#.##").format(maxSlope),
+				Label.CENTER);
 		maxResLabel = new Label(
 				"MT is rescued if the start of event# i + 1 > start of event# i by px =  " + this.restolerance,
 				Label.CENTER);
-		
+
 		CardLayout cl = new CardLayout();
-		Object[] colnames = new Object[] { "Track File", "Growth velocity", "Shrink velocity", "Growth events", "Shrink events",
-				"fcat", "fres", "Error" };
+		Object[] colnames = new Object[] { "Track File", "Growth velocity", "Shrink velocity", "Growth events",
+				"Shrink events", "fcat", "fres", "Error" };
 
 		Object[][] rowvalues = new Object[0][colnames.length];
 
@@ -416,7 +401,7 @@ public class InteractiveRANSAC implements PlugIn {
 		table.setFillsViewportHeight(true);
 
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-	
+
 		table.isOpaque();
 		int size = 100;
 		table.getColumnModel().getColumn(0).setPreferredWidth(size);
@@ -438,7 +423,7 @@ public class InteractiveRANSAC implements PlugIn {
 
 		maxSlopeField = new TextField(5);
 		maxSlopeField.setText(Float.toString(maxSlope));
-		
+
 		minSlopeField = new TextField(5);
 		minSlopeField.setText(Float.toString(minSlope));
 
@@ -452,7 +437,7 @@ public class InteractiveRANSAC implements PlugIn {
 		maxGapField.setSize(new Dimension(SizeX, 20));
 		minSlopeField.setSize(new Dimension(SizeX, 20));
 		maxSlopeField.setSize(new Dimension(SizeX, 20));
-		
+
 		scrollPane = new JScrollPane(table);
 		scrollPane.setMinimumSize(new Dimension(300, 200));
 		scrollPane.setPreferredSize(new Dimension(300, 200));
@@ -506,11 +491,11 @@ public class InteractiveRANSAC implements PlugIn {
 		final Button batch = new Button("Save Parameters for Batch run");
 		final Button cancel = new Button("Cancel");
 		final Button Compile = new Button("Compute rates and freq. till current file");
-		final Button AutoCompile = new Button("Compute average rates and frequencies");
+		final Button AutoCompile = new Button("Auto Compute Velocity and Frequencies");
 		final Button Measureserial = new Button("Select directory of MTrack generated files");
 		final Button WriteLength = new Button("Compute length distribution at framenumber : ");
 		final Button WriteStats = new Button("Compute lifetime and mean length distribution");
-		final Button WriteAgain = new Button("Save Rates and Frequencies to File");
+		final Button WriteAgain = new Button("Save Velocity and Frequencies to File");
 
 		PanelDirectory.add(Measureserial, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST,
 				GridBagConstraints.HORIZONTAL, insets, 0, 0));
@@ -539,7 +524,6 @@ public class InteractiveRANSAC implements PlugIn {
 
 		PanelParameteroptions.add(combomaxdist.BuildDisplay(), new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0,
 				GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, insets, 0, 0));
-
 
 		PanelParameteroptions.add(ChooseMethod, new GridBagConstraints(0, 4, 3, 1, 0.0, 0.0, GridBagConstraints.EAST,
 				GridBagConstraints.HORIZONTAL, insets, 0, 0));
@@ -600,12 +584,9 @@ public class InteractiveRANSAC implements PlugIn {
 				GridBagConstraints.HORIZONTAL, insets, 0, 0));
 
 		if (inputfiles != null) {
-		
+
 			table.addMouseListener(new MouseAdapter() {
-				
-			
-				
-				
+
 				public void mouseClicked(MouseEvent e) {
 					if (e.getClickCount() >= 1) {
 
@@ -663,7 +644,7 @@ public class InteractiveRANSAC implements PlugIn {
 
 		panelFirst.setVisible(true);
 		functionChoice = 0;
-	  
+
 		cl.show(panelCont, "1");
 
 		Cardframe.add(panelCont, BorderLayout.CENTER);
@@ -685,32 +666,31 @@ public class InteractiveRANSAC implements PlugIn {
 		this.inputfile = this.inputfiles[trackindex];
 		this.inputdirectory = this.inputfiles[trackindex].getParent();
 		this.mts = Tracking.loadMT(this.inputfiles[trackindex]);
-		if (mts != null ) {
-			if(mts.size() > 5) {
-			this.points = Tracking.toPoints(mts);
-			this.calibrations = Tracking.loadCalibration(this.inputfiles[trackindex]);
+		if (mts != null) {
+			if (mts.size() > 5) {
+				this.points = Tracking.toPoints(mts);
+				this.calibrations = Tracking.loadCalibration(this.inputfiles[trackindex]);
 
-			linearlist = new ArrayList<Pair<LinearFunction, ArrayList<PointFunctionMatch>>>();
-			dataset.removeAllSeries();
-			this.dataset.addSeries(Tracking.drawPoints(mts, calibrations));
-			Tracking.setColor(chart, 0, new Color(64, 64, 64));
-			Tracking.setStroke(chart, 0, 0.2f);
-			row = trackindex;
-			setFunction();
-			updateRANSAC();
-			compile.compileresults();
-			}
-			else {
+				linearlist = new ArrayList<Pair<LinearFunction, ArrayList<PointFunctionMatch>>>();
+				dataset.removeAllSeries();
+				this.dataset.addSeries(Tracking.drawPoints(mts, calibrations));
+				Tracking.setColor(chart, 0, new Color(64, 64, 64));
+				Tracking.setStroke(chart, 0, 0.2f);
+				row = trackindex;
+				setFunction();
+				updateRANSAC();
+				compile.compileresults();
+			} else {
 				IJ.log("Warning:  Loading an empty file");
-				
+
 				chart.setTitle("Bad File: No Donut for you");
 				dataset.removeAllSeries();
 				Tracking.setColor(chart, 0, new Color(64, 64, 64));
 				Tracking.setStroke(chart, 0, 0.2f);
-				
+
 			}
 		}
-		
+
 	}
 
 	public void setFunction() {
@@ -753,9 +733,7 @@ public class InteractiveRANSAC implements PlugIn {
 	int catindex = 0;
 
 	public void updateRANSAC() {
-	
-		
-		
+
 		negcount = 0;
 		negtimediff = 0;
 		averageshrink = 0;
@@ -765,15 +743,15 @@ public class InteractiveRANSAC implements PlugIn {
 		ArrayList<Averagerate> averagerates = new ArrayList<Averagerate>();
 
 		++updateCount;
-		
-	dataset.removeAllSeries();
-	this.dataset.addSeries(Tracking.drawPoints(mts, calibrations));
 
-	ArrayList<Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>>> segments =
-				Tracking.findAllFunctions( points, function, maxError, minInliers, maxDist );
+		dataset.removeAllSeries();
+		this.dataset.addSeries(Tracking.drawPoints(mts, calibrations));
 
-		if ( segments == null || segments.size() == 0 )
-		{
+		@SuppressWarnings("unchecked")
+		ArrayList<Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>>> segments = Tracking.findAllFunctions(points,
+				function, maxError, minInliers, maxDist);
+
+		if (segments == null || segments.size() == 0) {
 			--updateCount;
 			return;
 		}
@@ -784,8 +762,8 @@ public class InteractiveRANSAC implements PlugIn {
 
 		final LinearFunction linear = new LinearFunction();
 		int linearcount = 1;
-		i =1;
-		segment= 1;
+		i = 1;
+		segment = 1;
 		int count = 0;
 
 		int rescount = 0;
@@ -843,7 +821,7 @@ public class InteractiveRANSAC implements PlugIn {
 					Tracking.setColor(chart, i, new Color(0, 128, 0));
 					Tracking.setDisplayType(chart, i, true, false);
 					Tracking.setStroke(chart, i, 2f);
-					chart.setTitle("Length plot for" + " " +  this.inputfiles[row].getName());
+					chart.setTitle("Length plot for" + " " + this.inputfiles[row].getName());
 				}
 
 				++i;
@@ -894,7 +872,7 @@ public class InteractiveRANSAC implements PlugIn {
 					starttimerates.add(startrate);
 				}
 				if (linearrate < 0) {
-					
+
 					negcount++;
 					negtimediff += endX - startX;
 
@@ -906,12 +884,9 @@ public class InteractiveRANSAC implements PlugIn {
 					rt.addValue("End time", endX * calibrations[2]);
 					rt.addValue("Growth velocity", linearrate * calibrations[0] / calibrations[2]);
 
-					Pair<Float, Float> startrate = new ValuePair<Float, Float>((float) startX,
-							(float) linearrate);
+					Pair<Float, Float> startrate = new ValuePair<Float, Float>((float) startX, (float) linearrate);
 
 					starttimerates.add(startrate);
-
-				
 
 				}
 				if (linearrate > 0) {
@@ -940,8 +915,7 @@ public class InteractiveRANSAC implements PlugIn {
 			if (segments.size() < 2) {
 
 				System.out.println("Only two points found");
-				
-					
+
 			} else {
 				for (int catastrophy = 0; catastrophy < segments.size() - 1; ++catastrophy) {
 					final Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>> start = segments.get(catastrophy);
@@ -965,12 +939,10 @@ public class InteractiveRANSAC implements PlugIn {
 							final Pair<LinearFunction, ArrayList<PointFunctionMatch>> fit = Tracking
 									.findFunction(catastropyPoints, new LinearFunction(), 0.75, 3, 1.1);
 
-							
 							if (fit != null) {
 								if (fit.getA().getM() < 0) {
 									sort(fit);
 									negsegments.add(fit);
-									System.out.println(negsegments.size() + "Size of neg");
 									double minY = Math.min(fit.getB().get(0).getP1().getL()[1],
 											fit.getB().get(fit.getB().size() - 1).getP1().getL()[1]);
 									double maxY = Math.max(fit.getB().get(0).getP1().getL()[1],
@@ -1003,13 +975,13 @@ public class InteractiveRANSAC implements PlugIn {
 
 										starttimerates.add(startrate);
 
-										Rateobject velocity = new Rateobject(linearrate * calibrations[0] / calibrations[2],
+										Rateobject velocity = new Rateobject(
+												linearrate * calibrations[0] / calibrations[2],
 												(int) (startX * calibrations[2]), (int) (endX * calibrations[2]));
 										allrates.add(velocity);
 										Tracking.setColor(chart, i, new Color(0, 0, 255));
 										Tracking.setDisplayType(chart, i, true, false);
 										Tracking.setStroke(chart, i, 2f);
-
 
 										++i;
 										dataset.addSeries(Tracking.drawPoints(Tracking.toPairList(fit.getB()),
@@ -1023,25 +995,22 @@ public class InteractiveRANSAC implements PlugIn {
 									}
 								}
 							}
-							
-							
+
 						}
-								
-						 else {
+
+						else {
 							System.out.println("Catastrophy height not sufficient " + Math.abs(lStart - lEnd) + " < "
 									+ this.minDistanceCatastrophe);
-							
 
 						}
 					}
-				
 
 				}
 
 			}
 		}
 
-		if (this.detectmanualCatastrophe ) {
+		if (this.detectmanualCatastrophe) {
 
 			catindex++;
 			catstarttimerates = ManualCat(segments, allrates, shrinkrate, rt);
@@ -1131,7 +1100,7 @@ public class InteractiveRANSAC implements PlugIn {
 			}
 		});
 		table.validate();
-		
+
 		scrollPane.validate();
 
 		Averagerate avrate = new Averagerate(averagegrowth, averageshrink, catfrequ, resfrequ, count, negcount,
@@ -1151,87 +1120,85 @@ public class InteractiveRANSAC implements PlugIn {
 
 		List<Pair<Float, Float>> catstarttimerates = new ArrayList<Pair<Float, Float>>();
 
-		boolean alreadyfitted = false;
-		sort(segments);
-		for (int catastrophy = 0; catastrophy < segments.size() - 1; ++catastrophy) {
+		
 
+		for (int catastrophy = 0; catastrophy < segments.size() - 1; ++catastrophy) {
+			boolean alreadyfitted = false;
 			final Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>> start = segments.get(catastrophy);
 			final Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>> end = segments.get(catastrophy + 1);
 
+				
+				
 			double tStart = start.getB().get(start.getB().size() - 1).getP1().getL()[0];
 			double tEnd = end.getB().get(0).getP1().getL()[0];
 
-		
 			final double lStart = start.getB().get(start.getB().size() - 1).getP1().getL()[1];
 			final double lEnd = end.getB().get(0).getP1().getL()[1];
-			
-System.out.println(negsegments.size()+ " size here");
-			if(negsegments!=null) {
-		for(int i = 0; i < negsegments.size(); ++i) {
-			double tStartold = negsegments.get(i).getB().get(negsegments.get(i).getB().size() - 1).getP1().getL()[0];
-			double tEndold =  negsegments.get(i).getB().get(0).getP1().getL()[0];
-			System.out.println(tStartold + " " + tStart + " " + tEndold + " " + tEnd);
-			if(Math.abs(tStartold - tStart) < 5 || Math.abs(tEnd - tEndold) < 5) {
-				
-				
-				alreadyfitted = true;
-				
-				break;
-			}
-		}
-			}
-				
-			if(tEnd > tStart && !alreadyfitted) {
-			
-			if (Math.abs(lStart - lEnd) >= this.minDistanceCatastrophe) {
 
-				final double slope = (lEnd - lStart) / (tEnd - tStart);
-				final double intercept = lEnd - slope * tEnd;
+			if (negsegments != null) {
+				for (int i = 0; i < negsegments.size(); ++i) {
+					double tStartold = negsegments.get(i).getB().get(negsegments.get(i).getB().size() - 1).getP1()
+							.getL()[0];
+					double tEndold = negsegments.get(i).getB().get(0).getP1().getL()[0];
+					if (Math.abs(tStartold - tStart) < 5 || Math.abs(tEnd - tEndold) < 5) {
 
-				LinearFunction linearfunc = new LinearFunction(slope, intercept);
+						alreadyfitted = true;
 
-				double startX = tStart;
-				double endX = tEnd;
-
-				double linearrate = linearfunc.getCoefficient(1);
-
-				if (linearrate < 0) {
-
-					System.out.println("Overriding Ransac, Detecting without fiting a function");
-
-					negcount++;
-					negtimediff += endX - startX;
-
-					shrinkrate = linearrate;
-					averageshrink += linearrate;
-
-					rt.incrementCounter();
-					rt.addValue("Start time", startX * calibrations[2]);
-					rt.addValue("End time", endX * calibrations[2]);
-					rt.addValue("Growth velocity", linearrate * calibrations[0] / calibrations[2]);
-					Pair<Float, Float> startrate = new ValuePair<Float, Float>((float) startX, (float) linearrate);
-
-					catstarttimerates.add(startrate);
-
-					ArrayList<PointFunctionMatch> p = new ArrayList<PointFunctionMatch>();
-
-					p.add(new PointFunctionMatch(new Point(new double[] { tStart, lStart })));
-					p.add(new PointFunctionMatch(new Point(new double[] { tEnd, lEnd })));
-
-					Rateobject velocity = new Rateobject(linearrate * calibrations[0] / calibrations[2],
-							(int) (startX * calibrations[2]), (int) (endX * calibrations[2]));
-					allrates.add(velocity);
-
-					dataset.addSeries(Tracking.drawPoints(Tracking.toPairList(p), calibrations,
-							"CManual" + catindex + catastrophy));
-
-					Tracking.setColor(chart, i, new Color(255, 192, 255));
-					Tracking.setDisplayType(chart, i, true, false);
-					Tracking.setStroke(chart, i, 2f);
-					++i;
-					chart.setTitle("Length plot for" + " " + this.inputfiles[row].getName());
+						break;
+					}
 				}
 			}
+
+			if (tEnd > tStart && !alreadyfitted) {
+				if (Math.abs(lStart - lEnd) >= this.minDistanceCatastrophe) {
+
+					final double slope = (lEnd - lStart) / (tEnd - tStart);
+					final double intercept = lEnd - slope * tEnd;
+
+					LinearFunction linearfunc = new LinearFunction(slope, intercept);
+
+					double startX = tStart;
+					double endX = tEnd;
+
+					double linearrate = linearfunc.getCoefficient(1);
+
+					if (linearrate < 0) {
+
+						System.out.println("Overriding Ransac, Detecting without fiting a function");
+
+						negcount++;
+						negtimediff += endX - startX;
+
+						shrinkrate = linearrate;
+						averageshrink += linearrate;
+
+						rt.incrementCounter();
+						rt.addValue("Start time", startX * calibrations[2]);
+						rt.addValue("End time", endX * calibrations[2]);
+						rt.addValue("Growth velocity", linearrate * calibrations[0] / calibrations[2]);
+						Pair<Float, Float> startrate = new ValuePair<Float, Float>((float) startX, (float) linearrate);
+
+						catstarttimerates.add(startrate);
+
+						ArrayList<PointFunctionMatch> p = new ArrayList<PointFunctionMatch>();
+
+						p.add(new PointFunctionMatch(new Point(new double[] { tStart, lStart })));
+						p.add(new PointFunctionMatch(new Point(new double[] { tEnd, lEnd })));
+
+						Rateobject velocity = new Rateobject(linearrate * calibrations[0] / calibrations[2],
+								(int) (startX * calibrations[2]), (int) (endX * calibrations[2]));
+						allrates.add(velocity);
+
+						dataset.addSeries(Tracking.drawPoints(Tracking.toPairList(p), calibrations,
+								"CManual" + catindex + catastrophy));
+
+						Tracking.setColor(chart, i, new Color(255, 192, 255));
+						Tracking.setDisplayType(chart, i, true, false);
+						Tracking.setStroke(chart, i, 2f);
+						++i;
+						chart.setTitle("Length plot for" + " " + this.inputfiles[row].getName());
+					}
+				}
 			}
 		}
 		return catstarttimerates;
