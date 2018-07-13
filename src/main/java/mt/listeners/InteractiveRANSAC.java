@@ -172,7 +172,7 @@ public class InteractiveRANSAC implements PlugIn {
 	// for scrollbars
 	int maxErrorInt, lambdaInt, minSlopeInt, maxSlopeInt, minDistCatInt, restoleranceInt;
 
-	public float maxError = 3.0f;
+	public float maxError = 1.8f;
 	public final int scrollbarSize = 1000;
 	public float minSlope = 1;
 	public float maxSlope = 100;
@@ -218,7 +218,6 @@ public class InteractiveRANSAC implements PlugIn {
 		this.points = Tracking.toPoints(mts);
 		this.inputfile = file;
 		this.inputdirectory = file.getParent();
-		this.maxError = maxError;
 		this.minSlope = minSlope;
 		this.maxSlope = maxSlope;
 		this.maxDist = Math.min(maxDist, numTimepoints);
@@ -250,7 +249,6 @@ public class InteractiveRANSAC implements PlugIn {
 			this.inputfiles = file;
 			this.inputdirectory = file[0].getParent();
 		}
-		this.maxError = maxError;
 		this.minSlope = minSlope;
 		this.maxSlope = maxSlope;
 		this.maxDist = Math.min(maxDist, numTimepoints);
@@ -273,7 +271,6 @@ public class InteractiveRANSAC implements PlugIn {
 		allrates = new ArrayList<Rateobject>();
 		averagerates = new ArrayList<Averagerate>();
 		wrongfileindexlist = new HashMap<Integer, Boolean>();
-
 		Compilepositiverates = new HashMap<Integer, ArrayList<Rateobject>>();
 		Compilenegativerates = new HashMap<Integer, ArrayList<Rateobject>>();
 		Compileaverage = new HashMap<Integer, Averagerate>();
@@ -1130,6 +1127,8 @@ public class InteractiveRANSAC implements PlugIn {
 			final Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>> start = segments.get(catastrophy);
 			final Pair<AbstractFunction2D, ArrayList<PointFunctionMatch>> end = segments.get(catastrophy + 1);
 
+				
+				
 			double tStart = start.getB().get(start.getB().size() - 1).getP1().getL()[0];
 			double tEnd = end.getB().get(0).getP1().getL()[0];
 
