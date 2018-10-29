@@ -128,7 +128,6 @@ public class DisplayGraph {
 				
 			}
 			imp.updateAndDraw();
-			System.out.println( arg0.getCurrentSlice() );
 		}		
 	}
 	
