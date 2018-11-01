@@ -177,7 +177,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public JLabel inputradisec;
 	public TextField inputFieldradisec;
 	// steps per octave
-	public static int standardSensitivity = 4;
+	public static int standardSensitivity = 4; 
 	public int sensitivity = standardSensitivity;
 	public float deltaMin = 0;
 	public float thetaPerPixelMin = new Float(0.2);

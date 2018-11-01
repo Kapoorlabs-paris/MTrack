@@ -246,7 +246,8 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 
 					labelindexend = labelend.get(0);
 
-				if (labelindex != Integer.MIN_VALUE || labelindexend!= Integer.MIN_VALUE) {
+				System.out.println(labelindex + " "+ labelindexend);
+				if (labelindex != Integer.MIN_VALUE && labelindexend!= Integer.MIN_VALUE) {
 					paramnextframe = Getfinaltrackparam(PrevFrameparamstart.get(index), labelstart.get(0), psf,
 							framenumber);
 

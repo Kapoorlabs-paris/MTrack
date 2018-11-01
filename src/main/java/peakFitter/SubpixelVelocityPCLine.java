@@ -278,7 +278,6 @@ public void setMaxdisp (double maxdisp) {
 				fixedstartpoint.setPosition(new long[] { (long) PrevFrameparamstart.get(index).fixedpos[0],
 						(long) PrevFrameparamstart.get(index).fixedpos[1] });
 
-				System.out.println(fixedstartpoint);
 				
 				ArrayList<Integer> labelstart = FitterUtils.Getlabel(imgs, fixedstartpoint, originalslope,
 						originalintercept);

@@ -497,8 +497,8 @@ public class PackMT {
 		final FinalInterval range = new FinalInterval(512, 512);
 		final double[] sigma = { 2, 2 };
 
-		int SNR = 10;
-		int numlines = 15;
+		int SNR = 5;
+		int numlines = 50;
 		int numsims = 100;
 		//3893
 		int min = 1000;
@@ -528,7 +528,7 @@ public class PackMT {
 			
 			try {
 				File filedist = new File(
-						"/Users/aimachine/Documents/MTrack+Mser/New/Density15/All_SeedsSNR10DIST" + numlines + "Run" + i + ".txt");
+						"/Users/aimachine/Documents/MTrack+Mser/SNR5/Density50/All_SeedsSNR5DIST" + numlines + "Run" + i + ".txt");
 
 				FileWriter fwdist = new FileWriter(filedist);
 				BufferedWriter bwdist = new BufferedWriter(fwdist);
@@ -544,7 +544,7 @@ public class PackMT {
 
 			try {
 				File file = new File(
-						"/Users/aimachine/Documents/MTrack+Mser/New/Density15/All_SeedsSNR10Number" + numlines + "Run" + i + ".txt");
+						"/Users/aimachine/Documents/MTrack+Mser/SNR5/Density50/All_SeedsSNR5Number" + numlines + "Run" + i + ".txt");
 
 				FileWriter fw = new FileWriter(file);
 				BufferedWriter bw = new BufferedWriter(fw);
