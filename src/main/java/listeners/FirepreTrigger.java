@@ -57,6 +57,7 @@ import net.imglib2.util.Util;
 import net.imglib2.view.IntervalView;
 import net.imglib2.view.Views;
 import swingClasses.Preprocess;
+import util.SingletoDoubleConversion;
 
 public class FirepreTrigger implements ActionListener {
 
@@ -179,7 +180,7 @@ public class FirepreTrigger implements ActionListener {
 			// Open Surrey lab images
 			
 			ImageJFunctions.show(parent.originalPreprocessedimg).setTitle("Preprocessed Movie");
-
+		
 			if (parent.Simplemode)
 				new Interactive_MTSingleChannelBasic(new Interactive_MTSingleChannel(parent.originalimg, parent.originalPreprocessedimg,
 						parent.psf, parent.calibration, parent.userfile, parent.addToName)).run(null);

@@ -57,7 +57,6 @@ import ij.io.Opener;
 import interactiveMT.BatchMode;
 import interactiveMT.BatchMode.ImagePlusListener;
 import interactiveMT.Interactive_MTDoubleChannel.ValueChange;
-import interactiveMT.Interactive_MTDoubleChannel.Whichend;
 import labeledObjects.CommonOutputHF;
 import labeledObjects.Indexedlength;
 import lineFinder.FindlinesVia;
