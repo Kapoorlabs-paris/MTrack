@@ -41,7 +41,7 @@ import ij.plugin.frame.RoiManager;
 import interactiveMT.Interactive_MTSingleChannel.ValueChange;
 import labeledObjects.PlusMinusSeed;
 import interactiveMT.SingleBatchMode;
-import interactiveMT.Interactive_MTSingleChannel.Whichend;
+import interactiveMT.Interactive_MTSingleChannel.WhichendSingle;
 import lineFinder.FindlinesVia;
 import lineFinder.LinefinderInteractiveHFMSER;
 import lineFinder.LinefinderInteractiveHFMSERwHough;
@@ -392,44 +392,73 @@ public  class SingleTrackBatch {
 
 						
 
-					 Iterator itend = endseedmap.entrySet().iterator();
-						
-						while(itend.hasNext()){
-							
+					Iterator it = startseedmap.entrySet().iterator();
 
-							Map.Entry<Integer, Double> pair = (Map.Entry<Integer, Double>) itend.next();
-							
-							int key = pair.getKey();
-						
-						
-							
-							
-							String plusorminusend; 
-							String plusorminusstart; 
-							if (parent.seedmap.get(key) == Whichend.start || parent.seedmap.get(key) == Whichend.end && parent.seedmap.get(key) != Whichend.both ){
-								plusorminusend = "Zeroend";
-								plusorminusstart = "Zeroend";
-							
-							
-							PlusMinusSeed pmseedEndB = new PlusMinusSeed(key, plusorminusend);
-						
-									plusminusendlist.add(pmseedEndB);
-							
-							
-							
-							
-							
-							
-							PlusMinusSeed pmseedEndA = new PlusMinusSeed(key, plusorminusstart);
-						
-							
-									plusminusstartlist.add(pmseedEndA);
-							
-						
-						
-							}
-							
+					while (it.hasNext()) {
+
+						Map.Entry<Integer, Double> pair = (Map.Entry<Integer, Double>) it.next();
+
+						int key = pair.getKey();
+						double endrate = 0;
+						double startrate = 0;
+
+						if (endseedmap.containsKey(key) && endseedmap != null)
+							endrate = endseedmap.get(key);
+						if (startseedmap.containsKey(key) && startseedmap != null)
+							startrate = startseedmap.get(key);
+
+						String plusorminusend = (startrate > endrate) ? "Minus" : "Plus";
+						String plusorminusstart = (startrate > endrate) ? "Plus" : "Minus";
+
+						if (parent.seedmap.get(key) == WhichendSingle.start
+								|| parent.seedmap.get(key) == WhichendSingle.end && parent.seedmap.get(key) != WhichendSingle.both) {
+							plusorminusend = "Zeroend";
+							plusorminusstart = "Zeroend";
 						}
+
+						PlusMinusSeed pmseedEndB = new PlusMinusSeed(key, plusorminusend);
+						plusminusendlist.add(pmseedEndB);
+
+						PlusMinusSeed pmseedEndA = new PlusMinusSeed(key, plusorminusstart);
+						plusminusstartlist.add(pmseedEndA);
+					}
+
+					Iterator itend = endseedmap.entrySet().iterator();
+
+					while (itend.hasNext()) {
+
+						Map.Entry<Integer, Double> pair = (Map.Entry<Integer, Double>) itend.next();
+
+						int key = pair.getKey();
+						double endrate = 0;
+						double startrate = 0;
+
+						if (endseedmap.containsKey(key) && endseedmap != null)
+							endrate = endseedmap.get(key);
+						if (startseedmap.containsKey(key) && startseedmap != null)
+							startrate = startseedmap.get(key);
+
+						String plusorminusend;
+						String plusorminusstart;
+						if (parent.seedmap.get(key) == WhichendSingle.start
+								|| parent.seedmap.get(key) == WhichendSingle.end && parent.seedmap.get(key) != WhichendSingle.both) {
+							plusorminusend = "Zeroend";
+							plusorminusstart = "Zeroend";
+
+							PlusMinusSeed pmseedEndB = new PlusMinusSeed(key, plusorminusend);
+
+							plusminusendlist.add(pmseedEndB);
+
+							PlusMinusSeed pmseedEndA = new PlusMinusSeed(key, plusorminusstart);
+
+							plusminusstartlist.add(pmseedEndA);
+
+						}
+
+					}
+							
+							
+						
 							
 							
 						FileSaver.SaveResults(parent.Allend, plusminusendlist, parent.endlengthlist, parent.parent.calibration,

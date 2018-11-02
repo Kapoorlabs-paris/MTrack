@@ -45,7 +45,6 @@ import ij.IJ;
 import ij.gui.OvalRoi;
 import ij.gui.Overlay;
 import ij.gui.Roi;
-import interactiveMT.Interactive_MTDoubleChannel.Whichend;
 import labeledObjects.CommonOutputHF;
 import labeledObjects.Indexedlength;
 import lineFinder.LinefinderHF;

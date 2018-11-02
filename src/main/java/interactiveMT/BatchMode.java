@@ -56,7 +56,7 @@ import ij.plugin.PlugIn;
 import ij.process.ColorProcessor;
 import initialization.LocalPrefs;
 import interactiveMT.Interactive_MTDoubleChannel.ValueChange;
-import interactiveMT.Interactive_MTDoubleChannel.Whichend;
+import interactiveMT.Interactive_MTDoubleChannel.WhichendDouble;
 import labeledObjects.CommonOutputHF;
 import labeledObjects.Indexedlength;
 import mpicbg.imglib.multithreading.SimpleMultiThreading;
@@ -230,7 +230,7 @@ public class BatchMode implements PlugIn, Runnable {
 	public double sumlengthmicro = 0;
 
 	public Overlay overlay;
-	public HashMap<Integer, Boolean> whichend = new HashMap<Integer, Boolean>();
+	public HashMap<Integer, Boolean> WhichendDouble = new HashMap<Integer, Boolean>();
 	public HashMap<Integer, Double> pixellength = new HashMap<Integer, Double>();
 	public HashMap<Integer, Double> microlength = new HashMap<Integer, Double>();
 	public ArrayList<float[]> finalvelocity = new ArrayList<float[]>();
@@ -309,7 +309,7 @@ public class BatchMode implements PlugIn, Runnable {
 	public int detcount = 0;
 	public boolean SecondOrderSpline;
 	public boolean ThirdOrderSpline;
-	public HashMap<Integer, Whichend> seedmap = new HashMap<Integer, Whichend>();
+	public HashMap<Integer, WhichendDouble> seedmap = new HashMap<Integer, WhichendDouble>();
 
 	public boolean isFinished() {
 		return isFinished;

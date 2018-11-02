@@ -29,7 +29,7 @@ import javax.swing.JProgressBar;
 
 import LineModels.UseLineModel.UserChoiceModel;
 import graphconstructs.Trackproperties;
-import interactiveMT.Interactive_MTDoubleChannel.Whichend;
+import interactiveMT.Interactive_MTDoubleChannel.WhichendDouble;
 import labeledObjects.Indexedlength;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.type.numeric.real.FloatType;
@@ -81,7 +81,7 @@ public  class FindlinesVia {
 	LinefindingMethodHF(final RandomAccessibleInterval<FloatType> source,
 			final RandomAccessibleInterval<FloatType> Preprocessedsource,Pair<ArrayList<Indexedlength>,ArrayList<Indexedlength>> PrevFrameparam,
 			 final int framenumber, final double[] psf,  final LinefinderHF linefinder, final UserChoiceModel model,
-			final boolean DoMask, final double intensityratio, final double Inispacing, final HashMap<Integer, Whichend> Trackstart, final JProgressBar jpb,
+			final boolean DoMask, final double intensityratio, final double Inispacing, final HashMap<Integer, WhichendDouble> Trackstart, final JProgressBar jpb,
 			final int thirdDimsize, final double maxdist, final int startframe, final int numgaussians) {
 
 	

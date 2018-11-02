@@ -49,7 +49,7 @@ import ij.gui.EllipseRoi;
 import ij.gui.OvalRoi;
 import ij.gui.Overlay;
 import ij.gui.Roi;
-import interactiveMT.Interactive_MTDoubleChannel.Whichend;
+import interactiveMT.Interactive_MTDoubleChannel.WhichendDouble;
 import labeledObjects.CommonOutputHF;
 import labeledObjects.Indexedlength;
 import lineFinder.LinefinderHF;
@@ -86,7 +86,7 @@ public class SubpixelVelocityPCLine extends BenchmarkAlgorithm
 	public int Accountedframes;
 	private final double[] psf;
 	private final boolean DoMask;
-	private final HashMap<Integer, Whichend> Trackstart;
+	private final HashMap<Integer, WhichendDouble> Trackstart;
 	private boolean Maskfail = false;
 	// LM solver iteration params
 	public int maxiter = 200;
@@ -200,7 +200,7 @@ public void setMaxdisp (double maxdisp) {
 	public SubpixelVelocityPCLine(final RandomAccessibleInterval<FloatType> source, final LinefinderHF linefinder,
 			final ArrayList<Indexedlength> PrevFrameparamstart, final ArrayList<Indexedlength> PrevFrameparamend,
 			final double[] psf, final int framenumber, final UserChoiceModel model, final boolean DoMask,
-			final HashMap<Integer, Whichend> Trackstart, final JProgressBar jpb, final int thirdDimsize, final int startframe, final int numgaussians) {
+			final HashMap<Integer, WhichendDouble> Trackstart, final JProgressBar jpb, final int thirdDimsize, final int startframe, final int numgaussians) {
 
 		linefinder.checkInput();
 		linefinder.process();
@@ -257,8 +257,8 @@ public void setMaxdisp (double maxdisp) {
 		for (int index = 0; index < PrevFrameparamstart.size(); ++index) {
 
 
-			if (Trackstart.get(PrevFrameparamstart.get(index).seedLabel) == Whichend.start
-					|| Trackstart.get(PrevFrameparamstart.get(index).seedLabel) == Whichend.both) {
+			if (Trackstart.get(PrevFrameparamstart.get(index).seedLabel) == WhichendDouble.start
+					|| Trackstart.get(PrevFrameparamstart.get(index).seedLabel) == WhichendDouble.both) {
 
 				percent = (Math.round(100 * (index + 1) / (PrevFrameparamstart.size())));
 
@@ -278,7 +278,6 @@ public void setMaxdisp (double maxdisp) {
 				fixedstartpoint.setPosition(new long[] { (long) PrevFrameparamstart.get(index).fixedpos[0],
 						(long) PrevFrameparamstart.get(index).fixedpos[1] });
 
-				System.out.println(fixedstartpoint);
 				
 				ArrayList<Integer> labelstart = FitterUtils.Getlabel(imgs, fixedstartpoint, originalslope,
 						originalintercept);
@@ -401,8 +400,8 @@ public void setMaxdisp (double maxdisp) {
 
 		for (int index = 0; index < PrevFrameparamend.size(); ++index) {
 
-			if (Trackstart.get(PrevFrameparamend.get(index).seedLabel) == Whichend.end
-					|| Trackstart.get(PrevFrameparamend.get(index).seedLabel) == Whichend.both) {
+			if (Trackstart.get(PrevFrameparamend.get(index).seedLabel) == WhichendDouble.end
+					|| Trackstart.get(PrevFrameparamend.get(index).seedLabel) == WhichendDouble.both) {
 
 				percent = (Math.round(100 * (index + 1) / (PrevFrameparamend.size())));
 

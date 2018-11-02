@@ -44,7 +44,7 @@ import ij.measure.ResultsTable;
 import ij.plugin.frame.RoiManager;
 import interactiveMT.Interactive_MTDoubleChannel;
 import interactiveMT.Interactive_MTDoubleChannel.ValueChange;
-import interactiveMT.Interactive_MTDoubleChannel.Whichend;
+import interactiveMT.Interactive_MTDoubleChannel.WhichendDouble;
 import labeledObjects.Indexedlength;
 import labeledObjects.PlusMinusSeed;
 import lineFinder.FindlinesVia;
@@ -457,8 +457,8 @@ public class Track {
 			String plusorminusend = (startrate > endrate) ? "Minus" : "Plus";
 			String plusorminusstart = (startrate > endrate) ? "Plus" : "Minus";
 
-			if (parent.seedmap.get(key) == Whichend.start
-					|| parent.seedmap.get(key) == Whichend.end && parent.seedmap.get(key) != Whichend.both) {
+			if (parent.seedmap.get(key) == WhichendDouble.start
+					|| parent.seedmap.get(key) == WhichendDouble.end && parent.seedmap.get(key) != WhichendDouble.both) {
 				plusorminusend = "Zeroend";
 				plusorminusstart = "Zeroend";
 			}
@@ -487,8 +487,8 @@ public class Track {
 
 			String plusorminusend;
 			String plusorminusstart;
-			if (parent.seedmap.get(key) == Whichend.start
-					|| parent.seedmap.get(key) == Whichend.end && parent.seedmap.get(key) != Whichend.both) {
+			if (parent.seedmap.get(key) == WhichendDouble.start
+					|| parent.seedmap.get(key) == WhichendDouble.end && parent.seedmap.get(key) != WhichendDouble.both) {
 				plusorminusend = "Zeroend";
 				plusorminusstart = "Zeroend";
 
@@ -583,12 +583,18 @@ public class Track {
 
 			FileSaver.SaveUserResults(parent.AllUser, parent.userlengthlist, parent.calibration, parent.userfile,
 					parent.addToName, parent.nf);
-
+		//	FileSaverDummy.SaveUserResults(parent.AllUser, parent.userlengthlist, parent.calibration, parent.userfile,
+		//			parent.addToName, parent.nf);
 		}
 		FileSaver.SaveResults(parent.Allend, plusminusendlist, parent.endlengthlist, parent.calibration,
 				parent.userfile, parent.addToName, parent.nf);
 		FileSaver.SaveResults(parent.Allstart, plusminusstartlist, parent.startlengthlist, parent.calibration,
 				parent.userfile, parent.addToName, parent.nf);
+		
+	//	FileSaverDummy.SaveResults(parent.Allend, plusminusendlist, parent.endlengthlist, parent.calibration,
+	//			parent.userfile, parent.addToName, parent.nf);
+	//	FileSaverDummy.SaveResults(parent.Allstart, plusminusstartlist, parent.startlengthlist, parent.calibration,
+	//			parent.userfile, parent.addToName, parent.nf);
 		parent.displaystack();
 		if (parent.displayoverlay) {
 			parent.prestack.deleteLastSlice();

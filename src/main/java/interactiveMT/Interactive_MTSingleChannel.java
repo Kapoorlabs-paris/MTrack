@@ -121,6 +121,7 @@ import trackerType.MTTracker;
 import updateListeners.SingleDefaultModelHF;
 import updateListeners.SingleMarkendsnew;
 import util.Boundingboxes;
+import util.SingletoDoubleConversion;
 
 /**
  * An interactive tool for MT tracking using MSER and Hough Transform
@@ -391,7 +392,7 @@ public class Interactive_MTSingleChannel implements PlugIn {
 	int endStack;
 	public int thirdDimension;
 
-	public static enum Whichend {
+	public static enum WhichendSingle {
 
 		start, end, both, none, user;
 	}
@@ -406,7 +407,7 @@ public class Interactive_MTSingleChannel implements PlugIn {
 	public int detcount = 0;
 	public boolean SecondOrderSpline;
 	public boolean ThirdOrderSpline;
-	public HashMap<Integer, Whichend> seedmap = new HashMap<Integer, Whichend>();
+	public HashMap<Integer, WhichendSingle> seedmap = new HashMap<Integer, WhichendSingle>();
 
 	public boolean isFinished() {
 		return isFinished;
@@ -694,6 +695,9 @@ public class Interactive_MTSingleChannel implements PlugIn {
 		prestack = new ImageStack((int) originalimg.dimension(0), (int) originalimg.dimension(1),
 				java.awt.image.ColorModel.getRGBdefault());
 
+		
+		
+		
 		CurrentView = util.CopyUtils.getCurrentView(originalimg, thirdDimension, thirdDimensionSize);
 		CurrentPreprocessedView = util.CopyUtils.getCurrentPreView(originalPreprocessedimg, thirdDimension,
 				thirdDimensionSize);

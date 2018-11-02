@@ -34,7 +34,7 @@ import graphconstructs.Trackproperties;
 import ij.IJ;
 import ij.gui.OvalRoi;
 import ij.gui.Roi;
-import interactiveMT.Interactive_MTSingleChannel.Whichend;
+import interactiveMT.Interactive_MTSingleChannel.WhichendSingle;
 import labeledObjects.CommonOutputHF;
 import labeledObjects.Indexedlength;
 import lineFinder.LinefinderHF;
@@ -82,7 +82,7 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 	public double maxdist;
 	public boolean halfgaussian = false;
 	public double Intensityratio;
-	private final HashMap<Integer, Whichend> Trackstart;
+	private final HashMap<Integer, WhichendSingle> Trackstart;
 	public double Inispacing;
 	final int thirdDimsize;
 	final int startframe;
@@ -159,7 +159,7 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 	public SubpixelVelocityCline(final RandomAccessibleInterval<FloatType> source, final LinefinderHF finder,
 			final ArrayList<Indexedlength> PrevFrameparamstart, final ArrayList<Indexedlength> PrevFrameparamend,
 			final double[] psf, final int framenumber, final UserChoiceModel model, final boolean DoMask,
-			final HashMap<Integer, Whichend> Trackstart, final JProgressBar jpb, final int startframe,
+			final HashMap<Integer, WhichendSingle> Trackstart, final JProgressBar jpb, final int startframe,
 			final int thirdDimsize, final int numgaussians) {
 		finder.checkInput();
 		finder.process();
@@ -202,7 +202,7 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 
 		for (int index = 0; index < PrevFrameparamstart.size(); ++index) {
 
-			if (Trackstart.get(PrevFrameparamstart.get(index).seedLabel) == Whichend.both) {
+			if (Trackstart.get(PrevFrameparamstart.get(index).seedLabel) == WhichendSingle.both) {
 				percent = (Math.round(100 * (index + 1) / (PrevFrameparamstart.size())));
 
 				final double originalslope = PrevFrameparamstart.get(index).originalslope;
@@ -246,7 +246,7 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 
 					labelindexend = labelend.get(0);
 
-				if (labelindex != Integer.MIN_VALUE || labelindexend!= Integer.MIN_VALUE) {
+				if (labelindex != Integer.MIN_VALUE && labelindexend!= Integer.MIN_VALUE) {
 					paramnextframe = Getfinaltrackparam(PrevFrameparamstart.get(index), labelstart.get(0), psf,
 							framenumber);
 
@@ -438,7 +438,7 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 
 		for (int index = 0; index < PrevFrameparamstart.size(); ++index) {
 
-			if (Trackstart.get(PrevFrameparamstart.get(index).seedLabel) == Whichend.start) {
+			if (Trackstart.get(PrevFrameparamstart.get(index).seedLabel) == WhichendSingle.start) {
 				percent = (Math.round(100 * (index + 1) / (PrevFrameparamstart.size())));
 
 				final double originalslope = PrevFrameparamstart.get(index).originalslope;
@@ -564,7 +564,7 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 		for (int index = 0; index < PrevFrameparamend.size(); ++index) {
 			final int oldframenumber = PrevFrameparamend.get(PrevFrameparamend.size() - 1).framenumber;
 
-			if (Trackstart.get(PrevFrameparamend.get(index).seedLabel) == Whichend.end) {
+			if (Trackstart.get(PrevFrameparamend.get(index).seedLabel) == WhichendSingle.end) {
 				percent = (Math.round(100 * (index + 1) / (PrevFrameparamend.size())));
 
 				Point secondlinepoint = new Point(ndims);
@@ -687,7 +687,7 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 			}
 		}
 
-		return false;
+		return true;
 	}
 
 	@Override
