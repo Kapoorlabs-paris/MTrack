@@ -38,7 +38,7 @@ import interactiveMT.BatchMode;
 import interactiveMT.Interactive_MTDoubleChannel;
 import interactiveMT.Interactive_MTDoubleChannelBasic;
 import interactiveMT.Interactive_MTDoubleChannel.ValueChange;
-import interactiveMT.Interactive_MTDoubleChannel.Whichend;
+import interactiveMT.Interactive_MTDoubleChannel.WhichendDouble;
 import listeners.SkipFramesandTrackendsListener;
 import net.imglib2.util.Pair;
 import net.imglib2.util.ValuePair;
@@ -151,9 +151,9 @@ public class FinalPoint implements ActionListener {
 				mindistA = util.Boundingboxes.Distance(parent.ClickedPoints.get(index).getA(), endAmap.get(i));
 				mindistB = util.Boundingboxes.Distance(parent.ClickedPoints.get(index).getA(), endBmap.get(i));
 
-				if ( mindistA <= cutdist  && parent.seedmap.get(i) != Whichend.end) {
+				if ( mindistA <= cutdist  && parent.seedmap.get(i) != WhichendDouble.end) {
 
-					parent.seedmap.put(i, Whichend.start);
+					parent.seedmap.put(i, WhichendDouble.start);
 
 					int seedid = i;
 					double[] seedpos = parent.PrevFrameparam.getA().get(count).fixedpos;
@@ -161,9 +161,9 @@ public class FinalPoint implements ActionListener {
 					parent.IDALL.add(seedpair);
 				}
 
-				else if (mindistB <= cutdist  && parent.seedmap.get(i) != Whichend.start) {
+				else if (mindistB <= cutdist  && parent.seedmap.get(i) != WhichendDouble.start) {
 
-					parent.seedmap.put(i, Whichend.end);
+					parent.seedmap.put(i, WhichendDouble.end);
 
 					int seedid = i;
 					double[] seedpos = parent.PrevFrameparam.getB().get(count).fixedpos;
@@ -172,17 +172,17 @@ public class FinalPoint implements ActionListener {
 
 				}
 
-				else if (parent.seedmap.get(i) == Whichend.start && mindistB <= cutdist  ) {
-					parent.seedmap.put(i, Whichend.both);
+				else if (parent.seedmap.get(i) == WhichendDouble.start && mindistB <= cutdist  ) {
+					parent.seedmap.put(i, WhichendDouble.both);
 
 				}
 
-				else if (parent.seedmap.get(i) == Whichend.end && mindistA <= cutdist ) {
-					parent.seedmap.put(i, Whichend.both);
+				else if (parent.seedmap.get(i) == WhichendDouble.end && mindistA <= cutdist ) {
+					parent.seedmap.put(i, WhichendDouble.both);
 				}
 
 				else if (parent.seedmap.get(i) == null) 
-					parent.seedmap.put(i, Whichend.none);
+					parent.seedmap.put(i, WhichendDouble.none);
                   
 				
 			
@@ -246,7 +246,7 @@ public class FinalPoint implements ActionListener {
 
 			
 			
-				batch.seedmap.put(i, Whichend.both);
+				batch.seedmap.put(i, WhichendDouble.both);
 				
 
 		}

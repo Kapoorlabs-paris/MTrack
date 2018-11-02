@@ -82,7 +82,7 @@ import ij.plugin.frame.RoiManager;
 import ij.process.ColorProcessor;
 import interactiveMT.BeadFileChooser.whichModel;
 import interactiveMT.Interactive_MTDoubleChannel.ValueChange;
-import interactiveMT.Interactive_MTDoubleChannel.Whichend;
+import interactiveMT.Interactive_MTDoubleChannel.WhichendDouble;
 import interactiveMT.Interactive_MTDoubleChannel.moveInThirdDimListener;
 import mpicbg.imglib.multithreading.SimpleMultiThreading;
 import mpicbg.imglib.util.Util;

@@ -38,7 +38,7 @@ import interactiveMT.BatchMode;
 
 import interactiveMT.Interactive_MTSingleChannel;
 import interactiveMT.Interactive_MTSingleChannel.ValueChange;
-import interactiveMT.Interactive_MTSingleChannel.Whichend;
+import interactiveMT.Interactive_MTSingleChannel.WhichendSingle;
 import listeners.SkipFramesandTrackendsListener;
 import interactiveMT.Interactive_MTSingleChannelBasic;
 import interactiveMT.SingleBatchMode;
@@ -139,9 +139,9 @@ public class SingleFinalPoint implements ActionListener {
 				mindistA = util.Boundingboxes.Distance(parent.ClickedPoints.get(index).getA(), endAmap.get(i));
 				mindistB = util.Boundingboxes.Distance(parent.ClickedPoints.get(index).getA(), endBmap.get(i));
 
-				if (mindistA <= 1 && parent.seedmap.get(i) != Whichend.end) {
+				if (mindistA <= 1 && parent.seedmap.get(i) != WhichendSingle.end) {
 
-					parent.seedmap.put(i, Whichend.start);
+					parent.seedmap.put(i, WhichendSingle.start);
 
 					int seedid = i;
 					double[] seedpos = parent.PrevFrameparam.getA().get(count).fixedpos;
@@ -149,9 +149,9 @@ public class SingleFinalPoint implements ActionListener {
 					parent.IDALL.add(seedpair);
 				}
 
-				else if (mindistB <= 1 && parent.seedmap.get(i) != Whichend.start) {
+				else if (mindistB <= 1 && parent.seedmap.get(i) != WhichendSingle.start) {
 
-					parent.seedmap.put(i, Whichend.end);
+					parent.seedmap.put(i, WhichendSingle.end);
 
 					int seedid = i;
 					double[] seedpos = parent.PrevFrameparam.getB().get(count).fixedpos;
@@ -160,17 +160,17 @@ public class SingleFinalPoint implements ActionListener {
 
 				}
 
-				else if (parent.seedmap.get(i) == Whichend.start && mindistB <= 1) {
-					parent.seedmap.put(i, Whichend.both);
+				else if (parent.seedmap.get(i) == WhichendSingle.start && mindistB <= 1) {
+					parent.seedmap.put(i, WhichendSingle.both);
 
 				}
 
-				else if (parent.seedmap.get(i) == Whichend.end && mindistA <= 1) {
-					parent.seedmap.put(i, Whichend.both);
+				else if (parent.seedmap.get(i) == WhichendSingle.end && mindistA <= 1) {
+					parent.seedmap.put(i, WhichendSingle.both);
 				}
 
 				else if (parent.seedmap.get(i) == null) {
-					parent.seedmap.put(i, Whichend.none);
+					parent.seedmap.put(i, WhichendSingle.none);
 				}
 
 			}
@@ -232,7 +232,7 @@ public class SingleFinalPoint implements ActionListener {
 
 			
 			
-				batch.seedmap.put(i, Whichend.both);
+				batch.seedmap.put(i, WhichendSingle.both);
 				
 
 		}

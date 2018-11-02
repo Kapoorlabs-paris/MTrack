@@ -177,7 +177,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public JLabel inputradisec;
 	public TextField inputFieldradisec;
 	// steps per octave
-	public static int standardSensitivity = 4;
+	public static int standardSensitivity = 4; 
 	public int sensitivity = standardSensitivity;
 	public float deltaMin = 0;
 	public float thetaPerPixelMin = new Float(0.2);
@@ -344,7 +344,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public float missedframesMin = 0;
 	public float missedframesMax = 100;
 	public Overlay overlay;
-	public HashMap<Integer, Boolean> whichend = new HashMap<Integer, Boolean>();
+	public HashMap<Integer, Boolean> WhichendDouble = new HashMap<Integer, Boolean>();
 	public HashMap<Integer, Double> pixellength = new HashMap<Integer, Double>();
 	public HashMap<Integer, Double> microlength = new HashMap<Integer, Double>();
 	public ArrayList<float[]> finalvelocity = new ArrayList<float[]>();
@@ -425,7 +425,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public int thirdDimension;
 	public ImagePlus impImg; 
 	public ImageStack stackimg;
-	public static enum Whichend {
+	public static enum WhichendDouble {
 
 		start, end, both, none, user;
 	}
@@ -440,7 +440,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public int detcount = 0;
 	public boolean SecondOrderSpline;
 	public boolean ThirdOrderSpline;
-	public HashMap<Integer, Whichend> seedmap = new HashMap<Integer, Whichend>();
+	public HashMap<Integer, WhichendDouble> seedmap = new HashMap<Integer, WhichendDouble>();
 
 	public boolean isFinished() {
 		return isFinished;

@@ -56,7 +56,7 @@ import ij.plugin.PlugIn;
 import ij.process.ColorProcessor;
 import initialization.LocalPrefs;
 import interactiveMT.Interactive_MTSingleChannel.ValueChange;
-import interactiveMT.Interactive_MTSingleChannel.Whichend;
+import interactiveMT.Interactive_MTSingleChannel.WhichendSingle;
 import labeledObjects.CommonOutputHF;
 import labeledObjects.Indexedlength;
 import mpicbg.imglib.multithreading.SimpleMultiThreading;
@@ -305,7 +305,7 @@ public class SingleBatchMode implements PlugIn, Runnable {
 	public int detcount = 0;
 	public boolean SecondOrderSpline;
 	public boolean ThirdOrderSpline;
-	public HashMap<Integer, Whichend> seedmap = new HashMap<Integer, Whichend>();
+	public HashMap<Integer, WhichendSingle> seedmap = new HashMap<Integer, WhichendSingle>();
 
 	public boolean isFinished() {
 		return isFinished;

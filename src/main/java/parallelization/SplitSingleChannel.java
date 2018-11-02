@@ -54,7 +54,7 @@ import initialization.LocalPrefs;
 import interactiveMT.BatchMode;
 import interactiveMT.Interactive_MTSingleChannel.ValueChange;
 import interactiveMT.SingleBatchMode;
-import interactiveMT.Interactive_MTSingleChannel.Whichend;
+import interactiveMT.Interactive_MTSingleChannel.WhichendSingle;
 import labeledObjects.CommonOutputHF;
 import labeledObjects.Indexedlength;
 import lineFinder.FindlinesVia;
@@ -131,7 +131,7 @@ public class SplitSingleChannel implements Runnable  {
 			parent.colorUnselect = Color.MAGENTA;
 			parent.colorConfirm = Color.GREEN;
 			parent.colorUser = Color.ORANGE;
-			parent.seedmap = new HashMap<Integer, Whichend>();
+			parent.seedmap = new HashMap<Integer, WhichendSingle>();
 			parent.Progressmin = 0;
 			parent.Progressmax = 100;
 			parent.max = parent.Progressmax;
@@ -387,7 +387,7 @@ public class SplitSingleChannel implements Runnable  {
 				Pair<Integer, double[]> seedpair = new ValuePair<Integer, double[]>(
 						parent.PrevFrameparam.getA().get(i).seedLabel, parent.PrevFrameparam.getA().get(i).fixedpos);
 				parent.IDALL.add(seedpair);
-				parent.seedmap.put(parent.PrevFrameparam.getA().get(i).seedLabel, Whichend.start);
+				parent.seedmap.put(parent.PrevFrameparam.getA().get(i).seedLabel, WhichendSingle.start);
 
 			}
 
@@ -396,8 +396,8 @@ public class SplitSingleChannel implements Runnable  {
 				Pair<Integer, double[]> seedpair = new ValuePair<Integer, double[]>(
 						parent.PrevFrameparam.getB().get(i).seedLabel, parent.PrevFrameparam.getB().get(i).fixedpos);
 				parent.IDALL.add(seedpair);
-				if (parent.seedmap.get(parent.PrevFrameparam.getA().get(i).seedLabel) == Whichend.start)
-					parent.seedmap.put(parent.PrevFrameparam.getA().get(i).seedLabel, Whichend.both);
+				if (parent.seedmap.get(parent.PrevFrameparam.getA().get(i).seedLabel) == WhichendSingle.start)
+					parent.seedmap.put(parent.PrevFrameparam.getA().get(i).seedLabel, WhichendSingle.both);
 
 			}
 
