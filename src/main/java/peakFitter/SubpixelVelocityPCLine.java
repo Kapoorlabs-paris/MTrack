@@ -68,6 +68,7 @@ import net.imglib2.util.Pair;
 import net.imglib2.util.ValuePair;
 import net.imglib2.view.Views;
 import peakFitter.GaussianMaskFitMSER.EndfitMSER;
+import preProcessing.GetLocalmaxminMT;
 
 public class SubpixelVelocityPCLine extends BenchmarkAlgorithm
 		implements OutputAlgorithm<Pair<ArrayList<Indexedlength>, ArrayList<Indexedlength>>> {
@@ -572,8 +573,7 @@ public void setMaxdisp (double maxdisp) {
 			fixed_param[ndims] = iniparam.originalslope;
 			fixed_param[ndims + 1] = iniparam.originalintercept;
 			fixed_param[ndims + 2] = Inispacing;
-
-			PointSampleList<FloatType> datalist = FitterUtils.gatherfullData(imgs, label, ndims);
+			PointSampleList<FloatType> datalist = FitterUtils.gatherfullData(imgs, Intensityratio , label, ndims);
 			final Cursor<FloatType> listcursor = datalist.localizingCursor();
 			double[][] X = new double[(int) datalist.size()][ndims];
 			double[] I = new double[(int) datalist.size()];
@@ -592,8 +592,8 @@ public void setMaxdisp (double maxdisp) {
 
 			Accountedframes = framenumber;
 
-			System.out.println("Label: " + label + " " + "Initial guess: " + " StartX: " + LMparam[0] + " StartY: "
-					+ LMparam[1] + " EndX: " + LMparam[2] + " EndY: " + LMparam[3]);
+			//System.out.println("Label: " + label + " " + "Initial guess: " + " StartX: " + LMparam[0] + " StartY: "
+			//		+ LMparam[1] + " EndX: " + LMparam[2] + " EndY: " + LMparam[3]);
 
 			final double[] safeparam = LMparam.clone();
 			MTFitFunction UserChoiceFunction = null;
@@ -738,7 +738,7 @@ public void setMaxdisp (double maxdisp) {
 					else
 						System.out.println("New XMask: " + startfit[0] + " New YMask: " + startfit[1]);
 
-					System.out.println("Number of Gaussians used: " + numgaussians + " ds: " + ds);
+				//	System.out.println("Number of Gaussians used: " + numgaussians + " ds: " + ds);
 
 					
 
@@ -823,7 +823,7 @@ public void setMaxdisp (double maxdisp) {
 						System.out.println("New XLM: " + endfit[0] + " New YLM: " + endfit[1]);
 					else
 						System.out.println("New XMask: " + endfit[0] + " New YMask: " + endfit[1]);
-					System.out.println("Number of Gaussians used: " + numgaussians + "ds: " + ds);
+					//System.out.println("Number of Gaussians used: " + numgaussians + "ds: " + ds);
 
 					FitterUtils.SetProgressBarTime(jpb, percent, framenumber, thirdDimsize);
 
@@ -926,7 +926,7 @@ public void setMaxdisp (double maxdisp) {
 					for (int d = 0; d < ndims; ++d)
 						startfit[d] = (dist > 0) ? startfit[d] : endfit[d];
 
-					System.out.println("Curvature: " + Curvature);
+				//	System.out.println("Curvature: " + Curvature);
 
 					Indexedlength PointofInterest = new Indexedlength(label, seedLabel, framenumber, ds, lineIntensity,
 							background, startfit, iniparam.fixedpos, newslope, currentintercept, iniparam.originalslope,
@@ -935,7 +935,7 @@ public void setMaxdisp (double maxdisp) {
 						System.out.println("New XLM: " + startfit[0] + " New YLM: " + startfit[1]);
 					else
 						System.out.println("New XMask: " + startfit[0] + " New YMask: " + startfit[1]);
-					System.out.println("Number of Gaussians used: " + (numgaussians) + " " + ds);
+				//	System.out.println("Number of Gaussians used: " + (numgaussians) + " " + ds);
 
 					FitterUtils.SetProgressBarTime(jpb, percent, framenumber, thirdDimsize);
 
@@ -948,7 +948,7 @@ public void setMaxdisp (double maxdisp) {
 					final double ds = (LMparam[2 * ndims]);
 					final double lineIntensity = LMparam[2 * ndims + 2];
 					final double background = LMparam[2 * ndims + 3];
-					System.out.println("Curvature: " + Curvature);
+				//	System.out.println("Curvature: " + Curvature);
 					final double newslope = (endpos[1] - startpos[1]) / (endpos[0] - startpos[0])
 							- Curvature * (endpos[0] + startpos[0]);
 
@@ -1039,7 +1039,7 @@ public void setMaxdisp (double maxdisp) {
 						System.out.println("New XLM: " + endfit[0] + " New YLM: " + endfit[1]);
 					else
 						System.out.println("New XMask: " + endfit[0] + " New YMask: " + endfit[1]);
-					System.out.println("Number of Gaussians used: " + (numgaussians) + " " + ds);
+				//	System.out.println("Number of Gaussians used: " + (numgaussians) + " " + ds);
 
 					FitterUtils.SetProgressBarTime(jpb, percent, framenumber, thirdDimsize);
 
@@ -1140,8 +1140,8 @@ public void setMaxdisp (double maxdisp) {
 					for (int d = 0; d < ndims; ++d)
 						startfit[d] = (dist > 0) ? startfit[d] : endfit[d];
 
-					System.out.println("Curvature: " + Curvature);
-					System.out.println("Inflection: " + Inflection);
+				//	System.out.println("Curvature: " + Curvature);
+				//	System.out.println("Inflection: " + Inflection);
 					Indexedlength PointofInterest = new Indexedlength(label, seedLabel, framenumber, ds, lineIntensity,
 							background, startfit, iniparam.fixedpos, newslope, currentintercept, iniparam.originalslope,
 							iniparam.originalintercept, Curvature, Inflection, iniparam.originalds);
@@ -1149,7 +1149,7 @@ public void setMaxdisp (double maxdisp) {
 						System.out.println("New XLM: " + startfit[0] + " New YLM: " + startfit[1]);
 					else
 						System.out.println("New XMask: " + startfit[0] + " New YMask: " + startfit[1]);
-					System.out.println("Number of Gaussians used: " + (numgaussians) + " " + ds);
+				//	System.out.println("Number of Gaussians used: " + (numgaussians) + " " + ds);
 
 					FitterUtils.SetProgressBarTime(jpb, percent, framenumber, thirdDimsize);
 
@@ -1163,8 +1163,8 @@ public void setMaxdisp (double maxdisp) {
 					final double ds = (LMparam[2 * ndims]);
 					final double lineIntensity = LMparam[2 * ndims + 3];
 					final double background = LMparam[2 * ndims + 4];
-					System.out.println("Curvature: " + Curvature);
-					System.out.println("Inflection: " + Inflection);
+				//	System.out.println("Curvature: " + Curvature);
+				//	System.out.println("Inflection: " + Inflection);
 					final double newslope = (endpos[1] - startpos[1]) / (endpos[0] - startpos[0])
 							- Curvature * (endpos[0] + startpos[0]) - Inflection
 									* (startpos[0] * startpos[0] + endpos[0] * endpos[0] + startpos[0] * endpos[0]);
@@ -1260,7 +1260,7 @@ public void setMaxdisp (double maxdisp) {
 						System.out.println("New XLM: " + endfit[0] + " New YLM: " + endfit[1]);
 					else
 						System.out.println("New XMask: " + endfit[0] + " New YMask: " + endfit[1]);
-					System.out.println("Number of Gaussians used: " + (numgaussians) + " " + ds);
+				//	System.out.println("Number of Gaussians used: " + (numgaussians) + " " + ds);
 
 					FitterUtils.SetProgressBarTime(jpb, percent, framenumber, thirdDimsize);
 

@@ -317,7 +317,7 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 			
 			
 		
-			System.out.println("User " + dist);
+			//System.out.println("User " + dist);
 		
 			if (dist!=Double.NaN){
 			if (Math.abs(dist) > maxdist ) {
@@ -513,8 +513,8 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 			fixed_param[ndims] = iniparam.originalslope;
 			fixed_param[ndims + 1] = iniparam.originalintercept;
 			fixed_param[ndims + 2] = Inispacing;
-
-			PointSampleList<FloatType> datalist = FitterUtils.gatherfullData(imgs, label, ndims);
+			
+			PointSampleList<FloatType> datalist = FitterUtils.gatherfullData(imgs,Intensityratio , label, ndims);
 
 			final Cursor<FloatType> listcursor = datalist.localizingCursor();
 			double[][] X = new double[(int) datalist.size()][ndims];
@@ -535,8 +535,8 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 			Accountedframes = framenumber;
 
 			
-			System.out.println("Label: " + label + " " + "Initial guess: " + " StartX: " + LMparam[0] + " StartY: "
-					+ LMparam[1] + " EndX: " + LMparam[2] + " EndY: " + LMparam[3]);
+		//	System.out.println("Label: " + label + " " + "Initial guess: " + " StartX: " + LMparam[0] + " StartY: "
+		//			+ LMparam[1] + " EndX: " + LMparam[2] + " EndY: " + LMparam[3]);
 
 			final double[] safeparam = LMparam.clone();
 			MTFitFunction UserChoiceFunction = new GaussianSplinethirdorder();
@@ -683,7 +683,7 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 					System.out.println("New XLM: " + endfit[0] + " New YLM: " + endfit[1]);
 				else
 					System.out.println("New XMask: " + endfit[0] + " New YMask: " + endfit[1]);
-				System.out.println("Number of Gaussians used: " + numgaussians + "ds: " + ds);
+			//	System.out.println("Number of Gaussians used: " + numgaussians + "ds: " + ds);
 
 				
 
@@ -699,7 +699,7 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 				final double ds = (LMparam[2 * ndims]);
 				final double lineIntensity = LMparam[2 * ndims + 2];
 				final double background = LMparam[2 * ndims + 3];
-				System.out.println("Curvature: " + Curvature);
+		//		System.out.println("Curvature: " + Curvature);
 				final double newslope = (endpos[1] - startpos[1]) / (endpos[0] - startpos[0])
 						- Curvature * (endpos[0] + startpos[0]);
 
@@ -791,7 +791,7 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 					System.out.println("New XLM: " + endfit[0] + " New YLM: " + endfit[1]);
 				else
 					System.out.println("New XMask: " + endfit[0] + " New YMask: " + endfit[1]);
-				System.out.println("Number of Gaussians used: " + (numgaussians) + " " + ds);
+			//	System.out.println("Number of Gaussians used: " + (numgaussians) + " " + ds);
 
 				FitterUtils.SetProgressBarTime(jpb, percent, framenumber, thirdDimsize);
 
@@ -806,8 +806,8 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 				final double ds = (LMparam[2 * ndims]);
 				final double lineIntensity = LMparam[2 * ndims + 3];
 				final double background = LMparam[2 * ndims + 4];
-				System.out.println("Curvature: " + Curvature);
-				System.out.println("Inflection: " + Inflection);
+			//	System.out.println("Curvature: " + Curvature);
+			//	System.out.println("Inflection: " + Inflection);
 				final double newslope = (endpos[1] - startpos[1]) / (endpos[0] - startpos[0])
 						- Curvature * (endpos[0] + startpos[0])
 						- Inflection * (startpos[0] * startpos[0] + endpos[0] * endpos[0] + startpos[0] * endpos[0]);
@@ -903,7 +903,7 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 					System.out.println("New XLM: " + endfit[0] + " New YLM: " + endfit[1]);
 				else
 					System.out.println("New XMask: " + endfit[0] + " New YMask: " + endfit[1]);
-				System.out.println("Number of Gaussians used: " + (numgaussians) + " " + ds);
+			//	System.out.println("Number of Gaussians used: " + (numgaussians) + " " + ds);
 
 				FitterUtils.SetProgressBarTime(jpb, percent, framenumber, thirdDimsize);
 
