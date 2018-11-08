@@ -606,7 +606,7 @@ public class Interactive_MTSingleChannel implements PlugIn {
 		this.Kymoimg = null;
 		standardRectangle = new Rectangle(inix, iniy, (int) originalimg.dimension(0) - 2 * inix,
 				(int) originalimg.dimension(1) - 2 * iniy);
-		imp = ImageJFunctions.show(originalimg);
+		imp = ImageJFunctions.wrap(originalimg, "");
 		impcopy = imp.duplicate();
 
 		imp.setTitle("Original movie");
@@ -628,7 +628,7 @@ public class Interactive_MTSingleChannel implements PlugIn {
 		this.psf = psf;
 		standardRectangle = new Rectangle(inix, iniy, (int) originalimg.dimension(0) - 2 * inix,
 				(int) originalimg.dimension(1) - 2 * iniy);
-		imp = ImageJFunctions.show(originalimg);
+		imp = ImageJFunctions.wrap(originalimg, "");
 		impcopy = imp.duplicate();
 		imp.setTitle("Original movie");
 		this.addToName = addToName;

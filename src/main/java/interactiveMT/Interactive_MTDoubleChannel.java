@@ -646,7 +646,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 				(int) originalimg.dimension(1) - 2 * iniy);
 		
 		
-		imp = ImageJFunctions.show(originalimg);
+		imp = ImageJFunctions.wrap(originalimg, "");
 		imp.setTitle("Original movie");
 		
 		impcopy = imp.duplicate();
@@ -672,7 +672,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 		standardRectangle = new Rectangle(inix, iniy, (int) originalimg.dimension(0) - 2 * inix,
 				(int) originalimg.dimension(1) - 2 * iniy);
-		imp = ImageJFunctions.show(originalimg);
+		imp = ImageJFunctions.wrap(originalimg, "");
 		
 		imp.setTitle("Original movie");
 		impcopy = imp.duplicate();
