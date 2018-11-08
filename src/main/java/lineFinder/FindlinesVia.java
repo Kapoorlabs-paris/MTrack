@@ -40,6 +40,7 @@ import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.util.Pair;
 import net.imglib2.util.ValuePair;
 import peakFitter.ParallelSubpixelVelocityPCLineStart;
+import peakFitter.ParallelSubpixelVelocityUserSeed;
 import peakFitter.SubpixelLengthPCLine;
 import peakFitter.SubpixelVelocityPCLine;
 import peakFitter.SubpixelVelocityUserSeed;
@@ -179,22 +180,49 @@ public  class FindlinesVia {
 			final boolean DoMask, final double intensityratio, final double Inispacing, final JProgressBar jpb,
 			final int thirdDimsize, final double maxdist, final int startframe) {
 
+
+		int nThreads = Runtime.getRuntime().availableProcessors();
+		// set up executor service
+		final ExecutorService taskExecutorStart = Executors.newFixedThreadPool(nThreads);
+
 		
+		ArrayList<Indexedlength> NewFrameparamStart = new ArrayList<Indexedlength>();
+		 ArrayList<Trackproperties> startStateVectors = new ArrayList<Trackproperties>();
+		
+		 
+		 
+		 
+		 List<Callable<Object>> tasksStart = new ArrayList<Callable<Object>>();
+		 
+		 
+		for(int index = 0; index < PrevFrameparam.size(); ++index) {
+                     
+			final ParallelSubpixelVelocityUserSeed ParallelgrowthtrackerStart = 
+					new ParallelSubpixelVelocityUserSeed(source, linefinder, PrevFrameparam, index, psf, framenumber, model, DoMask, jpb, thirdDimsize, startframe);
+			
+			ParallelgrowthtrackerStart.setIntensityratio(intensityratio);
+			ParallelgrowthtrackerStart.setInispacing(Inispacing);
+			ParallelgrowthtrackerStart.setMaxdist(maxdist);
+			ParallelgrowthtrackerStart.checkInput();
+			tasksStart.add(Executors.callable(ParallelgrowthtrackerStart));
+			try {
+				taskExecutorStart.invokeAll(tasksStart);
+			} catch (InterruptedException e1) {
+
+			}
+			
+		   Accountedframes  = ParallelgrowthtrackerStart.getAccountedframes() ;
+		   
+		   NewFrameparamStart.addAll( ParallelgrowthtrackerStart.getResult());
+		   startStateVectors.addAll(ParallelgrowthtrackerStart.getstartStateVectors());
+		}
 		
 
-			final SubpixelVelocityUserSeed growthtracker = new SubpixelVelocityUserSeed(source, linefinder,
-					PrevFrameparam, psf, framenumber, model, DoMask,jpb, thirdDimsize, startframe);
-			growthtracker.setIntensityratio(intensityratio);
-			growthtracker.setInispacing(Inispacing);
-			growthtracker.setMaxdist(maxdist);
-			growthtracker.checkInput();
-			growthtracker.process();
-			Accountedframes  = growthtracker.getAccountedframes();
+		
 			
-			ArrayList<Indexedlength> NewFrameparam = growthtracker.getResult();
-			ArrayList<Trackproperties> startStateVectors = growthtracker.getstartStateVectors();
+	
 			Pair<ArrayList<Trackproperties>,ArrayList<Indexedlength>>	returnVector = 
-					new ValuePair<ArrayList<Trackproperties>,ArrayList<Indexedlength>>(startStateVectors, NewFrameparam);
+					new ValuePair<ArrayList<Trackproperties>,ArrayList<Indexedlength>>(startStateVectors, NewFrameparamStart);
 			
 			
 			
