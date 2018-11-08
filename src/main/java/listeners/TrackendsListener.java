@@ -27,7 +27,7 @@ import java.awt.event.ActionListener;
 import javax.swing.SwingUtilities;
 
 import interactiveMT.Interactive_MTDoubleChannel;
-import swingClasses.ProgressTrack;
+import swingClasses.ProgressSkip;
 
 public class TrackendsListener implements ActionListener {
 
@@ -72,7 +72,7 @@ final int endtime;
 		parent.frame.setLocationRelativeTo(parent.panelCont);
 		parent.frame.setVisible(true);
 
-		ProgressTrack trackMT = new ProgressTrack(parent);
+		ProgressSkip trackMT = new ProgressSkip(parent);
 		trackMT.execute();
 
 	}

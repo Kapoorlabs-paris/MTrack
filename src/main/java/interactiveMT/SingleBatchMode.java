@@ -39,6 +39,7 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import MTObjects.MTcounter;
 import MTObjects.ResultsMT;
+import drawandOverlay.AddGaussian;
 import fiji.tool.SliceListener;
 import fiji.tool.SliceObserver;
 import graphconstructs.Trackproperties;
@@ -63,6 +64,7 @@ import mpicbg.imglib.multithreading.SimpleMultiThreading;
 import mpicbg.imglib.util.Util;
 import net.imglib2.Cursor;
 import net.imglib2.FinalInterval;
+import net.imglib2.RandomAccess;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.algorithm.componenttree.mser.MserTree;
 import net.imglib2.img.array.ArrayImgFactory;
@@ -570,7 +572,7 @@ public class SingleBatchMode implements PlugIn, Runnable {
 			bitimgFloat = new ArrayImgFactory<FloatType>().create(newimg, new FloatType());
 			FloatType T = new FloatType(Math.round(thresholdHough));
 			GetLocalmaxminMT.ThresholdingMTBit(currentPreprocessedimg, bitimg, T);
-			GetLocalmaxminMT.ThresholdingMT(currentPreprocessedimg, bitimgFloat, thresholdHough,IntensityType.Gaussian,
+			ThresholdingMTimage(currentPreprocessedimg, bitimgFloat, thresholdHough,IntensityType.Gaussian,
 					new double[]{ Cannyradius,  Cannyradius});
 			if (displayBitimg)
 				ImageJFunctions.show(bitimg);
@@ -680,6 +682,47 @@ public class SingleBatchMode implements PlugIn, Runnable {
 	protected static int computeIntScrollbarPositionFromValue(final float thirdDimensionslider, final float min,
 			final float max, final int scrollbarSize) {
 		return Util.round(((thirdDimensionslider - min) / (max - min)) * max);
+	}
+	public static void ThresholdingMTimage(RandomAccessibleInterval<FloatType> img, RandomAccessibleInterval<FloatType> imgout,
+			Float ThresholdValue, final IntensityType setintensity, double[] sigma) {
+
+		final double[] backpos = new double[imgout.numDimensions()];
+		final Cursor<FloatType> bound = Views.iterable(img).localizingCursor();
+
+		final RandomAccess<FloatType> outbound = imgout.randomAccess();
+
+		while (bound.hasNext()) {
+
+
+			bound.fwd();
+
+			outbound.setPosition(bound);
+
+			if (bound.get().get() > (ThresholdValue)) {
+
+				bound.localize(backpos);
+				switch (setintensity) {
+
+				
+
+				case Gaussian:
+					AddGaussian.addGaussian(imgout, backpos, sigma);
+					break;
+				
+				default:
+					AddGaussian.addGaussian(imgout, backpos, sigma);
+					break;
+
+				}
+
+			}
+
+			else {
+
+				outbound.get().setZero();
+
+			}
+		}
 	}
 
 	public Comparator<Indexedlength> Seedcompare = new Comparator<Indexedlength>() {

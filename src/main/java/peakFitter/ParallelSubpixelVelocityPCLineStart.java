@@ -70,23 +70,21 @@ import net.imglib2.view.Views;
 import peakFitter.GaussianMaskFitMSER.EndfitMSER;
 import preProcessing.GetLocalmaxminMT;
 
-public class SubpixelVelocityPCLine extends BenchmarkAlgorithm
-		implements OutputAlgorithm<Pair<ArrayList<Indexedlength>, ArrayList<Indexedlength>>> {
+public class ParallelSubpixelVelocityPCLineStart extends BenchmarkAlgorithm
+		implements OutputAlgorithm<ArrayList<Indexedlength>>, Runnable {
 
 	private static final String BASE_ERROR_MSG = "[SubpixelVelocity] ";
 	private final RandomAccessibleInterval<FloatType> source;
 	private final ArrayList<CommonOutputHF> imgs;
-	private final ArrayList<Indexedlength> PrevFrameparamstart;
-	private final ArrayList<Indexedlength> PrevFrameparamend;
+	private final ArrayList<Indexedlength> ListPrevFrameparamstart;
 	private final int ndims;
 	private final int framenumber;
 	private ArrayList<Indexedlength> final_paramliststart;
-	private ArrayList<Indexedlength> final_paramlistend;
 	private ArrayList<Trackproperties> startinframe;
-	private ArrayList<Trackproperties> endinframe;
 	public int Accountedframes;
 	private final double[] psf;
 	private final boolean DoMask;
+	private final int index;
 	private final HashMap<Integer, WhichendDouble> Trackstart;
 	private boolean Maskfail = false;
 	// LM solver iteration params
@@ -198,8 +196,8 @@ public void setMaxdisp (double maxdisp) {
 		this.halfgaussian = halfgaussian;
 	}
 
-	public SubpixelVelocityPCLine(final RandomAccessibleInterval<FloatType> source, final LinefinderHF linefinder,
-			final ArrayList<Indexedlength> PrevFrameparamstart, final ArrayList<Indexedlength> PrevFrameparamend,
+	public ParallelSubpixelVelocityPCLineStart(final RandomAccessibleInterval<FloatType> source, final LinefinderHF linefinder,
+			final ArrayList<Indexedlength> ListPrevFrameparamstart, int index,
 			final double[] psf, final int framenumber, final UserChoiceModel model, final boolean DoMask,
 			final HashMap<Integer, WhichendDouble> Trackstart, final JProgressBar jpb, final int thirdDimsize, final int startframe, final int numgaussians) {
 
@@ -208,8 +206,8 @@ public void setMaxdisp (double maxdisp) {
 		imgs = linefinder.getResult();
 
 		this.source = source;
-		this.PrevFrameparamstart = PrevFrameparamstart;
-		this.PrevFrameparamend = PrevFrameparamend;
+		this.ListPrevFrameparamstart = ListPrevFrameparamstart;
+		this.index = index;
 		this.psf = psf;
 		this.framenumber = framenumber;
 		this.ndims = source.numDimensions();
@@ -220,7 +218,7 @@ public void setMaxdisp (double maxdisp) {
 		this.Trackstart = Trackstart;
 		this.startframe = startframe;
         this.numgaussians = numgaussians;
-		assert (PrevFrameparamend.size() == PrevFrameparamstart.size());
+		
 	}
 
 	@Override
@@ -246,38 +244,34 @@ public void setMaxdisp (double maxdisp) {
 		Inispacing = getInispacing();
 		ArrayList<Roi> onlyroi = new ArrayList<Roi>();
 		final_paramliststart = new ArrayList<Indexedlength>();
-		final_paramlistend = new ArrayList<Indexedlength>();
     
 		startinframe = new ArrayList<Trackproperties>();
-		endinframe = new ArrayList<Trackproperties>();
 
-		
+		Indexedlength PrevFrameparamstart = ListPrevFrameparamstart.get(index);
 	
 		
 		
-		for (int index = 0; index < PrevFrameparamstart.size(); ++index) {
 
 
-			if (Trackstart.get(PrevFrameparamstart.get(index).seedLabel) == WhichendDouble.start
-					|| Trackstart.get(PrevFrameparamstart.get(index).seedLabel) == WhichendDouble.both) {
+			if (Trackstart.get(PrevFrameparamstart.seedLabel) == WhichendDouble.start
+					|| Trackstart.get(PrevFrameparamstart.seedLabel) == WhichendDouble.both) {
 
-				percent = (Math.round(100 * (index + 1) / (PrevFrameparamstart.size())));
 
-				final double originalslope = PrevFrameparamstart.get(index).originalslope;
+				final double originalslope = PrevFrameparamstart.originalslope;
 
-				final double originalintercept = PrevFrameparamstart.get(index).originalintercept;
+				final double originalintercept = PrevFrameparamstart.originalintercept;
 
 				final Point linepoint = new Point(ndims);
-				linepoint.setPosition(new long[] { (long) PrevFrameparamstart.get(index).currentpos[0],
-						(long) PrevFrameparamstart.get(index).currentpos[1] });
+				linepoint.setPosition(new long[] { (long) PrevFrameparamstart.currentpos[0],
+						(long) PrevFrameparamstart.currentpos[1] });
 
-				final OvalRoi Bigroi = new OvalRoi(Util.round(PrevFrameparamstart.get(index).currentpos[0] - 2.5),
-						Util.round(PrevFrameparamstart.get(index).currentpos[1] - 2.5), Util.round(5), Util.round(5));
+				final OvalRoi Bigroi = new OvalRoi(Util.round(PrevFrameparamstart.currentpos[0] - 2.5),
+						Util.round(PrevFrameparamstart.currentpos[1] - 2.5), Util.round(5), Util.round(5));
 				onlyroi.add(Bigroi);
 
 				final Point fixedstartpoint = new Point(ndims);
-				fixedstartpoint.setPosition(new long[] { (long) PrevFrameparamstart.get(index).fixedpos[0],
-						(long) PrevFrameparamstart.get(index).fixedpos[1] });
+				fixedstartpoint.setPosition(new long[] { (long) PrevFrameparamstart.fixedpos[0],
+						(long) PrevFrameparamstart.fixedpos[1] });
 
 				
 				ArrayList<Integer> labelstart = FitterUtils.Getlabel(imgs, fixedstartpoint, originalslope,
@@ -299,16 +293,16 @@ public void setMaxdisp (double maxdisp) {
 					
 					
 					
-					paramnextframestart = Getfinaltrackparam(PrevFrameparamstart.get(index), labelstart.get(0),
+					paramnextframestart = Getfinaltrackparam(PrevFrameparamstart, labelstart.get(0),
 							psf, framenumber, StartorEnd.Start); 
 					double[] currentposini = paramnextframestart.currentpos;
-					double[] previousposini = PrevFrameparamstart.get(index).currentpos;
+					double[] previousposini = PrevFrameparamstart.currentpos;
 					double distmin = Distance(currentposini, previousposini);
 					
 					if (labelstart.size() > 1) {
 						for (int j = 1; j < labelstart.size(); ++j) {
 							System.out.println("Fitting multiple Labels");
-							Indexedlength test = Getfinaltrackparam(PrevFrameparamstart.get(index), labelstart.get(j),
+							Indexedlength test = Getfinaltrackparam(PrevFrameparamstart, labelstart.get(j),
 									psf, framenumber, StartorEnd.Start);
 							double[] currentpos = test.currentpos;
 							
@@ -331,10 +325,10 @@ public void setMaxdisp (double maxdisp) {
 				}
 
 				else
-					paramnextframestart = PrevFrameparamstart.get(index);
+					paramnextframestart = PrevFrameparamstart;
 				if (paramnextframestart == null)
-					paramnextframestart = PrevFrameparamstart.get(index);
-				final double[] oldstartpoint = PrevFrameparamstart.get(index).currentpos;
+					paramnextframestart = PrevFrameparamstart;
+				final double[] oldstartpoint = PrevFrameparamstart.currentpos;
 
 				double[] newstartpoint = paramnextframestart.currentpos;
 				double newstartslope = paramnextframestart.slope;
@@ -343,10 +337,10 @@ public void setMaxdisp (double maxdisp) {
 				if (framenumber > startframe + 1 || Math.abs(newstartslope)!=Double.NaN){
 					
 					
-				double oldslope = (PrevFrameparamstart.get(index).currentpos[1] - PrevFrameparamstart.get(index).fixedpos[1] ) 
-						/(PrevFrameparamstart.get(index).currentpos[0] - PrevFrameparamstart.get(index).fixedpos[0]) ;
+				double oldslope = (PrevFrameparamstart.currentpos[1] - PrevFrameparamstart.fixedpos[1] ) 
+						/(PrevFrameparamstart.currentpos[0] - PrevFrameparamstart.fixedpos[0]) ;
 			
-				double oldintercept = PrevFrameparamstart.get(index).currentpos[1] - oldslope * PrevFrameparamstart.get(index).currentpos[0];
+				double oldintercept = PrevFrameparamstart.currentpos[1] - oldslope * PrevFrameparamstart.currentpos[0];
 				
 				double newslope = (paramnextframestart.currentpos[1] - paramnextframestart.fixedpos[1] ) 
 						/(paramnextframestart.currentpos[0] - paramnextframestart.fixedpos[0]) ;
@@ -369,10 +363,10 @@ public void setMaxdisp (double maxdisp) {
 				// TCASM
 				if (Math.abs(dist) > maxdist){
 					IJ.log("Miss Assingment detected, activating TCASM layer at " + " " + oldstartpoint[0] + " " + oldstartpoint[1]);
-					paramnextframestart = PrevFrameparamstart.get(index);
+					paramnextframestart = PrevFrameparamstart;
 					newstartpoint = oldstartpoint;
-					newstartslope = PrevFrameparamstart.get(index).slope;
-					newstartintercept = PrevFrameparamstart.get(index).intercept;
+					newstartslope = PrevFrameparamstart.slope;
+					newstartintercept = PrevFrameparamstart.intercept;
 					
 				}
 				
@@ -391,140 +385,24 @@ public void setMaxdisp (double maxdisp) {
 
 				final Trackproperties startedge = new Trackproperties(framenumber, labelindex, oldstartpoint,
 						newstartpoint, newstartslope, newstartintercept, originalslope, originalintercept,
-						PrevFrameparamstart.get(index).seedLabel, PrevFrameparamstart.get(index).fixedpos,
-						PrevFrameparamstart.get(index).originalds);
+						PrevFrameparamstart.seedLabel, PrevFrameparamstart.fixedpos,
+						PrevFrameparamstart.originalds);
 
 				startinframe.add(startedge);
 			}
 
-		}
-
-		for (int index = 0; index < PrevFrameparamend.size(); ++index) {
-
-			if (Trackstart.get(PrevFrameparamend.get(index).seedLabel) == WhichendDouble.end
-					|| Trackstart.get(PrevFrameparamend.get(index).seedLabel) == WhichendDouble.both) {
-
-				percent = (Math.round(100 * (index + 1) / (PrevFrameparamend.size())));
-
-				Point secondlinepoint = new Point(ndims);
-				secondlinepoint.setPosition(new long[] { (long) PrevFrameparamend.get(index).currentpos[0],
-						(long) PrevFrameparamend.get(index).currentpos[1] });
-				Point fixedendpoint = new Point(ndims);
-				fixedendpoint.setPosition(new long[] { (long) PrevFrameparamend.get(index).fixedpos[0],
-						(long) PrevFrameparamend.get(index).fixedpos[1] });
-
-				final OvalRoi Bigroi = new OvalRoi(Util.round(PrevFrameparamend.get(index).currentpos[0] - 2.5),
-						Util.round(PrevFrameparamend.get(index).currentpos[1] - 2.5), Util.round(5), Util.round(5));
-				onlyroi.add(Bigroi);
-
-				final double originalslopeend = PrevFrameparamend.get(index).originalslope;
-
-				final double originalinterceptend = PrevFrameparamend.get(index).originalintercept;
-				ArrayList<Integer> labelend = FitterUtils.Getlabel(imgs, fixedendpoint, originalslopeend,
-						originalinterceptend);
-				Indexedlength paramnextframeend;
-				
-				int labelindex = Integer.MIN_VALUE;
-
-				if (labelend.size() > 0)
-
-					labelindex = labelend.get(0);
-				if (labelindex != Integer.MIN_VALUE) {
-					paramnextframeend = Getfinaltrackparam(PrevFrameparamend.get(index), labelend.get(0), psf,
-							framenumber, StartorEnd.End); 
-					double[] currentposini = paramnextframeend.currentpos;
-					double[] previousposini = PrevFrameparamend.get(index).currentpos;
-					double distmin = Distance(currentposini, previousposini);
-					if (labelend.size() > 1) {
-						for (int j = 1; j < labelend.size(); ++j) {
-							System.out.println("Fitting multiple Labels");
-
-							Indexedlength test = Getfinaltrackparam(PrevFrameparamend.get(index), labelend.get(j), psf,
-									framenumber, StartorEnd.End);
-							double[] currentpos = test.currentpos;
-							
-							double dist = Distance(currentpos, previousposini);
-						
-								if (dist < distmin && dist!=0) {
-									distmin = dist;
-									labelindex = labelend.get(j);
-									paramnextframeend = test;
-								
-							}
-								
-								if (distmin == 0){
-									labelindex = labelend.get(j);
-									paramnextframeend = test;
-									
-								}
-						}
-					}
-				}
-
-				else
-					paramnextframeend = PrevFrameparamend.get(index);
-				if (paramnextframeend == null)
-					paramnextframeend = PrevFrameparamend.get(index);
-				final double[] oldendpoint = PrevFrameparamend.get(index).currentpos;
-
-				double[] newendpoint = paramnextframeend.currentpos;
-				double newendslope = paramnextframeend.slope;
-				double newendintercept = paramnextframeend.intercept;
-				if (framenumber > startframe + 1 || Math.abs(newendslope)!=Double.NaN){
-				
-				double oldslope = (PrevFrameparamend.get(index).currentpos[1] - PrevFrameparamend.get(index).fixedpos[1] ) 
-						/(PrevFrameparamend.get(index).currentpos[0] - PrevFrameparamend.get(index).fixedpos[0]) ;
-				
-				double oldintercept = PrevFrameparamend.get(index).currentpos[1] - oldslope * PrevFrameparamend.get(index).currentpos[0];
-				double newslope = (paramnextframeend.currentpos[1] - paramnextframeend.fixedpos[1] ) 
-						/(paramnextframeend.currentpos[0] - paramnextframeend.fixedpos[0]) ;
-				
-				double dist = (paramnextframeend.currentpos[1] - oldslope * paramnextframeend.currentpos[0] -oldintercept)/Math.sqrt(1 + oldslope *oldslope);
-
-						
-						//Math.toDegrees(Math.atan(((newslope - oldslope)/(1 + newslope * oldslope)))); 
-						//(paramnextframeend.currentpos[1] - oldslope * paramnextframeend.currentpos[0] -oldintercept)/Math.sqrt(1 + oldslope *oldslope);
-						//Math.toDegrees(Math.atan(((newslope - oldslope)/(1 + newslope * oldslope)))); 
 		
-				if (dist!=Double.NaN ){
-					
-					System.out.println(dist + " " + maxdist);
-					
-				if (Math.abs(dist) > maxdist){
-					IJ.log("Miss Assingment detected, activating TCASM layer at " + " " + oldendpoint[0] + " " + oldendpoint[1]);
-					paramnextframeend = PrevFrameparamend.get(index);
-				    newendpoint = oldendpoint;	
-				    newendslope = PrevFrameparamend.get(index).slope;
-				    newendintercept = PrevFrameparamend.get(index).intercept;
-				}
-				
-				}
-				}
-				
-				final_paramlistend.add(paramnextframeend);
 
-			
-				
-				
-
-				final Trackproperties endedge = new Trackproperties(framenumber, labelindex, oldendpoint, newendpoint,
-						newendslope, newendintercept, originalslopeend, originalinterceptend,
-						PrevFrameparamend.get(index).seedLabel, PrevFrameparamend.get(index).fixedpos,
-						PrevFrameparamend.get(index).originalds);
-
-				endinframe.add(endedge);
-
-			}
-		}
+		
 
 		return true;
 	}
 
 	@Override
-	public Pair<ArrayList<Indexedlength>, ArrayList<Indexedlength>> getResult() {
+	public ArrayList<Indexedlength> getResult() {
 
-		Pair<ArrayList<Indexedlength>, ArrayList<Indexedlength>> listpair = new ValuePair<ArrayList<Indexedlength>, ArrayList<Indexedlength>>(
-				final_paramliststart, final_paramlistend);
+		 ArrayList<Indexedlength> listpair = new ArrayList<Indexedlength>(
+				final_paramliststart);
 
 		return listpair;
 	}
@@ -533,9 +411,7 @@ public void setMaxdisp (double maxdisp) {
 		return startinframe;
 	}
 
-	public ArrayList<Trackproperties> getendStateVectors() {
-		return endinframe;
-	}
+
 
 	public int getAccountedframes() {
 
@@ -1325,6 +1201,13 @@ public void setMaxdisp (double maxdisp) {
 
 		return midpoint;
 
+	}
+
+	@Override
+	public void run() {
+		
+		process();
+		
 	}
 
 }

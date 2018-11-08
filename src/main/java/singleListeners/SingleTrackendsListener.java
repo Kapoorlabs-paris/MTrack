@@ -28,7 +28,6 @@ import javax.swing.SwingUtilities;
 
 import interactiveMT.Interactive_MTDoubleChannel;
 import interactiveMT.Interactive_MTSingleChannel;
-import swingClasses.ProgressTrack;
 import swingClasses.SingleProgressTrack;
 
 public class SingleTrackendsListener implements ActionListener {
