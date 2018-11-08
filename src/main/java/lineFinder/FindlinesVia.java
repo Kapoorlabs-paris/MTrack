@@ -23,6 +23,10 @@ package lineFinder;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.swing.JProgressBar;
 
@@ -35,6 +39,7 @@ import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.util.Pair;
 import net.imglib2.util.ValuePair;
+import peakFitter.ParallelSubpixelVelocityPCLineStart;
 import peakFitter.SubpixelLengthPCLine;
 import peakFitter.SubpixelVelocityPCLine;
 import peakFitter.SubpixelVelocityUserSeed;
@@ -86,20 +91,71 @@ public  class FindlinesVia {
 
 	
 		
-		
-
-			final SubpixelVelocityPCLine growthtracker = new SubpixelVelocityPCLine(source, linefinder,
-					PrevFrameparam.getA(), PrevFrameparam.getB(), psf, framenumber, model, DoMask, Trackstart,jpb, thirdDimsize, startframe, numgaussians);
-			growthtracker.setIntensityratio(intensityratio);
-			growthtracker.setInispacing(Inispacing);
-			growthtracker.setMaxdist(maxdist);
-			growthtracker.checkInput();
-			growthtracker.process();
-			Accountedframes  = growthtracker.getAccountedframes();
+	
+			int nThreads = Runtime.getRuntime().availableProcessors();
+			// set up executor service
+			final ExecutorService taskExecutorStart = Executors.newFixedThreadPool(nThreads);
+			final ExecutorService taskExecutorEnd = Executors.newFixedThreadPool(nThreads);
+			 ArrayList<Indexedlength> NewFrameparamStart = new ArrayList<Indexedlength>();
+			 ArrayList<Trackproperties> startStateVectors = new ArrayList<Trackproperties>();
 			
-			Pair<ArrayList<Indexedlength>,ArrayList<Indexedlength>> NewFrameparam = growthtracker.getResult();
-			ArrayList<Trackproperties> startStateVectors = growthtracker.getstartStateVectors();
-			ArrayList<Trackproperties> endStateVectors = growthtracker.getendStateVectors();
+			 
+			 ArrayList<Indexedlength> NewFrameparamEnd = new ArrayList<Indexedlength>();
+			 ArrayList<Trackproperties> endStateVectors = new ArrayList<Trackproperties>();
+			 
+			 
+			 List<Callable<Object>> tasksStart = new ArrayList<Callable<Object>>();
+			 List<Callable<Object>> tasksEnd = new ArrayList<Callable<Object>>();
+			 
+			 
+			for(int index = 0; index < PrevFrameparam.getA().size(); ++index) {
+			
+			final ParallelSubpixelVelocityPCLineStart ParallelgrowthtrackerStart = new ParallelSubpixelVelocityPCLineStart(source, linefinder,
+					PrevFrameparam.getA(), index, psf, framenumber, model, DoMask, Trackstart,jpb, thirdDimsize, startframe, numgaussians);
+			ParallelgrowthtrackerStart.setIntensityratio(intensityratio);
+			ParallelgrowthtrackerStart.setInispacing(Inispacing);
+			ParallelgrowthtrackerStart.setMaxdist(maxdist);
+			ParallelgrowthtrackerStart.checkInput();
+			tasksStart.add(Executors.callable(ParallelgrowthtrackerStart));
+			try {
+				taskExecutorStart.invokeAll(tasksStart);
+			} catch (InterruptedException e1) {
+
+			}
+			
+		   Accountedframes  = ParallelgrowthtrackerStart.getAccountedframes() ;
+		   
+		   NewFrameparamStart.addAll( ParallelgrowthtrackerStart.getResult());
+		   startStateVectors.addAll(ParallelgrowthtrackerStart.getstartStateVectors());
+			
+			}
+			
+			for(int index = 0; index < PrevFrameparam.getB().size(); ++index) {
+				
+				final ParallelSubpixelVelocityPCLineStart ParallelgrowthtrackerEnd = new ParallelSubpixelVelocityPCLineStart(source, linefinder,
+						PrevFrameparam.getB(), index, psf, framenumber, model, DoMask, Trackstart,jpb, thirdDimsize, startframe, numgaussians);
+				ParallelgrowthtrackerEnd.setIntensityratio(intensityratio);
+				ParallelgrowthtrackerEnd.setInispacing(Inispacing);
+				ParallelgrowthtrackerEnd.setMaxdist(maxdist);
+				ParallelgrowthtrackerEnd.checkInput();
+				
+				tasksEnd.add(Executors.callable(ParallelgrowthtrackerEnd));
+				try {
+					taskExecutorEnd.invokeAll(tasksEnd);
+				} catch (InterruptedException e1) {
+
+				}
+			   Accountedframes  = ParallelgrowthtrackerEnd.getAccountedframes() ;
+				
+			   NewFrameparamEnd.addAll(ParallelgrowthtrackerEnd.getResult());
+			   endStateVectors.addAll(ParallelgrowthtrackerEnd.getstartStateVectors());
+			   
+				}
+			
+			//Accountedframes  = growthtracker.getAccountedframes() ;
+			
+			Pair<ArrayList<Indexedlength>,ArrayList<Indexedlength>> NewFrameparam = new ValuePair<ArrayList<Indexedlength>,ArrayList<Indexedlength>>(NewFrameparamStart,NewFrameparamEnd );
+		
 			Pair<ArrayList<Trackproperties>, ArrayList<Trackproperties>> Statevectors = new ValuePair<ArrayList<Trackproperties>, ArrayList<Trackproperties>>(startStateVectors, endStateVectors); 
 			Pair<Pair<ArrayList<Trackproperties>, ArrayList<Trackproperties>>,Pair<ArrayList<Indexedlength>,ArrayList<Indexedlength>>> 	returnVector = 
 					new ValuePair<Pair<ArrayList<Trackproperties>, ArrayList<Trackproperties>>,Pair<ArrayList<Indexedlength>,ArrayList<Indexedlength>>>(Statevectors, NewFrameparam);
