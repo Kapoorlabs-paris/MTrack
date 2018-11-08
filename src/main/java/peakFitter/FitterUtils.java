@@ -535,7 +535,7 @@ public class FitterUtils {
 		return datalist;
 	}
 
-	public static PointSampleList<FloatType> gatherfullData(final ArrayList<CommonOutputHF> imgs, final int label,
+	public static PointSampleList<FloatType> gatherfullData(final ArrayList<CommonOutputHF> imgs, final double threshold, final int label,
 			final int ndims) {
 		final PointSampleList<FloatType> datalist = new PointSampleList<FloatType>(ndims);
 
@@ -546,14 +546,13 @@ public class FitterUtils {
 		FinalInterval interval = imgs.get(labelindex).interval;
 
 		currentimg = Views.interval(currentimg, interval);
-
+		double maxintensity = GetLocalmaxminMT.computeMaxIntensity(currentimg);
 		Cursor<FloatType> localcursor = Views.iterable(currentimg).localizingCursor();
-
 		while (localcursor.hasNext()) {
 
 			localcursor.fwd();
 
-			if (localcursor.get().get() > 0) {
+			if (localcursor.get().get() > threshold * maxintensity) {
 				Point newpoint = new Point(localcursor);
 				datalist.add(newpoint, localcursor.get().copy());
 			}

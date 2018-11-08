@@ -65,6 +65,7 @@ import javax.swing.border.TitledBorder;
 import LineModels.UseLineModel.UserChoiceModel;
 import MTObjects.MTcounter;
 import MTObjects.ResultsMT;
+import drawandOverlay.AddGaussian;
 import fiji.tool.SliceListener;
 import fiji.tool.SliceObserver;
 import graphconstructs.Trackproperties;
@@ -87,6 +88,7 @@ import mpicbg.imglib.multithreading.SimpleMultiThreading;
 import mpicbg.imglib.util.Util;
 import net.imglib2.Cursor;
 import net.imglib2.FinalInterval;
+import net.imglib2.RandomAccess;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.algorithm.componenttree.mser.MserTree;
 import net.imglib2.img.array.ArrayImgFactory;
@@ -1004,7 +1006,7 @@ public class Interactive_MTSingleChannel implements PlugIn {
 				
 			
 			GetLocalmaxminMT.ThresholdingMTBit(currentPreprocessedimg, bitimg, thresholdHough);
-			GetLocalmaxminMT.ThresholdingMT(currentPreprocessedimg, bitimgFloat, thresholdHough,IntensityType.Gaussian,
+			ThresholdingMTimage(currentPreprocessedimg, bitimgFloat, thresholdHough,IntensityType.Gaussian,
 					new double[]{Cannyradius,  Cannyradius});
 			if (displayBitimg)
 				ImageJFunctions.show(bitimg);
@@ -1112,7 +1114,48 @@ public class Interactive_MTSingleChannel implements PlugIn {
 
 	}
 
-	
+	public static void ThresholdingMTimage(RandomAccessibleInterval<FloatType> img, RandomAccessibleInterval<FloatType> imgout,
+			Float ThresholdValue, final IntensityType setintensity, double[] sigma) {
+
+		final double[] backpos = new double[imgout.numDimensions()];
+		final Cursor<FloatType> bound = Views.iterable(img).localizingCursor();
+
+		final RandomAccess<FloatType> outbound = imgout.randomAccess();
+
+		while (bound.hasNext()) {
+
+
+			bound.fwd();
+
+			outbound.setPosition(bound);
+
+			if (bound.get().get() > (ThresholdValue)) {
+
+				bound.localize(backpos);
+				switch (setintensity) {
+
+				
+
+				case Gaussian:
+					AddGaussian.addGaussian(imgout, backpos, sigma);
+					break;
+				
+				default:
+					AddGaussian.addGaussian(imgout, backpos, sigma);
+					break;
+
+				}
+
+			}
+
+			else {
+
+				outbound.get().setZero();
+
+			}
+		}
+	}
+
 
 	protected class ConfirmDirectoryListener implements ActionListener {
 

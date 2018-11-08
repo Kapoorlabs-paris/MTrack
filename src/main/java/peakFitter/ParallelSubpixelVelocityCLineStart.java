@@ -53,14 +53,15 @@ import net.imglib2.view.Views;
 import peakFitter.GaussianMaskFitMSER.EndfitMSER;
 import preProcessing.GetLocalmaxminMT;
 
-public class SubpixelVelocityCline extends BenchmarkAlgorithm
-		implements OutputAlgorithm<Pair<ArrayList<Indexedlength>, ArrayList<Indexedlength>>> {
+public class ParallelSubpixelVelocityCLineStart extends BenchmarkAlgorithm
+		implements OutputAlgorithm<Pair<ArrayList<Indexedlength>, ArrayList<Indexedlength>>>, Runnable {
 
 	private static final String BASE_ERROR_MSG = "[SubpixelVelocity] ";
 	private final RandomAccessibleInterval<FloatType> source;
 	private final ArrayList<CommonOutputHF> imgs;
-	private final ArrayList<Indexedlength> PrevFrameparamstart;
-	private final ArrayList<Indexedlength> PrevFrameparamend;
+	private final ArrayList<Indexedlength> ListPrevFrameparamstart;
+	private final ArrayList<Indexedlength> ListPrevFrameparamend;
+    private final int listindex;
 	private final int ndims;
 	private final int framenumber;
 	private ArrayList<Indexedlength> final_paramliststart;
@@ -157,8 +158,8 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 		this.halfgaussian = halfgaussian;
 	}
 
-	public SubpixelVelocityCline(final RandomAccessibleInterval<FloatType> source, final LinefinderHF finder,
-			final ArrayList<Indexedlength> PrevFrameparamstart, final ArrayList<Indexedlength> PrevFrameparamend,
+	public ParallelSubpixelVelocityCLineStart(final RandomAccessibleInterval<FloatType> source, final LinefinderHF finder,
+			final ArrayList<Indexedlength> ListPrevFrameparamstart, final ArrayList<Indexedlength> ListPrevFrameparamend, final int listindex,
 			final double[] psf, final int framenumber, final UserChoiceModel model, final boolean DoMask,
 			final HashMap<Integer, WhichendSingle> Trackstart, final JProgressBar jpb, final int startframe,
 			final int thirdDimsize, final int numgaussians) {
@@ -169,8 +170,9 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 		this.model = model;
 		this.DoMask = DoMask;
 		this.jpb = jpb;
-		this.PrevFrameparamstart = PrevFrameparamstart;
-		this.PrevFrameparamend = PrevFrameparamend;
+		this.ListPrevFrameparamstart = ListPrevFrameparamstart;
+		this.ListPrevFrameparamend = ListPrevFrameparamend;
+		this.listindex = listindex;
 		this.psf = psf;
 		this.framenumber = framenumber;
 		this.ndims = source.numDimensions();
@@ -201,30 +203,31 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 		startinframe = new ArrayList<Trackproperties>();
 		endinframe = new ArrayList<Trackproperties>();
 
-		for (int index = 0; index < PrevFrameparamstart.size(); ++index) {
+		Indexedlength PrevFrameparamstart = ListPrevFrameparamstart.get(listindex);
+		Indexedlength PrevFrameparamend = ListPrevFrameparamend.get(listindex);
+		
 
-			if (Trackstart.get(PrevFrameparamstart.get(index).seedLabel) == WhichendSingle.both) {
-				percent = (Math.round(100 * (index + 1) / (PrevFrameparamstart.size())));
+			if (Trackstart.get(PrevFrameparamstart.seedLabel) == WhichendSingle.both) {
 
-				final double originalslope = PrevFrameparamstart.get(index).originalslope;
+				final double originalslope = PrevFrameparamstart.originalslope;
 
-				final double originalintercept = PrevFrameparamstart.get(index).originalintercept;
+				final double originalintercept = PrevFrameparamstart.originalintercept;
 
-				final double originalslopeend = PrevFrameparamend.get(index).originalslope;
+				final double originalslopeend = PrevFrameparamend.originalslope;
 
-				final double originalinterceptend = PrevFrameparamend.get(index).originalintercept;
+				final double originalinterceptend = PrevFrameparamend.originalintercept;
 
 				final Point linepoint = new Point(ndims);
-				linepoint.setPosition(new long[] { (long) PrevFrameparamstart.get(index).currentpos[0],
-						(long) PrevFrameparamstart.get(index).currentpos[1] });
+				linepoint.setPosition(new long[] { (long) PrevFrameparamstart.currentpos[0],
+						(long) PrevFrameparamstart.currentpos[1] });
 
 				final Point fixedstartpoint = new Point(ndims);
-				fixedstartpoint.setPosition(new long[] { (long) PrevFrameparamstart.get(index).fixedpos[0],
-						(long) PrevFrameparamstart.get(index).fixedpos[1] });
+				fixedstartpoint.setPosition(new long[] { (long) PrevFrameparamstart.fixedpos[0],
+						(long) PrevFrameparamstart.fixedpos[1] });
 
 				final Point fixedstartpointend = new Point(ndims);
-				fixedstartpointend.setPosition(new long[] { (long) PrevFrameparamend.get(index).fixedpos[0],
-						(long) PrevFrameparamend.get(index).fixedpos[1] });
+				fixedstartpointend.setPosition(new long[] { (long) PrevFrameparamend.fixedpos[0],
+						(long) PrevFrameparamend.fixedpos[1] });
 
 				ArrayList<Integer> labelstart = FitterUtils.Getlabel(imgs, fixedstartpoint, originalslope,
 						originalintercept);
@@ -248,7 +251,7 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 					labelindexend = labelend.get(0);
 
 				if (labelindex != Integer.MIN_VALUE && labelindexend!= Integer.MIN_VALUE) {
-					paramnextframe = Getfinaltrackparam(PrevFrameparamstart.get(index), labelstart.get(0), psf,
+					paramnextframe = Getfinaltrackparam(PrevFrameparamstart, labelstart.get(0), psf,
 							framenumber);
 
 					paramnextframestart = paramnextframe.getA();
@@ -256,11 +259,11 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 
 					// Start point
 					double[] currentposinistart = paramnextframestart.currentpos;
-					double[] previousposinistart = PrevFrameparamstart.get(index).currentpos;
+					double[] previousposinistart = PrevFrameparamstart.currentpos;
 
 					// End point
 					double[] currentposiniend = paramnextframeend.currentpos;
-					double[] previousposiniend = PrevFrameparamend.get(index).currentpos;
+					double[] previousposiniend = PrevFrameparamend.currentpos;
 
 					double distmin = Distance(currentposinistart, previousposinistart);
 					double distminend = Distance(currentposiniend, previousposiniend);
@@ -268,7 +271,7 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 					if (labelstart.size() > 1) {
 						for (int j = 1; j < labelstart.size(); ++j) {
 							System.out.println("Fitting multiple Labels");
-							Indexedlength teststart = Getfinaltrackparam(PrevFrameparamstart.get(index),
+							Indexedlength teststart = Getfinaltrackparam(PrevFrameparamstart,
 									labelstart.get(j), psf, framenumber, StartorEnd.Start);
 							double[] currentposstart = teststart.currentpos;
 
@@ -291,7 +294,7 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 					if (labelend.size() > 1) {
 						for (int j = 1; j < labelend.size(); ++j) {
 							System.out.println("Fitting multiple Labels");
-							Indexedlength testend = Getfinaltrackparam(PrevFrameparamend.get(index),
+							Indexedlength testend = Getfinaltrackparam(PrevFrameparamend,
 									labelend.get(j), psf, framenumber, StartorEnd.End);
 							double[] currentposend = testend.currentpos;
 
@@ -316,31 +319,31 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 				}
 
 				else{
-					paramnextframestart = PrevFrameparamstart.get(index);
-					paramnextframeend = PrevFrameparamend.get(index);
+					paramnextframestart = PrevFrameparamstart;
+					paramnextframeend = PrevFrameparamend;
 					 paramnextframe = new ValuePair<Indexedlength,
-					 Indexedlength>(PrevFrameparamstart.get(index),
-					 PrevFrameparamend.get(index));
+					 Indexedlength>(PrevFrameparamstart,
+					 PrevFrameparamend);
 				}
 				
 
 				paramnextframestart = paramnextframe.getA();
 				paramnextframeend = paramnextframe.getB();
 
-				double[] oldstartpointstart = PrevFrameparamstart.get(index).currentpos;
+				double[] oldstartpointstart = PrevFrameparamstart.currentpos;
 				double[] newstartpointstart = paramnextframestart.currentpos;
 				double newstartslope = paramnextframestart.slope;
 				double newstartintercept = paramnextframestart.intercept;
 
 				if (framenumber > startframe + 1 || Math.abs(newstartslope) != Double.NaN) {
 					// TCASM
-					double oldslope = (PrevFrameparamstart.get(index).currentpos[1]
-							- PrevFrameparamstart.get(index).fixedpos[1])
-							/ (PrevFrameparamstart.get(index).currentpos[0]
-									- PrevFrameparamstart.get(index).fixedpos[0]);
+					double oldslope = (PrevFrameparamstart.currentpos[1]
+							- PrevFrameparamstart.fixedpos[1])
+							/ (PrevFrameparamstart.currentpos[0]
+									- PrevFrameparamstart.fixedpos[0]);
 
-					double oldintercept = PrevFrameparamstart.get(index).currentpos[1]
-							- oldslope * PrevFrameparamstart.get(index).currentpos[0];
+					double oldintercept = PrevFrameparamstart.currentpos[1]
+							- oldslope * PrevFrameparamstart.currentpos[0];
 
 					double dist = (paramnextframestart.currentpos[1] - oldslope * paramnextframestart.currentpos[0]
 							- oldintercept) / Math.sqrt(1 + oldslope * oldslope);
@@ -363,10 +366,10 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 						if (Math.abs(dist) > maxdist) {
 							IJ.log("Miss Assingment detected, activating TCASM layer at " + " " + oldstartpointstart[0]
 									+ " " + oldstartpointstart[1]);
-							paramnextframestart = PrevFrameparamstart.get(index);
+							paramnextframestart = PrevFrameparamstart;
 							newstartpointstart = oldstartpointstart;
-							newstartslope = PrevFrameparamstart.get(index).slope;
-							newstartintercept = PrevFrameparamstart.get(index).intercept;
+							newstartslope = PrevFrameparamstart.slope;
+							newstartintercept = PrevFrameparamstart.intercept;
 						}
 
 					}
@@ -376,24 +379,24 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 
 				final Trackproperties startedge = new Trackproperties(framenumber, labelindex, oldstartpointstart,
 						newstartpointstart, newstartslope, newstartintercept, originalslope, originalintercept,
-						PrevFrameparamstart.get(index).seedLabel, PrevFrameparamstart.get(index).fixedpos,
-						PrevFrameparamstart.get(index).originalds);
+						PrevFrameparamstart.seedLabel, PrevFrameparamstart.fixedpos,
+						PrevFrameparamstart.originalds);
 
 				startinframe.add(startedge);
 
-				double[] oldstartpointend = PrevFrameparamend.get(index).currentpos;
+				double[] oldstartpointend = PrevFrameparamend.currentpos;
 				double[] newstartpointend = paramnextframeend.currentpos;
 				double newendslope = paramnextframeend.slope;
 				double newendintercept = paramnextframeend.intercept;
 
 				if (framenumber > startframe + 1 || Math.abs(newendslope) != Double.NaN) {
 					// TCASM
-					double oldslope = (PrevFrameparamend.get(index).currentpos[1]
-							- PrevFrameparamend.get(index).fixedpos[1])
-							/ (PrevFrameparamend.get(index).currentpos[0] - PrevFrameparamend.get(index).fixedpos[0]);
+					double oldslope = (PrevFrameparamend.currentpos[1]
+							- PrevFrameparamend.fixedpos[1])
+							/ (PrevFrameparamend.currentpos[0] - PrevFrameparamend.fixedpos[0]);
 
-					double oldintercept = PrevFrameparamend.get(index).currentpos[1]
-							- oldslope * PrevFrameparamend.get(index).currentpos[0];
+					double oldintercept = PrevFrameparamend.currentpos[1]
+							- oldslope * PrevFrameparamend.currentpos[0];
 
 					double dist = (paramnextframeend.currentpos[1] - oldslope * paramnextframeend.currentpos[0]
 							- oldintercept) / Math.sqrt(1 + oldslope * oldslope);
@@ -415,10 +418,10 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 						if (Math.abs(dist) > maxdist) {
 							IJ.log("Miss Assingment detected, activating TCASM layer at " + " " + oldstartpointend[0]
 									+ " " + oldstartpointend[1]);
-							paramnextframeend = PrevFrameparamend.get(index);
+							paramnextframeend = PrevFrameparamend;
 							newstartpointend = oldstartpointend;
-							newendslope = PrevFrameparamend.get(index).slope;
-							newendintercept = PrevFrameparamend.get(index).intercept;
+							newendslope = PrevFrameparamend.slope;
+							newendintercept = PrevFrameparamend.intercept;
 						}
 
 					}
@@ -428,16 +431,15 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 
 				final Trackproperties endedge = new Trackproperties(framenumber, labelindexend, oldstartpointend,
 						newstartpointend, newendslope, newendintercept, originalslope, originalintercept,
-						PrevFrameparamend.get(index).seedLabel, PrevFrameparamend.get(index).fixedpos,
-						PrevFrameparamend.get(index).originalds);
+						PrevFrameparamend.seedLabel, PrevFrameparamend.fixedpos,
+						PrevFrameparamend.originalds);
 
 				endinframe.add(endedge);
 
 			}
 
-		}
+		
 
-	
 
 		return true;
 	}
@@ -1735,5 +1737,13 @@ public class SubpixelVelocityCline extends BenchmarkAlgorithm
 		}
 		return (distance);
 	}
+	
+	@Override
+	public void run() {
+		
+		process();
+		
+	}
+
 
 }

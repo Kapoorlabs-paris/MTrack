@@ -84,48 +84,7 @@ public class GetLocalmaxminMT {
 	protected IntensityType intensityType;
 
 	// Thresholding a FloatType to set values below the threshold to 0 intensity
-	public static void ThresholdingMT(RandomAccessibleInterval<FloatType> img, RandomAccessibleInterval<FloatType> imgout,
-			Float ThresholdValue, final IntensityType setintensity, double[] sigma) {
-
-		final double[] backpos = new double[imgout.numDimensions()];
-		final Cursor<FloatType> bound = Views.iterable(img).localizingCursor();
-
-		final RandomAccess<FloatType> outbound = imgout.randomAccess();
-
-		while (bound.hasNext()) {
-
-
-			bound.fwd();
-
-			outbound.setPosition(bound);
-
-			if (bound.get().get() > (ThresholdValue)) {
-
-				bound.localize(backpos);
-				switch (setintensity) {
-
-				
-
-				case Gaussian:
-					AddGaussian.addGaussian(imgout, backpos, sigma);
-					break;
-				
-				default:
-					AddGaussian.addGaussian(imgout, backpos, sigma);
-					break;
-
-				}
-
-			}
-
-			else {
-
-				outbound.get().setZero();
-
-			}
-		}
-	}
-
+	
 	// Thresholding a FlotType to convert to BitType
 	
 

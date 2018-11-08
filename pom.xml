@@ -11,7 +11,6 @@
 
 	<groupId>net.kapoor</groupId>
 	<artifactId>MTV_Tracker</artifactId>
-	<version>1.4.4</version>
 
 	<name>Microtubule Tracker</name>
 	<description>Microtubule tracker.</description>
@@ -166,4 +165,5 @@
 			<artifactId>jfreechart</artifactId>
 		</dependency>
 	</dependencies>
+	<version>2.0.0</version>
 </project>

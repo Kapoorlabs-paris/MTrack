@@ -66,12 +66,13 @@ import peakFitter.GaussianMaskFitMSER.EndfitMSER;
 import peakFitter.SubpixelVelocityPCLine.StartorEnd;
 import preProcessing.GetLocalmaxminMT;
 
-public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements OutputAlgorithm<ArrayList<Indexedlength>> {
+public class ParallelSubpixelVelocityUserSeed extends BenchmarkAlgorithm implements OutputAlgorithm<ArrayList<Indexedlength>>, Runnable {
 
 	private static final String BASE_ERROR_MSG = "[SubpixelVelocityUserSeed] ";
 	private final RandomAccessibleInterval<FloatType> source;
 	private final ArrayList<CommonOutputHF> imgs;
-	private final ArrayList<Indexedlength> Userframe;
+	private final ArrayList<Indexedlength> ListUserframe;
+	private final int listindex;
 	private final int ndims;
 	private final int framenumber;
 	private ArrayList<Indexedlength> final_paramlistuser;
@@ -167,8 +168,8 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 		this.halfgaussian = halfgaussian;
 	}
 
-	public SubpixelVelocityUserSeed(final RandomAccessibleInterval<FloatType> source, final LinefinderHF linefinder,
-			final ArrayList<Indexedlength> Userframe, final double[] psf, final int framenumber,
+	public ParallelSubpixelVelocityUserSeed(final RandomAccessibleInterval<FloatType> source, final LinefinderHF linefinder,
+			final ArrayList<Indexedlength> ListUserframe, final int listindex, final double[] psf, final int framenumber,
 			final UserChoiceModel model, final boolean DoMask, final JProgressBar jpb, final int thirdDimsize,
 			int startframe) {
 
@@ -176,7 +177,8 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 		linefinder.process();
 		imgs = linefinder.getResult();
 		this.source = source;
-		this.Userframe = Userframe;
+		this.ListUserframe = ListUserframe;
+		this.listindex = listindex;
 		this.psf = psf;
 		this.framenumber = framenumber;
 		this.ndims = source.numDimensions();
@@ -218,31 +220,29 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 		startinuserframe = new ArrayList<Trackproperties>();
 		
 	
+		Indexedlength Userframe = ListUserframe.get(listindex);
 		
-		
-		for (int index = 0; index < Userframe.size(); ++index) {
 
-			percent = (Math.round(100 * (index + 1) / (Userframe.size())));
 
 			if (framenumber >= startframe + 1  ) {
 
-				originalslope = Userframe.get(index).slope;
-				originalintercept = Userframe.get(index).intercept;
+				originalslope = Userframe.slope;
+				originalintercept = Userframe.intercept;
 			}
 			
 			
 			
 			final Point linepoint = new Point(ndims);
-			linepoint.setPosition(new long[] { (long) Userframe.get(index).currentpos[0],
-					(long) Userframe.get(index).currentpos[1] });
+			linepoint.setPosition(new long[] { (long) Userframe.currentpos[0],
+					(long) Userframe.currentpos[1] });
 
-			final OvalRoi Bigroi = new OvalRoi(Util.round(Userframe.get(index).currentpos[0] - 2.5),
-					Util.round(Userframe.get(index).currentpos[1] - 2.5), Util.round(5), Util.round(5));
+			final OvalRoi Bigroi = new OvalRoi(Util.round(Userframe.currentpos[0] - 2.5),
+					Util.round(Userframe.currentpos[1] - 2.5), Util.round(5), Util.round(5));
 			onlyroi.add(Bigroi);
 
 			final Point fixedstartpoint = new Point(ndims);
 			fixedstartpoint.setPosition(
-					new long[] { (long) Userframe.get(index).fixedpos[0], (long) Userframe.get(index).fixedpos[1] });
+					new long[] { (long) Userframe.fixedpos[0], (long) Userframe.fixedpos[1] });
 
 			ArrayList<Integer> labelstart = FitterUtils.Getlabel(imgs, fixedstartpoint, originalslope,
 					originalintercept);
@@ -256,15 +256,15 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 
 			
 			if (labelindex != Integer.MIN_VALUE) {
-				paramnextframestart = Getfinaltrackparam(Userframe.get(index), labelstart.get(0), psf, startframe);
+				paramnextframestart = Getfinaltrackparam(Userframe, labelstart.get(0), psf, startframe);
 				double[] currentposini = paramnextframestart.currentpos;
-				double[] previouspos = Userframe.get(index).currentpos;
+				double[] previouspos = Userframe.currentpos;
 				double distmin = Distance(currentposini, previouspos);
 
 				if (labelstart.size() > 1) {
 					for (int j = 1; j < labelstart.size(); ++j) {
 						System.out.println("Fitting multiple Labels" + "User defined");
-						Indexedlength test = Getfinaltrackparam(Userframe.get(index), labelstart.get(j), psf,
+						Indexedlength test = Getfinaltrackparam(Userframe, labelstart.get(j), psf,
 								startframe);
 
 						double[] currentpos = test.currentpos;
@@ -290,20 +290,20 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 			}
 
 			else
-				paramnextframestart = Userframe.get(index);
+				paramnextframestart = Userframe;
 
 			if (paramnextframestart == null)
-				paramnextframestart = Userframe.get(index);
-			final double[] oldstartpoint = Userframe.get(index).currentpos;
+				paramnextframestart = Userframe;
+			final double[] oldstartpoint = Userframe.currentpos;
 
 			double[] newstartpoint = paramnextframestart.currentpos;
 			double newstartslope = paramnextframestart.slope;
 			double newstartintercept = paramnextframestart.intercept;
 			if (framenumber > startframe + 1 && Math.abs(newstartslope)!=Double.NaN){
-			double oldslope = (Userframe.get(index).currentpos[1] -  Userframe.get(index).fixedpos[1])
-					/(Userframe.get(index).currentpos[0] -  Userframe.get(index).fixedpos[0]);
+			double oldslope = (Userframe.currentpos[1] -  Userframe.fixedpos[1])
+					/(Userframe.currentpos[0] -  Userframe.fixedpos[0]);
 			
-			double oldintercept = Userframe.get(index).currentpos[1] - oldslope * Userframe.get(index).currentpos[0];
+			double oldintercept = Userframe.currentpos[1] - oldslope * Userframe.currentpos[0];
 			
 			double newslope = (paramnextframestart.currentpos[1] - paramnextframestart.fixedpos[1] ) 
 					/(paramnextframestart.currentpos[0] - paramnextframestart.fixedpos[0]) ;
@@ -322,10 +322,10 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 			if (dist!=Double.NaN){
 			if (Math.abs(dist) > maxdist ) {
 				IJ.log("Miss Assingment detected, activating TCASM layer at " + " " +  oldstartpoint[0] + " " + oldstartpoint[1]);
-				paramnextframestart = Userframe.get(index);
+				paramnextframestart = Userframe;
 				newstartpoint = oldstartpoint;
-				newstartslope = Userframe.get(index).slope;
-				newstartintercept = Userframe.get(index).intercept;
+				newstartslope = Userframe.slope;
+				newstartintercept = Userframe.intercept;
 			}
 			
 			}
@@ -336,11 +336,10 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 			
 
 			final Trackproperties startedge = new Trackproperties(framenumber, labelindex, oldstartpoint, newstartpoint,
-					newstartslope, newstartintercept, originalslope, originalintercept, Userframe.get(index).seedLabel,
-					Userframe.get(index).fixedpos, Userframe.get(index).originalds);
+					newstartslope, newstartintercept, originalslope, originalintercept, Userframe.seedLabel,
+					Userframe.fixedpos, Userframe.originalds);
 
 			startinuserframe.add(startedge);
-		}
 
 		return true;
 	}
@@ -965,6 +964,13 @@ public class SubpixelVelocityUserSeed extends BenchmarkAlgorithm implements Outp
 
 		return midpoint;
 
+	}
+
+	@Override
+	public void run() {
+		
+		process();
+		
 	}
 
 }
