@@ -128,7 +128,7 @@ public  class FindlinesVia {
 		   
 		   NewFrameparamStart.addAll( ParallelgrowthtrackerStart.getResult());
 		   startStateVectors.addAll(ParallelgrowthtrackerStart.getstartStateVectors());
-			
+			tasksStart.clear();
 			}
 			
 			for(int index = 0; index < PrevFrameparam.getB().size(); ++index) {
@@ -150,10 +150,9 @@ public  class FindlinesVia {
 				
 			   NewFrameparamEnd.addAll(ParallelgrowthtrackerEnd.getResult());
 			   endStateVectors.addAll(ParallelgrowthtrackerEnd.getstartStateVectors());
-			   
+			   tasksEnd.clear();
 				}
 			
-			//Accountedframes  = growthtracker.getAccountedframes() ;
 			
 			Pair<ArrayList<Indexedlength>,ArrayList<Indexedlength>> NewFrameparam = new ValuePair<ArrayList<Indexedlength>,ArrayList<Indexedlength>>(NewFrameparamStart,NewFrameparamEnd );
 		
@@ -215,6 +214,7 @@ public  class FindlinesVia {
 		   
 		   NewFrameparamStart.addAll( ParallelgrowthtrackerStart.getResult());
 		   startStateVectors.addAll(ParallelgrowthtrackerStart.getstartStateVectors());
+		   tasksStart.clear();
 		}
 		
 

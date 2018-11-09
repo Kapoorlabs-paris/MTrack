@@ -164,7 +164,7 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public ArrayList<float[]> deltadend = new ArrayList<>();
 	public ArrayList<float[]> deltad = new ArrayList<>();
 	public ArrayList<float[]> lengthKymo;
-	public final int scrollbarSize = 1000;
+	public int scrollbarSize = 10000;
 	public final int scrollbarSizebig = 1000;
 	public boolean AdvancedChoice = false;
 	public boolean AdvancedChoiceSeeds = false;
@@ -646,10 +646,9 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 				(int) originalimg.dimension(1) - 2 * iniy);
 		
 		
-		imp = ImageJFunctions.show(originalimg);
+		imp = ImageJFunctions.wrap(originalimg, "");
 		imp.setTitle("Original movie");
 		
-		impcopy = imp.duplicate();
 		this.addToName = addToName;
 		
 		this.userfile = userfile;
@@ -672,10 +671,9 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 
 		standardRectangle = new Rectangle(inix, iniy, (int) originalimg.dimension(0) - 2 * inix,
 				(int) originalimg.dimension(1) - 2 * iniy);
-		imp = ImageJFunctions.show(originalimg);
+		imp = ImageJFunctions.wrap(originalimg, "");
 		
 		imp.setTitle("Original movie");
-		impcopy = imp.duplicate();
 		this.addToName = addToName;
 		
 		this.userfile = userfile;
