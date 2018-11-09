@@ -88,7 +88,7 @@ public class ThirdPanel {
 		
 		final JScrollBar starttimeslider = new JScrollBar(Scrollbar.HORIZONTAL, parent.starttime, 10, 0, 10 + parent.scrollbarSize);
 		
-		final JScrollBar endtimeslider = new JScrollBar(Scrollbar.HORIZONTAL, parent.endtime , 10, 0, 10 + Math.max(parent.scrollbarSize,parent.endtime));
+		final JScrollBar endtimeslider = new JScrollBar(Scrollbar.HORIZONTAL, parent.endtime , 10, 0, 10 + parent.scrollbarSize);
 	  
 		endtimeslider.setValue(parent.endtime);
 		starttimeslider.setValue(parent.starttime);
