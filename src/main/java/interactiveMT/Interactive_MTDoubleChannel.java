@@ -164,8 +164,10 @@ public class Interactive_MTDoubleChannel implements PlugIn {
 	public ArrayList<float[]> deltadend = new ArrayList<>();
 	public ArrayList<float[]> deltad = new ArrayList<>();
 	public ArrayList<float[]> lengthKymo;
-	public int scrollbarSize = 10000;
-	public final int scrollbarSizebig = 1000;
+
+	public final int scrollbarSize = 10000;
+	public final int scrollbarSizebig = 10000;
+
 	public boolean AdvancedChoice = false;
 	public boolean AdvancedChoiceSeeds = false;
 

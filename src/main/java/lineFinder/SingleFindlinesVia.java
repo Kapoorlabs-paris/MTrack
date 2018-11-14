@@ -79,7 +79,7 @@ public class SingleFindlinesVia {
 		 
 		 List<Callable<Object>> tasksStart = new ArrayList<Callable<Object>>();
 		 
-		 
+		 if(PrevFrameparam.getA().size() > 0)
 		 for(int index = 0; index < PrevFrameparam.getA().size(); ++index) {
 			 
 			 
@@ -97,12 +97,13 @@ public class SingleFindlinesVia {
 
 				}
 				
-			   
+			
 			   NewFrameparamStart.addAll( ParallelgrowthtrackerStart.getResult().getA());
 			   NewFrameparamEnd.addAll( ParallelgrowthtrackerStart.getResult().getB());
 			   
 			   startStateVectors.addAll(ParallelgrowthtrackerStart.getstartStateVectors());
 			   endStateVectors.addAll(ParallelgrowthtrackerStart.getendStateVectors());
+
 			   tasksStart.clear();
 		 }
 		 
@@ -144,7 +145,7 @@ public class SingleFindlinesVia {
 		 
 		 List<Callable<Object>> tasksStart = new ArrayList<Callable<Object>>();
 		 
-		 
+		 if(PrevFrameparam.size() > 0)
 		for(int index = 0; index < PrevFrameparam.size(); ++index) {
                      
 			final ParallelSubpixelVelocityUserSeed ParallelgrowthtrackerStart = 
@@ -164,6 +165,7 @@ public class SingleFindlinesVia {
 		   
 		   NewFrameparamStart.addAll( ParallelgrowthtrackerStart.getResult());
 		   startStateVectors.addAll(ParallelgrowthtrackerStart.getstartStateVectors());
+
 		   tasksStart.clear();
 		}
 		

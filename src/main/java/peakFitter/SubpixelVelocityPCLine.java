@@ -364,7 +364,7 @@ public void setMaxdisp (double maxdisp) {
 				
 			
 				if (Math.abs(dist)!=Double.NaN){
-				System.out.println(dist);
+			//	System.out.println(dist);
 				
 				// TCASM
 				if (Math.abs(dist) > maxdist){
@@ -488,7 +488,7 @@ public void setMaxdisp (double maxdisp) {
 		
 				if (dist!=Double.NaN ){
 					
-					System.out.println(dist + " " + maxdist);
+					//System.out.println(dist + " " + maxdist);
 					
 				if (Math.abs(dist) > maxdist){
 					IJ.log("Miss Assingment detected, activating TCASM layer at " + " " + oldendpoint[0] + " " + oldendpoint[1]);

@@ -110,7 +110,8 @@ public void markendnew(){
 					
 					
 				}
-				
+			
+					/*
 					if (nearestRoiCurr!=null){
 					Rectangle rect = nearestRoiCurr.getBounds();
 
@@ -154,8 +155,10 @@ public void markendnew(){
 					
 				  System.out.println("You deleted: " + newx + "," + newy);
 					}
+					
+					*/
 			}
-				
+			
 				if(SwingUtilities.isLeftMouseButton(e) && e.isShiftDown()){
 					
 					

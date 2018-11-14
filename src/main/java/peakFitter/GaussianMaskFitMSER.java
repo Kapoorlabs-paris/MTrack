@@ -153,7 +153,7 @@ public class GaussianMaskFitMSER {
 
 		// ImageJFunctions.show(gaussianMask);
 		
-		System.out.println("Number of photons on this pixel (Relative): " + Numphotons);
+		//System.out.println("Number of photons on this pixel (Relative): " + Numphotons);
 	
 	
 		

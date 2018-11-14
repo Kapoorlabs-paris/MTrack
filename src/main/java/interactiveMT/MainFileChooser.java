@@ -786,7 +786,7 @@ public class MainFileChooser extends JPanel {
 
 							preoutputSlice = (IntervalView<FloatType>) Preprocess(outputSlice);
 							Normalize.normalize(Views.iterable(pretotalimg), minval, maxval);
-						//	ImageJFunctions.show(pretotalimg).setTitle("Preprocessed Movie");
+
 						}
 
 						Normalize.normalize(Views.iterable(totalimg), minval, maxval);
@@ -897,7 +897,7 @@ public class MainFileChooser extends JPanel {
 
 					case JOptionPane.NO_OPTION:
 						// Put constructor for single channel
-					//	ImageJFunctions.show(originalPreprocessedimg).setTitle("Preprocessed Movie");
+
 						if (Simplemode)
 
 							new Interactive_MTSingleChannelBasic(new Interactive_MTSingleChannel(originalimg,
