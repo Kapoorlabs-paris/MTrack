@@ -57,7 +57,7 @@ public void markendnew(){
 			
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				
+				/*
 				if(SwingUtilities.isLeftMouseButton(e) && e.isShiftDown() == false && e.isAltDown() == false){
 					
 					int x = canvas.offScreenX(e.getX());
@@ -155,7 +155,7 @@ public void markendnew(){
 				  System.out.println("You deleted: " + newx + "," + newy);
 					}
 			}
-				
+			*/	
 				if(SwingUtilities.isLeftMouseButton(e) && e.isShiftDown()){
 					
 					

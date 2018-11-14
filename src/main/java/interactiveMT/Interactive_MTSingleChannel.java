@@ -141,8 +141,8 @@ public class Interactive_MTSingleChannel implements PlugIn {
 	public ArrayList<float[]> deltad = new ArrayList<>();
 	public TextField inputField = new TextField();
 	public ArrayList<float[]> lengthKymo;
-	public final int scrollbarSize = 1000;
-	public final int scrollbarSizebig = 1000;
+	public final int scrollbarSize = 10000;
+	public final int scrollbarSizebig = 10000;
 	public boolean AdvancedChoice = false;
 	public boolean AdvancedChoiceSeeds = false;
 	
