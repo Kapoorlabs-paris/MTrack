@@ -141,8 +141,10 @@ public class Interactive_MTSingleChannel implements PlugIn {
 	public ArrayList<float[]> deltad = new ArrayList<>();
 	public TextField inputField = new TextField();
 	public ArrayList<float[]> lengthKymo;
+
 	public final int scrollbarSize = 10000;
 	public final int scrollbarSizebig = 10000;
+
 	public boolean AdvancedChoice = false;
 	public boolean AdvancedChoiceSeeds = false;
 	
@@ -606,8 +608,8 @@ public class Interactive_MTSingleChannel implements PlugIn {
 		this.Kymoimg = null;
 		standardRectangle = new Rectangle(inix, iniy, (int) originalimg.dimension(0) - 2 * inix,
 				(int) originalimg.dimension(1) - 2 * iniy);
-		imp = ImageJFunctions.show(originalimg);
-		impcopy = imp.duplicate();
+		imp = ImageJFunctions.wrap(originalimg, "");
+		
 
 		imp.setTitle("Original movie");
 		this.addToName = addToName;
@@ -628,8 +630,8 @@ public class Interactive_MTSingleChannel implements PlugIn {
 		this.psf = psf;
 		standardRectangle = new Rectangle(inix, iniy, (int) originalimg.dimension(0) - 2 * inix,
 				(int) originalimg.dimension(1) - 2 * iniy);
-		imp = ImageJFunctions.show(originalimg);
-		impcopy = imp.duplicate();
+		imp = ImageJFunctions.wrap(originalimg, "");
+		
 		imp.setTitle("Original movie");
 		this.addToName = addToName;
 		this.userfile = userfile;
@@ -708,7 +710,7 @@ public class Interactive_MTSingleChannel implements PlugIn {
 		endStack = thirdDimensionSize;
 		thirdDimensionSizeOriginal = thirdDimensionSize;
 		preprocessedimp = ImageJFunctions.show(CurrentView);
-        preprocessedimp.setTitle("Preprocessed movie");
+        preprocessedimp.setTitle("Active image" + " " + "time point : " + thirdDimension);
 		Roi roi = preprocessedimp.getRoi();
 
 		if (roi == null) {

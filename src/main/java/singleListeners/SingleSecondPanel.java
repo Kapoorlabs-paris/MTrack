@@ -84,7 +84,6 @@ public class SingleSecondPanel {
 		Deselect.setLayout(child.layout);
 		Timeselect.setLayout(child.layout);
 		Batchselect.setLayout(child.layout);
-		
 		final JScrollBar timeslider = new JScrollBar(Scrollbar.HORIZONTAL, parent.thirdDimensionsliderInit, 10, 0, 10 + parent.scrollbarSize);
 		
 		final JScrollBar starttimeslider = new JScrollBar(Scrollbar.HORIZONTAL, parent.starttime, 10, 0, 10 + parent.scrollbarSize);
