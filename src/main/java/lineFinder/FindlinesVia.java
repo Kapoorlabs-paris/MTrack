@@ -108,7 +108,7 @@ public  class FindlinesVia {
 			 List<Callable<Object>> tasksStart = new ArrayList<Callable<Object>>();
 			 List<Callable<Object>> tasksEnd = new ArrayList<Callable<Object>>();
 			 
-			 
+			 if(PrevFrameparam.getA().size() > 0)
 			for(int index = 0; index < PrevFrameparam.getA().size(); ++index) {
 			final ParallelSubpixelVelocityPCLineStart ParallelgrowthtrackerStart = new ParallelSubpixelVelocityPCLineStart(source, linefinder,
 					PrevFrameparam.getA(), index, psf, framenumber, model, DoMask, Trackstart,jpb, thirdDimsize, startframe, numgaussians);
@@ -130,7 +130,7 @@ public  class FindlinesVia {
 		   startStateVectors.addAll(ParallelgrowthtrackerStart.getstartStateVectors());
 			tasksStart.clear();
 			}
-			
+			 if(PrevFrameparam.getB().size() > 0)
 			for(int index = 0; index < PrevFrameparam.getB().size(); ++index) {
 				final ParallelSubpixelVelocityPCLineStart ParallelgrowthtrackerEnd = new ParallelSubpixelVelocityPCLineStart(source, linefinder,
 						PrevFrameparam.getB(), index, psf, framenumber, model, DoMask, Trackstart,jpb, thirdDimsize, startframe, numgaussians);
@@ -194,7 +194,7 @@ public  class FindlinesVia {
 		 
 		 List<Callable<Object>> tasksStart = new ArrayList<Callable<Object>>();
 		 
-		 
+		 if(PrevFrameparam.size() > 0)
 		for(int index = 0; index < PrevFrameparam.size(); ++index) {
                      
 			final ParallelSubpixelVelocityUserSeed ParallelgrowthtrackerStart = 

@@ -94,6 +94,7 @@ public class ThirdPanel {
 		starttimeslider.setValue(parent.starttime);
 		parent.thirdDimension = parent.computeScrollbarPositionFromValue(parent.thirdDimension, parent.thirdDimensionsliderInit, parent.thirdDimensionSize, parent.scrollbarSize);
 		
+		endtimeslider.setValue(parent.computeScrollbarPositionFromValue(parent.endtime, parent.thirdDimensionsliderInit, parent.thirdDimensionSize, parent.scrollbarSize));
 		
 		final String timestring = "Time point for choosing ends ";
 		final String starttimestring = "Start time for tracking ";
@@ -115,8 +116,8 @@ public class ThirdPanel {
 				new EmptyBorder(parent.c.insets));
 		
 		
-		final Label LeftClick = new Label(
-				"Left click deselects/selects an end");
+	//	final Label LeftClick = new Label(
+	//			"Left click deselects/selects an end");
 		final Label SLeftClick = new Label( "Shift +  left click marks a user defined seed");
 		
 		
@@ -134,8 +135,8 @@ public class ThirdPanel {
 		parent.Deselect.add(timeslider,new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
 				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 		
-		parent.Deselect.add(LeftClick,new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
-				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+	//	parent.Deselect.add(LeftClick,new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
+	//			GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 		
 		parent.Deselect.add(SLeftClick,new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
 				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));

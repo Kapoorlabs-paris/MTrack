@@ -79,7 +79,7 @@ public class SingleFindlinesVia {
 		 
 		 List<Callable<Object>> tasksStart = new ArrayList<Callable<Object>>();
 		 
-		 
+		 if(PrevFrameparam.getA().size() > 0)
 		 for(int index = 0; index < PrevFrameparam.getA().size(); ++index) {
 			 
 			 
@@ -145,7 +145,7 @@ public class SingleFindlinesVia {
 		 
 		 List<Callable<Object>> tasksStart = new ArrayList<Callable<Object>>();
 		 
-		 
+		 if(PrevFrameparam.size() > 0)
 		for(int index = 0; index < PrevFrameparam.size(); ++index) {
                      
 			final ParallelSubpixelVelocityUserSeed ParallelgrowthtrackerStart = 

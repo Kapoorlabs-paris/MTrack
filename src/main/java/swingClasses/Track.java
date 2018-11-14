@@ -578,6 +578,7 @@ public class Track {
 				}
 
 			}
+			
 
 		
 
@@ -591,10 +592,10 @@ public class Track {
 		FileSaver.SaveResults(parent.Allstart, plusminusstartlist, parent.startlengthlist, parent.calibration,
 				parent.userfile, parent.addToName, parent.nf);
 		
-	//	FileSaverDummy.SaveResults(parent.Allend, plusminusendlist, parent.endlengthlist, parent.calibration,
-	//			parent.userfile, parent.addToName, parent.nf);
-	//	FileSaverDummy.SaveResults(parent.Allstart, plusminusstartlist, parent.startlengthlist, parent.calibration,
-	//			parent.userfile, parent.addToName, parent.nf);
+		//FileSaverDummy.SaveResults(parent.Allend, plusminusendlist, parent.endlengthlist, parent.calibration,
+		//		parent.userfile, parent.addToName, parent.nf);
+		//FileSaverDummy.SaveResults(parent.Allstart, plusminusstartlist, parent.startlengthlist, parent.calibration,
+		//		parent.userfile, parent.addToName, parent.nf);
 		parent.displaystack();
 		if (parent.displayoverlay) {
 			parent.prestack.deleteLastSlice();
