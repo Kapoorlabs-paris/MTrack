@@ -358,7 +358,7 @@ public void setMaxdisp (double maxdisp) {
 				
 			
 				if (Math.abs(dist)!=Double.NaN){
-				System.out.println(dist);
+				//System.out.println(dist);
 				
 				// TCASM
 				if (Math.abs(dist) > maxdist){

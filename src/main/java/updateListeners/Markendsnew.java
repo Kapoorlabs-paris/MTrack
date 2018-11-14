@@ -109,6 +109,7 @@ public class Markendsnew {
 					
 					
 				}
+					/*
 				
 					if (nearestRoiCurr!=null){
 					Rectangle rect = nearestRoiCurr.getBounds();
@@ -153,6 +154,7 @@ public class Markendsnew {
 					
 				  System.out.println("You deleted: " + newx + "," + newy);
 					}
+					*/
 			}
 				
 				if(SwingUtilities.isLeftMouseButton(e) && e.isShiftDown()){

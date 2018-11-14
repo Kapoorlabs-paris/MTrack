@@ -108,9 +108,8 @@ public  class FindlinesVia {
 			 List<Callable<Object>> tasksStart = new ArrayList<Callable<Object>>();
 			 List<Callable<Object>> tasksEnd = new ArrayList<Callable<Object>>();
 			 
-			 
+			 if(PrevFrameparam.getA().size() > 0)
 			for(int index = 0; index < PrevFrameparam.getA().size(); ++index) {
-			
 			final ParallelSubpixelVelocityPCLineStart ParallelgrowthtrackerStart = new ParallelSubpixelVelocityPCLineStart(source, linefinder,
 					PrevFrameparam.getA(), index, psf, framenumber, model, DoMask, Trackstart,jpb, thirdDimsize, startframe, numgaussians);
 			ParallelgrowthtrackerStart.setIntensityratio(intensityratio);
@@ -118,6 +117,7 @@ public  class FindlinesVia {
 			ParallelgrowthtrackerStart.setMaxdist(maxdist);
 			ParallelgrowthtrackerStart.checkInput();
 			tasksStart.add(Executors.callable(ParallelgrowthtrackerStart));
+			if(tasksStart.size() > 0)
 			try {
 				taskExecutorStart.invokeAll(tasksStart);
 			} catch (InterruptedException e1) {
@@ -130,9 +130,8 @@ public  class FindlinesVia {
 		   startStateVectors.addAll(ParallelgrowthtrackerStart.getstartStateVectors());
 			tasksStart.clear();
 			}
-			
+			 if(PrevFrameparam.getB().size() > 0)
 			for(int index = 0; index < PrevFrameparam.getB().size(); ++index) {
-				
 				final ParallelSubpixelVelocityPCLineStart ParallelgrowthtrackerEnd = new ParallelSubpixelVelocityPCLineStart(source, linefinder,
 						PrevFrameparam.getB(), index, psf, framenumber, model, DoMask, Trackstart,jpb, thirdDimsize, startframe, numgaussians);
 				ParallelgrowthtrackerEnd.setIntensityratio(intensityratio);
@@ -141,6 +140,7 @@ public  class FindlinesVia {
 				ParallelgrowthtrackerEnd.checkInput();
 				
 				tasksEnd.add(Executors.callable(ParallelgrowthtrackerEnd));
+				if(tasksEnd.size() > 0)
 				try {
 					taskExecutorEnd.invokeAll(tasksEnd);
 				} catch (InterruptedException e1) {
@@ -193,7 +193,7 @@ public  class FindlinesVia {
 		 
 		 List<Callable<Object>> tasksStart = new ArrayList<Callable<Object>>();
 		 
-		 
+		 if(PrevFrameparam.size() > 0)
 		for(int index = 0; index < PrevFrameparam.size(); ++index) {
                      
 			final ParallelSubpixelVelocityUserSeed ParallelgrowthtrackerStart = 
@@ -204,6 +204,7 @@ public  class FindlinesVia {
 			ParallelgrowthtrackerStart.setMaxdist(maxdist);
 			ParallelgrowthtrackerStart.checkInput();
 			tasksStart.add(Executors.callable(ParallelgrowthtrackerStart));
+			if(tasksStart.size() > 0)
 			try {
 				taskExecutorStart.invokeAll(tasksStart);
 			} catch (InterruptedException e1) {

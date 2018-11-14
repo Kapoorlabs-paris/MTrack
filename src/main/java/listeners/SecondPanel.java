@@ -125,8 +125,8 @@ public class SecondPanel {
 				new EmptyBorder(child.c.insets));
 		
 		
-		final Label LeftClick = new Label(
-				"Left click deselects/selects an end");
+		//final Label LeftClick = new Label(
+		//		"Left click deselects/selects an end");
 		final Label SLeftClick = new Label( "Shift +  left click marks a user defined seed");
 		
 		final Label Batchsave = new Label(
@@ -145,8 +145,8 @@ public class SecondPanel {
 		Deselect.add(timeslider,new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
 				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 		
-		Deselect.add(LeftClick,new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
-				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
+		//Deselect.add(LeftClick,new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
+		//		GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
 		
 		Deselect.add(SLeftClick,new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.WEST,
 				GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
