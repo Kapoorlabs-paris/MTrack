@@ -178,7 +178,7 @@ public class Interactive_PSFAnalyze implements PlugIn {
 	
 	public float minDiversityMin = 0;
 	public float minDiversityMax = 1;
-	public int minSizeInit = 10;
+	public int minSizeInit = 1;
 	public int maxSizeInit = 5000;
 	public boolean isStarted = false;
 	public int minDiversityInit = 1;
@@ -816,11 +816,7 @@ public class Interactive_PSFAnalyze implements PlugIn {
 			minDiversity = computeValueFromScrollbarPosition(minDiversityInit, minDiversityMin, 
 					minDiversityMax,
 					scrollbarSize);
-			minSize = (int) computeValueFromScrollbarPosition(minSizeInit, 
-					minSizemin, minSizemax, scrollbarSize);
-			maxSize = (int) computeValueFromScrollbarPosition(maxSizeInit, 
-					maxSizemin, maxSizemax, scrollbarSize);
-
+		
 			final Label deltaText = new Label("Grey Level Seperation between Components = " + delta, Label.CENTER);
 			final Label Unstability_ScoreText = new Label("Unstability Score = " + Unstability_Score, Label.CENTER);
 			final Label minDiversityText = new Label("minDiversity = " +minDiversity, Label.CENTER);
@@ -1132,6 +1128,7 @@ public class Interactive_PSFAnalyze implements PlugIn {
 	public static void main(String[] args) {
 
 		JFrame frame = new JFrame("");
+		new ImageJ();
 		BeadFileChooser panel = new BeadFileChooser();
 
 		frame.getContentPane().add(panel, "Center");
