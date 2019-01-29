@@ -135,6 +135,8 @@ public class ProgressBeads extends SwingWorker<Void, Void> {
 	protected void done() {
 		try {
 
+			
+			System.out.println(parent.AllFittedBeads.size() + " Size ");
 			DrawPoints draw = new DrawPoints();
 			if (parent.AllFittedBeads.size() > 1)
 				draw.drawPoints(parent.AllFittedBeads);
