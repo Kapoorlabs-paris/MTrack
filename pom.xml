@@ -171,5 +171,7 @@
 			<version>${jfreesvg.version}</version>
 		</dependency>
 	</dependencies>
+
 	<version>2.0.5-SNAPSHOT</version>
+
 </project>

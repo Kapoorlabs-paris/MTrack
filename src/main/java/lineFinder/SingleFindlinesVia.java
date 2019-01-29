@@ -103,7 +103,7 @@ public class SingleFindlinesVia {
 			   
 			   startStateVectors.addAll(ParallelgrowthtrackerStart.getstartStateVectors());
 			   endStateVectors.addAll(ParallelgrowthtrackerStart.getendStateVectors());
-			   
+
 			   tasksStart.clear();
 		 }
 		 
@@ -165,7 +165,7 @@ public class SingleFindlinesVia {
 		   
 		   NewFrameparamStart.addAll( ParallelgrowthtrackerStart.getResult());
 		   startStateVectors.addAll(ParallelgrowthtrackerStart.getstartStateVectors());
-		   
+
 		   tasksStart.clear();
 		}
 		
