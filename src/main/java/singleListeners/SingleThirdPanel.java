@@ -81,17 +81,17 @@ public class SingleThirdPanel {
 			parent.Segselect.setLayout(parent.layout);
 			parent.panelThird.setLayout(parent.layout);
 			
-		
 		final JScrollBar timeslider = new JScrollBar(Scrollbar.HORIZONTAL, parent.thirdDimensionsliderInit, 10, 0, 10 + parent.scrollbarSize);
 		
 		final JScrollBar starttimeslider = new JScrollBar(Scrollbar.HORIZONTAL, parent.starttime, 10, 0, 10 + parent.scrollbarSize);
 		
-		final JScrollBar endtimeslider = new JScrollBar(Scrollbar.HORIZONTAL, parent.endtime, 10, 0, 10 + parent.scrollbarSize);
+		final JScrollBar endtimeslider = new JScrollBar(Scrollbar.HORIZONTAL, parent.endtime, 10, 0, 10 + + parent.scrollbarSize);
 	
 		parent.thirdDimension = parent.computeScrollbarPositionFromValue(parent.thirdDimensionsliderInit, parent.thirdDimensionsliderInit, parent.thirdDimensionSize, parent.scrollbarSize);
 		
 		endtimeslider.setValue(parent.computeScrollbarPositionFromValue(parent.endtime, parent.thirdDimensionsliderInit, parent.thirdDimensionSize, parent.scrollbarSize));
 		
+		endtimeslider.setValue(parent.computeScrollbarPositionFromValue(parent.endtime, parent.thirdDimensionsliderInit, parent.thirdDimensionSize, parent.scrollbarSize));
 		
 		
 		final String timestring = "Time point for choosing ends ";

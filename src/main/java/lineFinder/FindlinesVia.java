@@ -153,7 +153,6 @@ public  class FindlinesVia {
 			   tasksEnd.clear();
 				}
 			
-			//Accountedframes  = growthtracker.getAccountedframes() ;
 			
 			Pair<ArrayList<Indexedlength>,ArrayList<Indexedlength>> NewFrameparam = new ValuePair<ArrayList<Indexedlength>,ArrayList<Indexedlength>>(NewFrameparamStart,NewFrameparamEnd );
 		
