@@ -26,11 +26,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.jgrapht.WeightedGraph;
-import org.jgrapht.alg.NeighborIndex;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
-import org.jgrapht.graph.Subgraph;
 
 import fiji.tool.SliceListener;
 import fiji.tool.SliceObserver;
