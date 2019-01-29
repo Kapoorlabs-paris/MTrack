@@ -63,14 +63,14 @@ public class DrawPoints {
 	
      public  XYSeries drawLinePoints(final ArrayList<GaussianLineFitParam> beadLineparams){
 		
-		return drawLinePoints(beadLineparams, "Sigma", 20);
+		return drawLinePoints(beadLineparams, "Sigma", 100);
 	}
 	
 	
 	
 	public  XYSeries drawPoints(final ArrayList<GaussianFitParam> beadparams){
 		
-		return drawPoints(beadparams, "Sigma", 20);
+		return drawPoints(beadparams, "Sigma", 100);
 	}
 	
 	public  XYSeries drawPoints(final ArrayList<GaussianFitParam> beadparams, final String name, final int numBins){
@@ -87,18 +87,22 @@ public class DrawPoints {
 		if (name == "Sigma"){
 		
 		for (final GaussianFitParam param : beadparams ){
-			
+			if (Math.abs(param.Sigma[0])<=10000 && Math.abs(param.Sigma[1])<=100000){ 
+				
 			seriesname.add(param.Sigma[0], param.Sigma[1]);
 			Xvalues.add(param.Sigma[0]);
 			Yvalues.add(param.Sigma[1]);
 			
+		
+			
+			}
 		}
 		
 		}
 		
 		dataset.addSeries(seriesname);
 	
-		
+	
 		
 		final JFreeChart histXchart = makehistXChart(Xvalues, numBins);
 		final JFreeChart histYchart = makehistYChart(Yvalues, numBins);
@@ -128,7 +132,7 @@ public class DrawPoints {
 		if (name == "Sigma"){
 		
 		for (final GaussianLineFitParam param : beadLineparams ){
-			if (param!=null){
+			if (Math.abs(param.Sigma[0])<=10000 && Math.abs(param.Sigma[1])<=100000){ 
 			seriesname.add(param.Sigma[0], param.Sigma[1]);
 			Xvalues.add(param.Sigma[0]);
 			Yvalues.add(param.Sigma[1]);
@@ -249,6 +253,9 @@ public class DrawPoints {
 	
 	protected JFreeChart createChart( final IntervalXYDataset dataset, final String title, final String units )
 	{
+		
+		
+		
 		final JFreeChart chart = ChartFactory.createXYBarChart(
 			title,
 			"Pixel [" + units + "]", 
