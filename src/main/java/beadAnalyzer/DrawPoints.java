@@ -63,14 +63,14 @@ public class DrawPoints {
 	
      public  XYSeries drawLinePoints(final ArrayList<GaussianLineFitParam> beadLineparams){
 		
-		return drawLinePoints(beadLineparams, "Sigma", 100);
+		return drawLinePoints(beadLineparams, "Sigma", 1000);
 	}
 	
 	
 	
 	public  XYSeries drawPoints(final ArrayList<GaussianFitParam> beadparams){
 		
-		return drawPoints(beadparams, "Sigma", 100);
+		return drawPoints(beadparams, "Sigma", 1000);
 	}
 	
 	public  XYSeries drawPoints(final ArrayList<GaussianFitParam> beadparams, final String name, final int numBins){
