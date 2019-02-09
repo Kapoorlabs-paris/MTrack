@@ -5,7 +5,9 @@
 	<parent>
 		<groupId>org.scijava</groupId>
 		<artifactId>pom-scijava</artifactId>
+
 		<version>25.0.0</version>
+
 		<relativePath />
 	</parent>
 
@@ -83,6 +85,7 @@
 	<properties>
 		<license.licenseName>gpl_v3</license.licenseName>
 		<license.copyrightOwners>MTrack developers.</license.copyrightOwners>
+
 
 		<jfreesvg.version>3.3</jfreesvg.version>
 
