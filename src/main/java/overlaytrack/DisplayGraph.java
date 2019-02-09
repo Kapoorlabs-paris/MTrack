@@ -22,9 +22,6 @@
 package overlaytrack;
 
 import java.awt.Color;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Set;
 
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
@@ -33,13 +30,8 @@ import fiji.tool.SliceListener;
 import fiji.tool.SliceObserver;
 import graphconstructs.Trackproperties;
 import ij.ImagePlus;
-import ij.ImageStack;
 import ij.gui.Line;
 import ij.gui.Overlay;
-import net.imagej.DrawingTool;
-import net.imglib2.RandomAccessibleInterval;
-import net.imglib2.img.display.imagej.ImageJFunctions;
-import net.imglib2.type.numeric.real.FloatType;
 
 public class DisplayGraph {
 	// add listener to the imageplus slice slider
