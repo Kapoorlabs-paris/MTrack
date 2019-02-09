@@ -133,7 +133,7 @@ public class CreateINIfile {
 		LocalPrefs.set("RoiViaWatershed.boolean", parent.RoisViaWatershed);
 		
         LocalPrefs.set("autothreshold.boolean", parent.autothreshold);
-        LocalPrefs.setHomeDir(parent.userfile.getParent());
+        LocalPrefs.setHomeDir(parent.userfile.getPath());
         System.out.println(LocalPrefs.getHomeDir() + " " + LocalPrefs.getPrefsDir() + " " + Prefs.getHomeDir());
 		LocalPrefs.savePreferences();
 		
