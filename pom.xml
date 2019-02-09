@@ -6,7 +6,7 @@
 		<groupId>org.scijava</groupId>
 		<artifactId>pom-scijava</artifactId>
 
-		<version>24.2.0</version>
+		<version>25.0.0</version>
 
 		<relativePath />
 	</parent>
@@ -88,7 +88,6 @@
 
 
 		<jfreesvg.version>3.3</jfreesvg.version>
-		<jgrapht.version>1.3.0</jgrapht.version>
 
 		<!-- NB: Deploy releases to the ImageJ Maven repository. -->
 		<releaseProfiles>deploy-to-imagej</releaseProfiles>
@@ -158,12 +157,13 @@
 			<groupId>mpicbg</groupId>
 			<artifactId>mpicbg</artifactId>
 		</dependency>
-		<dependency>
+	
+	<dependency>
 			<groupId>org.jgrapht</groupId>
 			<artifactId>jgrapht-core</artifactId>
 			<version>${jgrapht.version}</version>
 		</dependency>
-			<dependency>
+		<dependency>
 			<!-- NB: dependency:analyze erroneously flags this, but it's required -->
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi</artifactId>
@@ -179,7 +179,5 @@
 			<version>${jfreesvg.version}</version>
 		</dependency>
 	</dependencies>
-
-	<version>2.0.5-SNAPSHOT</version>
 
 </project>
