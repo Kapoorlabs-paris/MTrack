@@ -13,7 +13,7 @@
 
 	<groupId>net.kapoor</groupId>
 	<artifactId>MTV_Tracker</artifactId>
-	<version>2.0.6-SNAPSHOT</version>
+	<version>2.0.6</version>
 
 	<name>Microtubule Tracker</name>
 	<description>Microtubule tracker.</description>
@@ -161,8 +161,7 @@
 	<dependency>
 			<groupId>org.jgrapht</groupId>
 			<artifactId>jgrapht-core</artifactId>
-			<version>${jgrapht.version}</version>
-		</dependency>
+			</dependency>
 		<dependency>
 			<!-- NB: dependency:analyze erroneously flags this, but it's required -->
 			<groupId>org.apache.poi</groupId>

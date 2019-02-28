@@ -72,7 +72,7 @@ final int endtime;
 		parent.frame.setSize(200, 100);
 		parent.frame.setLocationRelativeTo(parent.panelCont);
 		parent.frame.setVisible(true);
-
+		System.out.println(parent.addToName);
 		SingleProgressTrack trackMT = new SingleProgressTrack(parent, starttime, endtime);
 		trackMT.execute();
 

@@ -136,7 +136,6 @@ public class PreprocessFlatNext extends SwingWorker<Void, Void> {
 					new Interactive_MTSingleChannel(parent.originalimg, parent.originalPreprocessedimg, parent.psf, parent.calibration,
 							parent.userfile, parent.addToName).run(null);
 				
-				
 			}
 			
 			parent.frame.dispose();
