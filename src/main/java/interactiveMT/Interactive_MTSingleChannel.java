@@ -648,7 +648,7 @@ public class Interactive_MTSingleChannel implements PlugIn {
 		 newends = new SingleMarkendsnew(this);
 		SaveTxt = true;
 		
-		
+		System.out.println(addToName + " " + userfile);
 		AllSeedrois = new ArrayList<OvalRoi>();
 		jpb = new JProgressBar();
 		newHoughtree = new HashMap<Integer, MserTree<UnsignedByteType>>();

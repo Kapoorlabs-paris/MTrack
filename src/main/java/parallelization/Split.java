@@ -116,7 +116,7 @@ public class Split implements Runnable  {
 			System.out.println(parent.parent.addToName);
 			System.out.println(parent.batchfolder);
 			
-			double percent = Math.round(100 * (fileindex + 1) / (parent.AllImages.length - 1));
+			double percent = Math.round(100 * (fileindex + 1) / (parent.AllImages.length));
 
 			FitterUtils.SetProgressBarTime(fileprogress, percent, (fileindex + 1), (parent.AllImages.length), "Processing File (please wait)");
 

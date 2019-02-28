@@ -105,7 +105,7 @@ public class Interactive_MTSingleChannelBasic implements PlugIn {
 
 	@Override
 	public void run(String arg) {
-	
+		System.out.println(parent.addToName + " " + parent.userfile);
 		parent.usefolder = parent.userfile.getParentFile().getAbsolutePath();
 
 		parent.FindLinesViaMSER = true;
@@ -257,7 +257,6 @@ public class Interactive_MTSingleChannelBasic implements PlugIn {
 		
 
 		
-		parent.addToName = inputField.getText();
 		
 		
 		panelFirst.setLayout(layout);

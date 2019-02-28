@@ -132,7 +132,7 @@ public class SingleCreateINIfile {
 		
 		LocalPrefs.set("SaveTxt.boolean", parent.SaveTxt);
 		 LocalPrefs.set("autothreshold.boolean", parent.autothreshold);
-	        LocalPrefs.setHomeDir(parent.userfile.getParent());
+	        LocalPrefs.setHomeDir(parent.userfile.getPath());
 	        System.out.println(LocalPrefs.getHomeDir() + " " + LocalPrefs.getPrefsDir());
 		LocalPrefs.savePreferences();
 		

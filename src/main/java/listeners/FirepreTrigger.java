@@ -137,7 +137,6 @@ public class FirepreTrigger implements ActionListener {
 							parent.processSlice(slice, outputSlice);
 						}
 						Normalize.normalize(Views.iterable(totalimg), parent.minval, parent.maxval);
-						ImageJFunctions.show(totalimg).setTitle("Preprocessed Movie");
 						
 						parent.originalPreprocessedimg = totalimg;
 					
@@ -179,7 +178,6 @@ public class FirepreTrigger implements ActionListener {
 			
 			// Open Surrey lab images
 			
-			ImageJFunctions.show(parent.originalPreprocessedimg).setTitle("Preprocessed Movie");
 		
 			if (parent.Simplemode)
 				new Interactive_MTSingleChannelBasic(new Interactive_MTSingleChannel(parent.originalimg, parent.originalPreprocessedimg,
