@@ -91,7 +91,7 @@ public class SingleSkipFramesandTrackendsListener implements ActionListener {
 		else
 		parent.frame.setLocationRelativeTo(child.panelCont);	
 		parent.frame.setVisible(true);
-
+		System.out.println(parent.addToName);
 		
 		if (child!=null){
 			SingleProgressSkip trackMT = new SingleProgressSkip(parent, child);

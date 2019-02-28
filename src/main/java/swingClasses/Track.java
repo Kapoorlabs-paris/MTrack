@@ -599,10 +599,10 @@ public class Track {
 		parent.displaystack();
 		if (parent.displayoverlay) {
 			parent.prestack.deleteLastSlice();
-			new ImagePlus(parent.addToName + "Overlays", parent.prestack).show();
+			new ImagePlus(parent.userfile + "Overlays", parent.prestack).show();
 		}
 
-		DisplayID.displayseeds(parent.addToName, Views.hyperSlice(parent.originalimg, 2, 0), parent.IDALL);
+		DisplayID.displayseeds(parent.userfile.getName(), Views.hyperSlice(parent.originalimg, 2, 0), parent.IDALL);
 	}
 
 

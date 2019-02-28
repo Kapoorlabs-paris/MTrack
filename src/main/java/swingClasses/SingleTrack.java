@@ -69,6 +69,7 @@ public  class SingleTrack {
 	public SingleTrack(final Interactive_MTSingleChannel parent){
 	
 		this.parent = parent;
+		
 	}
 	
 	

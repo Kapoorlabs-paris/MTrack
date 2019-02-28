@@ -192,7 +192,6 @@ final Interactive_MTSingleChannelBasic child;
 			parent.jpb.setIndeterminate(false);
 			get();
 			
-
 			
 			if (child!=null){
 				child.controlnext.removeAll();
