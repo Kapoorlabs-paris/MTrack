@@ -200,8 +200,9 @@ public  class SingleTrackBatch {
 				impstartsec.draw();
 				impstartsec.setTitle("Graph Start A MT");
 				FileSaver fsB = new FileSaver(impstartsec);
-				fsB.saveAsTiff(  parent.batchfolder + "//" + parent.parent.addToName + ".tif");
+				fsB.saveAsTiff(  parent.batchfolder + "//" + parent.parent.addToName +"IDFile" +  ".tif");
 
+				impstartsec.close();
 			
 			}
 			if (parent.Allend.get(0).size() > 0) {
@@ -215,7 +216,8 @@ public  class SingleTrackBatch {
 				impendsec.draw();
 				impendsec.setTitle("Graph Start B MT");
 				FileSaver fsB = new FileSaver(impendsec);
-				fsB.saveAsTiff(  parent.batchfolder + "//" + parent.parent.addToName + ".tif");
+				fsB.saveAsTiff(  parent.batchfolder + "//" + parent.parent.addToName + "IDFile" + ".tif");
+				impendsec.close();
 				
 			}
 			
@@ -229,7 +231,8 @@ public  class SingleTrackBatch {
 				impstartsec.draw();
 				impstartsec.setTitle("Graph Start User MT");
 				FileSaver fsB = new FileSaver(impstartsec);
-				fsB.saveAsTiff(  parent.batchfolder + "//" + parent.parent.addToName + ".tif");
+				fsB.saveAsTiff(  parent.batchfolder + "//" + parent.parent.addToName + "IDFile" + ".tif");
+				impstartsec.close();
 			}
 			
 
