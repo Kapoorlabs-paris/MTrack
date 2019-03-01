@@ -105,9 +105,10 @@ public class SingleFindlinesVia {
 			   endStateVectors.addAll(ParallelgrowthtrackerStart.getendStateVectors());
 
 			   tasksStart.clear();
+			 
 		 }
 		 
-		
+		  taskExecutorStart.shutdown();
 			Pair<ArrayList<Indexedlength>,ArrayList<Indexedlength>> NewFrameparam = new ValuePair<ArrayList<Indexedlength>,ArrayList<Indexedlength>>(NewFrameparamStart,NewFrameparamEnd );
 			Pair<ArrayList<Trackproperties>, ArrayList<Trackproperties>> Statevectors = new ValuePair<ArrayList<Trackproperties>, ArrayList<Trackproperties>>(startStateVectors, endStateVectors); 
 			Pair<Pair<ArrayList<Trackproperties>, ArrayList<Trackproperties>>,Pair<ArrayList<Indexedlength>,ArrayList<Indexedlength>>>  returnVector = 
@@ -167,9 +168,10 @@ public class SingleFindlinesVia {
 		   startStateVectors.addAll(ParallelgrowthtrackerStart.getstartStateVectors());
 
 		   tasksStart.clear();
+		  
 		}
 		
-
+		 taskExecutorStart.shutdown();
 		
 			
 	

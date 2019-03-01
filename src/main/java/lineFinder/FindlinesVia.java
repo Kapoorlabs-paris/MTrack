@@ -129,7 +129,9 @@ public  class FindlinesVia {
 		   NewFrameparamStart.addAll( ParallelgrowthtrackerStart.getResult());
 		   startStateVectors.addAll(ParallelgrowthtrackerStart.getstartStateVectors());
 			tasksStart.clear();
+			
 			}
+			 taskExecutorStart.shutdown();
 			 if(PrevFrameparam.getB().size() > 0)
 			for(int index = 0; index < PrevFrameparam.getB().size(); ++index) {
 				final ParallelSubpixelVelocityPCLineStart ParallelgrowthtrackerEnd = new ParallelSubpixelVelocityPCLineStart(source, linefinder,
@@ -151,8 +153,9 @@ public  class FindlinesVia {
 			   NewFrameparamEnd.addAll(ParallelgrowthtrackerEnd.getResult());
 			   endStateVectors.addAll(ParallelgrowthtrackerEnd.getstartStateVectors());
 			   tasksEnd.clear();
+		
 				}
-			
+			   taskExecutorEnd.shutdown();
 			
 			Pair<ArrayList<Indexedlength>,ArrayList<Indexedlength>> NewFrameparam = new ValuePair<ArrayList<Indexedlength>,ArrayList<Indexedlength>>(NewFrameparamStart,NewFrameparamEnd );
 		
@@ -216,8 +219,9 @@ public  class FindlinesVia {
 		   NewFrameparamStart.addAll( ParallelgrowthtrackerStart.getResult());
 		   startStateVectors.addAll(ParallelgrowthtrackerStart.getstartStateVectors());
 		   tasksStart.clear();
+		  
 		}
-		
+		 taskExecutorStart.shutdown();
 
 		
 			
