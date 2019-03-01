@@ -40,6 +40,7 @@ import graphconstructs.Trackproperties;
 import ij.ImagePlus;
 import ij.gui.Line;
 import ij.gui.Overlay;
+import ij.io.FileSaver;
 import ij.measure.ResultsTable;
 import ij.plugin.frame.RoiManager;
 import interactiveMT.Interactive_MTSingleChannel.ValueChange;
@@ -65,6 +66,7 @@ public  class SingleTrackBatch {
     	ArrayList<PlusMinusSeed> plusminusendlist = new ArrayList<PlusMinusSeed>();
     	HashMap<Integer, Double> startseedmap = new HashMap<Integer, Double>();
     	HashMap<Integer, Double> endseedmap = new HashMap<Integer, Double>();
+    	 private volatile boolean exit = false;
 	public SingleTrackBatch(final SingleBatchMode parent){
 	
 		this.parent = parent;
@@ -75,6 +77,7 @@ public  class SingleTrackBatch {
 	
 	public  void Trackobject(final int next, final int endtime) {
 
+		while(!exit) {
 		parent.thirdDimensionSize = endtime;
 
 		for (int index = next; index <= endtime; ++index) {
@@ -196,6 +199,9 @@ public  class SingleTrackBatch {
 				displaygraphtrackstart.getImp();
 				impstartsec.draw();
 				impstartsec.setTitle("Graph Start A MT");
+				FileSaver fsB = new FileSaver(impstartsec);
+				fsB.saveAsTiff(  parent.batchfolder + "//" + parent.parent.addToName + ".tif");
+
 			
 			}
 			if (parent.Allend.get(0).size() > 0) {
@@ -208,6 +214,8 @@ public  class SingleTrackBatch {
 				displaygraphtrackend.getImp();
 				impendsec.draw();
 				impendsec.setTitle("Graph Start B MT");
+				FileSaver fsB = new FileSaver(impendsec);
+				fsB.saveAsTiff(  parent.batchfolder + "//" + parent.parent.addToName + ".tif");
 				
 			}
 			
@@ -220,10 +228,11 @@ public  class SingleTrackBatch {
 				displaygraphtrackstart.getImp();
 				impstartsec.draw();
 				impstartsec.setTitle("Graph Start User MT");
+				FileSaver fsB = new FileSaver(impstartsec);
+				fsB.saveAsTiff(  parent.batchfolder + "//" + parent.parent.addToName + ".tif");
 			}
 			
 
-			ResultsTable rtAll = new ResultsTable();
 			int MaxSeedLabel, MinSeedLabel;
 			
 		
@@ -684,7 +693,11 @@ public  class SingleTrackBatch {
 
 			parent.frame.dispose();
 			DisplayID.displayseeds(parent.parent.addToName,Views.hyperSlice(parent.originalimg, 2, 0), parent.IDALL);
+			
 		}
+}
 
-
+	public void stop(){
+        exit = true;
+    }
 }

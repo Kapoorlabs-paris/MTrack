@@ -410,7 +410,7 @@ public class Split implements Runnable  {
 			TrackBatch newtrack = new TrackBatch(parent);
 			newtrack.Trackobject(next, parent.thirdDimensionSize);
 
-		
+		   newtrack.stop();
 
 		}
 

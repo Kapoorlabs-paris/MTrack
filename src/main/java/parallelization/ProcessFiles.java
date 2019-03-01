@@ -37,22 +37,21 @@ import interactiveMT.SingleBatchMode;
 public class ProcessFiles  {
 
 	public static void process(File[] directory, ExecutorService taskexecutor) {
-		 List<Callable<Object>> tasks = new ArrayList<Callable<Object>>();
 		 
 		for (int fileindex = 0; fileindex < directory.length; ++fileindex) {
 			
+			
 			BatchMode parent = new BatchMode(directory, new Interactive_MTDoubleChannel(), directory[0]);
-			 tasks.add(Executors.callable(new Split(directory[fileindex], parent, fileindex)));
+			Split mySplit = new Split(directory[fileindex], parent, fileindex);
+			
+			 taskexecutor.submit(mySplit);
+
 			
 			
 			
 			
 		}
-		try {
-			taskexecutor.invokeAll(tasks);
-		} catch (InterruptedException e1) {
-			// TODO Auto-generated catch block
-		}
+	
 		
 		
 		
@@ -64,22 +63,18 @@ public class ProcessFiles  {
 	
 	
 	public static void processSingle(File[] directory, ExecutorService taskexecutor) {
-		 List<Callable<Object>> tasks = new ArrayList<Callable<Object>>();
 		for (int fileindex = 0; fileindex < directory.length; ++fileindex) {
 		
 		
 			SingleBatchMode parent = new SingleBatchMode(directory, new Interactive_MTSingleChannel(), directory[0]);
-			 tasks.add(Executors.callable(new SplitSingleChannel(directory[fileindex], parent, fileindex)));
-		
+			
+			SplitSingleChannel mySplit = new SplitSingleChannel(directory[fileindex], parent, fileindex);
+			taskexecutor.submit(mySplit);
 		
 		}
 		
 		
-		try {
-			taskexecutor.invokeAll(tasks);
-		} catch (InterruptedException e1) {
-			// TODO Auto-generated catch block
-		}
+	
 		
 		
 		

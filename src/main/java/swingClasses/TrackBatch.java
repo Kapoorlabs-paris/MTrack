@@ -42,6 +42,7 @@ import ij.IJ;
 import ij.ImagePlus;
 import ij.gui.Line;
 import ij.gui.Overlay;
+import ij.io.FileSaver;
 import ij.measure.ResultsTable;
 import ij.plugin.frame.RoiManager;
 import interactiveMT.BatchMode;
@@ -67,6 +68,7 @@ public class TrackBatch {
 	ArrayList<PlusMinusSeed> plusminusendlist = new ArrayList<PlusMinusSeed>();
 	HashMap<Integer, Double> startseedmap = new HashMap<Integer, Double>();
 	HashMap<Integer, Double> endseedmap = new HashMap<Integer, Double>();
+	 private volatile boolean exit = false;
 	public TrackBatch(final BatchMode parent) {
 
 		this.parent = parent;
@@ -77,6 +79,7 @@ public class TrackBatch {
 
 		parent.thirdDimensionSize = endtime;
 
+		while(!exit){
 		for (int index = next; index <= endtime; ++index) {
 
 			parent.displayBitimg = false;
@@ -172,21 +175,44 @@ public class TrackBatch {
 		}
 
 		if (parent.Allstart.get(0).size() > 0) {
+			ImagePlus impstartsec = ImageJFunctions.show(parent.originalimg);
 			final Trackstart trackerstart = new Trackstart(parent.Allstart, parent.thirdDimensionSize - next);
 			trackerstart.process();
+			SimpleWeightedGraph<double[], DefaultWeightedEdge> graphstart = trackerstart.getResult();
+			DisplayGraph displaygraphtrackstart = new DisplayGraph(impstartsec, graphstart);
+			displaygraphtrackstart.getImp();
+			impstartsec.draw();
+			impstartsec.setTitle("Graph Start A MT");
+			FileSaver fsB = new FileSaver(impstartsec);
+			fsB.saveAsTiff(  parent.batchfolder + "//" + parent.parent.addToName + ".tif");
 
 		}
 		if (parent.Allend.get(0).size() > 0) {
+			ImagePlus impendsec = ImageJFunctions.show(parent.originalimg);
 			final Trackend trackerend = new Trackend(parent.Allend, parent.thirdDimensionSize - next);
 
 			trackerend.process();
+			SimpleWeightedGraph<double[], DefaultWeightedEdge> graphend = trackerend.getResult();
+			DisplayGraph displaygraphtrackend = new DisplayGraph(impendsec, graphend);
+			displaygraphtrackend.getImp();
+			impendsec.draw();
+			impendsec.setTitle("Graph Start B MT");
+			FileSaver fsB = new FileSaver(impendsec);
+			fsB.saveAsTiff(  parent.batchfolder + "//" + parent.parent.addToName + ".tif");
 
 		}
 
 		if (parent.returnVectorUser != null && parent.AllUser.get(0).size() > 0) {
+			ImagePlus impstartsec = ImageJFunctions.show(parent.originalimg);
 			final Trackstart trackerstart = new Trackstart(parent.AllUser, parent.thirdDimensionSize - next);
 			trackerstart.process();
-
+			SimpleWeightedGraph<double[], DefaultWeightedEdge> graphstart = trackerstart.getResult();
+			DisplayGraph displaygraphtrackstart = new DisplayGraph(impstartsec, graphstart);
+			displaygraphtrackstart.getImp();
+			impstartsec.draw();
+			impstartsec.setTitle("Graph Start User MT");
+			FileSaver fsB = new FileSaver(impstartsec);
+			fsB.saveAsTiff(  parent.batchfolder + "//" + parent.parent.addToName + ".tif");
 		}
 
 
@@ -660,5 +686,9 @@ public class TrackBatch {
 		parent.frame.dispose();
 		DisplayID.displayseeds(parent.parent.addToName,Views.hyperSlice(parent.originalimg, 2, 0), parent.IDALL);
 	}
-
+	
+}
+	 public void stop(){
+	        exit = true;
+	    }
 }
