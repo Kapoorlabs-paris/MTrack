@@ -409,7 +409,7 @@ public class SplitSingleChannel implements Runnable  {
 			SingleTrackBatch newtrack = new SingleTrackBatch(parent);
 			newtrack.Trackobject(next, parent.thirdDimensionSize);
 
-		
+			 newtrack.stop();
 
 		}
 
