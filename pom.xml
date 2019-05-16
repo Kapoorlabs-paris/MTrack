@@ -6,7 +6,7 @@
 		<groupId>org.scijava</groupId>
 		<artifactId>pom-scijava</artifactId>
 
-		<version>25.0.0</version>
+		<version>26.0.0</version>
 
 		<relativePath />
 	</parent>
@@ -35,7 +35,7 @@
 		<developer>
 			<id>kapoorlab</id>
 			<name>Varun Kapoor</name>
-			<url>http://imagej.net/User:MTrack</url>
+			<url>https://imagej.net/User:MTrack</url>
 			<roles>
 				<role>founder</role>
 				<role>lead</role>
@@ -50,20 +50,20 @@
 	<contributors>
 		<contributor>
 			<name>Curtis Rueden</name>
-			<url>http://imagej.net/User:Rueden</url>
+			<url>https://imagej.net/User:Rueden</url>
 			<properties><id>ctrueden</id></properties>
 		</contributor>
 		<contributor>
 			<name>Jan Eglinger</name>
-			<url>http://imagej.net/User:Eglinger</url>
+			<url>https://imagej.net/User:Eglinger</url>
 			<properties><id>imagejan</id></properties>
 		</contributor>
 	</contributors>
 
 	<mailingLists>
 		<mailingList>
-			<name>ImageJ Forum</name>
-			<archive>http://forum.imagej.net/</archive>
+			<name>Image.sc Forum</name>
+			<archive>https://forum.image.sc/tags/mtrack</archive>
 		</mailingList>
 	</mailingLists>
 
@@ -89,14 +89,14 @@
 
 		<jfreesvg.version>3.3</jfreesvg.version>
 
-		<!-- NB: Deploy releases to the ImageJ Maven repository. -->
-		<releaseProfiles>deploy-to-imagej</releaseProfiles>
+		<!-- NB: Deploy releases to the SciJava Maven repository. -->
+		<releaseProfiles>deploy-to-scijava</releaseProfiles>
 	</properties>
 
 	<repositories>
 		<repository>
-			<id>imagej.public</id>
-			<url>http://maven.imagej.net/content/groups/public</url>
+			<id>scijava.public</id>
+			<url>https://maven.scijava.org/content/groups/public</url>
 		</repository>
 	</repositories>
 
