@@ -5,23 +5,21 @@
 	<parent>
 		<groupId>org.scijava</groupId>
 		<artifactId>pom-scijava</artifactId>
-
 		<version>25.0.0</version>
-
 		<relativePath />
 	</parent>
 
-	<groupId>net.kapoor</groupId>
-	<artifactId>MTV_Tracker</artifactId>
-	<version>2.0.7</version>
+	<groupId>net.imagej</groupId>
+	<artifactId>MTrack</artifactId>
+	<version>3.0.0</version>
 
-	<name>Microtubule Tracker</name>
-	<description>Microtubule tracker.</description>
+	<name>MTrack</name>
+	<description>MTrack</description>
 	<url>https://github.com/kapoorlab/MTrack</url>
 	<inceptionYear>2017</inceptionYear>
 	<organization>
-		<name>Preibisch Lab</name>
-		<url>http://preibischlab.mdc-berlin.de</url>
+		<name>Kapoor Lab</name>
+		<url>https://science.institut-curie.org/platforms/cell-and-tissue-imaging/photonics/contacts</url>
 	</organization>
 	<licenses>
 		<license>
