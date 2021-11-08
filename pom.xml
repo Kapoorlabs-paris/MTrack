@@ -68,7 +68,7 @@
 	</mailingLists>
 
 	<scm>
-		<connection>scm:git:git://github.com/kapoorlab/MTrack</connection>
+		<connection>scm:git:https://github.com/kapoorlab/MTrack</connection>
 		<developerConnection>scm:git:git@github.com/kapoorlab/MTrack</developerConnection>
 		<tag>HEAD</tag>
 		<url>https://github.com/kapoorlab/MTrack</url>
