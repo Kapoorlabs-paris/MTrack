@@ -1,4 +1,4 @@
-[![](https://travis-ci.org/PreibischLab/MTrack.svg?branch=master)](https://travis-ci.org/PreibischLab/MTrack)
+[![](https://github.com/kapoorlab/MTrack/actions/workflows/build-main.yml/badge.svg)](https://github.com/kapoorlab/MTrack/actions/workflows/build-main.yml)
 
 # MTrack
 
