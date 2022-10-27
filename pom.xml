@@ -9,7 +9,7 @@
 		<relativePath />
 	</parent>
 
-	<groupId>net.imagej</groupId>
+	<groupId>org.kapoorlabs</groupId>
 	<artifactId>MTrack</artifactId>
 	<version>3.0.1-SNAPSHOT</version>
 
@@ -18,8 +18,8 @@
 	<url>https://github.com/Kapoorlabs-paris/MTrack</url>
 	<inceptionYear>2017</inceptionYear>
 	<organization>
-		<name>Kapoor Lab</name>
-		<url>https://science.institut-curie.org/platforms/cell-and-tissue-imaging/photonics/contacts</url>
+		<name>Kapoor Labs</name>
+		<url>https://kapoorlabs.org/</url>
 	</organization>
 	<licenses>
 		<license>
