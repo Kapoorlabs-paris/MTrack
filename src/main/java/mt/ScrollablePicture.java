@@ -28,8 +28,6 @@ import javax.swing.JLabel;
 import javax.swing.Scrollable;
 import javax.swing.SwingConstants;
 
-import com.sun.java.swing.*;
-
 public class ScrollablePicture extends JLabel implements Scrollable {
 
     private int maxUnitIncrement = 1;
