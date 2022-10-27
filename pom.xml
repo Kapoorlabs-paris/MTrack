@@ -33,7 +33,7 @@
 		<developer>
 			<id>kapoorlab</id>
 			<name>Varun Kapoor</name>
-			<url>https://imagej.net/User:MTrack</url>
+			<url>https://imagej.net/people/kapoorlab</url>
 			<roles>
 				<role>founder</role>
 				<role>lead</role>
@@ -48,12 +48,12 @@
 	<contributors>
 		<contributor>
 			<name>Curtis Rueden</name>
-			<url>https://imagej.net/User:Rueden</url>
+			<url>https://imagej.net/people/ctrueden</url>
 			<properties><id>ctrueden</id></properties>
 		</contributor>
 		<contributor>
 			<name>Jan Eglinger</name>
-			<url>https://imagej.net/User:Eglinger</url>
+			<url>https://imagej.net/people/imagejan</url>
 			<properties><id>imagejan</id></properties>
 		</contributor>
 	</contributors>
