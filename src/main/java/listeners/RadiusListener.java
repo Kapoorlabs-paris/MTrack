@@ -2,7 +2,7 @@
  * #%L
  * Microtubule tracker.
  * %%
- * Copyright (C) 2017 MTrack developers.
+ * Copyright (C) 2017 - 2022 MTrack developers.
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as

@@ -82,6 +82,7 @@
 
 	<properties>
 		<license.licenseName>gpl_v3</license.licenseName>
+		<license.projectName>Microtubule tracker.</license.projectName>
 		<license.copyrightOwners>MTrack developers.</license.copyrightOwners>
 
 		<!-- NB: Deploy releases to the SciJava Maven repository. -->
