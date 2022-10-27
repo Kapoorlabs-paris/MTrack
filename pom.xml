@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.scijava</groupId>
 		<artifactId>pom-scijava</artifactId>
-		<version>26.0.0</version>
+		<version>33.2.0</version>
 		<relativePath />
 	</parent>
 
@@ -84,9 +84,6 @@
 		<license.licenseName>gpl_v3</license.licenseName>
 		<license.copyrightOwners>MTrack developers.</license.copyrightOwners>
 
-
-		<jfreesvg.version>3.3</jfreesvg.version>
-
 		<!-- NB: Deploy releases to the SciJava Maven repository. -->
 		<releaseProfiles>deploy-to-scijava</releaseProfiles>
 	</properties>
@@ -122,9 +119,6 @@
 			<groupId>net.imagej</groupId>
 			<artifactId>ij</artifactId>
 		</dependency>
-<!-- https://mvnrepository.com/artifact/org.apache.xmlgraphics/batik-svggen -->
-<!-- https://mvnrepository.com/artifact/org.jfree/jfreesvg -->
-
 
 		<!-- Fiji dependencies -->
 		<dependency>
@@ -155,11 +149,10 @@
 			<groupId>mpicbg</groupId>
 			<artifactId>mpicbg</artifactId>
 		</dependency>
-	
-	<dependency>
+		<dependency>
 			<groupId>org.jgrapht</groupId>
 			<artifactId>jgrapht-core</artifactId>
-			</dependency>
+		</dependency>
 		<dependency>
 			<!-- NB: dependency:analyze erroneously flags this, but it's required -->
 			<groupId>org.apache.poi</groupId>
@@ -173,8 +166,6 @@
 			<!-- NB: dependency:analyze erroneously flags this, but it's required -->
 			<groupId>org.jfree</groupId>
 			<artifactId>jfreesvg</artifactId>
-			<version>${jfreesvg.version}</version>
 		</dependency>
 	</dependencies>
-
 </project>
