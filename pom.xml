@@ -15,7 +15,7 @@
 
 	<name>MTrack</name>
 	<description>MTrack</description>
-	<url>https://github.com/kapoorlab/MTrack</url>
+	<url>https://github.com/Kapoorlabs-paris/MTrack</url>
 	<inceptionYear>2017</inceptionYear>
 	<organization>
 		<name>Kapoor Lab</name>
@@ -66,18 +66,18 @@
 	</mailingLists>
 
 	<scm>
-		<connection>scm:git:https://github.com/kapoorlab/MTrack</connection>
-		<developerConnection>scm:git:git@github.com/kapoorlab/MTrack</developerConnection>
+		<connection>scm:git:https://github.com/Kapoorlabs-paris/MTrack</connection>
+		<developerConnection>scm:git:git@github.com/Kapoorlabs-paris/MTrack</developerConnection>
 		<tag>HEAD</tag>
-		<url>https://github.com/kapoorlab/MTrack</url>
+		<url>https://github.com/Kapoorlabs-paris/MTrack</url>
 	</scm>
 	<issueManagement>
 		<system>GitHub Issues</system>
-		<url>https://github.com/PreibischLab/MTrack/issues</url>
+		<url>https://github.com/Kapoorlabs-paris/MTrack/issues</url>
 	</issueManagement>
 	<ciManagement>
 		<system>GitHub Actions</system>
-		<url>https://github.com/kapoorlab/MTrack/actions</url>
+		<url>https://github.com/Kapoorlabs-paris/MTrack/actions</url>
 	</ciManagement>
 
 	<properties>
