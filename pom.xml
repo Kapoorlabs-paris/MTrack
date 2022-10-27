@@ -87,6 +87,9 @@
 
 		<!-- NB: Deploy releases to the SciJava Maven repository. -->
 		<releaseProfiles>deploy-to-scijava</releaseProfiles>
+
+		<!-- Skip javadoc linting, due to embedded 3rd party library. -->
+		<doclint>none</doclint>
 	</properties>
 
 	<repositories>
